@@ -197,6 +197,7 @@ public class AssetEntryFinderImpl
 			sb.append("(AssetTag.tagId = AssetEntries_AssetTags.tagId) ");
 		}
 
+		/*
 		if (entryQuery.getAnyCategoryIds().length > 0) {
 			sb.append("INNER JOIN ");
 			sb.append("AssetEntries_AssetCategories ON ");
@@ -207,6 +208,7 @@ public class AssetEntryFinderImpl
 			sb.append("(AssetCategory.categoryId = ");
 			sb.append("AssetEntries_AssetCategories.categoryId) ");
 		}
+		*/
 
 		if (entryQuery.getAllCategoryIds().length > 0) {
 			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
