@@ -624,6 +624,21 @@ public interface LayoutLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns the default layout for the guest group of the given company.
+	*
+	* @param companyId the primary key of the company
+	* @return The default layout for the guest group of the given company or
+	null if no such layout exists
+	* @throws PortalException if the guest group for the given company could
+	not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.Layout getDefaultLayout(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns the layout for the friendly URL
 	*
 	* @param groupId the primary key of the group
