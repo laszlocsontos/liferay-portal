@@ -56,6 +56,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 		TransactionalCallbackAwareExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Transactional
 public class LayoutSetPrototypeTest extends BaseExportImportTestCase {
 
 	@Before
@@ -66,37 +67,31 @@ public class LayoutSetPrototypeTest extends BaseExportImportTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkDisabled() throws Exception {
 		runLayoutSetPrototype(false, false, false, false, false);
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkDisabledWithPageAddition() throws Exception {
 		runLayoutSetPrototype(false, false, true, false, false);
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkDisabledWithPageDeletion() throws Exception {
 		runLayoutSetPrototype(false, false, true, true, false);
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkEnabled() throws Exception {
 		runLayoutSetPrototype(true, false, false, false, false);
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkEnabledwithPageAddition() throws Exception {
 		runLayoutSetPrototype(true, false, true, false, false);
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkEnabledwithPageAdditionFromLPLinkDisabled()
 		throws Exception {
 
@@ -104,7 +99,6 @@ public class LayoutSetPrototypeTest extends BaseExportImportTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkEnabledwithPageAdditionFromLPLinkEnabled()
 		throws Exception {
 
@@ -112,19 +106,16 @@ public class LayoutSetPrototypeTest extends BaseExportImportTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkEnabledwithPageDeletion() throws Exception {
 		runLayoutSetPrototype(true, false, true, true, false);
 	}
 
 	@Test
-	@Transactional
 	public void testLSPLinkEnabledwithPageDeletionFromLP() throws Exception {
 		runLayoutSetPrototype(true, false, true, true, true);
 	}
 
 	@Test
-	@Transactional
 	public void testMergeLayoutPrototypeLayout() throws Exception {
 
 		// Add site template
