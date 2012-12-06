@@ -190,27 +190,24 @@ public class LayoutSetPrototypeTest extends BaseExportImportTestCase {
 		UnicodeProperties layoutProperties = layout.getTypeSettingsProperties();
 
 		int mergeFailCount = GetterUtil.getInteger(
-			layoutProperties.get(
-				SitesUtil.PROP_MERGE_FAIL_COUNT));
+			layoutProperties.get(SitesUtil.MERGE_FAIL_COUNT));
 
 		Assert.assertEquals(0, mergeFailCount);
 
-		layoutProperties.remove(SitesUtil.PROP_LAST_MERGE_TIME);
-		layoutProperties.remove(SitesUtil.PROP_MERGE_FAIL_COUNT);
+		layoutProperties.remove(SitesUtil.LAST_MERGE_TIME);
+		layoutProperties.remove(SitesUtil.MERGE_FAIL_COUNT);
 
 		UnicodeProperties layoutPrototypeLayoutProperties =
 			layoutPrototypeLayout.getTypeSettingsProperties();
 
 		mergeFailCount = GetterUtil.getInteger(
-			layoutPrototypeLayoutProperties.get(
-				SitesUtil.PROP_MERGE_FAIL_COUNT));
+			layoutPrototypeLayoutProperties.get(SitesUtil.MERGE_FAIL_COUNT));
 
 		Assert.assertEquals(0, mergeFailCount);
 
-		layoutPrototypeLayoutProperties.remove(SitesUtil.PROP_MERGE_FAIL_COUNT);
+		layoutPrototypeLayoutProperties.remove(SitesUtil.MERGE_FAIL_COUNT);
 
 		Assert.assertEquals(layoutPrototypeLayoutProperties, layoutProperties);
-
 	}
 
 	protected void runLayoutSetPrototype(
