@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.lar;
+package com.liferay.portal.layout;
 
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
@@ -57,7 +57,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Transactional
-public class LayoutSetPrototypeTest extends BaseExportImportTestCase {
+public class LayoutSetPrototypeTest extends BaseLayoutSetPrototypeTestCase {
 
 	@Before
 	public void setUp() throws Exception {
@@ -134,19 +134,19 @@ public class LayoutSetPrototypeTest extends BaseExportImportTestCase {
 		// Add portlets to page template
 
 		Assert.assertNotNull(
-			addPortlet(
+			ServiceTestUtil.addPortletToLayout(
 				layoutPrototypeLayout, PortletKeys.JOURNAL_CONTENT,
 				"column-1"));
 
 		Assert.assertNotNull(
-			addPortlet(
+			ServiceTestUtil.addPortletToLayout(
 				layoutPrototypeLayout, PortletKeys.WIKI_DISPLAY, "column-2"));
 
 		updateLayoutTemplateId(layoutPrototypeLayout, "2_2_columns");
 
 		Group layoutSetPrototypeGroup = layoutSetPrototype.getGroup();
 
-		addLayout(
+		ServiceTestUtil.addLayout(
 			layoutSetPrototypeGroup.getGroupId(),
 			ServiceTestUtil.randomString(), layoutPrototype, true);
 
@@ -249,7 +249,7 @@ public class LayoutSetPrototypeTest extends BaseExportImportTestCase {
 
 				updateLayoutTemplateId(layoutPrototypeLayout, "2_2_columns");
 
-				layout = addLayout(
+				layout = ServiceTestUtil.addLayout(
 					group.getGroupId(), ServiceTestUtil.randomString(),
 					layoutPrototype, layoutLinkEnabled);
 
