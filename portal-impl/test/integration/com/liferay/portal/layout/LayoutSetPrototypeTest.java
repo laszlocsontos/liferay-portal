@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutPrototype;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.LayoutTypePortletConstants;
@@ -62,6 +63,7 @@ public class LayoutSetPrototypeTest extends BaseLayoutSetPrototypeTestCase {
 	@Before
 	public void setUp() throws Exception {
 		FinderCacheUtil.clearCache();
+
 		ServiceContextThreadLocal.pushServiceContext(
 			ServiceTestUtil.getServiceContext());
 	}
@@ -117,7 +119,6 @@ public class LayoutSetPrototypeTest extends BaseLayoutSetPrototypeTestCase {
 
 	@Test
 	public void testMergeLayoutPrototypeLayout() throws Exception {
-
 		Object[] preparedData = prepareLayoutSetPrototype(true, true, 2);
 
 		Group group = (Group) preparedData[1];
@@ -126,16 +127,15 @@ public class LayoutSetPrototypeTest extends BaseLayoutSetPrototypeTestCase {
 
 		Layout layoutPrototypeLayout = layoutPrototype.getLayout();
 
-		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
-			group.getGroupId(), false);
-
-		Layout layout = layouts.get(0);
+		Layout layout = LayoutLocalServiceUtil.fetchFirstLayout(
+			group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
 		SitesUtil.applyLayoutPrototype(layoutPrototype, layout, true);
 
 		// Change layout of page template
 
-		updateLayoutTemplateId(layoutPrototypeLayout, "1_column");
+		layout = updateLayoutTemplateId(layoutPrototypeLayout, "1_column");
 
 		propagateChanges(layout);
 
