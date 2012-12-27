@@ -276,7 +276,7 @@ public class LayoutSetPrototypeTest extends BaseLayoutSetPrototypeTestCase {
 					layoutPrototype, layoutLinkEnabled);
 
 				if (layoutLinkEnabled) {
-					propagateChanges(layout);
+					layout = propagateChanges(layout);
 				}
 
 				updateLayoutTemplateId(layoutPrototypeLayout, "1_column");
@@ -287,10 +287,17 @@ public class LayoutSetPrototypeTest extends BaseLayoutSetPrototypeTestCase {
 						layout.getTypeSettingsProperty(
 							LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID));
 
-					propagateChanges(layout);
+					layout = propagateChanges(layout);
 				}
 			}
 			else {
+
+				// Database will store Date values without milliseconds. Wait
+				// for more than one second to ensure that later queries can
+				// correctly compare the Date values.
+
+				Thread.sleep(2000);
+
 				layout = ServiceTestUtil.addLayout(
 					layoutSetPrototypeGroup.getGroupId(),
 					ServiceTestUtil.randomString(), true);
@@ -331,7 +338,7 @@ public class LayoutSetPrototypeTest extends BaseLayoutSetPrototypeTestCase {
 
 			if (deletePage) {
 				LayoutLocalServiceUtil.deleteLayout(
-					layout.getPlid(), ServiceTestUtil.getServiceContext());
+					layout, true, ServiceTestUtil.getServiceContext());
 
 				groupLayoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
 					group, false);

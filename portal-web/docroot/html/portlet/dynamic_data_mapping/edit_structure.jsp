@@ -156,7 +156,7 @@ if (Validator.isNotNull(script)) {
 
 				<aui:input name="description" />
 
-				<aui:field-wrapper label="parent-data-definition">
+				<aui:field-wrapper label='<%= LanguageUtil.format(pageContext, "parent-x", scopeStructureName) %>'>
 					<aui:input name="parentStructureId" type="hidden" value="<%= parentStructureId %>" />
 
 					<c:choose>
@@ -214,6 +214,7 @@ if (Validator.isNotNull(script)) {
 	function <portlet:namespace />openParentStructureSelector() {
 		Liferay.Util.openDDMPortlet(
 		{
+			classPK: <%= (structure != null) ? structure.getPrimaryKey() : 0 %>,
 			ddmResource: '<%= ddmResource %>',
 			dialog: {
 				width: 820

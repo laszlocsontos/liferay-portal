@@ -172,7 +172,7 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 	* @param userId the primary key of the user moving the file entry
 	* @param fileEntry the file entry to be moved
 	* @return the moved file entry
-	* @throws PortalExcpetion if a user with the primary key could not be found
+	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryToTrash(
@@ -200,7 +200,7 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 	* @param userId the primary key of the user moving the file shortcut
 	* @param dlFileShortcut the file shortcut to be moved
 	* @return the moved file shortcut
-	* @throws PortalExcpetion if a user with the primary key could not be found
+	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
@@ -235,7 +235,7 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 	* @param userId the primary key of the user moving the folder
 	* @param folder the folder to be moved
 	* @return the moved folder
-	* @throws PortalExcpetion if a user with the primary key could not be found
+	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.kernel.repository.model.Folder moveFolderToTrash(
@@ -288,6 +288,14 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 			fileVersion, assetCategoryIds, assetTagNames, assetLinkEntryIds);
 	}
 
+	public void updateDependentStatus(com.liferay.portal.model.User user,
+		java.util.List<java.lang.Object> dlFileEntriesAndDLFolders, int status)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlAppHelperLocalService.updateDependentStatus(user,
+			dlFileEntriesAndDLFolders, status);
+	}
+
 	public void updateFileEntry(long userId,
 		com.liferay.portal.kernel.repository.model.FileEntry fileEntry,
 		com.liferay.portal.kernel.repository.model.FileVersion sourceFileVersion,
@@ -327,14 +335,6 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 			com.liferay.portal.kernel.exception.SystemException {
 		_dlAppHelperLocalService.updateStatus(userId, fileEntry,
 			latestFileVersion, oldStatus, newStatus, workflowContext);
-	}
-
-	public void updateStatuses(com.liferay.portal.model.User user,
-		java.util.List<java.lang.Object> dlFileEntriesAndDLFolders, int status)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_dlAppHelperLocalService.updateStatuses(user,
-			dlFileEntriesAndDLFolders, status);
 	}
 
 	/**

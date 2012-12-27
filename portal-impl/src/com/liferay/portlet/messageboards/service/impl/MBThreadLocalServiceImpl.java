@@ -301,8 +301,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreads(
-	 * 				long, long, boolean, boolean, QueryDefinition)}
+	 * @deprecated {As of 6.2.0, replaced by @link #getGroupThreads( long, long,
+	 *             boolean, boolean, QueryDefinition)}
 	 */
 	public List<MBThread> getGroupThreads(
 			long groupId, long userId, int status, boolean subscribed,
@@ -317,8 +317,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreads(
-	 * 				long, long, boolean, QueryDefinition)}
+	 * @deprecated {As of 6.2.0, replaced by @link #getGroupThreads( long, long,
+	 *             boolean, QueryDefinition)}
 	 */
 	public List<MBThread> getGroupThreads(
 			long groupId, long userId, int status, boolean subscribed,
@@ -332,8 +332,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreads(
-	 * 				long, long, QueryDefinition)}
+	 * @deprecated {As of 6.2.0, replaced by @link #getGroupThreads( long, long,
+	 *             QueryDefinition)}
 	 */
 	public List<MBThread> getGroupThreads(
 			long groupId, long userId, int status, int start, int end)
@@ -371,8 +371,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreadsCount(
-	 * 				long, QueryDefinition)}
+	 * @deprecated {As of 6.2.0, replaced by @link #getGroupThreadsCount( long,
+	 *             QueryDefinition)}
 	 */
 	public int getGroupThreadsCount(long groupId, int status)
 			throws SystemException {
@@ -418,8 +418,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreadsCount(
-	 * 				long, long, QueryDefinition)}
+	 * @deprecated {As of 6.2.0, replaced by @link #getGroupThreadsCount( long,
+	 *             long, QueryDefinition)}
 	 */
 	public int getGroupThreadsCount(long groupId, long userId, int status)
 		throws SystemException {
@@ -430,8 +430,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreadsCount(
-	 * 				long, long, boolean, QueryDefinition)}
+	 * @deprecated {As of 6.2.0, replaced by @link #getGroupThreadsCount( long,
+	 *             long, boolean, QueryDefinition)}
 	 */
 	public int getGroupThreadsCount(
 			long groupId, long userId, int status, boolean subscribed)
@@ -444,8 +444,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #getGroupThreadsCount(
-	 * 				long, long, boolean, boolean, QueryDefinition)}
+	 * @deprecated {As of 6.2.0, replaced by @link #getGroupThreadsCount( long,
+	 *             long, boolean, boolean, QueryDefinition)}
 	 */
 	public int getGroupThreadsCount(
 			long groupId, long userId, int status, boolean subscribed,
@@ -871,7 +871,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 			// Messages
 
-			updateStatus(threadId, status);
+			updateDependentStatus(threadId, status);
 
 			if (thread.getCategoryId() !=
 					MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
@@ -933,7 +933,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			}
 		}
 		else {
-			updateStatus(threadId, status);
+			updateDependentStatus(threadId, status);
 		}
 
 		return thread;
@@ -986,7 +986,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		return messagesMoved;
 	}
 
-	protected void updateStatus(long threadId, int status)
+	protected void updateDependentStatus(long threadId, int status)
 		throws PortalException, SystemException {
 
 		List<MBMessage> messages = mbMessageLocalService.getThreadMessages(
@@ -997,66 +997,62 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				continue;
 			}
 
-			updateStatus(message, status);
-		}
-	}
+			if (status == WorkflowConstants.STATUS_IN_TRASH) {
 
-	protected void updateStatus(MBMessage message, int status)
-		throws PortalException, SystemException {
+				// Asset
 
-		if (status == WorkflowConstants.STATUS_IN_TRASH) {
+				if (message.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+					assetEntryLocalService.updateVisible(
+						MBMessage.class.getName(), message.getMessageId(),
+						false);
+				}
 
-			// Asset
+				// Social
 
-			if (message.getStatus() == WorkflowConstants.STATUS_APPROVED) {
-				assetEntryLocalService.updateVisible(
-					MBMessage.class.getName(), message.getMessageId(), false);
-			}
-
-			// Social
-
-			socialActivityCounterLocalService.disableActivityCounters(
-				MBMessage.class.getName(), message.getMessageId());
-
-			// Index
-
-			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-				MBMessage.class);
-
-			indexer.reindex(message);
-
-			// Workflow
-
-			if (message.getStatus() == WorkflowConstants.STATUS_PENDING) {
-				message.setStatus(WorkflowConstants.STATUS_DRAFT);
-
-				mbMessagePersistence.update(message);
-
-				workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(
-					message.getCompanyId(), message.getGroupId(),
+				socialActivityCounterLocalService.disableActivityCounters(
 					MBMessage.class.getName(), message.getMessageId());
+
+				// Index
+
+				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+					MBMessage.class);
+
+				indexer.reindex(message);
+
+				// Workflow
+
+				if (message.getStatus() == WorkflowConstants.STATUS_PENDING) {
+					message.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+					mbMessagePersistence.update(message);
+
+					workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(
+						message.getCompanyId(), message.getGroupId(),
+						MBMessage.class.getName(), message.getMessageId());
+				}
 			}
-		}
-		else {
+			else {
 
-			// Asset
+				// Asset
 
-			if (message.getStatus() == WorkflowConstants.STATUS_APPROVED) {
-				assetEntryLocalService.updateVisible(
-					MBMessage.class.getName(), message.getMessageId(), true);
+				if (message.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+					assetEntryLocalService.updateVisible(
+						MBMessage.class.getName(), message.getMessageId(),
+						true);
+				}
+
+				// Social
+
+				socialActivityCounterLocalService.enableActivityCounters(
+					MBMessage.class.getName(), message.getMessageId());
+
+				// Index
+
+				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+					MBMessage.class);
+
+				indexer.reindex(message);
 			}
-
-			// Social
-
-			socialActivityCounterLocalService.enableActivityCounters(
-				MBMessage.class.getName(), message.getMessageId());
-
-			// Index
-
-			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-				MBMessage.class);
-
-			indexer.reindex(message);
 		}
 	}
 
