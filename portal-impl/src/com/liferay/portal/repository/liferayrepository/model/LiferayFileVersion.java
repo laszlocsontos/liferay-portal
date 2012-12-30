@@ -179,8 +179,8 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 		return _dlFileVersion.getTitle();
 	}
 
-	public DLFolder getTrashFolder() {
-		return _dlFileVersion.getTrashFolder();
+	public DLFolder getTrashContainer() {
+		return _dlFileVersion.getTrashContainer();
 	}
 
 	public long getUserId() {
@@ -232,8 +232,8 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 		return _dlFileVersion.isInTrash();
 	}
 
-	public boolean isInTrashFolder() {
-		return _dlFileVersion.isInTrashFolder();
+	public boolean isInTrashContainer() {
+		return _dlFileVersion.isInTrashContainer();
 	}
 
 	public boolean isPending() {
@@ -283,6 +283,11 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 			return new LiferayFileVersion(
 				_dlFileVersion.toEscapedModel(), true);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return _dlFileVersion.toString();
 	}
 
 	public FileVersion toUnescapedModel() {

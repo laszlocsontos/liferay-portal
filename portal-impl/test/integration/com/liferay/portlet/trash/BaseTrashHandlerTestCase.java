@@ -37,6 +37,7 @@ import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.service.TrashEntryLocalServiceUtil;
 
@@ -86,6 +87,18 @@ public abstract class BaseTrashHandlerTestCase {
 	@Transactional
 	public void testTrashAndRestoreDraft() throws Exception {
 		trashBaseModel(false, false);
+	}
+
+	@Test
+	@Transactional
+	public void testTrashAssetTagsApproved() throws Exception {
+		trashAssetTags(true);
+	}
+
+	@Test
+	@Transactional
+	public void testTrashAssetTagsDraft() throws Exception {
+		trashAssetTags(false);
 	}
 
 	@Test
@@ -180,6 +193,10 @@ public abstract class BaseTrashHandlerTestCase {
 			BaseModel<?> parentBaseModel)
 		throws Exception;
 
+	protected int getGroupTagsCount(long groupId) throws Exception {
+		return AssetTagLocalServiceUtil.getGroupTagsCount(groupId);
+	}
+
 	protected BaseModel<?> getParentBaseModel(
 			Group group, ServiceContext serviceContext)
 		throws Exception {
@@ -246,7 +263,7 @@ public abstract class BaseTrashHandlerTestCase {
 		return true;
 	}
 
-	protected boolean isInTrashFolder(ClassedModel classedModel)
+	protected boolean isInTrashContainer(ClassedModel classedModel)
 		throws Exception {
 
 		return false;
@@ -295,6 +312,62 @@ public abstract class BaseTrashHandlerTestCase {
 			QueryUtil.ALL_POS, null);
 
 		return results.getLength();
+	}
+
+	protected void trashAssetTags(boolean approved) throws Exception {
+		int initialAssetTagsCount = AssetTagLocalServiceUtil.getGroupTagsCount(
+			group.getGroupId());
+
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
+
+		serviceContext.setScopeGroupId(group.getGroupId());
+
+		BaseModel<?> parentBaseModel = getParentBaseModel(
+			group, serviceContext);
+
+		String[] assetTagNames = {
+			"Content", "Enterprise", "Open", "Source", "For", "Life"
+		};
+
+		serviceContext.setAssetTagNames(assetTagNames);
+
+		baseModel = addBaseModel(parentBaseModel, approved, serviceContext);
+
+		Assert.assertEquals(approved, isAssetEntryVisible(baseModel));
+
+		if (approved) {
+			Assert.assertEquals(
+				initialAssetTagsCount + assetTagNames.length,
+				getGroupTagsCount(group.getGroupId()));
+		}
+		else {
+			Assert.assertEquals(
+				initialAssetTagsCount, getGroupTagsCount(group.getGroupId()));
+		}
+
+		moveBaseModelToTrash((Long)baseModel.getPrimaryKeyObj());
+
+		baseModel = getBaseModel((Long)baseModel.getPrimaryKeyObj());
+
+		Assert.assertEquals(
+			initialAssetTagsCount, getGroupTagsCount(group.getGroupId()));
+
+		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
+			getBaseModelClassName());
+
+		trashHandler.restoreTrashEntry(getTrashEntryClassPK(baseModel));
+
+		Assert.assertEquals(approved, isAssetEntryVisible(baseModel));
+
+		if (approved) {
+			Assert.assertEquals(
+				initialAssetTagsCount + assetTagNames.length,
+				getGroupTagsCount(group.getGroupId()));
+		}
+		else {
+			Assert.assertEquals(
+				initialAssetTagsCount, getGroupTagsCount(group.getGroupId()));
+		}
 	}
 
 	protected void trashBaseModel(boolean approved, boolean delete)
@@ -349,6 +422,8 @@ public abstract class BaseTrashHandlerTestCase {
 
 		Assert.assertEquals(
 			initialTrashEntriesCount, getTrashEntriesCount(group.getGroupId()));
+
+		baseModel = getBaseModel((Long)baseModel.getPrimaryKeyObj());
 
 		WorkflowedModel workflowedModel = getWorkflowedModel(baseModel);
 
@@ -537,7 +612,7 @@ public abstract class BaseTrashHandlerTestCase {
 			initialTrashEntriesCount + 1,
 			getTrashEntriesCount(group.getGroupId()));
 
-		Assert.assertFalse(isInTrashFolder(baseModel));
+		Assert.assertFalse(isInTrashContainer(baseModel));
 
 		moveParentBaseModelToTrash((Long)parentBaseModel.getPrimaryKeyObj());
 
@@ -545,7 +620,7 @@ public abstract class BaseTrashHandlerTestCase {
 			initialTrashEntriesCount + 2,
 			getTrashEntriesCount(group.getGroupId()));
 
-		Assert.assertTrue(isInTrashFolder(baseModel));
+		Assert.assertTrue(isInTrashContainer(baseModel));
 
 		if (isBaseModelMoveableFromTrash()) {
 			if (delete) {

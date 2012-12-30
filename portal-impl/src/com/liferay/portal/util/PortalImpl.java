@@ -762,25 +762,31 @@ public class PortalImpl implements Portal {
 			else if (securityMode.equals("ip")) {
 				String[] allowedIps = PropsValues.REDIRECT_URL_IPS_ALLOWED;
 
+				if (allowedIps.length == 0) {
+					return url;
+				}
+
 				InetAddress inetAddress = InetAddress.getByName(domain);
 
-				if ((allowedIps.length > 0) &&
-					!ArrayUtil.contains(
-						allowedIps, inetAddress.getHostAddress())) {
+				String hostAddress = inetAddress.getHostAddress();
 
-					String serverIp = getComputerAddress();
+				String serverIp = getComputerAddress();
 
-					if (!serverIp.equals(inetAddress.getHostAddress()) ||
-						!ArrayUtil.contains(allowedIps, "SERVER_IP")) {
+				boolean serverIpIsHostAddress = serverIp.equals(hostAddress);
 
-						if (_log.isDebugEnabled()) {
-							_log.debug(
-								"Redirect URL " + url + " is not allowed");
-						}
+				for (String ip : allowedIps) {
+					if ((serverIpIsHostAddress && ip.equals("SERVER_IP")) ||
+						ip.equals(hostAddress)) {
 
-						url = null;
+						return url;
 					}
 				}
+
+				if (_log.isDebugEnabled()) {
+					_log.debug("Redirect URL " + url + " is not allowed");
+				}
+
+				url = null;
 			}
 		}
 		catch (UnknownHostException uhe) {
@@ -1440,12 +1446,12 @@ public class PortalImpl implements Portal {
 				request, PortletKeys.LOGIN, themeDisplay.getPlid(),
 				PortletRequest.RENDER_PHASE);
 
-			createAccountURL.setWindowState(WindowState.MAXIMIZED);
-			createAccountURL.setPortletMode(PortletMode.VIEW);
-
-			createAccountURL.setParameter("saveLastPath", "0");
+			createAccountURL.setParameter(
+				"saveLastPath", Boolean.FALSE.toString());
 			createAccountURL.setParameter(
 				"struts_action", "/login/create_account");
+			createAccountURL.setPortletMode(PortletMode.VIEW);
+			createAccountURL.setWindowState(WindowState.MAXIMIZED);
 
 			if (!PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS) {
 				return createAccountURL.toString();
@@ -5790,7 +5796,16 @@ public class PortalImpl implements Portal {
 				companyId, name, ResourceConstants.SCOPE_INDIVIDUAL,
 				primaryKey);
 
-		if (count == 0) {
+		if (count > 0) {
+			return;
+		}
+
+		if (layout.isTypeControlPanel()) {
+			ResourceLocalServiceUtil.addResources(
+				companyId, groupId, 0, name, primaryKey, portletActions, true,
+				true);
+		}
+		else {
 			ResourceLocalServiceUtil.addResources(
 				companyId, groupId, 0, name, primaryKey, portletActions, true,
 				!layout.isPrivateLayout());

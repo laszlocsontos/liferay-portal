@@ -53,6 +53,11 @@ public class WikiPageTrashHandlerTest extends BaseTrashHandlerTestCase {
 	}
 
 	@Override
+	public void testTrashAssetTagsDraft() throws Exception {
+		Assert.assertTrue("This test does not apply", true);
+	}
+
+	@Override
 	protected BaseModel<?> addBaseModelWithWorkflow(
 			BaseModel<?> parentBaseModel, boolean approved,
 			ServiceContext serviceContext)
@@ -73,7 +78,7 @@ public class WikiPageTrashHandlerTest extends BaseTrashHandlerTestCase {
 			ServiceTestUtil.randomString(), ServiceTestUtil.randomString(),
 			true, serviceContext);
 
-		WikiPageLocalServiceUtil.updateStatus(
+		page = WikiPageLocalServiceUtil.updateStatus(
 			TestPropsValues.getUserId(), page.getResourcePrimKey(),
 			WorkflowConstants.STATUS_APPROVED, serviceContext);
 
@@ -158,12 +163,12 @@ public class WikiPageTrashHandlerTest extends BaseTrashHandlerTestCase {
 	}
 
 	@Override
-	protected boolean isInTrashFolder(ClassedModel classedModel)
+	protected boolean isInTrashContainer(ClassedModel classedModel)
 		throws Exception {
 
 		WikiPage page = (WikiPage)classedModel;
 
-		return page.isInTrashFolder();
+		return page.isInTrashContainer();
 	}
 
 	@Override
