@@ -16,11 +16,10 @@ package com.liferay.portal.servlet;
 
 import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
 import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
+import com.liferay.portal.kernel.servlet.MockServletContext;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.util.CharPool;
-import com.liferay.portal.kernel.util.Validator;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.servlet.ServletContext;
@@ -34,8 +33,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
-
-import org.springframework.mock.web.MockServletContext;
 
 /**
  * @author László Csontos
@@ -76,7 +73,7 @@ public class ComboServletTest extends PowerMockito {
 
 	@Test
 	public void testGetResourceURLWithUnixDir() throws Exception {
-		ServletContext servletContext = getServletContext(
+		ServletContext servletContext = new MockServletContext(
 			_WAS_DEFAULT_PATH_UNIX);
 
 		testGetResourceURL(
@@ -85,7 +82,7 @@ public class ComboServletTest extends PowerMockito {
 
 	@Test
 	public void testGetResourceURLWithWindowsDir() throws Exception {
-		ServletContext servletContext = getServletContext(
+		ServletContext servletContext = new MockServletContext(
 			_WAS_DEFAULT_PATH_WINDOWS);
 
 		testGetResourceURL(
@@ -94,34 +91,17 @@ public class ComboServletTest extends PowerMockito {
 
 	@Test
 	public void testGetResourceURLWithWrongContext() throws Exception {
-		ServletContext servletContext = getServletContext(null);
+		ServletContext servletContext = new MockServletContext(null);
 
 		testGetResourceURL(servletContext, null, true);
 	}
 
 	@Test
 	public void testGetResourceURLWithWrongPath() throws Exception {
-		ServletContext servletContext = getServletContext(
+		ServletContext servletContext = new MockServletContext(
 			_WAS_DEFAULT_PATH_UNIX);
 
 		testGetResourceURL(servletContext, "/dummyPath", true);
-	}
-
-	protected ServletContext getServletContext(final String path) {
-		return new MockServletContext() {
-
-			@Override
-			public URL getResource(String resourcePath)
-				throws MalformedURLException {
-
-				if (Validator.isNull(path)) {
-					return null;
-				}
-
-				return new URL("file:" + path + resourcePath);
-			}
-
-		};
 	}
 
 	protected void testGetResourceURL(
