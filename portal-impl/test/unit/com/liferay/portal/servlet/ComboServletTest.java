@@ -108,12 +108,9 @@ public class ComboServletTest extends PowerMockito {
 			ServletContext servletContext, String path, boolean expectNull)
 		throws Exception {
 
-		String rootPath = null;
+		String rootPath = "dummyPath";
 
-		if (expectNull) {
-			rootPath = "dummyPath";
-		}
-		else {
+		if (!expectNull) {
 			rootPath = ServletContextUtil.getRootPath(servletContext);
 		}
 
@@ -133,11 +130,11 @@ public class ComboServletTest extends PowerMockito {
 
 	private static final String _WAS_DEFAULT_PATH_UNIX =
 		"/opt/IBM/WebSphere/AppServer/profiles/appsrv01" +
-		"/installedApps/cell1/lportal_war.ear/lportal.war";
+			"/installedApps/cell1/lportal_war.ear/lportal.war";
 
 	private static final String _WAS_DEFAULT_PATH_WINDOWS =
 		"C:/Program Files/IBM/WebSphere/AppServer/profiles/appsrv01" +
-		"/installedApps/cell1/lportal_war.ear/lportal.war";
+			"/installedApps/cell1/lportal_war.ear/lportal.war";
 
 	private static ComboServlet _comboServlet;
 

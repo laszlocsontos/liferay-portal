@@ -23,6 +23,9 @@ import java.net.URL;
 public class MockServletContext extends
 		org.springframework.mock.web.MockServletContext {
 
+	public MockServletContext() {
+	}
+
 	public MockServletContext(String rootPath) {
 		_rootPath = rootPath;
 	}
