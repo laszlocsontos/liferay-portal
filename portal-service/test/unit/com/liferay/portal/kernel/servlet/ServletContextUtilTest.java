@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.util.StringPool;
 
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 
 import javax.servlet.ServletContext;
 
@@ -31,8 +30,6 @@ import org.junit.runner.RunWith;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import org.springframework.mock.web.MockServletContext;
 
 /**
  * @author Laszlo Csontos
@@ -67,28 +64,13 @@ public class ServletContextUtilTest extends PowerMockito {
 	}
 
 	protected void getRootURI(String path, URI uri) throws Exception {
-		ServletContext servletContext = getServletContext(path);
+		ServletContext servletContext = new MockServletContext(path);
 
 		URI rootURI = ServletContextUtil.getRootURI(servletContext);
 
 		Assert.assertEquals(uri, rootURI);
 		Assert.assertEquals(
 			uri, servletContext.getAttribute(ServletContextUtil.URI_ATTRIBUTE));
-	}
-
-	protected ServletContext getServletContext(final String path) {
-		return new MockServletContext() {
-
-			@Override
-			public URL getResource(String resourcePath)
-				throws MalformedURLException {
-
-				URL url = new URL("file:" + path + resourcePath);
-
-				return url;
-			}
-
-		};
 	}
 
 	protected URI getURI(String path) {
