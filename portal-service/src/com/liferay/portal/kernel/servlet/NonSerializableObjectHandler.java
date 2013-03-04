@@ -14,7 +14,11 @@
 
 package com.liferay.portal.kernel.servlet;
 
+import com.liferay.portal.kernel.util.ServerDetector;
+
 import java.io.Serializable;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Igor Spasic
@@ -31,6 +35,19 @@ public final class NonSerializableObjectHandler implements Serializable {
 		}
 
 		return value;
+	}
+
+	public static HttpServletRequest handleNonSerializableRequest(
+		HttpServletRequest request) {
+
+		if (!ServerDetector.isWebLogic() ||
+			(NonSerializableObjectRequestWrapper.isWrapped(request) &&
+			(request instanceof NonSerializableObjectRequestWrapper))) {
+
+			return request;
+		}
+
+		return new NonSerializableObjectRequestWrapper(request);
 	}
 
 	public NonSerializableObjectHandler(Object value) {

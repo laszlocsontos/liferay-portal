@@ -19,14 +19,13 @@ import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.concurrent.ConcurrentLFUCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
+import com.liferay.portal.kernel.servlet.NonSerializableObjectHandler;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -61,7 +60,8 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 		String uri = getURI(request);
 
-		request = handleNonSerializableRequest(request);
+		request = NonSerializableObjectHandler.handleNonSerializableRequest(
+			request);
 
 		request.setAttribute(WebKeys.INVOKER_FILTER_URI, uri);
 
@@ -229,18 +229,6 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		}
 
 		return uri;
-	}
-
-	protected HttpServletRequest handleNonSerializableRequest(
-		HttpServletRequest request) {
-
-		if (ServerDetector.isWebLogic()) {
-			if (!NonSerializableObjectRequestWrapper.isWrapped(request)) {
-				request = new NonSerializableObjectRequestWrapper(request);
-			}
-		}
-
-		return request;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(InvokerFilter.class);

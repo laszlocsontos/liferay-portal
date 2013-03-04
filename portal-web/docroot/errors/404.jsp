@@ -22,6 +22,7 @@
 <%@ page import="com.liferay.portal.kernel.log.Log" %>
 <%@ page import="com.liferay.portal.kernel.log.LogFactoryUtil" %>
 <%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
+<%@ page import="com.liferay.portal.kernel.servlet.NonSerializableObjectHandler" %>
 <%@ page import="com.liferay.portal.kernel.util.JavaConstants" %>
 <%@ page import="com.liferay.portal.model.LayoutSet" %>
 <%@ page import="com.liferay.portal.util.PortalUtil" %>
@@ -39,6 +40,8 @@
 // less than ideal. In this case we will simply print the error message.
 
 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+request = NonSerializableObjectHandler.handleNonSerializableRequest(request);
 
 Throwable t = (Throwable)request.getAttribute(JavaConstants.JAVAX_SERVLET_ERROR_EXCEPTION);
 Object msg = request.getAttribute(JavaConstants.JAVAX_SERVLET_ERROR_MESSAGE);
