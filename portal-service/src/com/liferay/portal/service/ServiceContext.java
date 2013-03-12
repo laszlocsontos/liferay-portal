@@ -479,17 +479,6 @@ public class ServiceContext implements Cloneable, Serializable {
 
 	/**
 	 * Returns the date when an entity was modified if this service context is
-	 * being passed as a parameter to a method which updates an entity.
-	 *
-	 * @return the date when an entity was modified if this service context is
-	 *         being passed as a parameter to a method which updates an entity
-	 */
-	public Date getModifiedDate() {
-		return _modifiedDate;
-	}
-
-	/**
-	 * Returns the date when an entity was modified if this service context is
 	 * being passed as a parameter to a method which modifies an entity.
 	 *
 	 * @param  defaultModifiedDate an optional default modified date to use if
@@ -506,6 +495,17 @@ public class ServiceContext implements Cloneable, Serializable {
 		else {
 			return new Date();
 		}
+	}
+
+	/**
+	 * Returns the date when an entity was modified if this service context is
+	 * being passed as a parameter to a method which updates an entity.
+	 *
+	 * @return the date when an entity was modified if this service context is
+	 *         being passed as a parameter to a method which updates an entity
+	 */
+	public Date getModifiedDate() {
+		return _modifiedDate;
 	}
 
 	/**
@@ -758,6 +758,10 @@ public class ServiceContext implements Cloneable, Serializable {
 		return _deriveDefaultPermissions;
 	}
 
+	public boolean isFailOnError() {
+		return _failOnError;
+	}
+
 	/**
 	 * Returns whether the primary entity of this service context is to be
 	 * indexed/re-indexed.
@@ -961,6 +965,10 @@ public class ServiceContext implements Cloneable, Serializable {
 		Map<String, Serializable> expandoBridgeAttributes) {
 
 		_expandoBridgeAttributes = expandoBridgeAttributes;
+	}
+
+	public void setFailOnError(boolean failOnError) {
+		_failOnError = failOnError;
 	}
 
 	/**
@@ -1265,6 +1273,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	private String _currentURL;
 	private boolean _deriveDefaultPermissions;
 	private Map<String, Serializable> _expandoBridgeAttributes;
+	private boolean _failOnError = true;
 	private Date _formDate;
 	private String[] _groupPermissions;
 	private String[] _guestPermissions;
