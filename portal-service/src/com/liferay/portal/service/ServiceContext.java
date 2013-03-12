@@ -330,6 +330,10 @@ public class ServiceContext implements Cloneable, Serializable {
 		return _expandoBridgeAttributes;
 	}
 
+	public boolean getFailOnError() {
+		return _failOnError;
+	}
+
 	/**
 	 * Returns the date when an <code>aui:form</code> was generated in this
 	 * service context. The form date can be used in detecting situations in
@@ -963,6 +967,10 @@ public class ServiceContext implements Cloneable, Serializable {
 		_expandoBridgeAttributes = expandoBridgeAttributes;
 	}
 
+	public void setFailOnError(boolean failOnError) {
+		_failOnError = failOnError;
+	}
+
 	/**
 	 * Sets the date when an <code>aui:form</code> was generated in this service
 	 * context. The form date can be used in detecting situations in which an
@@ -1265,6 +1273,7 @@ public class ServiceContext implements Cloneable, Serializable {
 	private String _currentURL;
 	private boolean _deriveDefaultPermissions;
 	private Map<String, Serializable> _expandoBridgeAttributes;
+	private boolean _failOnError = true;
 	private Date _formDate;
 	private String[] _groupPermissions;
 	private String[] _guestPermissions;
