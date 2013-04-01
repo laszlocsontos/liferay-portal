@@ -16,8 +16,6 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.hamcrest.CoreMatchers;
-
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -27,6 +25,8 @@ import org.junit.runner.RunWith;
 
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import static org.hamcrest.CoreMatchers.is;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -39,10 +39,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class UpgradeVirtualHostTest extends UpgradeVirtualHost {
 
 	@BeforeClass
-	public static void init() {
-		_checkOracle();
-
-		_checkPrivileges();
+	public static void init() throws Exception {
+		checkOracle();
+		checkPrivileges();
 
 		InitUtil.initWithSpring();
 
@@ -51,25 +50,25 @@ public class UpgradeVirtualHostTest extends UpgradeVirtualHost {
 
 	@Before
 	public void setUp() throws Exception {
-		_createSchema();
+		createSchema();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_dropSchema(_schemaName);
+		dropSchema(_schemaName);
 	}
 
 	@Test
 	public void testUpdateCompany() throws Exception {
-		_openConnectionWithCurrentSchema();
+		openConnectionWithCurrentSchema();
 	}
 
 	@Test
 	public void testUpdateLayoutSet() throws Exception {
-		_openConnectionWithCurrentSchema();
+		openConnectionWithCurrentSchema();
 	}
 
-	private static void _checkOracle() {
+	protected static void checkOracle() {
 		DB db = DBFactoryUtil.getDB();
 
 		String dbType = db.getType();
@@ -77,13 +76,13 @@ public class UpgradeVirtualHostTest extends UpgradeVirtualHost {
 		Assume.assumeTrue(dbType.equals(DB.TYPE_ORACLE));
 	}
 
-	private static void _checkPrivileges() {
+	protected static void checkPrivileges() throws Exception {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
+			con = openConnection();
 
 			StringBundler sb = new StringBundler();
 
@@ -102,7 +101,7 @@ public class UpgradeVirtualHostTest extends UpgradeVirtualHost {
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				Assume.assumeThat(rs.getInt(1), CoreMatchers.is(3));
+				Assume.assumeThat(rs.getInt(1), is(3));
 			}
 		}
 		catch (SQLException sqle) {
@@ -113,8 +112,12 @@ public class UpgradeVirtualHostTest extends UpgradeVirtualHost {
 		}
 	}
 
-	private void _createSchema() throws Exception {
-		Connection connection = _openConnection();
+	protected static Connection openConnection() throws Exception {
+		return _datasource.getConnection();
+	}
+
+	protected void createSchema() throws Exception {
+		Connection connection = openConnection();
 		Statement statement = null;
 
 		_schemaName =
@@ -132,16 +135,14 @@ public class UpgradeVirtualHostTest extends UpgradeVirtualHost {
 		}
 	}
 
-	private void _dropSchema(String schemaName) throws Exception {
+	protected void dropSchema(String schemaName) throws Exception {
 		runSQL("DROP USER " + schemaName + " CASCADE");
 	}
 
-	private Connection _openConnection() throws Exception {
-		return _datasource.getConnection();
-	}
+	protected Connection openConnectionWithCurrentSchema()
+			throws Exception {
 
-	private Connection _openConnectionWithCurrentSchema() throws Exception {
-		Connection connection = _openConnection();
+		Connection connection = openConnection();
 		Statement statement = null;
 
 		try {
