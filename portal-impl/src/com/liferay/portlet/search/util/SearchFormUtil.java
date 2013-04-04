@@ -14,12 +14,19 @@
 
 package com.liferay.portlet.search.util;
 
+import com.liferay.portal.kernel.cache.Lifecycle;
+import com.liferay.portal.kernel.cache.ThreadLocalCache;
+import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.LayoutServiceUtil;
@@ -107,13 +114,7 @@ public class SearchFormUtil {
 			scopeGroupId = themeDisplay.getScopeGroupId();
 		}
 
-		long plid = LayoutServiceUtil.getDefaultPlid(
-			groupId, scopeGroupId, false, portletId);
-
-		if (plid == 0) {
-			plid = LayoutServiceUtil.getDefaultPlid(
-				groupId, scopeGroupId, true, portletId);
-		}
+		long plid = _getDefaultPlid(request, groupId, scopeGroupId, portletId);
 
 		if (plid == 0) {
 			Layout layout = (Layout)request.getAttribute(WebKeys.LAYOUT);
@@ -130,6 +131,53 @@ public class SearchFormUtil {
 		portletURL.setPortletMode(PortletMode.VIEW);
 
 		return portletURL;
+	}
+
+	private static String _getCacheKey(
+		long groupId, long scopeGroupId, String portletId) {
+
+		StringBundler sb = new StringBundler(5);
+
+		sb.append(StringUtil.toHexString(groupId));
+		sb.append(StringPool.POUND);
+		sb.append(StringUtil.toHexString(scopeGroupId));
+		sb.append(StringPool.POUND);
+		sb.append(StringUtil.toHexString(portletId));
+
+		return sb.toString();
+	}
+
+	private static long _getDefaultPlid(
+			HttpServletRequest request, long groupId, long scopeGroupId,
+			String portletId)
+		throws PortalException, SystemException {
+
+		String cacheKey = _getCacheKey(groupId, scopeGroupId, portletId);
+
+		ThreadLocalCache<Long> threadLocalCache =
+			ThreadLocalCacheManager.getThreadLocalCache(
+				Lifecycle.REQUEST, SearchFormUtil.class.getName());
+
+		long plid = 0;
+
+		Long value = threadLocalCache.get(cacheKey);
+
+		if (value == null) {
+			plid = LayoutServiceUtil.getDefaultPlid(
+				groupId, scopeGroupId, false, portletId);
+
+			if (plid == 0) {
+				plid = LayoutServiceUtil.getDefaultPlid(
+					groupId, scopeGroupId, true, portletId);
+			}
+
+			threadLocalCache.put(cacheKey, Long.valueOf(plid));
+		}
+		else {
+			plid = value.longValue();
+		}
+
+		return plid;
 	}
 
 }
