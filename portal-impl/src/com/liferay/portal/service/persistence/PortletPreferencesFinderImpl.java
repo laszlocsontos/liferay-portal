@@ -17,7 +17,10 @@ package com.liferay.portal.service.persistence;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.PortletPreferences;
 import com.liferay.portal.model.impl.PortletPreferencesImpl;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
@@ -72,6 +75,37 @@ public class PortletPreferencesFinderImpl
 			String portletId, boolean privateLayout)
 		throws SystemException {
 
+		return doFindByC_G_O_O_P_P(
+			companyId, groupId, ownerId, ownerType, portletId, privateLayout,
+			false);
+	}
+
+	public List<Long> findPlidsByC_G_O_O_P_P(
+			long companyId, long groupId, long ownerId, int ownerType,
+			String portletId, boolean privateLayout)
+		throws SystemException {
+
+		return doFindByC_G_O_O_P_P(
+			companyId, groupId, ownerId, ownerType, portletId, privateLayout,
+			true);
+	}
+
+	public List<PortletPreferences> findPortletPreferencesByC_G_O_O_P_P(
+			long companyId, long groupId, long ownerId, int ownerType,
+			String portletId, boolean privateLayout)
+		throws SystemException {
+
+		return doFindByC_G_O_O_P_P(
+			companyId, groupId, ownerId, ownerType, portletId, privateLayout,
+			false);
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <E> List<E> doFindByC_G_O_O_P_P(
+			long companyId, long groupId, long ownerId, int ownerType,
+			String portletId, boolean privateLayout, boolean returnPlidsOnly)
+		throws SystemException {
+
 		Session session = null;
 
 		try {
@@ -79,9 +113,25 @@ public class PortletPreferencesFinderImpl
 
 			String sql = CustomSQLUtil.get(FIND_BY_C_G_O_O_P_P);
 
+			String distinctValue = StringPool.BLANK;
+			String projectionValue = "{PortletPreferences.*}";
+
+			if (returnPlidsOnly) {
+				distinctValue = "DISTINCT";
+				projectionValue = "PortletPreferences.plid";
+			}
+
+			sql = StringUtil.replace(sql, "[$DISTINCT$]", distinctValue);
+			sql = StringUtil.replace(sql, "[$PROJECTION$]", projectionValue);
+
 			SQLQuery q = session.createSQLQuery(sql);
 
-			q.addEntity("PortletPreferences", PortletPreferencesImpl.class);
+			if (returnPlidsOnly) {
+				q.addScalar("plid", Type.LONG);
+			}
+			else {
+				q.addEntity("PortletPreferences", PortletPreferencesImpl.class);
+			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -93,7 +143,7 @@ public class PortletPreferencesFinderImpl
 			qPos.add(portletId.concat("_INSTANCE_%"));
 			qPos.add(privateLayout);
 
-			return q.list(true);
+			return (List<E>)q.list(true);
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
