@@ -102,6 +102,11 @@ public class PortletPreferencesFinderImpl
 		}
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #findPortletPreferencesByC_G_O_O_P_P(long, long, long, int,
+	 *             String, boolean)}
+	 */
 	public List<PortletPreferences> findByC_G_O_O_P_P(
 			long companyId, long groupId, long ownerId, int ownerType,
 			String portletId, boolean privateLayout)
