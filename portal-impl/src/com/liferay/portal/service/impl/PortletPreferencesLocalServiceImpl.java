@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.portal.kernel.cache.ThreadLocalCachable;
 import com.liferay.portal.kernel.concurrent.LockRegistry;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
@@ -165,7 +164,6 @@ public class PortletPreferencesLocalServiceImpl
 			ownerId, ownerType, plid, portletId);
 	}
 
-	@ThreadLocalCachable
 	public List<PortletPreferences> getPortletPreferences(
 			long companyId, long groupId, long ownerId, int ownerType,
 			String portletId, boolean privateLayout)
