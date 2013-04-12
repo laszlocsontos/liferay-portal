@@ -16,6 +16,7 @@ package com.liferay.portal.servlet.filters.etag;
 
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
 import java.nio.ByteBuffer;
@@ -41,6 +42,17 @@ public class ETagFilter extends BasePortalFilter {
 		}
 		else {
 			return false;
+		}
+	}
+
+	protected void finishResponse(
+			BufferCacheServletResponse bufferCacheServletResponse)
+		throws Exception {
+
+		bufferCacheServletResponse.finishResponse();
+
+		if (!ServerDetector.isJetty()) {
+			bufferCacheServletResponse.outputBuffer();
 		}
 	}
 
@@ -71,12 +83,11 @@ public class ETagFilter extends BasePortalFilter {
 
 		if (isEligibleForEtag(bufferCacheServletResponse.getStatus())) {
 			if (!ETagUtil.processETag(request, response, byteBuffer)) {
-				bufferCacheServletResponse.finishResponse();
-				bufferCacheServletResponse.outputBuffer();
+				finishResponse(bufferCacheServletResponse);
 			}
 		}
 		else {
-			bufferCacheServletResponse.finishResponse();
+			finishResponse(bufferCacheServletResponse);
 		}
 	}
 
