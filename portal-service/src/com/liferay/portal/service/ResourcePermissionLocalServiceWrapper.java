@@ -954,6 +954,16 @@ public class ResourcePermissionLocalServiceWrapper
 			scope, primKey, roleIdsToActionIds);
 	}
 
+	public void setResourcePermissions(long companyId, java.lang.String name,
+		int scope, java.lang.String primKey,
+		java.util.Map<java.lang.Long, java.lang.String[]> roleIdsToActionIds,
+		boolean skipExistingPermissionCheck)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_resourcePermissionLocalService.setResourcePermissions(companyId, name,
+			scope, primKey, roleIdsToActionIds, skipExistingPermissionCheck);
+	}
+
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
