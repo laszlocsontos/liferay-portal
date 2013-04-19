@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.spring.aop.SelectionLogic;
 import com.liferay.portal.kernel.spring.aop.ShardSelection;
 import com.liferay.portal.kernel.spring.aop.ShardSelectorParam;
+import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Shard;
 import com.liferay.portal.service.ShardLocalServiceUtil;
@@ -58,11 +59,11 @@ public class ShardGeneralAdvice implements MethodInterceptor {
 				}
 			}
 			else {
-				returnValue = _invokeOnShardByParameter(methodInvocation);
+				returnValue = _invokeOnShardByParameter(methodInvocation, true);
 			}
 		}
 		else {
-			returnValue = _invokeOnShardByParameter(methodInvocation);
+			returnValue = _invokeOnShardByParameter(methodInvocation, false);
 		}
 
 		return returnValue;
@@ -72,48 +73,9 @@ public class ShardGeneralAdvice implements MethodInterceptor {
 		_shardAdvice = shardAdvice;
 	}
 
-	private Object _invokeOnShardByParameter(MethodInvocation methodInvocation)
+	private Object _invokeMethod(
+			long companyId, MethodInvocation methodInvocation)
 		throws Throwable {
-
-		Object[] arguments = methodInvocation.getArguments();
-
-		if ((arguments == null) || (arguments.length == 0)) {
-			return methodInvocation.proceed();
-		}
-
-		Method method = methodInvocation.getMethod();
-
-		Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-
-		Object companyIdParam = null;
-
-		for (int i = 0; ((i < parameterAnnotations.length) &&
-				(companyIdParam == null)); i++) {
-
-			for (Annotation annotation : parameterAnnotations[i]) {
-				if (annotation instanceof ShardSelectorParam) {
-					companyIdParam = arguments[i];
-					break;
-				}
-			}
-		}
-	
-		if (companyIdParam == null) {
-			return methodInvocation.proceed();
-		}
-
-		long companyId = -1;
-
-		if (companyIdParam instanceof Long) {
-			companyId = (Long)companyIdParam;
-		}
-		else {
-			Class clazz = companyIdParam.getClass();
-
-			Method getCompanyIdMethod = clazz.getMethod("getCompanyId");
-
-			companyId = (Long)getCompanyIdMethod.invoke(clazz);
-		}
 
 		Shard shard = ShardLocalServiceUtil.getShard(
 			Company.class.getName(), companyId);
@@ -138,6 +100,58 @@ public class ShardGeneralAdvice implements MethodInterceptor {
 		}
 
 		return returnValue;
+	}
+
+	private Object _invokeOnShardByParameter(
+			MethodInvocation methodInvocation, boolean defaultParamSelection)
+		throws Throwable {
+//TODO handle If ShardSelelection(logic = SelectionLogic.SKIP) applied on method
+		Object[] arguments = methodInvocation.getArguments();
+
+		if ((arguments == null) || (arguments.length == 0)) {
+			return methodInvocation.proceed();
+		}
+
+		Method method = methodInvocation.getMethod();
+
+		Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+
+		Object companyIdParam = null;
+
+		for (int i = 0; ((i < parameterAnnotations.length) &&
+				(companyIdParam == null)); i++) {
+
+			for (Annotation annotation : parameterAnnotations[i]) {
+				if (annotation instanceof ShardSelectorParam) {
+					companyIdParam = arguments[i];
+					break;
+				}
+			}
+		}
+
+		long companyId = -1;
+
+		if (companyIdParam == null) {
+			if (defaultParamSelection) {
+				companyId = (Long)arguments[0];
+			}
+			else {
+				return methodInvocation.proceed();
+			}
+		}
+
+		if (companyIdParam instanceof Long) {
+			companyId = (Long)companyIdParam;
+		}
+		else {
+			Class clazz = companyIdParam.getClass();
+
+			Method getCompanyIdMethod = clazz.getMethod("getCompanyId");
+
+			companyId = (Long)getCompanyIdMethod.invoke(clazz);
+		}
+
+		return _invokeMethod(companyId, methodInvocation);
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(ShardGeneralAdvice.class);

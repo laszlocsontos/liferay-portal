@@ -20,6 +20,7 @@ package com.liferay.portal.kernel.spring.aop;
 public enum SelectionLogic {
 
 	PARAMETER(SelectionLogicDefinition.LOGIC_PARAMETER),
+	SKIP(SelectionLogicDefinition.LOGIC_SKIP),
 	THREADLOCAL(SelectionLogicDefinition.LOGIC_THREADLOCAL);
 
 	SelectionLogic(int logic) {

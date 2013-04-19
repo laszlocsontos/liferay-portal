@@ -31,6 +31,8 @@ import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.TriggerType;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
+import com.liferay.portal.kernel.spring.aop.SelectionLogic;
+import com.liferay.portal.kernel.spring.aop.ShardSelection;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.CharPool;
@@ -108,6 +110,7 @@ import javax.servlet.ServletContext;
  * @author Wesley Gong
  * @author Shuyang Zhou
  */
+@ShardSelection(logic = SelectionLogic.PARAMETER)
 public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 	@Skip

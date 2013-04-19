@@ -59,6 +59,9 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.spring.aop.SelectionLogic;
+import com.liferay.portal.kernel.spring.aop.ShardSelection;
+import com.liferay.portal.kernel.spring.aop.ShardSelectorParam;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
@@ -167,6 +170,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Wesley Gong
  * @author Zsigmond Rab
  */
+@ShardSelection(logic = SelectionLogic.PARAMETER)
 public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 	/**
@@ -263,6 +267,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	public void addDefaultGroups(long userId)
 		throws PortalException, SystemException {
 
@@ -340,6 +345,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	public void addDefaultRoles(long userId)
 		throws PortalException, SystemException {
 
@@ -382,6 +388,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	@SuppressWarnings("deprecation")
 	public void addDefaultUserGroups(long userId)
 		throws PortalException, SystemException {
@@ -431,6 +438,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	public void addGroupUsers(long groupId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -455,6 +463,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	public void addOrganizationUsers(long organizationId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -475,6 +484,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  userIds the primary keys of the users
 	 * @throws SystemException if a system exception occurred
 	 */
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	public void addPasswordPolicyUsers(long passwordPolicyId, long[] userIds)
 		throws SystemException {
 
@@ -492,6 +502,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	public void addRoleUsers(long roleId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -514,6 +525,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	public void addTeamUsers(long teamId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -575,12 +587,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	public User addUser(
-			long creatorUserId, long companyId, boolean autoPassword,
-			String password1, String password2, boolean autoScreenName,
-			String screenName, String emailAddress, long facebookId,
-			String openId, Locale locale, String firstName, String middleName,
-			String lastName, int prefixId, int suffixId, boolean male,
-			int birthdayMonth, int birthdayDay, int birthdayYear,
+			long creatorUserId, @ShardSelectorParam long companyId,
+			boolean autoPassword, String password1, String password2,
+			boolean autoScreenName, String screenName, String emailAddress,
+			long facebookId, String openId, Locale locale, String firstName,
+			String middleName, String lastName, int prefixId, int suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
 			String jobTitle, long[] groupIds, long[] organizationIds,
 			long[] roleIds, long[] userGroupIds, boolean sendEmail,
 			ServiceContext serviceContext)
@@ -614,6 +626,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
+	@ShardSelection(logic = SelectionLogic.SKIP)
 	@SuppressWarnings("deprecation")
 	public void addUserGroupUsers(long userGroupId, long[] userIds)
 		throws PortalException, SystemException {
@@ -681,12 +694,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 */
 	@SuppressWarnings("deprecation")
 	public User addUserWithWorkflow(
-			long creatorUserId, long companyId, boolean autoPassword,
-			String password1, String password2, boolean autoScreenName,
-			String screenName, String emailAddress, long facebookId,
-			String openId, Locale locale, String firstName, String middleName,
-			String lastName, int prefixId, int suffixId, boolean male,
-			int birthdayMonth, int birthdayDay, int birthdayYear,
+			long creatorUserId,@ShardSelectorParam long companyId,
+			boolean autoPassword, String password1, String password2,
+			boolean autoScreenName, String screenName, String emailAddress,
+			long facebookId, String openId, Locale locale, String firstName,
+			String middleName, String lastName, int prefixId, int suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
 			String jobTitle, long[] groupIds, long[] organizationIds,
 			long[] roleIds, long[] userGroupIds, boolean sendEmail,
 			ServiceContext serviceContext)

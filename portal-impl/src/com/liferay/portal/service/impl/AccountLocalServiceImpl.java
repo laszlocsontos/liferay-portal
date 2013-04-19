@@ -16,12 +16,15 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.spring.aop.SelectionLogic;
+import com.liferay.portal.kernel.spring.aop.ShardSelection;
 import com.liferay.portal.model.Account;
 import com.liferay.portal.service.base.AccountLocalServiceBaseImpl;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@ShardSelection(logic = SelectionLogic.PARAMETER)
 public class AccountLocalServiceImpl extends AccountLocalServiceBaseImpl {
 
 	public Account getAccount(long companyId, long accountId)

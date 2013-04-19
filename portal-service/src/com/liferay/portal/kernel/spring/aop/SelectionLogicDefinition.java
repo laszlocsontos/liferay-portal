@@ -19,8 +19,10 @@ package com.liferay.portal.kernel.spring.aop;
  */
 public interface SelectionLogicDefinition {
 
-	public static final int LOGIC_PARAMETER = 1;
+	public static final int LOGIC_PARAMETER = 0;
 
-	public static final int LOGIC_THREADLOCAL = 0;
+	public static final int LOGIC_SKIP = 1;
+
+	public static final int LOGIC_THREADLOCAL = 2;
 
 }
