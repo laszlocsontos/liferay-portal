@@ -254,6 +254,7 @@
 
 		<column name="groupId" type="long" />
 		<column name="articleId" type="String" />
+		<column name="version" type="double" />
 
 		<!-- Finder methods -->
 
