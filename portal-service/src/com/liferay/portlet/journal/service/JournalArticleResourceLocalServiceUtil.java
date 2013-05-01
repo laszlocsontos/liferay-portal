@@ -296,21 +296,30 @@ public class JournalArticleResourceLocalServiceUtil {
 	}
 
 	public static long getArticleResourcePrimKey(long groupId,
-		java.lang.String articleId)
+		java.lang.String articleId, double version)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getArticleResourcePrimKey(groupId, articleId);
+		return getService()
+				   .getArticleResourcePrimKey(groupId, articleId, version);
 	}
 
 	public static long getArticleResourcePrimKey(java.lang.String uuid,
-		long groupId, java.lang.String articleId)
+		long groupId, java.lang.String articleId, double version)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getArticleResourcePrimKey(uuid, groupId, articleId);
+		return getService()
+				   .getArticleResourcePrimKey(uuid, groupId, articleId, version);
 	}
 
 	public static java.util.List<com.liferay.portlet.journal.model.JournalArticleResource> getArticleResources(
 		long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getArticleResources(groupId);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalArticleResource updateArticleResource(
+		long groupId, java.lang.String articleId, double version)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().updateArticleResource(groupId, articleId, version);
 	}
 
 	public static JournalArticleResourceLocalService getService() {

@@ -296,23 +296,31 @@ public class JournalArticleResourceLocalServiceWrapper
 	}
 
 	public long getArticleResourcePrimKey(long groupId,
-		java.lang.String articleId)
+		java.lang.String articleId, double version)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _journalArticleResourceLocalService.getArticleResourcePrimKey(groupId,
-			articleId);
+			articleId, version);
 	}
 
 	public long getArticleResourcePrimKey(java.lang.String uuid, long groupId,
-		java.lang.String articleId)
+		java.lang.String articleId, double version)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _journalArticleResourceLocalService.getArticleResourcePrimKey(uuid,
-			groupId, articleId);
+			groupId, articleId, version);
 	}
 
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticleResource> getArticleResources(
 		long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _journalArticleResourceLocalService.getArticleResources(groupId);
+	}
+
+	public com.liferay.portlet.journal.model.JournalArticleResource updateArticleResource(
+		long groupId, java.lang.String articleId, double version)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _journalArticleResourceLocalService.updateArticleResource(groupId,
+			articleId, version);
 	}
 
 	/**
