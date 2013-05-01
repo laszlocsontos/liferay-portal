@@ -56,14 +56,15 @@ public class JournalArticleResourceLocalServiceImpl
 			articleResourcePrimKey);
 	}
 
-	public long getArticleResourcePrimKey(long groupId, String articleId)
+	public long getArticleResourcePrimKey(
+			long groupId, String articleId, double version)
 		throws SystemException {
 
-		return getArticleResourcePrimKey(null, groupId, articleId);
+		return getArticleResourcePrimKey(null, groupId, articleId, version);
 	}
 
 	public long getArticleResourcePrimKey(
-			String uuid, long groupId, String articleId)
+			String uuid, long groupId, String articleId, double version)
 		throws SystemException {
 
 		JournalArticleResource articleResource = null;
@@ -90,6 +91,7 @@ public class JournalArticleResourceLocalServiceImpl
 
 			articleResource.setGroupId(groupId);
 			articleResource.setArticleId(articleId);
+			articleResource.setVersion(version);
 
 			journalArticleResourcePersistence.update(articleResource);
 		}
@@ -101,6 +103,18 @@ public class JournalArticleResourceLocalServiceImpl
 		throws SystemException {
 
 		return journalArticleResourcePersistence.findByGroupId(groupId);
+	}
+
+	public JournalArticleResource updateArticleResource(
+			long groupId, String articleId, double version)
+		throws PortalException, SystemException {
+
+		JournalArticleResource journalArticleResource =
+			journalArticleResourcePersistence.findByG_A(groupId, articleId);
+
+		journalArticleResource.setVersion(version);
+
+		return journalArticleResourcePersistence.update(journalArticleResource);
 	}
 
 }
