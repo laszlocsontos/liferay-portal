@@ -952,11 +952,11 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 		else if (portletId.equals(PortletKeys.JOURNAL)) {
 			long groupId = GetterUtil.getLong(document.get(Field.GROUP_ID));
 			String articleId = document.get("articleId");
-			//double version = GetterUtil.getDouble(document.get("version"));
+			double version = GetterUtil.getDouble(document.get("version"));
 
 			long articleResourcePrimKey =
 				journalArticleResourceLocalService.getArticleResourcePrimKey(
-					groupId, articleId);
+					groupId, articleId, version);
 
 			long classNameId = PortalUtil.getClassNameId(
 				JournalArticle.class.getName());

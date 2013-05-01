@@ -324,7 +324,7 @@ public class JournalArticleLocalServiceImpl
 
 		long resourcePrimKey =
 			journalArticleResourceLocalService.getArticleResourcePrimKey(
-				serviceContext.getUuid(), groupId, articleId);
+				serviceContext.getUuid(), groupId, articleId, version);
 
 		JournalArticle article = journalArticlePersistence.create(id);
 
@@ -625,7 +625,7 @@ public class JournalArticleLocalServiceImpl
 
 		long resourcePrimKey =
 			journalArticleResourceLocalService.getArticleResourcePrimKey(
-				groupId, articleId);
+				groupId, articleId, version);
 
 		article.setResourcePrimKey(resourcePrimKey);
 
@@ -828,11 +828,13 @@ public class JournalArticleLocalServiceImpl
 			}
 		}
 
+		version = JournalArticleConstants.VERSION_DEFAULT;
+
 		long id = counterLocalService.increment();
 
 		long resourcePrimKey =
 			journalArticleResourceLocalService.getArticleResourcePrimKey(
-				groupId, newArticleId);
+				groupId, newArticleId, version);
 
 		JournalArticle newArticle = journalArticlePersistence.create(id);
 
@@ -844,7 +846,7 @@ public class JournalArticleLocalServiceImpl
 		newArticle.setCreateDate(now);
 		newArticle.setModifiedDate(now);
 		newArticle.setArticleId(newArticleId);
-		newArticle.setVersion(JournalArticleConstants.VERSION_DEFAULT);
+		newArticle.setVersion(version);
 		newArticle.setTitle(oldArticle.getTitle());
 		newArticle.setUrlTitle(
 			getUniqueUrlTitle(
@@ -4371,6 +4373,12 @@ public class JournalArticleLocalServiceImpl
 
 		journalArticlePersistence.update(article);
 
+		if (addNewVersion) {
+			journalArticleResourceLocalService.updateArticleResource(
+				article.getGroupId(), article.getArticleId(),
+				article.getVersion());
+		}
+
 		// Asset
 
 		updateAsset(
@@ -4609,6 +4617,12 @@ public class JournalArticleLocalServiceImpl
 		article.setContent(content);
 
 		journalArticlePersistence.update(article);
+
+		if (incrementVersion) {
+			journalArticleResourceLocalService.updateArticleResource(
+				article.getGroupId(), article.getArticleId(),
+				article.getVersion());
+		}
 
 		return article;
 	}
