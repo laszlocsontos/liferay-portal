@@ -2016,6 +2016,7 @@ public class JournalArticleResourcePersistenceImpl extends BasePersistenceImpl<J
 		journalArticleResourceImpl.setResourcePrimKey(journalArticleResource.getResourcePrimKey());
 		journalArticleResourceImpl.setGroupId(journalArticleResource.getGroupId());
 		journalArticleResourceImpl.setArticleId(journalArticleResource.getArticleId());
+		journalArticleResourceImpl.setVersion(journalArticleResource.getVersion());
 
 		return journalArticleResourceImpl;
 	}

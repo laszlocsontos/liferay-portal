@@ -852,7 +852,8 @@ create table JournalArticleResource (
 	uuid_ VARCHAR(75) null,
 	resourcePrimKey LONG not null primary key,
 	groupId LONG,
-	articleId VARCHAR(75) null
+	articleId VARCHAR(75) null,
+	version DOUBLE
 );
 
 create table JournalContentSearch (

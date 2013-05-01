@@ -2544,6 +2544,7 @@
 			</basic>
 			<basic name="groupId" />
 			<basic name="articleId" />
+			<basic name="version" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />

@@ -36,7 +36,7 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 	Externalizable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(11);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -46,6 +46,8 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 		sb.append(groupId);
 		sb.append(", articleId=");
 		sb.append(articleId);
+		sb.append(", version=");
+		sb.append(version);
 		sb.append("}");
 
 		return sb.toString();
@@ -71,6 +73,8 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 			journalArticleResourceImpl.setArticleId(articleId);
 		}
 
+		journalArticleResourceImpl.setVersion(version);
+
 		journalArticleResourceImpl.resetOriginalValues();
 
 		return journalArticleResourceImpl;
@@ -81,6 +85,7 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 		resourcePrimKey = objectInput.readLong();
 		groupId = objectInput.readLong();
 		articleId = objectInput.readUTF();
+		version = objectInput.readDouble();
 	}
 
 	public void writeExternal(ObjectOutput objectOutput)
@@ -101,10 +106,13 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 		else {
 			objectOutput.writeUTF(articleId);
 		}
+
+		objectOutput.writeDouble(version);
 	}
 
 	public String uuid;
 	public long resourcePrimKey;
 	public long groupId;
 	public String articleId;
+	public double version;
 }

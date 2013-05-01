@@ -50,6 +50,7 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 		attributes.put("resourcePrimKey", getResourcePrimKey());
 		attributes.put("groupId", getGroupId());
 		attributes.put("articleId", getArticleId());
+		attributes.put("version", getVersion());
 
 		return attributes;
 	}
@@ -77,6 +78,12 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 
 		if (articleId != null) {
 			setArticleId(articleId);
+		}
+
+		Double version = (Double)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
 		}
 	}
 
@@ -168,6 +175,24 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	*/
 	public void setArticleId(java.lang.String articleId) {
 		_journalArticleResource.setArticleId(articleId);
+	}
+
+	/**
+	* Returns the version of this journal article resource.
+	*
+	* @return the version of this journal article resource
+	*/
+	public double getVersion() {
+		return _journalArticleResource.getVersion();
+	}
+
+	/**
+	* Sets the version of this journal article resource.
+	*
+	* @param version the version of this journal article resource
+	*/
+	public void setVersion(double version) {
+		_journalArticleResource.setVersion(version);
 	}
 
 	public boolean isNew() {

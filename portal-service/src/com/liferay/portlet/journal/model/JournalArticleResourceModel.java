@@ -115,6 +115,20 @@ public interface JournalArticleResourceModel extends BaseModel<JournalArticleRes
 	 */
 	public void setArticleId(String articleId);
 
+	/**
+	 * Returns the version of this journal article resource.
+	 *
+	 * @return the version of this journal article resource
+	 */
+	public double getVersion();
+
+	/**
+	 * Sets the version of this journal article resource.
+	 *
+	 * @param version the version of this journal article resource
+	 */
+	public void setVersion(double version);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

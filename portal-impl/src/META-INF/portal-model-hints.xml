@@ -1779,6 +1779,7 @@
 		<field name="resourcePrimKey" type="long" />
 		<field name="groupId" type="long" />
 		<field name="articleId" type="String" />
+		<field name="version" type="double" />
 	</model>
 	<model name="com.liferay.portlet.journal.model.JournalContentSearch">
 		<field name="contentSearchId" type="long" />

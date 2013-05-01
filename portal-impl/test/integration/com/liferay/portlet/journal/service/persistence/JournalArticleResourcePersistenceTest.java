@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
+import com.liferay.portal.test.AssertUtils;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
 import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
@@ -120,6 +121,8 @@ public class JournalArticleResourcePersistenceTest {
 
 		newJournalArticleResource.setArticleId(ServiceTestUtil.randomString());
 
+		newJournalArticleResource.setVersion(ServiceTestUtil.nextDouble());
+
 		_persistence.update(newJournalArticleResource);
 
 		JournalArticleResource existingJournalArticleResource = _persistence.findByPrimaryKey(newJournalArticleResource.getPrimaryKey());
@@ -132,6 +135,8 @@ public class JournalArticleResourcePersistenceTest {
 			newJournalArticleResource.getGroupId());
 		Assert.assertEquals(existingJournalArticleResource.getArticleId(),
 			newJournalArticleResource.getArticleId());
+		AssertUtils.assertEquals(existingJournalArticleResource.getVersion(),
+			newJournalArticleResource.getVersion());
 	}
 
 	@Test
@@ -172,7 +177,7 @@ public class JournalArticleResourcePersistenceTest {
 	protected OrderByComparator getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("JournalArticleResource",
 			"uuid", true, "resourcePrimKey", true, "groupId", true,
-			"articleId", true);
+			"articleId", true, "version", true);
 	}
 
 	@Test
@@ -325,6 +330,8 @@ public class JournalArticleResourcePersistenceTest {
 		journalArticleResource.setGroupId(ServiceTestUtil.nextLong());
 
 		journalArticleResource.setArticleId(ServiceTestUtil.randomString());
+
+		journalArticleResource.setVersion(ServiceTestUtil.nextDouble());
 
 		_persistence.update(journalArticleResource);
 

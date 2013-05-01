@@ -34,6 +34,7 @@ public class JournalArticleResourceSoap implements Serializable {
 		soapModel.setResourcePrimKey(model.getResourcePrimKey());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setArticleId(model.getArticleId());
+		soapModel.setVersion(model.getVersion());
 
 		return soapModel;
 	}
@@ -121,8 +122,17 @@ public class JournalArticleResourceSoap implements Serializable {
 		_articleId = articleId;
 	}
 
+	public double getVersion() {
+		return _version;
+	}
+
+	public void setVersion(double version) {
+		_version = version;
+	}
+
 	private String _uuid;
 	private long _resourcePrimKey;
 	private long _groupId;
 	private String _articleId;
+	private double _version;
 }

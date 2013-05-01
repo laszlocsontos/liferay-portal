@@ -60,9 +60,10 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 			{ "uuid_", Types.VARCHAR },
 			{ "resourcePrimKey", Types.BIGINT },
 			{ "groupId", Types.BIGINT },
-			{ "articleId", Types.VARCHAR }
+			{ "articleId", Types.VARCHAR },
+			{ "version", Types.DOUBLE }
 		};
-	public static final String TABLE_SQL_CREATE = "create table JournalArticleResource (uuid_ VARCHAR(75) null,resourcePrimKey LONG not null primary key,groupId LONG,articleId VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table JournalArticleResource (uuid_ VARCHAR(75) null,resourcePrimKey LONG not null primary key,groupId LONG,articleId VARCHAR(75) null,version DOUBLE)";
 	public static final String TABLE_SQL_DROP = "drop table JournalArticleResource";
 	public static final String ORDER_BY_JPQL = " ORDER BY journalArticleResource.resourcePrimKey ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY JournalArticleResource.resourcePrimKey ASC";
@@ -120,6 +121,7 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 		attributes.put("resourcePrimKey", getResourcePrimKey());
 		attributes.put("groupId", getGroupId());
 		attributes.put("articleId", getArticleId());
+		attributes.put("version", getVersion());
 
 		return attributes;
 	}
@@ -148,6 +150,12 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 
 		if (articleId != null) {
 			setArticleId(articleId);
+		}
+
+		Double version = (Double)attributes.get("version");
+
+		if (version != null) {
+			setVersion(version);
 		}
 	}
 
@@ -223,6 +231,14 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 		return GetterUtil.getString(_originalArticleId);
 	}
 
+	public double getVersion() {
+		return _version;
+	}
+
+	public void setVersion(double version) {
+		_version = version;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -258,6 +274,7 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 		journalArticleResourceImpl.setResourcePrimKey(getResourcePrimKey());
 		journalArticleResourceImpl.setGroupId(getGroupId());
 		journalArticleResourceImpl.setArticleId(getArticleId());
+		journalArticleResourceImpl.setVersion(getVersion());
 
 		journalArticleResourceImpl.resetOriginalValues();
 
@@ -347,12 +364,14 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 			journalArticleResourceCacheModel.articleId = null;
 		}
 
+		journalArticleResourceCacheModel.version = getVersion();
+
 		return journalArticleResourceCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(11);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -362,13 +381,15 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 		sb.append(getGroupId());
 		sb.append(", articleId=");
 		sb.append(getArticleId());
+		sb.append(", version=");
+		sb.append(getVersion());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(16);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.journal.model.JournalArticleResource");
@@ -390,6 +411,10 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 			"<column><column-name>articleId</column-name><column-value><![CDATA[");
 		sb.append(getArticleId());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>version</column-name><column-value><![CDATA[");
+		sb.append(getVersion());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -408,6 +433,7 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 	private boolean _setOriginalGroupId;
 	private String _articleId;
 	private String _originalArticleId;
+	private double _version;
 	private long _columnBitmask;
 	private JournalArticleResource _escapedModel;
 }
