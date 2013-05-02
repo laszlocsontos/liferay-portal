@@ -127,6 +127,7 @@
 		<aop:advisor advice-ref="com.liferay.portal.dao.shard.advice.ShardGloballyAdvice" pointcut="execution(void com.liferay.portal.service.ServiceComponentLocalService.upgradeDB(..))" />
 		<aop:advisor advice-ref="com.liferay.portal.dao.shard.advice.ShardGloballyAdvice" pointcut="execution(void com.liferay.portlet.journal.service.JournalArticleLocalService.checkArticles())" />
 		<aop:advisor advice-ref="com.liferay.portal.dao.shard.advice.ShardGeneralAdvice" pointcut="execution(* com.liferay.portal.service.AccountLocalService.getAccount(long, long))" />
-		<aop:advisor advice-ref="com.liferay.portal.dao.shard.advice.ShardGeneralAdvice" pointcut="execution(* com.liferay.portal.service.UserLocalService.searchCount(..))" />
+		<aop:advisor advice-ref="com.liferay.portal.dao.shard.advice.ShardGeneralAdvice" pointcut="execution(com.liferay.portal.service.UserLocalService)" />
+		<aop:advisor advice-ref="com.liferay.portal.dao.shard.advice.ShardGeneralAdvice" pointcut="execution(com.liferay.portal.service.GroupLocalService)" />
 	</aop:config>
 </beans>

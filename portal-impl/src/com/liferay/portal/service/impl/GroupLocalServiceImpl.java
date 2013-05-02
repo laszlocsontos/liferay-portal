@@ -36,6 +36,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.StorageType;
+import com.liferay.portal.kernel.spring.aop.SelectionLogic;
+import com.liferay.portal.kernel.spring.aop.ShardSelection;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -172,6 +174,7 @@ import java.util.Map;
  * @author Wesley Gong
  * @see    com.liferay.portal.model.impl.GroupImpl
  */
+@ShardSelection(logic = SelectionLogic.PARAMETER)
 public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 	public static final String ORGANIZATION_NAME_SUFFIX = " LFR_ORGANIZATION";
