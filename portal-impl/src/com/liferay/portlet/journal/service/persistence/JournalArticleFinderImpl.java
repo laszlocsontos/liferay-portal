@@ -1076,7 +1076,7 @@ public class JournalArticleFinderImpl
 				FIND_BY_G_F, queryDefinition, "JournalArticle");
 
 			sql = CustomSQLUtil.replaceOrderBy(
-				sql, queryDefinition.getOrderByComparator());
+				sql, queryDefinition.getOrderByComparator(), "JournalArticle");
 
 			if (inlineSQLHelper) {
 				sql = InlineSQLHelperUtil.replacePermissionCheck(
@@ -1130,7 +1130,7 @@ public class JournalArticleFinderImpl
 				FIND_BY_G_C_S, queryDefinition, "JournalArticle");
 
 			sql = CustomSQLUtil.replaceOrderBy(
-				sql, queryDefinition.getOrderByComparator());
+				sql, queryDefinition.getOrderByComparator(), "JournalArticle");
 
 			if (ddmStructureKey.equals(
 					String.valueOf(
@@ -1187,7 +1187,7 @@ public class JournalArticleFinderImpl
 				FIND_BY_G_U_F_C, queryDefinition, "JournalArticle");
 
 			sql = CustomSQLUtil.replaceOrderBy(
-				sql, queryDefinition.getOrderByComparator());
+				sql, queryDefinition.getOrderByComparator(), "JournalArticle");
 
 			if (folderIds.isEmpty()) {
 				sql = StringUtil.replace(

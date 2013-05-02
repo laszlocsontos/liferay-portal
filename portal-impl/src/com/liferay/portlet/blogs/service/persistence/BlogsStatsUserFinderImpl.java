@@ -191,7 +191,7 @@ public class BlogsStatsUserFinderImpl
 			sql = StringUtil.replace(
 				sql, "[$ORGANIZATION_ID$]",
 				getOrganizationIds(organizationIds));
-			sql = CustomSQLUtil.replaceOrderBy(sql, obc);
+			sql = CustomSQLUtil.replaceOrderBy(sql, obc, "BlogsStatsUser");
 
 			SQLQuery q = session.createSQLQuery(sql);
 
