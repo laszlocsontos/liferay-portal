@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.spring.aop.SelectionLogic;
 import com.liferay.portal.kernel.spring.aop.ShardSelection;
 import com.liferay.portal.kernel.spring.aop.ShardSelectorParam;
-import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Shard;
 import com.liferay.portal.service.ShardLocalServiceUtil;
@@ -36,9 +35,11 @@ import org.aopalliance.intercept.MethodInvocation;
 public class ShardGeneralAdvice implements MethodInterceptor {
 
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-		Method method = methodInvocation.getMethod();
+		Object thisObject = methodInvocation.getThis();
 
-		Class clazz = method.getClass();
+		Class<?> clazz = thisObject.getClass();
+
+		Method method = methodInvocation.getMethod();
 
 		Object returnValue = null;
 
@@ -58,7 +59,7 @@ public class ShardGeneralAdvice implements MethodInterceptor {
 					_shardAdvice.popCompanyService();
 				}
 			}
-			else {
+			else if(shardSelection.logic() == SelectionLogic.PARAMETER) {
 				returnValue = _invokeOnShardByParameter(methodInvocation, true);
 			}
 		}
@@ -105,7 +106,7 @@ public class ShardGeneralAdvice implements MethodInterceptor {
 	private Object _invokeOnShardByParameter(
 			MethodInvocation methodInvocation, boolean defaultParamSelection)
 		throws Throwable {
-//TODO handle If ShardSelelection(logic = SelectionLogic.SKIP) applied on method
+
 		Object[] arguments = methodInvocation.getArguments();
 
 		if ((arguments == null) || (arguments.length == 0)) {
@@ -118,15 +119,28 @@ public class ShardGeneralAdvice implements MethodInterceptor {
 
 		Object companyIdParam = null;
 
-		for (int i = 0; ((i < parameterAnnotations.length) &&
-				(companyIdParam == null)); i++) {
+		for (Annotation[] annotations : parameterAnnotations) {
+			for (Annotation annotation : annotations) {
+				if (annotation instanceof ShardSelection) {
+					ShardSelection shardSelection = (ShardSelection)annotation;
+					if (shardSelection.logic() == SelectionLogic.SKIP) {
+						return methodInvocation.proceed();
+					}
+				}
+			}
+		}
 
+		int i = 0;
+
+		while ((i < parameterAnnotations.length) && (companyIdParam == null)) {
 			for (Annotation annotation : parameterAnnotations[i]) {
 				if (annotation instanceof ShardSelectorParam) {
 					companyIdParam = arguments[i];
 					break;
 				}
 			}
+
+			i++;
 		}
 
 		long companyId = -1;
@@ -140,15 +154,17 @@ public class ShardGeneralAdvice implements MethodInterceptor {
 			}
 		}
 
-		if (companyIdParam instanceof Long) {
-			companyId = (Long)companyIdParam;
-		}
-		else {
-			Class clazz = companyIdParam.getClass();
+		if ((companyId == -1) && (companyIdParam != null)) {
+			if (companyIdParam instanceof Long) {
+				companyId = (Long)companyIdParam;
+			}
+			else {
+				Class clazz = companyIdParam.getClass();
 
-			Method getCompanyIdMethod = clazz.getMethod("getCompanyId");
+				Method getCompanyIdMethod = clazz.getMethod("getCompanyId");
 
-			companyId = (Long)getCompanyIdMethod.invoke(clazz);
+				companyId = (Long)getCompanyIdMethod.invoke(clazz);
+			}
 		}
 
 		return _invokeMethod(companyId, methodInvocation);
