@@ -52,18 +52,28 @@ public class ManifestHelperTask extends Task {
 		}
 	}
 
+	public boolean getAnalyze() {
+		return _analyze;
+	}
+
+	public Reference getClasspathRef() {
+		return _path.getRefid();
+	}
+
+	public String getProjectDirPropertyName() {
+		return _projectDirPropertyName;
+	}
+
 	public void setAnalyze(boolean analyze) {
 		_analyze = analyze;
 	}
 
 	public void setClasspathRef(Reference reference) {
 		if (_path == null) {
-			_path = new Path(getProject());
+			_path = new Path(getProject()).createPath();
 		}
 
-		Path path = _path.createPath();
-
-		path.setRefid(reference);
+		_path.setRefid(reference);
 	}
 
 	public void setProjectDirPropertyName(String projectDirPropertyName) {
