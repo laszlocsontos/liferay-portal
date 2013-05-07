@@ -1408,6 +1408,17 @@ public class OrganizationLocalServiceUtil {
 			type, regionId, countryId, params);
 	}
 
+	public static int searchCount(long companyId, long parentOrganizationId,
+		java.lang.String keywords, java.lang.String type,
+		java.lang.Long regionId, java.lang.Long countryId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean fallbackToAnyParent)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchCount(companyId, parentOrganizationId, keywords,
+			type, regionId, countryId, params, fallbackToAnyParent);
+	}
+
 	/**
 	* Returns the number of organizations with the type, region, and country,
 	* and whose name, street, city, and zipcode match the keywords specified

@@ -1255,6 +1255,14 @@ public interface OrganizationLocalService extends BaseLocalService,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(long companyId, long parentOrganizationId,
+		java.lang.String keywords, java.lang.String type,
+		java.lang.Long regionId, java.lang.Long countryId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean fallbackToAnyParent)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
 	/**
 	* Returns the number of organizations with the type, region, and country,
 	* and whose name, street, city, and zipcode match the keywords specified
