@@ -812,7 +812,7 @@ public class CustomSQL {
 	private static final String _ORDER_BY_CLAUSE = " ORDER BY ";
 
 	private static final Pattern _ORDER_BY_PATTERN = Pattern.compile(
-		"((?<!\\.)\\w+\\s+(?:ASC|DESC))", Pattern.CASE_INSENSITIVE);
+		"(\\s+(?<!\\.)\\w+\\s+(?:ASC|DESC))", Pattern.CASE_INSENSITIVE);
 
 	private static final String _STATUS_CONDITION_DEFAULT = "status = ?";
 
