@@ -1471,6 +1471,39 @@ public class OrganizationLocalServiceImpl
 			LinkedHashMap<String, Object> params)
 		throws SystemException {
 
+		return searchCount(
+			companyId, parentOrganizationId, keywords, type, regionId,
+			countryId, params, false);
+	}
+
+	public int searchCount(
+			long companyId, long parentOrganizationId, String keywords,
+			String type, Long regionId, Long countryId,
+			LinkedHashMap<String, Object> params, boolean fallbackToAnyParent)
+		throws SystemException {
+
+		if ((parentOrganizationId ==
+				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) &&
+			fallbackToAnyParent) {
+
+			List<Organization> organizationsTree =
+				(List<Organization>)params.get("organizationsTree");
+
+			if (organizationsTree != null) {
+				for (Organization organizationNode : organizationsTree) {
+					if (organizationNode.getParentOrganizationId() !=
+							OrganizationConstants.
+								DEFAULT_PARENT_ORGANIZATION_ID) {
+
+						parentOrganizationId =
+							OrganizationConstants.ANY_PARENT_ORGANIZATION_ID;
+
+						break;
+					}
+				}
+			}
+		}
+
 		String parentOrganizationIdComparator = StringPool.EQUAL;
 
 		if (parentOrganizationId ==
