@@ -451,7 +451,7 @@ public class ResourcePermissionLocalServiceImpl
 		throws SystemException {
 
 		Boolean skipPermissionCheck =
-			ResourcePermissionsThreadLocal.getSkipPermissionCheck();
+			ResourcePermissionsThreadLocal.getSkipExistingPermissionCheck();
 
 		if ((skipPermissionCheck != null) && skipPermissionCheck) {
 			return null;
@@ -1098,12 +1098,13 @@ public class ResourcePermissionLocalServiceImpl
 
 	public void setResourcePermissions(
 			long companyId, String name, int scope, String primKey,
-			Map<Long, String[]> roleIdsToActionIds, boolean skipPermissionCheck)
+			Map<Long, String[]> roleIdsToActionIds,
+			boolean skipExistingPermissionCheck)
 		throws PortalException, SystemException {
 
 		boolean firstSkipPermissionCheckChange =
-			ResourcePermissionsThreadLocal.setSkipPermissionCheck(
-				skipPermissionCheck);
+			ResourcePermissionsThreadLocal.setSkipExistingPermissionCheck(
+				skipExistingPermissionCheck);
 
 		try {
 			updateResourcePermission(
@@ -1112,7 +1113,8 @@ public class ResourcePermissionLocalServiceImpl
 		}
 		finally {
 			if (firstSkipPermissionCheckChange) {
-				ResourcePermissionsThreadLocal.setSkipPermissionCheck(null);
+				ResourcePermissionsThreadLocal.setSkipExistingPermissionCheck(
+					null);
 			}
 		}
 	}
@@ -1132,7 +1134,7 @@ public class ResourcePermissionLocalServiceImpl
 		}
 		else {
 			Boolean skipPermissionCheck =
-				ResourcePermissionsThreadLocal.getSkipPermissionCheck();
+				ResourcePermissionsThreadLocal.getSkipExistingPermissionCheck();
 
 			if (PortalUtil.isSystemRole(roleId) ||
 				(skipPermissionCheck == null) || !skipPermissionCheck) {
