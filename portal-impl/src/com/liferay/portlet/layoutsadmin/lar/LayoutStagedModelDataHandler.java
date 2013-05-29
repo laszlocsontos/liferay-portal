@@ -501,9 +501,9 @@ public class LayoutStagedModelDataHandler
 
 		LayoutUtil.update(importedLayout);
 
-		List<Layout> newLayouts = portletDataContext.getNewLayouts();
+		List<Layout> importedLayouts = portletDataContext.getImportedLayouts();
 
-		newLayouts.add(importedLayout);
+		importedLayouts.add(importedLayout);
 
 		portletDataContext.setPlid(importedLayout.getPlid());
 		portletDataContext.setOldPlid(layout.getPlid());
