@@ -991,6 +991,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public Set<Layout> getNewLayouts() {
+		return _newLayouts;
+	}
+
+	@Override
 	public Map<?, ?> getNewPrimaryKeysMap(Class<?> clazz) {
 		return getNewPrimaryKeysMap(clazz.getName());
 	}
@@ -1750,6 +1755,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public void setNewLayouts(Set<Layout> newLayouts) {
+		_newLayouts = newLayouts;
+	}
+
+	@Override
 	public void setOldPlid(long oldPlid) {
 		_oldPlid = oldPlid;
 	}
@@ -2216,6 +2226,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private Map<String, Lock> _locksMap = new HashMap<String, Lock>();
 	private ManifestSummary _manifestSummary = new ManifestSummary();
 	private Element _missingReferencesElement;
+	private Set<Layout> _newLayouts;
 	private Map<String, Map<?, ?>> _newPrimaryKeysMaps =
 		new HashMap<String, Map<?, ?>>();
 	private Set<String> _notUniquePerLayout = new HashSet<String>();
