@@ -901,7 +901,8 @@ public class LayoutStagedModelDataHandler
 			addGuestPermissions = true;
 		}
 
-		boolean skipExistingPermissionCheck = true;
+		boolean skipExistingPermissionCheck =
+			PropsValues.LAYOUT_PROTOTYPE_LAR_SKIP_EXISTING_PERMISSION_CHECK;
 
 		ResourceLocalServiceUtil.addResources(
 			companyId, groupId, userId, Layout.class.getName(),

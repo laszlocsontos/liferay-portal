@@ -691,8 +691,10 @@ public class LayoutImporter {
 			// Portlet permissions
 
 			if (importPermissions) {
-				boolean skipExistingPermissionCheck = newLayouts.contains(
-					layout);
+				boolean skipExistingPermissionCheck =
+					PropsValues.
+						LAYOUT_PROTOTYPE_LAR_SKIP_EXISTING_PERMISSION_CHECK &&
+					newLayouts.contains(layout);
 
 				_permissionImporter.importPortletPermissions(
 					layoutCache, companyId, groupId, userId, layout,
