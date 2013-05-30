@@ -29,11 +29,11 @@ public class DLContentVersionComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"version"};
 
 	public DLContentVersionComparator() {
-		this(false);
+		super(false);
 	}
 
 	public DLContentVersionComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -46,21 +46,11 @@ public class DLContentVersionComparator extends OrderByComparator {
 
 		int value = version1.compareTo(version2);
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -70,10 +60,13 @@ public class DLContentVersionComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

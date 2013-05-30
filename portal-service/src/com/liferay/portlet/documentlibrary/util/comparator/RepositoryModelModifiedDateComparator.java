@@ -30,18 +30,18 @@ import java.util.Date;
  */
 public class RepositoryModelModifiedDateComparator extends OrderByComparator {
 
-	public static final String ORDER_BY_ASC = "modifiedDate ASC";
+	public static final String ORDER_BY_ASC = "[$TABLE$].modifiedDate ASC";
 
-	public static final String ORDER_BY_DESC = "modifiedDate DESC";
+	public static final String ORDER_BY_DESC = "[$TABLE$].modifiedDate DESC";
 
 	public static final String[] ORDER_BY_FIELDS = {"modifiedDate"};
 
 	public RepositoryModelModifiedDateComparator() {
-		this(false);
+		super(false);
 	}
 
 	public RepositoryModelModifiedDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class RepositoryModelModifiedDateComparator extends OrderByComparator {
 
 		int value = DateUtil.compareTo(modifiedDate1, modifiedDate2);
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
@@ -60,23 +60,8 @@ public class RepositoryModelModifiedDateComparator extends OrderByComparator {
 	}
 
 	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
 	public String[] getOrderByFields() {
 		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
 	}
 
 	protected Date getModifiedDate(Object obj) {
@@ -107,6 +92,14 @@ public class RepositoryModelModifiedDateComparator extends OrderByComparator {
 		}
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
+	}
+
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

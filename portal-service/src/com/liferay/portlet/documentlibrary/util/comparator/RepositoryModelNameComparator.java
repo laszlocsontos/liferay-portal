@@ -27,18 +27,18 @@ import com.liferay.portlet.documentlibrary.model.DLFolder;
  */
 public class RepositoryModelNameComparator extends OrderByComparator {
 
-	public static final String ORDER_BY_ASC = "title ASC";
+	public static final String ORDER_BY_ASC = "[$TABLE$].title ASC";
 
-	public static final String ORDER_BY_DESC = "title DESC";
+	public static final String ORDER_BY_DESC = "[$TABLE$].title DESC";
 
 	public static final String[] ORDER_BY_FIELDS = {"title"};
 
 	public RepositoryModelNameComparator() {
-		this(false);
+		super(false);
 	}
 
 	public RepositoryModelNameComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class RepositoryModelNameComparator extends OrderByComparator {
 
 		int value = name1.compareToIgnoreCase(name2);
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
@@ -57,23 +57,8 @@ public class RepositoryModelNameComparator extends OrderByComparator {
 	}
 
 	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
 	public String[] getOrderByFields() {
 		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
 	}
 
 	protected String getName(Object obj) {
@@ -104,6 +89,14 @@ public class RepositoryModelNameComparator extends OrderByComparator {
 		}
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
+	}
+
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

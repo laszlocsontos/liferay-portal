@@ -32,11 +32,11 @@ public class ArticleIDComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"articleId", "version"};
 
 	public ArticleIDComparator() {
-		this(false);
+		super(false);
 	}
 
 	public ArticleIDComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -58,21 +58,11 @@ public class ArticleIDComparator extends OrderByComparator {
 			}
 		}
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -82,10 +72,13 @@ public class ArticleIDComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

@@ -22,18 +22,20 @@ import com.liferay.portal.model.Organization;
  */
 public class OrganizationTypeComparator extends OrderByComparator {
 
-	public static final String ORDER_BY_ASC = "orgType ASC, orgName ASC";
+	public static final String ORDER_BY_ASC =
+		"[$TABLE$].orgType ASC, [$TABLE$].orgName ASC";
 
-	public static final String ORDER_BY_DESC = "orgType DESC, orgName DESC";
+	public static final String ORDER_BY_DESC =
+		"[$TABLE$].orgType DESC, [$TABLE$].orgName DESC";
 
 	public static final String[] ORDER_BY_FIELDS = {"type", "name"};
 
 	public OrganizationTypeComparator() {
-		this(false);
+		super(false);
 	}
 
 	public OrganizationTypeComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -53,21 +55,11 @@ public class OrganizationTypeComparator extends OrderByComparator {
 			value = name1.compareTo(name2);
 		}
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -77,10 +69,13 @@ public class OrganizationTypeComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

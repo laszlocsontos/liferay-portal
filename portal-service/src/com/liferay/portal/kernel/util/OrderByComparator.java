@@ -27,11 +27,48 @@ import java.util.Comparator;
 @SuppressWarnings("rawtypes")
 public abstract class OrderByComparator implements Comparator, Serializable {
 
+	public static final String TABLE_NAME = "[$TABLE$]";
+
+	public OrderByComparator() {
+		this(false);
+	}
+
+	public OrderByComparator(boolean ascending) {
+		this.ascending = ascending;
+	}
+
 	@Override
 	public abstract int compare(Object obj1, Object obj2);
 
 	public String getOrderBy() {
-		return null;
+		return getOrderBy(null);
+	}
+
+	public String getOrderBy(String tableName) {
+		String orderBy = null;
+
+		if (isAscending()) {
+			orderBy = getOrderByAsc();
+		}
+		else {
+			orderBy = getOrderByDesc();
+		}
+
+		if (Validator.isNull(orderBy)) {
+			return null;
+		}
+
+		if (orderBy.indexOf(TABLE_NAME) < 0) {
+			return orderBy;
+		}
+
+		if (Validator.isNull(tableName)) {
+			return StringUtil.replace(
+				orderBy, TABLE_NAME.concat(StringPool.PERIOD),
+				StringPool.BLANK);
+		}
+
+		return StringUtil.replace(orderBy, TABLE_NAME, tableName);
 	}
 
 	public String[] getOrderByConditionFields() {
@@ -78,16 +115,7 @@ public abstract class OrderByComparator implements Comparator, Serializable {
 	}
 
 	public boolean isAscending() {
-		String orderBy = getOrderBy();
-
-		if ((orderBy == null) ||
-			StringUtil.toUpperCase(orderBy).endsWith(_ORDER_BY_DESC)) {
-
-			return false;
-		}
-		else {
-			return true;
-		}
+		return ascending;
 	}
 
 	public boolean isAscending(String field) {
@@ -98,6 +126,12 @@ public abstract class OrderByComparator implements Comparator, Serializable {
 	public String toString() {
 		return getOrderBy();
 	}
+
+	protected abstract String getOrderByAsc();
+
+	protected abstract String getOrderByDesc();
+
+	protected boolean ascending;
 
 	private static final String _ORDER_BY_DESC = " DESC";
 

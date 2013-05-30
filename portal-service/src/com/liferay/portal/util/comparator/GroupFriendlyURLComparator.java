@@ -22,18 +22,20 @@ import com.liferay.portal.model.Group;
  */
 public class GroupFriendlyURLComparator extends OrderByComparator {
 
-	public static final String ORDER_BY_ASC = "groupFriendlyURL ASC";
+	public static final String ORDER_BY_ASC =
+		OrderByComparator.TABLE_NAME.concat(".groupFriendlyURL ASC");
 
-	public static final String ORDER_BY_DESC = "groupFriendlyURL DESC";
+	public static final String ORDER_BY_DESC =
+		OrderByComparator.TABLE_NAME.concat(".groupFriendlyURL DESC");
 
 	public static final String[] ORDER_BY_FIELDS = {"groupFriendlyURL"};
 
 	public GroupFriendlyURLComparator() {
-		this(false);
+		super(false);
 	}
 
 	public GroupFriendlyURLComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -46,21 +48,11 @@ public class GroupFriendlyURLComparator extends OrderByComparator {
 
 		int value = friendlyURL1.compareTo(friendlyURL2);
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -70,10 +62,13 @@ public class GroupFriendlyURLComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }
