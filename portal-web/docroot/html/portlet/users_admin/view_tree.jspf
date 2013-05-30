@@ -300,56 +300,38 @@ if (filterManageableOrganizations && organizations.isEmpty()) {
 								organizationParams.put("excludedOrganizationIds", excludedOrganizationIds);
 								%>
 
-								<c:choose>
-									<c:when test="<%= !searchTerms.hasSearchTerms() %>">
-										<liferay-ui:search-container-results>
-											<c:choose>
-												<c:when test="<%= (parentOrganizationId <= 0) && (filterManageableOrganizations) %>">
-
-													<%
-													results = ListUtil.subList(organizations, searchContainer.getStart(), searchContainer.getEnd());
-													total = organizations.size();
-
-													pageContext.setAttribute("results", results);
-													pageContext.setAttribute("total", total);
-													%>
-
-												</c:when>
-												<c:otherwise>
-													<c:choose>
-														<c:when test="<%= PropsValues.ORGANIZATIONS_INDEXER_ENABLED && PropsValues.ORGANIZATIONS_SEARCH_WITH_INDEX %>">
-															<%@ include file="/html/portlet/users_admin/organization_search_results_index.jspf" %>
-														</c:when>
-														<c:otherwise>
-															<%@ include file="/html/portlet/users_admin/organization_search_results_database.jspf" %>
-														</c:otherwise>
-													</c:choose>
-												</c:otherwise>
-											</c:choose>
-										</liferay-ui:search-container-results>
-
-										<c:if test="<%= !results.isEmpty() %>">
-											<aui:button cssClass="delete-organizations" onClick='<%= renderResponse.getNamespace() + "deleteOrganizations();" %>' value="delete" />
-										</c:if>
-									</c:when>
-									<c:otherwise>
-										<liferay-ui:search-container-results>
+								<liferay-ui:search-container-results>
+									<c:choose>
+										<c:when test="<%= !searchTerms.hasSearchTerms() && (parentOrganizationId <= 0) && (filterManageableOrganizations) %>">
 
 											<%
-											if (filterManageableOrganizations) {
-												organizationParams.put("organizationsTree", organizations);
+											results = ListUtil.subList(organizations, searchContainer.getStart(), searchContainer.getEnd());
+											total = organizations.size();
+
+											pageContext.setAttribute("results", results);
+											pageContext.setAttribute("total", total);
+											%>
+
+										</c:when>
+										<c:otherwise>
+
+											<%
+											if (searchTerms.hasSearchTerms()) {
+												if (filterManageableOrganizations) {
+													organizationParams.put("organizationsTree", organizations);
+												}
+												else if (parentOrganizationId > 0) {
+													List<Organization> organizationsTree = new ArrayList<Organization>();
+
+													Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(parentOrganizationId);
+
+													organizationsTree.add(parentOrganization);
+
+													organizationParams.put("organizationsTree", organizationsTree);
+												}
+
+												parentOrganizationId = OrganizationConstants.ANY_PARENT_ORGANIZATION_ID;
 											}
-											else if (parentOrganizationId > 0) {
-												List<Organization> organizationsTree = new ArrayList<Organization>();
-
-												Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(parentOrganizationId);
-
-												organizationsTree.add(parentOrganization);
-
-												organizationParams.put("organizationsTree", organizationsTree);
-											}
-
-											parentOrganizationId = OrganizationConstants.ANY_PARENT_ORGANIZATION_ID;
 											%>
 
 											<c:choose>
@@ -360,15 +342,13 @@ if (filterManageableOrganizations && organizations.isEmpty()) {
 													<%@ include file="/html/portlet/users_admin/organization_search_results_database.jspf" %>
 												</c:otherwise>
 											</c:choose>
+										</c:otherwise>
+									</c:choose>
 
-											<c:if test="<%= !results.isEmpty() %>">
-												<div class="separator"><!-- --></div>
-
-												<aui:button cssClass="delete-organizations" onClick='<%= renderResponse.getNamespace() + "deleteOrganizations();" %>' value="delete" />
-											</c:if>
-										</liferay-ui:search-container-results>
-									</c:otherwise>
-								</c:choose>
+									<c:if test="<%= !results.isEmpty() %>">
+										<aui:button cssClass="delete-organizations" onClick='<%= renderResponse.getNamespace() + "deleteOrganizations();" %>' value="delete" />
+									</c:if>
+								</liferay-ui:search-container-results>
 
 								<liferay-ui:search-container-row
 									className="com.liferay.portal.model.Organization"
