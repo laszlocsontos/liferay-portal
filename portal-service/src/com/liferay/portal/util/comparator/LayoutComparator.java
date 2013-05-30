@@ -31,11 +31,11 @@ public class LayoutComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"groupId", "layoutId"};
 
 	public LayoutComparator() {
-		this(false);
+		super(false);
 	}
 
 	public LayoutComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class LayoutComparator extends OrderByComparator {
 		int value = groupId1.compareTo(groupId2);
 
 		if (value != 0) {
-			if (_ascending) {
+			if (isAscending()) {
 				return value;
 			}
 			else {
@@ -62,21 +62,11 @@ public class LayoutComparator extends OrderByComparator {
 
 		value = layoutId1.compareTo(layoutId2);
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -86,10 +76,13 @@ public class LayoutComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

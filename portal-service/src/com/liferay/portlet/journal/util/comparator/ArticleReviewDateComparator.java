@@ -32,11 +32,11 @@ public class ArticleReviewDateComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"reviewDate", "version"};
 
 	public ArticleReviewDateComparator() {
-		this(false);
+		super(false);
 	}
 
 	public ArticleReviewDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -56,21 +56,11 @@ public class ArticleReviewDateComparator extends OrderByComparator {
 			}
 		}
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -80,10 +70,13 @@ public class ArticleReviewDateComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

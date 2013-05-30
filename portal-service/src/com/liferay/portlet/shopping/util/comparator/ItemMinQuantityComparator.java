@@ -35,11 +35,11 @@ public class ItemMinQuantityComparator extends OrderByComparator {
 	};
 
 	public ItemMinQuantityComparator() {
-		this(false);
+		super(false);
 	}
 
 	public ItemMinQuantityComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -66,21 +66,11 @@ public class ItemMinQuantityComparator extends OrderByComparator {
 				item2.getName().toLowerCase());
 		}
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -90,10 +80,13 @@ public class ItemMinQuantityComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

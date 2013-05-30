@@ -23,11 +23,11 @@ import com.liferay.portal.kernel.workflow.WorkflowTask;
 public class BaseWorkflowTaskNameComparator extends OrderByComparator {
 
 	public BaseWorkflowTaskNameComparator() {
-		this(false);
+		super(false);
 	}
 
 	public BaseWorkflowTaskNameComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class BaseWorkflowTaskNameComparator extends OrderByComparator {
 			value = workflowTaskId1.compareTo(workflowTaskId2);
 		}
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
@@ -56,10 +56,13 @@ public class BaseWorkflowTaskNameComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return null;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return null;
+	}
 
 }

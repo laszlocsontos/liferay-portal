@@ -31,11 +31,11 @@ public class ItemNameComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"categoryId", "name"};
 
 	public ItemNameComparator() {
-		this(false);
+		super(false);
 	}
 
 	public ItemNameComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -53,21 +53,11 @@ public class ItemNameComparator extends OrderByComparator {
 				item2.getName().toLowerCase());
 		}
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -77,10 +67,13 @@ public class ItemNameComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

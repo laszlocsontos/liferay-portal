@@ -29,11 +29,11 @@ public class EntryUserNameComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"userName"};
 
 	public EntryUserNameComparator() {
-		this(false);
+		super(false);
 	}
 
 	public EntryUserNameComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -44,21 +44,11 @@ public class EntryUserNameComparator extends OrderByComparator {
 		int value = entry1.getUserName().toLowerCase().compareTo(
 			entry2.getUserName().toLowerCase());
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -68,10 +58,13 @@ public class EntryUserNameComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

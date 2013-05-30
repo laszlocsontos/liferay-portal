@@ -30,7 +30,7 @@ public class MessageCreateDateComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"createDate"};
 
 	public MessageCreateDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -41,21 +41,11 @@ public class MessageCreateDateComparator extends OrderByComparator {
 		int value = DateUtil.compareTo(
 			message1.getCreateDate(), message2.getCreateDate());
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -65,10 +55,13 @@ public class MessageCreateDateComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

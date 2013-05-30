@@ -29,11 +29,11 @@ public class EntryPriorityComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"priority"};
 
 	public EntryPriorityComparator() {
-		this(false);
+		super(false);
 	}
 
 	public EntryPriorityComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -50,21 +50,11 @@ public class EntryPriorityComparator extends OrderByComparator {
 			value = 1;
 		}
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -74,10 +64,13 @@ public class EntryPriorityComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

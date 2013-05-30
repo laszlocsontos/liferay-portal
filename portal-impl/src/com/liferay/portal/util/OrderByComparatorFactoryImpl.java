@@ -175,6 +175,16 @@ public class OrderByComparatorFactoryImpl implements OrderByComparatorFactory {
 			}
 		}
 
+		@Override
+		protected String getOrderByAsc() {
+			return null;
+		}
+
+		@Override
+		protected String getOrderByDesc() {
+			return null;
+		}
+
 		private DefaultOrderByComparator(String tableName, Object... columns) {
 			_tableName = tableName;
 			_columns = columns;

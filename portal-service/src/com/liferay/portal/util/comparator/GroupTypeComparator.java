@@ -22,18 +22,20 @@ import com.liferay.portal.model.Group;
  */
 public class GroupTypeComparator extends OrderByComparator {
 
-	public static final String ORDER_BY_ASC = "groupType ASC, groupName ASC";
+	public static final String ORDER_BY_ASC =
+		"[$TABLE$].groupType ASC, [$TABLE$].groupName ASC";
 
-	public static final String ORDER_BY_DESC = "groupType DESC, groupName DESC";
+	public static final String ORDER_BY_DESC =
+		"[$TABLE$].groupType DESC, [$TABLE$].groupName DESC";
 
 	public static final String[] ORDER_BY_FIELDS = {"groupType", "groupName"};
 
 	public GroupTypeComparator() {
-		this(false);
+		super(false);
 	}
 
 	public GroupTypeComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -54,21 +56,11 @@ public class GroupTypeComparator extends OrderByComparator {
 			value = group1.getName().compareTo(group2.getName());
 		}
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
-		}
-	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
 		}
 	}
 
@@ -78,10 +70,13 @@ public class GroupTypeComparator extends OrderByComparator {
 	}
 
 	@Override
-	public boolean isAscending() {
-		return _ascending;
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }

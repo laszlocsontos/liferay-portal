@@ -36,11 +36,11 @@ public class RepositoryModelCreateDateComparator extends OrderByComparator {
 	public static final String[] ORDER_BY_FIELDS = {"createDate"};
 
 	public RepositoryModelCreateDateComparator() {
-		this(false);
+		super(false);
 	}
 
 	public RepositoryModelCreateDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(ascending);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class RepositoryModelCreateDateComparator extends OrderByComparator {
 
 		int value = DateUtil.compareTo(createDate1, createDate2);
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
@@ -59,23 +59,8 @@ public class RepositoryModelCreateDateComparator extends OrderByComparator {
 	}
 
 	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
 	public String[] getOrderByFields() {
 		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
 	}
 
 	protected Date getCreateDate(Object obj) {
@@ -106,6 +91,14 @@ public class RepositoryModelCreateDateComparator extends OrderByComparator {
 		}
 	}
 
-	private boolean _ascending;
+	@Override
+	protected String getOrderByAsc() {
+		return ORDER_BY_ASC;
+	}
+
+	@Override
+	protected String getOrderByDesc() {
+		return ORDER_BY_DESC;
+	}
 
 }
