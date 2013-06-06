@@ -27,10 +27,13 @@ import java.security.PrivilegedAction;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 /**
  * @author Raymond Augé
  */
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DoPrivilegedFactory implements BeanPostProcessor {
 
 	public static <T> T wrap(T bean) {

@@ -21,21 +21,30 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.ReflectionUtil;
+import com.liferay.portal.util.ClassLoaderUtil;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -43,7 +52,8 @@ import org.springframework.util.ReflectionUtils;
  * @author Shuyang Zhou
  */
 public class BeanReferenceAnnotationBeanPostProcessor
-	implements BeanFactoryAware, BeanPostProcessor {
+	extends InstantiationAwareBeanPostProcessorAdapter
+	implements BeanClassLoaderAware, BeanFactoryAware {
 
 	public BeanReferenceAnnotationBeanPostProcessor() {
 		if (_log.isDebugEnabled()) {
@@ -53,6 +63,17 @@ public class BeanReferenceAnnotationBeanPostProcessor
 
 	public void destroy() {
 		_beans.clear();
+	}
+
+	@Override
+	public Object getEarlyBeanReference(Object bean, String beanName)
+			throws BeansException {
+
+		if (!_earlyBeans.contains(beanName)) {
+			_earlyBeans.add(beanName);
+		}
+
+		return bean;
 	}
 
 	@Override
@@ -83,6 +104,11 @@ public class BeanReferenceAnnotationBeanPostProcessor
 		_autoInject(bean, beanName, bean.getClass());
 
 		return bean;
+	}
+
+	@Override
+	public void setBeanClassLoader(ClassLoader beanClassLoader) {
+		_beanClassLoader = beanClassLoader;
 	}
 
 	@Override
@@ -131,6 +157,15 @@ public class BeanReferenceAnnotationBeanPostProcessor
 			if (referencedBean == null) {
 				try {
 					referencedBean = _beanFactory.getBean(referencedBeanName);
+
+					if (_earlyBeans.contains(referencedBeanName)) {
+						referencedBean = ProxyUtil.newProxyInstance(
+							_beanClassLoader,
+							ReflectionUtil.getInterfaces(referencedBean, _beanClassLoader),
+								new LazyBeanInitializationHandler(
+									_beanFactory, referencedBeanName, _beanClassLoader)
+							);
+					}
 				}
 				catch (NoSuchBeanDefinitionException nsbde) {
 					try {
@@ -177,14 +212,68 @@ public class BeanReferenceAnnotationBeanPostProcessor
 		_autoInject(targetBean, targetBeanName, beanClass.getSuperclass());
 	}
 
-	private static final String _JAVA_LANG_OBJECT = "java.lang.Object";
-
 	private static final String _ORG_SPRINGFRAMEWORK = "org.springframework";
 
 	private static Log _log = LogFactoryUtil.getLog(
 		BeanReferenceAnnotationBeanPostProcessor.class);
 
+	private ClassLoader _beanClassLoader;
+
 	private BeanFactory _beanFactory;
+
 	private Map<String, Object> _beans = new HashMap<String, Object>();
+
+	private Set<String> _earlyBeans = new HashSet<String>(); private static final String _JAVA_LANG_OBJECT = "java.lang.Object";
+
+	private static class LazyBeanInitializationHandler implements InvocationHandler {
+
+		public LazyBeanInitializationHandler(BeanFactory beanFactory, String beanName, ClassLoader beanClassLoader) {
+			_beanClassLoader = beanClassLoader;
+			_beanFactory = beanFactory;
+			_beanName = beanName;
+		}
+
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] arguments)
+			throws Throwable {
+
+			ClassLoader contextClassLoader =
+				ClassLoaderUtil.getContextClassLoader();
+
+			try {
+				if ((_beanClassLoader != null) &&
+					(_beanClassLoader != contextClassLoader)) {
+
+					ClassLoaderUtil.setContextClassLoader(_beanClassLoader);
+				}
+
+				if (_bean == null) {
+					_bean = _beanFactory.getBean(_beanName);
+				}
+
+				return method.invoke(_bean, arguments);
+			}
+			catch (InvocationTargetException ite) {
+				_log.error(ite.getTargetException());
+
+				return null;
+			}
+			finally {
+				if ((_beanClassLoader != null) &&
+					(_beanClassLoader != contextClassLoader)) {
+
+					ClassLoaderUtil.setContextClassLoader(contextClassLoader);
+				}
+			}
+		}
+
+		ClassLoader _beanClassLoader;
+		BeanFactory _beanFactory;
+		String _beanName;
+
+		Object _bean;
+
+	}
+
 
 }
