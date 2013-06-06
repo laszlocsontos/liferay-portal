@@ -256,6 +256,10 @@
 		<column name="groupId" type="long" />
 		<column name="articleId" type="String" />
 
+		<!-- Latest versions for approved and expired articles -->
+		<column name="lastApprovedVersion" type="double" />
+		<column name="lastExpiredVersion" type="double" />
+
 		<!-- Finder methods -->
 
 		<finder name="GroupId" return-type="Collection">

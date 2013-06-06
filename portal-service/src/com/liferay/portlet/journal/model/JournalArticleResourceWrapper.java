@@ -53,6 +53,8 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 		attributes.put("resourcePrimKey", getResourcePrimKey());
 		attributes.put("groupId", getGroupId());
 		attributes.put("articleId", getArticleId());
+		attributes.put("lastApprovedVersion", getLastApprovedVersion());
+		attributes.put("lastExpiredVersion", getLastExpiredVersion());
 
 		return attributes;
 	}
@@ -81,6 +83,19 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 
 		if (articleId != null) {
 			setArticleId(articleId);
+		}
+
+		Double lastApprovedVersion = (Double)attributes.get(
+				"lastApprovedVersion");
+
+		if (lastApprovedVersion != null) {
+			setLastApprovedVersion(lastApprovedVersion);
+		}
+
+		Double lastExpiredVersion = (Double)attributes.get("lastExpiredVersion");
+
+		if (lastExpiredVersion != null) {
+			setLastExpiredVersion(lastExpiredVersion);
 		}
 	}
 
@@ -182,6 +197,46 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	@Override
 	public void setArticleId(java.lang.String articleId) {
 		_journalArticleResource.setArticleId(articleId);
+	}
+
+	/**
+	* Returns the last approved version of this journal article resource.
+	*
+	* @return the last approved version of this journal article resource
+	*/
+	@Override
+	public double getLastApprovedVersion() {
+		return _journalArticleResource.getLastApprovedVersion();
+	}
+
+	/**
+	* Sets the last approved version of this journal article resource.
+	*
+	* @param lastApprovedVersion the last approved version of this journal article resource
+	*/
+	@Override
+	public void setLastApprovedVersion(double lastApprovedVersion) {
+		_journalArticleResource.setLastApprovedVersion(lastApprovedVersion);
+	}
+
+	/**
+	* Returns the last expired version of this journal article resource.
+	*
+	* @return the last expired version of this journal article resource
+	*/
+	@Override
+	public double getLastExpiredVersion() {
+		return _journalArticleResource.getLastExpiredVersion();
+	}
+
+	/**
+	* Sets the last expired version of this journal article resource.
+	*
+	* @param lastExpiredVersion the last expired version of this journal article resource
+	*/
+	@Override
+	public void setLastExpiredVersion(double lastExpiredVersion) {
+		_journalArticleResource.setLastExpiredVersion(lastExpiredVersion);
 	}
 
 	@Override

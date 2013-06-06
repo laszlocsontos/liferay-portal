@@ -1873,6 +1873,8 @@
 		<property name="uuid" type="com.liferay.portal.dao.orm.hibernate.StringType" column="uuid_" />
 		<property name="groupId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="articleId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="lastApprovedVersion" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="lastExpiredVersion" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
 	</class>
 	<class name="com.liferay.portlet.journal.model.impl.JournalContentSearchImpl" table="JournalContentSearch">
 		<cache usage="read-write" />

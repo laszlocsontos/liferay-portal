@@ -115,6 +115,34 @@ public interface JournalArticleResourceModel extends BaseModel<JournalArticleRes
 	 */
 	public void setArticleId(String articleId);
 
+	/**
+	 * Returns the last approved version of this journal article resource.
+	 *
+	 * @return the last approved version of this journal article resource
+	 */
+	public double getLastApprovedVersion();
+
+	/**
+	 * Sets the last approved version of this journal article resource.
+	 *
+	 * @param lastApprovedVersion the last approved version of this journal article resource
+	 */
+	public void setLastApprovedVersion(double lastApprovedVersion);
+
+	/**
+	 * Returns the last expired version of this journal article resource.
+	 *
+	 * @return the last expired version of this journal article resource
+	 */
+	public double getLastExpiredVersion();
+
+	/**
+	 * Sets the last expired version of this journal article resource.
+	 *
+	 * @param lastExpiredVersion the last expired version of this journal article resource
+	 */
+	public void setLastExpiredVersion(double lastExpiredVersion);
+
 	@Override
 	public boolean isNew();
 

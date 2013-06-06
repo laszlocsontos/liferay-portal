@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
+import com.liferay.portal.test.AssertUtils;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
 import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
@@ -120,6 +121,10 @@ public class JournalArticleResourcePersistenceTest {
 
 		newJournalArticleResource.setArticleId(ServiceTestUtil.randomString());
 
+		newJournalArticleResource.setLastApprovedVersion(ServiceTestUtil.nextDouble());
+
+		newJournalArticleResource.setLastExpiredVersion(ServiceTestUtil.nextDouble());
+
 		_persistence.update(newJournalArticleResource);
 
 		JournalArticleResource existingJournalArticleResource = _persistence.findByPrimaryKey(newJournalArticleResource.getPrimaryKey());
@@ -132,6 +137,10 @@ public class JournalArticleResourcePersistenceTest {
 			newJournalArticleResource.getGroupId());
 		Assert.assertEquals(existingJournalArticleResource.getArticleId(),
 			newJournalArticleResource.getArticleId());
+		AssertUtils.assertEquals(existingJournalArticleResource.getLastApprovedVersion(),
+			newJournalArticleResource.getLastApprovedVersion());
+		AssertUtils.assertEquals(existingJournalArticleResource.getLastExpiredVersion(),
+			newJournalArticleResource.getLastExpiredVersion());
 	}
 
 	@Test
@@ -172,7 +181,8 @@ public class JournalArticleResourcePersistenceTest {
 	protected OrderByComparator getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("JournalArticleResource",
 			"uuid", true, "resourcePrimKey", true, "groupId", true,
-			"articleId", true);
+			"articleId", true, "lastApprovedVersion", true,
+			"lastExpiredVersion", true);
 	}
 
 	@Test
@@ -325,6 +335,10 @@ public class JournalArticleResourcePersistenceTest {
 		journalArticleResource.setGroupId(ServiceTestUtil.nextLong());
 
 		journalArticleResource.setArticleId(ServiceTestUtil.randomString());
+
+		journalArticleResource.setLastApprovedVersion(ServiceTestUtil.nextDouble());
+
+		journalArticleResource.setLastExpiredVersion(ServiceTestUtil.nextDouble());
 
 		_persistence.update(journalArticleResource);
 

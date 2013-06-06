@@ -60,9 +60,11 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 			{ "uuid_", Types.VARCHAR },
 			{ "resourcePrimKey", Types.BIGINT },
 			{ "groupId", Types.BIGINT },
-			{ "articleId", Types.VARCHAR }
+			{ "articleId", Types.VARCHAR },
+			{ "lastApprovedVersion", Types.DOUBLE },
+			{ "lastExpiredVersion", Types.DOUBLE }
 		};
-	public static final String TABLE_SQL_CREATE = "create table JournalArticleResource (uuid_ VARCHAR(75) null,resourcePrimKey LONG not null primary key,groupId LONG,articleId VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table JournalArticleResource (uuid_ VARCHAR(75) null,resourcePrimKey LONG not null primary key,groupId LONG,articleId VARCHAR(75) null,lastApprovedVersion DOUBLE,lastExpiredVersion DOUBLE)";
 	public static final String TABLE_SQL_DROP = "drop table JournalArticleResource";
 	public static final String ORDER_BY_JPQL = " ORDER BY journalArticleResource.resourcePrimKey ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY JournalArticleResource.resourcePrimKey ASC";
@@ -126,6 +128,8 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 		attributes.put("resourcePrimKey", getResourcePrimKey());
 		attributes.put("groupId", getGroupId());
 		attributes.put("articleId", getArticleId());
+		attributes.put("lastApprovedVersion", getLastApprovedVersion());
+		attributes.put("lastExpiredVersion", getLastExpiredVersion());
 
 		return attributes;
 	}
@@ -154,6 +158,19 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 
 		if (articleId != null) {
 			setArticleId(articleId);
+		}
+
+		Double lastApprovedVersion = (Double)attributes.get(
+				"lastApprovedVersion");
+
+		if (lastApprovedVersion != null) {
+			setLastApprovedVersion(lastApprovedVersion);
+		}
+
+		Double lastExpiredVersion = (Double)attributes.get("lastExpiredVersion");
+
+		if (lastExpiredVersion != null) {
+			setLastExpiredVersion(lastExpiredVersion);
 		}
 	}
 
@@ -237,6 +254,26 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 		return GetterUtil.getString(_originalArticleId);
 	}
 
+	@Override
+	public double getLastApprovedVersion() {
+		return _lastApprovedVersion;
+	}
+
+	@Override
+	public void setLastApprovedVersion(double lastApprovedVersion) {
+		_lastApprovedVersion = lastApprovedVersion;
+	}
+
+	@Override
+	public double getLastExpiredVersion() {
+		return _lastExpiredVersion;
+	}
+
+	@Override
+	public void setLastExpiredVersion(double lastExpiredVersion) {
+		_lastExpiredVersion = lastExpiredVersion;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -272,6 +309,8 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 		journalArticleResourceImpl.setResourcePrimKey(getResourcePrimKey());
 		journalArticleResourceImpl.setGroupId(getGroupId());
 		journalArticleResourceImpl.setArticleId(getArticleId());
+		journalArticleResourceImpl.setLastApprovedVersion(getLastApprovedVersion());
+		journalArticleResourceImpl.setLastExpiredVersion(getLastExpiredVersion());
 
 		journalArticleResourceImpl.resetOriginalValues();
 
@@ -359,12 +398,16 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 			journalArticleResourceCacheModel.articleId = null;
 		}
 
+		journalArticleResourceCacheModel.lastApprovedVersion = getLastApprovedVersion();
+
+		journalArticleResourceCacheModel.lastExpiredVersion = getLastExpiredVersion();
+
 		return journalArticleResourceCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -374,6 +417,10 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 		sb.append(getGroupId());
 		sb.append(", articleId=");
 		sb.append(getArticleId());
+		sb.append(", lastApprovedVersion=");
+		sb.append(getLastApprovedVersion());
+		sb.append(", lastExpiredVersion=");
+		sb.append(getLastExpiredVersion());
 		sb.append("}");
 
 		return sb.toString();
@@ -381,7 +428,7 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(16);
+		StringBundler sb = new StringBundler(22);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.portlet.journal.model.JournalArticleResource");
@@ -403,6 +450,14 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 			"<column><column-name>articleId</column-name><column-value><![CDATA[");
 		sb.append(getArticleId());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>lastApprovedVersion</column-name><column-value><![CDATA[");
+		sb.append(getLastApprovedVersion());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>lastExpiredVersion</column-name><column-value><![CDATA[");
+		sb.append(getLastExpiredVersion());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -421,6 +476,8 @@ public class JournalArticleResourceModelImpl extends BaseModelImpl<JournalArticl
 	private boolean _setOriginalGroupId;
 	private String _articleId;
 	private String _originalArticleId;
+	private double _lastApprovedVersion;
+	private double _lastExpiredVersion;
 	private long _columnBitmask;
 	private JournalArticleResource _escapedModel;
 }

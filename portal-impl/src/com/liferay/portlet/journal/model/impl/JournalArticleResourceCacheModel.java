@@ -36,7 +36,7 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 	Externalizable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(13);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -46,6 +46,10 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 		sb.append(groupId);
 		sb.append(", articleId=");
 		sb.append(articleId);
+		sb.append(", lastApprovedVersion=");
+		sb.append(lastApprovedVersion);
+		sb.append(", lastExpiredVersion=");
+		sb.append(lastExpiredVersion);
 		sb.append("}");
 
 		return sb.toString();
@@ -72,6 +76,9 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 			journalArticleResourceImpl.setArticleId(articleId);
 		}
 
+		journalArticleResourceImpl.setLastApprovedVersion(lastApprovedVersion);
+		journalArticleResourceImpl.setLastExpiredVersion(lastExpiredVersion);
+
 		journalArticleResourceImpl.resetOriginalValues();
 
 		return journalArticleResourceImpl;
@@ -83,6 +90,8 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 		resourcePrimKey = objectInput.readLong();
 		groupId = objectInput.readLong();
 		articleId = objectInput.readUTF();
+		lastApprovedVersion = objectInput.readDouble();
+		lastExpiredVersion = objectInput.readDouble();
 	}
 
 	@Override
@@ -104,10 +113,15 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 		else {
 			objectOutput.writeUTF(articleId);
 		}
+
+		objectOutput.writeDouble(lastApprovedVersion);
+		objectOutput.writeDouble(lastExpiredVersion);
 	}
 
 	public String uuid;
 	public long resourcePrimKey;
 	public long groupId;
 	public String articleId;
+	public double lastApprovedVersion;
+	public double lastExpiredVersion;
 }

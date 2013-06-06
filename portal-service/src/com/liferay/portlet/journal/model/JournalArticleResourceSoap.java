@@ -34,6 +34,8 @@ public class JournalArticleResourceSoap implements Serializable {
 		soapModel.setResourcePrimKey(model.getResourcePrimKey());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setArticleId(model.getArticleId());
+		soapModel.setLastApprovedVersion(model.getLastApprovedVersion());
+		soapModel.setLastExpiredVersion(model.getLastExpiredVersion());
 
 		return soapModel;
 	}
@@ -121,8 +123,26 @@ public class JournalArticleResourceSoap implements Serializable {
 		_articleId = articleId;
 	}
 
+	public double getLastApprovedVersion() {
+		return _lastApprovedVersion;
+	}
+
+	public void setLastApprovedVersion(double lastApprovedVersion) {
+		_lastApprovedVersion = lastApprovedVersion;
+	}
+
+	public double getLastExpiredVersion() {
+		return _lastExpiredVersion;
+	}
+
+	public void setLastExpiredVersion(double lastExpiredVersion) {
+		_lastExpiredVersion = lastExpiredVersion;
+	}
+
 	private String _uuid;
 	private long _resourcePrimKey;
 	private long _groupId;
 	private String _articleId;
+	private double _lastApprovedVersion;
+	private double _lastExpiredVersion;
 }

@@ -2590,6 +2590,8 @@
 			</basic>
 			<basic name="groupId" />
 			<basic name="articleId" />
+			<basic name="lastApprovedVersion" />
+			<basic name="lastExpiredVersion" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
