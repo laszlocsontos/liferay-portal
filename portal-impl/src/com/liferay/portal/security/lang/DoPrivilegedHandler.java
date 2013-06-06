@@ -31,11 +31,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.BeanFactory;
+
 /**
  * @author Raymond Augé
  */
 public class DoPrivilegedHandler
 	implements DoPrivilegedBean, InvocationHandler {
+
+	public DoPrivilegedHandler(BeanFactory beanFactory, String beanName) {
+		_beanFactory = beanFactory;
+		_beanName = beanName;
+
+		_initNotPrivilegedMethods();
+	}
 
 	public DoPrivilegedHandler(Object bean) {
 		_bean = bean;
@@ -45,7 +54,11 @@ public class DoPrivilegedHandler
 
 	@Override
 	public Object getActualBean() {
-		return _bean;
+		try {
+			return _getBean();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -69,7 +82,7 @@ public class DoPrivilegedHandler
 		if (methodDeclaringClass.equals(DoPrivilegedBean.class) &&
 			methodName.equals("getActualBean")) {
 
-			return _bean;
+			return _getBean();
 		}
 		else if (methodDeclaringClass.equals(Object.class) &&
 				 methodName.equals("equals")) {
@@ -82,10 +95,10 @@ public class DoPrivilegedHandler
 				object = doPrivilegedBean.getActualBean();
 			}
 
-			return _bean.equals(object);
+			return _getBean().equals(object);
 		}
 		else if (!SecurityManagerUtil.isActive() || _isNotPrivileged(method)) {
-			return method.invoke(_bean, arguments);
+			return method.invoke(_getBean(), arguments);
 		}
 
 		String declaringClassName = methodDeclaringClass.getName();
@@ -93,12 +106,12 @@ public class DoPrivilegedHandler
 		if (declaringClassName.endsWith(_BEAN_NAME_SUFFIX_FINDER) ||
 			declaringClassName.endsWith(_BEAN_NAME_SUFFIX_PERSISTENCE)) {
 
-			PortalServicePermission.checkService(_bean, method, arguments);
+			PortalServicePermission.checkService(_getBean(), method, arguments);
 		}
 
 		try {
 			return AccessController.doPrivileged(
-				new InvokePrivilegedExceptionAction(_bean, method, arguments));
+				new InvokePrivilegedExceptionAction(_getBean(), method, arguments));
 		}
 		catch (PrivilegedActionException pae) {
 			Exception e = pae.getException();
@@ -107,10 +120,33 @@ public class DoPrivilegedHandler
 		}
 	}
 
+	private Object _getBean() throws Exception {
+		if (_bean == null) {
+			_bean = AccessController.doPrivileged(
+				new InvokePrivilegedExceptionAction(_beanFactory, BeanFactory.class.getMethod("getBean", String.class), new Object[] { _beanName }));
+		}
+
+		return _bean;
+	}
+
+	private Class<?> _getBeanClass() throws Exception {
+		if (_bean == null) {
+			return (Class<?>) AccessController.doPrivileged(
+				new InvokePrivilegedExceptionAction(_beanFactory, BeanFactory.class.getMethod("getType", String.class), new Object[] { _beanName }));
+		}
+
+		return _bean.getClass();
+	}
+
 	private void _initNotPrivilegedMethods() {
 		_notPrivilegedMethods = new ArrayList<MethodKey>();
 
-		Class<?> beanClass = _bean.getClass();
+		Class<?> beanClass;
+		try {
+			beanClass = _getBeanClass();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		Method[] methods = beanClass.getMethods();
 
@@ -148,6 +184,9 @@ public class DoPrivilegedHandler
 	private static final String _BEAN_NAME_SUFFIX_PERSISTENCE = "Persistence";
 
 	private Object _bean;
+	private BeanFactory _beanFactory;
+	private String _beanName;
+
 	private boolean _hasNotPrivilegedMethods = false;
 	private List<MethodKey> _notPrivilegedMethods;
 

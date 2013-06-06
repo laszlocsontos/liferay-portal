@@ -22,16 +22,25 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.util.ClassLoaderUtil;
 
+import java.lang.reflect.InvocationHandler;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 
 /**
  * @author Raymond Augé
  */
-public class DoPrivilegedFactory implements BeanPostProcessor {
+public class DoPrivilegedFactory
+	extends InstantiationAwareBeanPostProcessorAdapter
+	implements BeanFactoryAware {
 
 	public static <T> T wrap(T bean) {
 		Class<?> clazz = bean.getClass();
@@ -48,7 +57,7 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 			if (packageName.startsWith("java.")) {
 				return bean;
 			}
-		}
+ 		}
 
 		Class<?>[] interfaces = ReflectionUtil.getInterfaces(bean);
 
@@ -60,7 +69,42 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 			new BeanPrivilegedAction<T>(bean, interfaces));
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T wrap(T bean, BeanFactory beanFactory, String beanName) {
+		Class<?> clazz = bean.getClass();
+
+		if (clazz.isPrimitive()) {
+			return bean;
+		}
+
+		Package pkg = clazz.getPackage();
+
+		if (pkg != null) {
+			String packageName = pkg.getName();
+
+			if (packageName.startsWith("java.")) {
+				return bean;
+			}
+ 		}
+
+		Class<?>[] interfaces = ReflectionUtil.getInterfaces(bean);
+
+		if (interfaces.length <= 0) {
+			return bean;
+		}
+
+		return AccessController.doPrivileged(
+			new BeanPrivilegedAction<T>(bean, beanFactory, beanName, interfaces));
+	}
+
 	public DoPrivilegedFactory() {
+	}
+
+	@Override
+	public Object getEarlyBeanReference(Object bean, String beanName) {
+		_earlyBeanReferences.putIfAbsent(beanName, bean);
+
+		return bean;
 	}
 
 	@Override
@@ -83,6 +127,12 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 					clazz + " with access controller checking");
 		}
 
+		if (_isEarlyBeanReference(beanName) &&
+			_isFinderOrPersistence(beanName)) {
+
+			return wrap(bean, _beanFactory, beanName);
+		}
+
 		return wrap(bean);
 	}
 
@@ -91,6 +141,11 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 		throws BeansException {
 
 		return bean;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		_beanFactory = beanFactory;
 	}
 
 	private boolean _isDoPrivileged(Class<?> beanClass) {
@@ -109,6 +164,10 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 		return false;
 	}
 
+	private boolean _isEarlyBeanReference(String beanName) {
+		return _earlyBeanReferences.containsKey(beanName);
+	}
+
 	private boolean _isFinderOrPersistence(String beanName) {
 		if (beanName.endsWith(_BEAN_NAME_SUFFIX_FINDER) ||
 			beanName.endsWith(_BEAN_NAME_SUFFIX_PERSISTENCE)) {
@@ -125,12 +184,31 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 
 	private static Log _log = LogFactoryUtil.getLog(DoPrivilegedFactory.class);
 
+	private static ConcurrentMap<String, Object> _earlyBeanReferences =
+		new ConcurrentHashMap<String, Object>();
+
+	private BeanFactory _beanFactory;
+
 	private static class BeanPrivilegedAction <T>
 		implements PrivilegedAction<T> {
 
 		public BeanPrivilegedAction(T bean, Class<?>[] interfaces) {
 			_bean = bean;
+
 			_interfaces = ArrayUtil.append(interfaces, DoPrivilegedBean.class);
+
+			_invocationHandler = new DoPrivilegedHandler(bean);
+		}
+
+		public BeanPrivilegedAction(
+			T bean, BeanFactory beanFactory, String beanName,
+			Class<?>[] interfaces) {
+
+			_bean = bean;
+
+			_interfaces = ArrayUtil.append(interfaces, DoPrivilegedBean.class);
+
+			_invocationHandler = new DoPrivilegedHandler(beanFactory, beanName);
 		}
 
 		@Override
@@ -138,7 +216,7 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 			try {
 				return (T)ProxyUtil.newProxyInstance(
 					ClassLoaderUtil.getPortalClassLoader(), _interfaces,
-					new DoPrivilegedHandler(_bean));
+					_invocationHandler);
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
@@ -150,7 +228,10 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 		}
 
 		private T _bean;
+
 		private Class<?>[] _interfaces;
+
+		private InvocationHandler _invocationHandler;
 
 	}
 
