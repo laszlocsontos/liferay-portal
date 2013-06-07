@@ -16,16 +16,17 @@ package com.liferay.portal.jcr;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.memory.FinalizeManager;
-import com.liferay.portal.kernel.util.AutoResetThreadLocal;
+import com.liferay.portal.kernel.util.InitialThreadLocal;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsValues;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+
+import org.apache.commons.collections.map.ReferenceMap;
 
 /**
  * @author Michael Young
@@ -112,9 +113,9 @@ public class JCRFactoryUtil {
 	}
 
 	private static JCRFactory _jcrFactory;
+
 	private static ThreadLocal<Map<String, Session>> _sessions =
-		new AutoResetThreadLocal<Map<String, Session>>(
-			JCRFactoryUtil.class + "._sessions",
-			new HashMap<String, Session>());
+		new InitialThreadLocal<Map<String, Session>>(
+			JCRFactoryUtil.class + "._sessions", new ReferenceMap(), false);
 
 }
