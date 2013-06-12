@@ -177,7 +177,11 @@ public class DoPrivilegedFactory
 
 			Package pkg = clazz.getPackage();
 
-			String packageName = pkg.getName();
+			String packageName = "";
+
+			if (pkg != null) {
+				packageName = pkg.getName();
+			}
 
 			if (clazz.isPrimitive() || packageName.startsWith("java.")) {
 				return _bean;
