@@ -21,6 +21,10 @@ import com.liferay.portal.kernel.bean.IdentifiableBean;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.security.lang.DoPrivilegedBean;
+import com.liferay.portal.security.lang.DoPrivilegedFactory;
+import com.liferay.portal.service.persistence.BasePersistence;
+import com.liferay.portal.service.persistence.GroupPersistence;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -155,6 +159,17 @@ public class BeanReferenceAnnotationBeanPostProcessor
 						throw new BeanLocatorException(
 							stringWriter.toString(), ble);
 					}
+				}
+
+				/*
+				if (referencedBean instanceof GroupPersistence) {
+					_log.error("@@@ Injecting " + referencedBeanName + " into " +
+						targetBeanName + " " + _beans.containsKey(referencedBeanName));
+				}*/
+				if ((referencedBean instanceof BasePersistence<?>) &&
+					!(referencedBean instanceof DoPrivilegedBean)) {
+
+					referencedBean = DoPrivilegedFactory.wrap(referencedBean);
 				}
 
 				_beans.put(referencedBeanName, referencedBean);
