@@ -26,14 +26,21 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
 
 /**
  * @author Raymond Augé
  */
-public class DoPrivilegedFactory implements BeanPostProcessor {
+public class DoPrivilegedFactory
+	extends InstantiationAwareBeanPostProcessorAdapter {
+
+	public static boolean isEarlyBeanReference(String beanName) {
+		return _earlyBeanReferenceNames.contains(beanName);
+	}
 
 	public static <T> T wrap(T bean) {
 		return AccessController.doPrivileged(new BeanPrivilegedAction<T>(bean));
@@ -42,6 +49,16 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 	public DoPrivilegedFactory() {
 	}
 
+	@Override
+	public Object getEarlyBeanReference(Object bean, String beanName)
+		throws BeansException {
+
+		_earlyBeanReferenceNames.add(beanName);
+
+		return bean;
+	}
+
+	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName)
 		throws BeansException {
 
@@ -52,6 +69,16 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 		Class<?> clazz = bean.getClass();
 
 		if (!_isDoPrivileged(clazz) && !_isFinderOrPersistence(beanName)) {
+			return bean;
+		}
+
+		if (isEarlyBeanReference(beanName)) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Postpone wrapping as bean " + beanName +
+						" is just an early reference now");
+			}
+
 			return bean;
 		}
 
@@ -135,6 +162,8 @@ public class DoPrivilegedFactory implements BeanPostProcessor {
 	private static final String _BEAN_NAME_SUFFIX_PERSISTENCE = "Persistence";
 
 	private static Log _log = LogFactoryUtil.getLog(DoPrivilegedFactory.class);
+
+	private static Set<String> _earlyBeanReferenceNames = new HashSet<String>();
 
 	private static class BeanPrivilegedAction <T>
 		implements PrivilegedAction<T> {
