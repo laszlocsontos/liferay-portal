@@ -72,6 +72,28 @@ public class DB2DB extends BaseDB {
 		return _SUPPORTS_SCROLLABLE_RESULTS;
 	}
 
+	public void reorgTable(String tableName) throws SQLException {
+		Connection con = null;
+		CallableStatement callStmt = null;
+
+		try {
+			con = DataAccess.getConnection();
+
+			String sql = "call sysproc.admin_cmd(?)";
+
+			callStmt = con.prepareCall(sql);
+
+			String param = "reorg table " + tableName;
+
+			callStmt.setString(1, param);
+
+			callStmt.execute();
+		}
+		finally {
+			DataAccess.cleanUp(con, callStmt);
+		}
+	}
+
 	@Override
 	public void runSQL(String template) throws IOException, SQLException {
 		if (template.startsWith(ALTER_COLUMN_NAME)) {
@@ -197,26 +219,8 @@ public class DB2DB extends BaseDB {
 			return;
 		}
 
-		Connection con = null;
-		CallableStatement callStmt = null;
-
-		try {
-			con = DataAccess.getConnection();
-
-			for (String tableName : tableNames) {
-				String sql = "call sysproc.admin_cmd(?)";
-
-				callStmt = con.prepareCall(sql);
-
-				String param = "reorg table " + tableName;
-
-				callStmt.setString(1, param);
-
-				callStmt.execute();
-			}
-		}
-		finally {
-			DataAccess.cleanUp(con, callStmt);
+		for (String tableName : tableNames) {
+			reorgTable(tableName);
 		}
 	}
 
