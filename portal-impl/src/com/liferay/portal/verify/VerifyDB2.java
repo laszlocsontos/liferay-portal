@@ -14,6 +14,7 @@
 
 package com.liferay.portal.verify;
 
+import com.liferay.portal.dao.db.DB2DB;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
@@ -37,6 +38,8 @@ public class VerifyDB2 extends VerifyProcess {
 		if (!dbType.equals(DB.TYPE_DB2)) {
 			return;
 		}
+
+		_db2db = (DB2DB)db;
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -63,16 +66,14 @@ public class VerifyDB2 extends VerifyProcess {
 					continue;
 				}
 
-				String columnName = rs.getString(2);
-
-				runSQL(
-					"alter table " + tableName + " alter column " + columnName +
-						" set data type varchar(600)");
+				_db2db.reorgTable(tableName);
 			}
 		}
 		finally {
 			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
+
+	private DB2DB _db2db;
 
 }
