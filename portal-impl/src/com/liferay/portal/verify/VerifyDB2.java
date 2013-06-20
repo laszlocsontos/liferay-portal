@@ -66,7 +66,7 @@ public class VerifyDB2 extends VerifyProcess {
 					continue;
 				}
 
-				_db2db.reorgTable(tableName);
+				// _db2db.reorgTable(tableName);
 			}
 		}
 		finally {
