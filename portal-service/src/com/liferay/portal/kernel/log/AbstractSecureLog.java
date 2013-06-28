@@ -14,8 +14,10 @@
 
 package com.liferay.portal.kernel.log;
 
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
+import com.liferay.portal.kernel.util.StackTraceUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 /**
  * @author László Csontos
@@ -142,7 +144,7 @@ public abstract class AbstractSecureLog<L> implements Log {
 		log(getWarnLevel(), t.getMessage(), t);
 	}
 
-	protected abstract void doLog(L level, String msg, Throwable t);
+	protected abstract void doLog(L level, String msg);
 
 	protected abstract L getDebugLevel();
 
@@ -163,7 +165,32 @@ public abstract class AbstractSecureLog<L> implements Log {
 	}
 
 	protected void log(L level, Object msg, Throwable t) {
-		doLog(level, GetterUtil.getString(msg, StringPool.BLANK), t);
+		if (t == null) {
+			doLog(level, LogUtil.sanitize(msg));
+
+			return;
+		}
+
+		String message = StringPool.BLANK;
+
+		if (msg != null) {
+			message = SanitizerUtil.sanitizeCrlf(msg.toString());
+		}
+
+		if (Validator.isBlank(message)) {
+			message = SanitizerUtil.sanitizeCrlf(t.getMessage());
+		}
+
+		if (Validator.isBlank(message)) {
+			message = t.getClass().getName();
+		}
+
+		String stackTrace = LogUtil.sanitize(
+			StackTraceUtil.getStackTrace(t, true));
+
+		message = message.concat(StringPool.OS_EOL).concat(stackTrace);
+
+		doLog(level, message);
 	}
 
 	protected void log(L level, Throwable t) {
