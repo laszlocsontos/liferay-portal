@@ -15,7 +15,12 @@
 package com.liferay.portal.kernel.log;
 
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.StackTraceUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 /**
  * @author László Csontos
@@ -142,7 +147,7 @@ public abstract class AbstractSecureLog<L> implements Log {
 		log(getWarnLevel(), t.getMessage(), t);
 	}
 
-	protected abstract void doLog(L level, String msg, Throwable t);
+	protected abstract void doLog(L level, String msg);
 
 	protected abstract L getDebugLevel();
 
@@ -163,11 +168,76 @@ public abstract class AbstractSecureLog<L> implements Log {
 	}
 
 	protected void log(L level, Object msg, Throwable t) {
-		doLog(level, GetterUtil.getString(msg, StringPool.BLANK), t);
+		String message = _sanitize(msg);
+
+		if (t == null) {
+			doLog(level, message);
+
+			return;
+		}
+
+		if (Validator.isBlank(message)) {
+			message = _sanitize(t.getMessage());
+		}
+
+		if (Validator.isBlank(message)) {
+			message = t.getClass().getName();
+		}
+
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(message);
+		sb.append(StringPool.OS_EOL);
+
+		String stackTrace = _sanitize(
+			StackTraceUtil.getStackTrace(t), false, true);
+
+		sb.append(stackTrace);
+
+		doLog(level, sb.toString());
 	}
 
 	protected void log(L level, Throwable t) {
 		log(level, null, t);
 	}
+
+	private String _sanitize(Object msg) {
+		return _sanitize(msg, true, true);
+	}
+
+	private String _sanitize(
+			Object msg, boolean sanitizeCrlf, boolean sanitizeHtml) {
+
+		String originalMessage = GetterUtil.getString(msg, StringPool.BLANK);
+
+		if (Validator.isBlank(originalMessage)) {
+			return originalMessage;
+		}
+
+		String sanitizedMessage = originalMessage;
+
+		if (sanitizeCrlf) {
+			sanitizedMessage = StringUtil.replace(
+				sanitizedMessage, _CRLF, _UNDERLINES);
+		}
+
+		if (sanitizeHtml) {
+			sanitizedMessage = HtmlUtil.escape(sanitizedMessage);
+		}
+
+		if (!sanitizedMessage.equals(originalMessage)) {
+			sanitizedMessage = sanitizedMessage.concat(" [Encoded]");
+		}
+
+		return sanitizedMessage;
+	}
+
+	private static final String[] _CRLF = new String[] {
+		StringPool.NEW_LINE, StringPool.RETURN
+	};
+
+	private static final String[] _UNDERLINES = new String[] {
+		StringPool.UNDERLINE, StringPool.UNDERLINE
+	};
 
 }
