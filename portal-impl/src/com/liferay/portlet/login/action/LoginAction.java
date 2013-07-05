@@ -158,6 +158,8 @@ public class LoginAction extends PortletAction {
 
 				SessionErrors.add(actionRequest, e.getClass());
 			}
+
+			setStatusFound(actionResponse);
 		}
 		else if (e instanceof CompanyMaxUsersException ||
 				 e instanceof CookieNotSupportedException ||
@@ -170,6 +172,8 @@ public class LoginAction extends PortletAction {
 				 e instanceof UserScreenNameException) {
 
 			SessionErrors.add(actionRequest, e.getClass());
+
+			setStatusFound(actionResponse);
 		}
 		else {
 			_log.error(e, e);
@@ -233,6 +237,13 @@ public class LoginAction extends PortletAction {
 				}
 			}
 		}
+	}
+
+	protected void setStatusFound(ActionResponse actionResponse) {
+		HttpServletResponse response = PortalUtil.getHttpServletResponse(
+			actionResponse);
+
+		response.setStatus(HttpServletResponse.SC_FOUND);
 	}
 
 	private static final boolean _CHECK_METHOD_ON_PROCESS_ACTION = false;
