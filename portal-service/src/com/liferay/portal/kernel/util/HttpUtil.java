@@ -230,8 +230,8 @@ public class HttpUtil {
 		return getHttp().removeProtocol(url);
 	}
 
-	public static String sanitize(String location) {
-		return getHttp().sanitize(location);
+	public static String sanitizeHeader(String location) {
+		return getHttp().sanitizeHeader(location);
 	}
 
 	public static String setParameter(String url, String name, boolean value) {

@@ -38,7 +38,7 @@ public class NoRedirectServletResponse extends HttpServletResponseWrapper {
 
 		// Disable send redirect
 
-		_redirectLocation = HttpUtil.sanitize(location);
+		_redirectLocation = HttpUtil.sanitizeHeader(location);
 	}
 
 	private String _redirectLocation;

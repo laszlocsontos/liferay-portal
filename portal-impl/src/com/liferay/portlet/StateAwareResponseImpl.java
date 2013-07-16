@@ -165,7 +165,7 @@ public abstract class StateAwareResponseImpl
 	}
 
 	public void setRedirectLocation(String redirectLocation) {
-		_redirectLocation = HttpUtil.sanitize(redirectLocation);
+		_redirectLocation = HttpUtil.sanitizeHeader(redirectLocation);
 	}
 
 	@Override

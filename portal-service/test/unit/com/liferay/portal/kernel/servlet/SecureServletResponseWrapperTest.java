@@ -48,9 +48,17 @@ public class SecureServletResponseWrapperTest extends PowerMockito {
 		mockStatic(ConfigurationSerializer.class);
 		mockStatic(PropsUtil.class);
 
-		when(ConfigurationSerializer.getSerializer()).thenReturn(null);
+		when(
+			ConfigurationSerializer.getSerializer()
+		).thenReturn(
+			null
+		);
 
-		when(PropsUtil.get(Matchers.anyString())).thenReturn(StringPool.BLANK);
+		when(
+			PropsUtil.get(Matchers.anyString())
+		).thenReturn(
+			StringPool.BLANK
+		);
 
 		new HttpUtil().setHttp(new HttpImpl());
 	}
@@ -74,7 +82,8 @@ public class SecureServletResponseWrapperTest extends PowerMockito {
 		doTest(
 			new String[] {_VALUE_INPUT, _VALUE_INPUT, _VALUE_INPUT},
 			new String[] {
-				_VALUE_SANITIZED, _VALUE_SANITIZED, _VALUE_SANITIZED});
+				_VALUE_SANITIZED, _VALUE_SANITIZED, _VALUE_SANITIZED
+			});
 	}
 
 	@Test
