@@ -141,7 +141,7 @@ public interface Http {
 
 	public String removeProtocol(String url);
 
-	public String sanitize(String location);
+	public String sanitizeHeader(String location);
 
 	public String setParameter(String url, String name, boolean value);
 

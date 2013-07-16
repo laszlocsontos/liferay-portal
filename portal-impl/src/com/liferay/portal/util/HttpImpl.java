@@ -884,8 +884,15 @@ public class HttpImpl implements Http {
 	}
 
 	@Override
-	public String sanitize(String location) {
-		return StringUtil.replace(location, _CRLF, _SPACES);
+	public String sanitizeHeader(String location) {
+		return StringUtil.replace(
+			location,
+			new String[] {
+				StringPool.NEW_LINE, StringPool.RETURN
+			},
+			 new String[] {
+				StringPool.SPACE, StringPool.SPACE
+			});
 	}
 
 	@Override
