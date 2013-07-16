@@ -37,7 +37,7 @@ public class NoRedirectActionResponse extends ActionResponseWrapper {
 
 		// Disable send redirect
 
-		_redirectLocation = HttpUtil.sanitize(location);
+		_redirectLocation = HttpUtil.sanitizeHeader(location);
 	}
 
 	private String _redirectLocation;

@@ -32,17 +32,17 @@ public class SecureServletResponseWrapper extends HttpServletResponseWrapper {
 
 	@Override
 	public void addHeader(String name, String value) {
-		super.addHeader(name, HttpUtil.sanitize(value));
+		super.addHeader(name, HttpUtil.sanitizeHeader(value));
 	}
 
 	@Override
 	public void sendRedirect(String location) throws IOException {
-		super.sendRedirect(HttpUtil.sanitize(location));
+		super.sendRedirect(HttpUtil.sanitizeHeader(location));
 	}
 
 	@Override
 	public void setHeader(String name, String value) {
-		super.setHeader(name, HttpUtil.sanitize(value));
+		super.setHeader(name, HttpUtil.sanitizeHeader(value));
 	}
 
 }
