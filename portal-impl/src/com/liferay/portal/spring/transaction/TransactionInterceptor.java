@@ -42,6 +42,19 @@ public class TransactionInterceptor implements MethodInterceptor {
 			platformTransactionManager, transactionAttribute, methodInvocation);
 	}
 
+	public boolean isReadOnlyMethod(MethodInvocation methodInvocation) {
+		TransactionAttribute transactionAttribute = getTransactionAttribute(
+			methodInvocation);
+
+		if ((transactionAttribute != null) &&
+			transactionAttribute.isReadOnly()) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public void setPlatformTransactionManager(
 		PlatformTransactionManager platformTransactionManager) {
 

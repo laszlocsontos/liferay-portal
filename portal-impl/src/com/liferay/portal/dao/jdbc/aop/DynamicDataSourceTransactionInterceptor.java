@@ -22,8 +22,6 @@ import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInvocation;
 
-import org.springframework.transaction.interceptor.TransactionAttribute;
-
 /**
  * @author Michael Young
  */
@@ -44,6 +42,13 @@ public class DynamicDataSourceTransactionInterceptor
 			return super.invoke(methodInvocation);
 		}
 
+		if (isReadOnlyMethod(methodInvocation)) {
+			_dynamicDataSourceTargetSource.setOperation(Operation.READ);
+		}
+		else {
+			_dynamicDataSourceTargetSource.setOperation(Operation.WRITE);
+		}
+
 		Class<?> targetClass = null;
 
 		if (methodInvocation.getThis() != null) {
@@ -53,19 +58,6 @@ public class DynamicDataSourceTransactionInterceptor
 		}
 
 		Method targetMethod = methodInvocation.getMethod();
-
-		TransactionAttribute transactionAttribute =
-			transactionAttributeSource.getTransactionAttribute(
-				targetMethod, targetClass);
-
-		if ((transactionAttribute != null) &&
-			transactionAttribute.isReadOnly()) {
-
-			_dynamicDataSourceTargetSource.setOperation(Operation.READ);
-		}
-		else {
-			_dynamicDataSourceTargetSource.setOperation(Operation.WRITE);
-		}
 
 		_dynamicDataSourceTargetSource.pushMethod(
 			targetClass.getName().concat(StringPool.PERIOD).concat(
