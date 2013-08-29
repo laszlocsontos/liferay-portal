@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.concurrent.ConcurrentLFUCache;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.NonSerializableObjectRequestWrapper;
-import com.liferay.portal.kernel.servlet.SecureHttpServletResponseWrapper;
+import com.liferay.portal.kernel.servlet.SanitizedServletResponse;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -51,12 +51,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
-	public InvokerFilter() {
-		if (ServerDetector.isTomcat()) {
-			_sanitizeHeader = false;
-		}
-	}
-
 	@Override
 	public void destroy() {
 		portalDestroy();
@@ -76,9 +70,7 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 
 		HttpServletResponse response = (HttpServletResponse)servletResponse;
 
-		if (_sanitizeHeader) {
-			response = new SecureHttpServletResponseWrapper(response);
-		}
+		response = secureResponseHeaders(request, response);
 
 		request.setAttribute(WebKeys.INVOKER_FILTER_URI, uri);
 
@@ -261,6 +253,24 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 		return request;
 	}
 
+	protected HttpServletResponse secureResponseHeaders(
+		HttpServletRequest request, HttpServletResponse response) {
+
+		if (!GetterUtil.getBoolean(
+				request.getAttribute(_SECURE_RESPONSE), true)) {
+
+			return response;
+		}
+
+		request.setAttribute(_SECURE_RESPONSE, Boolean.FALSE);
+
+		return SanitizedServletResponse.getSanitizedServletResponse(
+			request, response);
+	}
+
+	private static final String _SECURE_RESPONSE =
+		InvokerFilter.class.getName() + "SECURE_RESPONSE";
+
 	private static Log _log = LogFactoryUtil.getLog(InvokerFilter.class);
 
 	private String _contextPath;
@@ -269,6 +279,5 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 	private FilterConfig _filterConfig;
 	private int _invokerFilterChainSize;
 	private InvokerFilterHelper _invokerFilterHelper;
-	private boolean _sanitizeHeader = true;
 
 }
