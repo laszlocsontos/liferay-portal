@@ -78,6 +78,20 @@ public class ChainableMethodAdviceInjector {
 			parentChainableMethodAdvice.nextMethodInterceptor;
 		parentChainableMethodAdvice.nextMethodInterceptor =
 			newChainableMethodAdvice;
+
+		// Advices created after the chain has already been created doesn't have
+		// a reference to ServiceBeanAopCacheManager. This happens because
+		// instances of ServiceBeanAopProxy see only an older view of the
+		// chain's state. Having this in mind we need to fix this manually after
+		// wiring a new advice into an existing chain.
+
+		ServiceBeanAopCacheManager chainAopCacheManager =
+			parentChainableMethodAdvice.serviceBeanAopCacheManager;
+
+		chainAopCacheManager.reset();
+
+		newChainableMethodAdvice.setServiceBeanAopCacheManager(
+			chainAopCacheManager);
 	}
 
 	public void setChildMethodInterceptor(

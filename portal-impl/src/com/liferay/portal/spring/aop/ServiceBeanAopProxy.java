@@ -252,6 +252,8 @@ public class ServiceBeanAopProxy implements AopProxy, InvocationHandler {
 				serviceBeanMethodInvocation);
 
 		if (methodInterceptorsBag == null) {
+			_initMethodInterceptors();
+
 			List<MethodInterceptor> methodInterceptors = _getMethodInterceptors(
 				serviceBeanMethodInvocation);
 
