@@ -22,9 +22,23 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * @author László Csontos
  * @author Miguel Pastor
  */
 public class DB2DBTest extends BaseDBTestCase {
+
+	@Test
+	public void testReplaceTemplate() throws IOException {
+		Assert.assertEquals(
+			"create table test1(col1 varchar(50));\n",
+			buildSQL("create table test1(col1 varchar(50) null);"));
+
+		Assert.assertEquals(
+			"create table test1(col1 varchar(50), col2 varchar(50));\n",
+			buildSQL(
+				"create table test1(col1 varchar(50) null, " +
+				"col2 varchar(50) null);"));
+	}
 
 	@Test
 	public void testRewordRenameTable() throws IOException {
