@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
@@ -32,10 +33,13 @@ import java.sql.SQLException;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Alexander Chow
  * @author Bruno Farache
+ * @author László Csontos
  * @author Sandeep Soni
  * @author Ganesh Ram
  */
@@ -224,6 +228,23 @@ public class DB2DB extends BaseDB {
 	}
 
 	@Override
+	protected String replaceTemplate(String template, String[] actual) {
+		Matcher matcher = _nullColumnPattern.matcher(template);
+
+		StringBuffer sb = new StringBuffer();
+
+		while (matcher.find()) {
+			matcher.appendReplacement(sb, matcher.group());
+		}
+
+		matcher.appendTail(sb);
+
+		template = sb.toString();
+
+		return super.replaceTemplate(template, actual);
+	}
+
+	@Override
 	protected String reword(String data) throws IOException {
 		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
 			new UnsyncStringReader(data));
@@ -285,5 +306,31 @@ public class DB2DB extends BaseDB {
 	private static final boolean _SUPPORTS_SCROLLABLE_RESULTS = false;
 
 	private static DB2DB _instance = new DB2DB();
+	private static Pattern _nullColumnPattern;
+
+	static {
+		StringBundler sb = new StringBundler();
+
+		sb.append(StringPool.OPEN_PARENTHESIS);
+
+		int start = 5;
+		int end = start + 10;
+
+		for (int i = start; i < end; i++) {
+			sb.append(StringUtil.replace(TEMPLATE[i], StringPool.SPACE, "\\s"));
+
+			if ((i + 1) < end) {
+				sb.append(StringPool.PIPE);
+			}
+			else {
+				sb.append("\\(\\d+\\)");
+			}
+		}
+
+		sb.append(")\\sNULL");
+
+		_nullColumnPattern = Pattern.compile(
+			sb.toString(), Pattern.CASE_INSENSITIVE);
+	}
 
 }
