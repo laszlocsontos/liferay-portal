@@ -326,6 +326,11 @@ public class ArrayUtil_IW {
 		return ArrayUtil.getValue(array, pos);
 	}
 
+	public boolean isArrayOf(java.lang.Object obj,
+		java.lang.Class<?> componentType) {
+		return ArrayUtil.isArrayOf(obj, componentType);
+	}
+
 	public boolean isEmpty(boolean[] array) {
 		return ArrayUtil.isEmpty(array);
 	}
@@ -396,6 +401,42 @@ public class ArrayUtil_IW {
 
 	public boolean isNotEmpty(short[] array) {
 		return ArrayUtil.isNotEmpty(array);
+	}
+
+	public boolean isPrimitiveArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveArray(obj);
+	}
+
+	public boolean isPrimitiveBooleanArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveBooleanArray(obj);
+	}
+
+	public boolean isPrimitiveByteArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveByteArray(obj);
+	}
+
+	public boolean isPrimitiveCharArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveCharArray(obj);
+	}
+
+	public boolean isPrimitiveDoubleArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveDoubleArray(obj);
+	}
+
+	public boolean isPrimitiveFloatArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveFloatArray(obj);
+	}
+
+	public boolean isPrimitiveIntArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveIntArray(obj);
+	}
+
+	public boolean isPrimitiveLongArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveLongArray(obj);
+	}
+
+	public boolean isPrimitiveShortArray(java.lang.Object obj) {
+		return ArrayUtil.isPrimitiveShortArray(obj);
 	}
 
 	public boolean[] remove(boolean[] array, boolean value) {
