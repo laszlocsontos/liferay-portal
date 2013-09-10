@@ -31,6 +31,8 @@ public class PrimitiveLongList {
 		_checkCapacity(_elementsSize + 1);
 
 		_elements[_elementsSize++] = value;
+
+		_toString = null;
 	}
 
 	public void addAll(long[] values) {
@@ -39,6 +41,8 @@ public class PrimitiveLongList {
 		System.arraycopy(values, 0, _elements, _elementsSize, values.length);
 
 		_elementsSize += values.length;
+
+		_toString = null;
 	}
 
 	public long[] getArray() {
@@ -49,6 +53,36 @@ public class PrimitiveLongList {
 
 	public int size() {
 		return _elementsSize;
+	}
+
+	@Override
+	public String toString() {
+		if (_elementsSize == 0) {
+			_toString = "[]";
+		}
+
+		if (_toString == null) {
+			StringBundler sb = new StringBundler(_elementsSize * 3);
+
+			sb.append(StringPool.OPEN_BRACKET);
+
+			for (int i = 0; i < _elementsSize; i++) {
+				long element = _elements[i];
+
+				sb.append(element);
+
+				if ((i + 1) < _elementsSize) {
+					sb.append(StringPool.COMMA);
+					sb.append(StringPool.SPACE);
+				}
+			}
+
+			sb.append(StringPool.CLOSE_BRACKET);
+
+			_toString = sb.toString();
+		}
+
+		return _toString;
 	}
 
 	private void _checkCapacity(int minSize) {
@@ -83,5 +117,6 @@ public class PrimitiveLongList {
 
 	private long[] _elements;
 	private int _elementsSize;
+	private String _toString;
 
 }
