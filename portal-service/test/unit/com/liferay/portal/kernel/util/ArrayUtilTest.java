@@ -270,6 +270,18 @@ public class ArrayUtilTest {
 	}
 
 	@Test
+	public void testIsArrayOf() {
+		Assert.assertTrue(ArrayUtil.isArrayOf(new String[0], String.class));
+		Assert.assertTrue(ArrayUtil.isArrayOf(new String[1], String.class));
+		Assert.assertFalse(ArrayUtil.isArrayOf(null, String.class));
+		Assert.assertFalse(ArrayUtil.isArrayOf(null, Object.class));
+		Assert.assertFalse(ArrayUtil.isArrayOf(new String[0], Object.class));
+		Assert.assertFalse(ArrayUtil.isArrayOf(new String[1], Object.class));
+		Assert.assertFalse(ArrayUtil.isArrayOf(new String[0], null));
+		Assert.assertFalse(ArrayUtil.isArrayOf(new String[1], null));
+	}
+
+	@Test
 	public void testIsEmptyBooleanArray() {
 		Assert.assertTrue(ArrayUtil.isEmpty((boolean[])null));
 		Assert.assertTrue(ArrayUtil.isEmpty(new boolean[0]));
@@ -403,6 +415,87 @@ public class ArrayUtilTest {
 					new User("brian", 20), new User("julio", 20),
 					new User("sergio", 20)
 				}));
+	}
+
+	@Test
+	public void testIsPrimitiveArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveArray(new int[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveArray(new int[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveArray(StringPool.BLANK));
+	}
+
+	@Test
+	public void testIsPrimitiveBooleanArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveBooleanArray(new boolean[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveBooleanArray(new boolean[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveBooleanArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveBooleanArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveBooleanArray(StringPool.BLANK));
+	}
+
+	@Test
+	public void testIsPrimitiveByteArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveByteArray(new byte[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveByteArray(new byte[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveByteArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveByteArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveByteArray(StringPool.BLANK));
+	}
+
+	@Test
+	public void testIsPrimitiveCharArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveCharArray(new char[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveCharArray(new char[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveCharArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveCharArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveCharArray(StringPool.BLANK));
+	}
+
+	@Test
+	public void testIsPrimitiveDoubleArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveDoubleArray(new double[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveDoubleArray(new double[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveDoubleArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveDoubleArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveDoubleArray(StringPool.BLANK));
+	}
+
+	@Test
+	public void testIsPrimitiveFloatArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveFloatArray(new float[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveFloatArray(new float[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveFloatArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveFloatArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveFloatArray(StringPool.BLANK));
+	}
+
+	@Test
+	public void testIsPrimitiveIntArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveIntArray(new int[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveIntArray(new int[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveIntArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveIntArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveIntArray(StringPool.BLANK));
+	}
+
+	@Test
+	public void testIsPrimitiveLongArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveLongArray(new long[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveLongArray(new long[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveLongArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveLongArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveLongArray(StringPool.BLANK));
+	}
+
+	@Test
+	public void testIsPrimitiveShortArray() {
+		Assert.assertTrue(ArrayUtil.isPrimitiveShortArray(new short[0]));
+		Assert.assertTrue(ArrayUtil.isPrimitiveShortArray(new short[1]));
+		Assert.assertFalse(ArrayUtil.isPrimitiveShortArray(null));
+		Assert.assertFalse(ArrayUtil.isPrimitiveShortArray(new Object()));
+		Assert.assertFalse(ArrayUtil.isPrimitiveShortArray(StringPool.BLANK));
 	}
 
 	@Test

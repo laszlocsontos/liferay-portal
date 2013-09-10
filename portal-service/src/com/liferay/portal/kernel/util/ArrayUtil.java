@@ -1020,6 +1020,24 @@ public class ArrayUtil {
 		}
 	}
 
+	public static boolean isArrayOf(Object obj, Class<?> componentType) {
+		if (obj == null) {
+			return false;
+		}
+
+		Class<?> clazz = obj.getClass();
+
+		if (!clazz.isArray()) {
+			return false;
+		}
+
+		if (!clazz.getComponentType().equals(componentType)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public static boolean isEmpty(boolean[] array) {
 		if ((array == null) || (array.length == 0)) {
 			return true;
@@ -1126,6 +1144,56 @@ public class ArrayUtil {
 
 	public static boolean isNotEmpty(short[] array) {
 		return !isEmpty(array);
+	}
+
+	public static boolean isPrimitiveArray(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+
+		Class<?> clazz = obj.getClass();
+
+		if (!clazz.isArray()) {
+			return false;
+		}
+
+		if (!clazz.getComponentType().isPrimitive()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public static boolean isPrimitiveBooleanArray(Object obj) {
+		return isArrayOf(obj, boolean.class);
+	}
+
+	public static boolean isPrimitiveByteArray(Object obj) {
+		return isArrayOf(obj, byte.class);
+	}
+
+	public static boolean isPrimitiveCharArray(Object obj) {
+		return isArrayOf(obj, char.class);
+	}
+
+	public static boolean isPrimitiveDoubleArray(Object obj) {
+		return isArrayOf(obj, double.class);
+	}
+
+	public static boolean isPrimitiveFloatArray(Object obj) {
+		return isArrayOf(obj, float.class);
+	}
+
+	public static boolean isPrimitiveIntArray(Object obj) {
+		return isArrayOf(obj, int.class);
+	}
+
+	public static boolean isPrimitiveLongArray(Object obj) {
+		return isArrayOf(obj, long.class);
+	}
+
+	public static boolean isPrimitiveShortArray(Object obj) {
+		return isArrayOf(obj, short.class);
 	}
 
 	public static boolean[] remove(boolean[] array, boolean value) {
