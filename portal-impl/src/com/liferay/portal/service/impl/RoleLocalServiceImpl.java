@@ -704,6 +704,13 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		return rolePersistence.findByCompanyId(companyId);
 	}
 
+	@Override
+	public List<Role> getRoles(long companyId, Integer[] types)
+		throws SystemException {
+
+		return roleFinder.findByC_T(companyId, types);
+	}
+
 	/**
 	 * Returns all the roles with the primary keys.
 	 *
@@ -769,6 +776,15 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		long classNameId = PortalUtil.getClassNameId(Team.class);
 
 		return rolePersistence.findByC_C_C(companyId, classNameId, teamId);
+	}
+
+	@Override
+	public List<Role> getTeamRoles(long groupId, long[] skipRoleIds)
+		throws PortalException, SystemException {
+
+		// TODO: Method's body is coming in the next commit
+
+		return null;
 	}
 
 	/**
