@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -802,9 +803,41 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	public List<Role> getTeamRoles(long groupId, long[] skipRoleIds)
 		throws PortalException, SystemException {
 
-		// TODO: Method's body is coming in the next commit
+		Group group = groupLocalService.getGroup(groupId);
 
-		return null;
+		List<Team> teams = null;
+
+		if (group.isOrganization() || group.isRegularSite()) {
+			teams = teamLocalService.getGroupTeams(groupId);
+		}
+		else if (group.isLayout()) {
+			teams = teamLocalService.getGroupTeams(group.getParentGroupId());
+		}
+
+		List<Role> roles = new ArrayList<Role>();
+
+		if (ArrayUtil.isNotEmpty(skipRoleIds)) {
+			Arrays.sort(skipRoleIds);
+		}
+		else {
+			skipRoleIds = null;
+		}
+
+		if (teams != null) {
+			for (Team team : teams) {
+				Role role = getTeamRole(team.getCompanyId(), team.getTeamId());
+
+				if ((skipRoleIds != null) &&
+					(Arrays.binarySearch(skipRoleIds, role.getRoleId()) >= 0)) {
+
+					continue;
+				}
+
+				roles.add(role);
+			}
+		}
+
+		return roles;
 	}
 
 	/**
