@@ -240,7 +240,6 @@ public class RoleFinderImpl
 			qPos.add(companyId);
 			qPos.add(names, 2);
 			qPos.add(descriptions, 2);
-			qPos.add(types);
 
 			Iterator<Long> itr = q.iterate();
 
@@ -455,7 +454,6 @@ public class RoleFinderImpl
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			qPos.add(companyId);
-			qPos.add(types);
 
 			list = q.list(true);
 		}
@@ -628,7 +626,6 @@ public class RoleFinderImpl
 			qPos.add(companyId);
 			qPos.add(names, 2);
 			qPos.add(descriptions, 2);
-			qPos.add(types);
 
 			return (List<Role>)QueryUtil.list(q, getDialect(), start, end);
 		}
@@ -858,17 +855,17 @@ public class RoleFinderImpl
 
 		StringBundler sb = new StringBundler(types.length * 2);
 
-		sb.append(" AND (");
+		sb.append(" AND (Role_.type_ IN(");
 
 		for (int i = 0; i < types.length; i++) {
-			sb.append("Role_.type_ = ?");
+			sb.append(types[i]);
 
 			if ((i + 1) < types.length) {
-				sb.append(" OR ");
+				sb.append(StringPool.COMMA);
 			}
 		}
 
-		sb.append(StringPool.CLOSE_PARENTHESIS);
+		sb.append("))");
 
 		return sb.toString();
 	}
