@@ -800,6 +800,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
+	@ThreadLocalCachable
 	public List<Role> getTeamRoles(long groupId, long[] skipRoleIds)
 		throws PortalException, SystemException {
 
