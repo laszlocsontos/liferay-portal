@@ -110,10 +110,9 @@ public class RoleFinderImpl
 
 	public static final FinderPath FINDER_PATH_FIND_BY_C_T = new FinderPath(
 		RoleModelImpl.ENTITY_CACHE_ENABLED, RoleModelImpl.FINDER_CACHE_ENABLED,
-		List.class, RolePersistenceImpl.FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-		"findByC_T", new String[] {
-			Long.class.getName(), String.class.getName()
-		});
+		RoleImpl.class,
+		RolePersistenceImpl.FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_T",
+		new String[] {Long.class.getName(), String.class.getName()});
 
 	public static final String JOIN_BY_USERS_ROLES =
 		RoleFinder.class.getName() + ".joinByUsersRoles";
