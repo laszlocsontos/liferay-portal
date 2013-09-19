@@ -74,7 +74,7 @@ public class RoleLocalServiceTest {
 		Map<Team, Role> teamRoleMap = RoleLocalServiceUtil.getTeamRoleMap(
 			organization.getGroupId());
 
-		doTest(teamRoleMap, team, true);
+		doTestTeamRoleMap(teamRoleMap, team, true);
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class RoleLocalServiceTest {
 		Map<Team, Role> teamRoleMap = RoleLocalServiceUtil.getTeamRoleMap(
 			organization.getGroupId());
 
-		doTest(teamRoleMap, team, false);
+		doTestTeamRoleMap(teamRoleMap, team, false);
 	}
 
 	@Test
@@ -106,10 +106,10 @@ public class RoleLocalServiceTest {
 		Map<Team, Role> teamRoleMap = RoleLocalServiceUtil.getTeamRoleMap(
 			group.getGroupId());
 
-		doTest(teamRoleMap, team, false);
+		doTestTeamRoleMap(teamRoleMap, team, false);
 	}
 
-	protected void doTest(
+	protected void doTestTeamRoleMap(
 		Map<Team, Role> teamRoleMap, Team team, boolean otherGroup) {
 
 		Assert.assertNotNull(teamRoleMap);
