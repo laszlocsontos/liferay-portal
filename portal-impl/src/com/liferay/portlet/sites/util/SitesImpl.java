@@ -117,6 +117,8 @@ import javax.portlet.RenderResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.time.StopWatch;
+
 /**
  * @author Raymond Augé
  * @author Ryan Park
@@ -326,7 +328,21 @@ public class SitesImpl implements Sites {
 	public void copyPortletPermissions(Layout targetLayout, Layout sourceLayout)
 		throws Exception {
 
+		StopWatch stopWatch = null;
+
+		if (_log.isDebugEnabled()) {
+			stopWatch = new StopWatch();
+
+			stopWatch.start();
+		}
+
 		doCopyPortletPermissions(targetLayout, sourceLayout);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"doCopyPortletPermissions() takes " + stopWatch.getTime() +
+					" ms");
+		}
 	}
 
 	@Override
