@@ -606,6 +606,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
+	@ThreadLocalCachable
 	public List<Role> getGroupRelatedRoles(long groupId)
 		throws PortalException, SystemException {
 
