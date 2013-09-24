@@ -965,6 +965,32 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			ArrayUtil.toArray(folderIds.toArray(new Long[folderIds.size()])));
 	}
 
+	@Override
+	public List<JournalArticle> getGroupArticles(
+			long groupId, long userId, long rootFolderId, int status, int start,
+			int end, OrderByComparator orderByComparator)
+		throws PortalException, SystemException {
+
+		List<Long> folderIds = journalFolderService.getFolderIds(
+			groupId, rootFolderId);
+
+		QueryDefinition queryDefinition = new QueryDefinition(
+			status, start, end, orderByComparator);
+
+		if (folderIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		else if (userId <= 0) {
+			return journalArticleFinder.filterFindByG_F(
+				groupId, folderIds, queryDefinition);
+		}
+		else {
+			return journalArticleFinder.filterFindByG_U_F_C(
+				groupId, userId, folderIds,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT, queryDefinition);
+		}
+	}
+
 	/**
 	 * Returns an ordered range of all the web content articles matching the
 	 * group, user, the root folder or any of its subfolders.
@@ -992,24 +1018,9 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			OrderByComparator orderByComparator)
 		throws PortalException, SystemException {
 
-		List<Long> folderIds = journalFolderService.getFolderIds(
-			groupId, rootFolderId);
-
-		QueryDefinition queryDefinition = new QueryDefinition(
-			WorkflowConstants.STATUS_ANY, start, end, orderByComparator);
-
-		if (folderIds.isEmpty()) {
-			return Collections.emptyList();
-		}
-		else if (userId <= 0) {
-			return journalArticleFinder.filterFindByG_F(
-				groupId, folderIds, queryDefinition);
-		}
-		else {
-			return journalArticleFinder.filterFindByG_U_F_C(
-				groupId, userId, folderIds,
-				JournalArticleConstants.CLASSNAME_ID_DEFAULT, queryDefinition);
-		}
+		return getGroupArticles(
+			groupId, userId, rootFolderId, WorkflowConstants.STATUS_ANY, start,
+			end, orderByComparator);
 	}
 
 	/**
@@ -1031,11 +1042,19 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			long groupId, long userId, long rootFolderId)
 		throws PortalException, SystemException {
 
+		return getGroupArticlesCount(
+			groupId, userId, rootFolderId, WorkflowConstants.STATUS_ANY);
+	}
+
+	@Override
+	public int getGroupArticlesCount(
+			long groupId, long userId, long rootFolderId, int status)
+		throws PortalException, SystemException {
+
 		List<Long> folderIds = journalFolderService.getFolderIds(
 			groupId, rootFolderId);
 
-		QueryDefinition queryDefinition = new QueryDefinition(
-			WorkflowConstants.STATUS_ANY);
+		QueryDefinition queryDefinition = new QueryDefinition(status);
 
 		if (folderIds.isEmpty()) {
 			return 0;
