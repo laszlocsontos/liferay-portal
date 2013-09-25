@@ -19,8 +19,11 @@ import com.liferay.portal.PasswordExpiredException;
 import com.liferay.portal.UserLockoutException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -34,6 +37,7 @@ import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.admin.util.OmniadminUtil;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
@@ -148,6 +152,15 @@ public class LDAPAuth implements Authenticator {
 
 			InitialLdapContext innerCtx = null;
 
+			ldapAuthResult = getFailedLDAPAuthResult(env);
+
+			if (ldapAuthResult != null) {
+				return ldapAuthResult;
+			}
+			else {
+				ldapAuthResult = new LDAPAuthResult();
+			}
+
 			try {
 				innerCtx = new InitialLdapContext(env, null);
 
@@ -168,6 +181,8 @@ public class LDAPAuth implements Authenticator {
 
 				ldapAuthResult.setAuthenticated(false);
 				ldapAuthResult.setErrorMessage(e.getMessage());
+
+				setFailedLDAPAuthResult(env, ldapAuthResult);
 			}
 			finally {
 				if (innerCtx != null) {
@@ -547,6 +562,47 @@ public class LDAPAuth implements Authenticator {
 		}
 	}
 
+	protected LDAPAuthResult getFailedLDAPAuthResult(Map<String, Object> env) {
+		Map<String, LDAPAuthResult> failedAuthenticationCache =
+			_failedAuthResultCache.get();
+
+		String cacheKey = _getCacheKey(env);
+
+		return failedAuthenticationCache.get(cacheKey);
+	}
+
+	protected void setFailedLDAPAuthResult(
+			Map<String, Object> env, LDAPAuthResult ldapAuthResult) {
+
+		Map<String, LDAPAuthResult> failedAuthenticationCache =
+			_failedAuthResultCache.get();
+
+		String cacheKey = _getCacheKey(env);
+
+		if (failedAuthenticationCache.containsKey(cacheKey)) {
+			return;
+		}
+
+		failedAuthenticationCache.put(cacheKey, ldapAuthResult);
+	}
+
+	private String _getCacheKey(Map<String, Object> env) {
+		StringBundler sb = new StringBundler(5);
+
+		sb.append(MapUtil.getString(env, Context.PROVIDER_URL));
+		sb.append(StringPool.POUND);
+		sb.append(MapUtil.getString(env, Context.SECURITY_PRINCIPAL));
+		sb.append(StringPool.POUND);
+		sb.append(MapUtil.getString(env, Context.SECURITY_CREDENTIALS));
+
+		return sb.toString();
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(LDAPAuth.class);
+
+	private ThreadLocal<Map<String, LDAPAuthResult>> _failedAuthResultCache =
+		new AutoResetThreadLocal<Map<String, LDAPAuthResult>>(
+			LDAPAuth.class + "._failedAuthenticationCache",
+			new HashMap<String, LDAPAuthResult>());
 
 }
