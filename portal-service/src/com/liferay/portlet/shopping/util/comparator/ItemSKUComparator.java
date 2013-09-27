@@ -14,32 +14,28 @@
 
 package com.liferay.portlet.shopping.util.comparator;
 
-import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.util.DefaultOrderByComparator;
 import com.liferay.portlet.shopping.model.ShoppingItem;
 
 /**
  * @author Brian Wing Shun Chan
  */
-public class ItemSKUComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC =
-		"ShoppingItem.categoryId ASC, ShoppingItem.sku ASC";
-
-	public static final String ORDER_BY_DESC =
-		"ShoppingItem.categoryId DESC, ShoppingItem.sku DESC";
+public class ItemSKUComparator extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"categoryId", "sku"};
+
+	public static final String TABLE_NAME = "ShoppingItem";
 
 	public ItemSKUComparator() {
 		this(false);
 	}
 
 	public ItemSKUComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
+	protected int doCompare(Object obj1, Object obj2) {
 		ShoppingItem item1 = (ShoppingItem)obj1;
 		ShoppingItem item2 = (ShoppingItem)obj2;
 
@@ -55,34 +51,7 @@ public class ItemSKUComparator extends OrderByComparator {
 			value = sku1.compareTo(sku2);
 		}
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }
