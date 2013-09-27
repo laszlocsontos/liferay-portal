@@ -15,26 +15,24 @@
 package com.liferay.portlet.trash.util.comparator;
 
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.util.DefaultOrderByComparator;
 import com.liferay.portlet.trash.model.TrashEntry;
 
 /**
  * @author Sergio González
  */
-public class EntryCreateDateComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC = "TrashEntry.createDate ASC";
-
-	public static final String ORDER_BY_DESC = "TrashEntry.createDate DESC";
+public class EntryCreateDateComparator extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"createDate"};
+
+	public static final String TABLE_NAME = "TrashEntry";
 
 	public EntryCreateDateComparator() {
 		this(false);
 	}
 
 	public EntryCreateDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
@@ -45,34 +43,7 @@ public class EntryCreateDateComparator extends OrderByComparator {
 		int value = DateUtil.compareTo(
 			entry1.getCreateDate(), entry2.getCreateDate());
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }

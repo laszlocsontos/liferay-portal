@@ -15,64 +15,35 @@
 package com.liferay.portlet.documentlibrary.util.comparator;
 
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.util.DefaultOrderByComparator;
 import com.liferay.portlet.documentlibrary.model.DLFileRank;
 
 /**
  * @author Brian Wing Shun Chan
  */
-public class FileRankCreateDateComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC = "DLFileRank.createDate ASC";
-
-	public static final String ORDER_BY_DESC = "DLFileRank.createDate DESC";
+public class FileRankCreateDateComparator extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"createDate"};
+
+	public static final String TABLE_NAME = "DLFileRank";
 
 	public FileRankCreateDateComparator() {
 		this(false);
 	}
 
 	public FileRankCreateDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
+	protected int doCompare(Object obj1, Object obj2) {
 		DLFileRank dlFileRank1 = (DLFileRank)obj1;
 		DLFileRank dlFileRank2 = (DLFileRank)obj2;
 
 		int value = DateUtil.compareTo(
 			dlFileRank1.getCreateDate(), dlFileRank2.getCreateDate());
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }

@@ -14,31 +14,29 @@
 
 package com.liferay.portlet.trash.util.comparator;
 
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.util.DefaultOrderByComparator;
 import com.liferay.portlet.trash.model.TrashEntry;
 
 /**
  * @author Sergio González
  */
-public class EntryUserNameComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC = "TrashEntry.userName ASC";
-
-	public static final String ORDER_BY_DESC = "TrashEntry.userName DESC";
+public class EntryUserNameComparator extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"userName"};
+
+	public static final String TABLE_NAME = "TrashEntry";
 
 	public EntryUserNameComparator() {
 		this(false);
 	}
 
 	public EntryUserNameComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
+	protected int doCompare(Object obj1, Object obj2) {
 		TrashEntry entry1 = (TrashEntry)obj1;
 		TrashEntry entry2 = (TrashEntry)obj2;
 
@@ -47,34 +45,7 @@ public class EntryUserNameComparator extends OrderByComparator {
 
 		int value = name1.compareTo(name2);
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }

@@ -15,35 +15,28 @@
 package com.liferay.portlet.blogs.util.comparator;
 
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.util.DefaultOrderByComparator;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 
 /**
  * @author Alexander Chow
  */
-public class EntryDisplayDateComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC =
-		"BlogsEntry.displayDate ASC, BlogsEntry.entryId ASC";
-
-	public static final String[] ORDER_BY_CONDITION_FIELDS =
-		{"displayDate", "entryId"};
-
-	public static final String ORDER_BY_DESC =
-		"BlogsEntry.displayDate DESC, BlogsEntry.entryId DESC";
+public class EntryDisplayDateComparator extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"displayDate", "entryId"};
+
+	public static final String TABLE_NAME = "BlogsEntry";
 
 	public EntryDisplayDateComparator() {
 		this(false);
 	}
 
 	public EntryDisplayDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
+	protected int doCompare(Object obj1, Object obj2) {
 		BlogsEntry entry1 = (BlogsEntry)obj1;
 		BlogsEntry entry2 = (BlogsEntry)obj2;
 
@@ -59,39 +52,7 @@ public class EntryDisplayDateComparator extends OrderByComparator {
 			}
 		}
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByConditionFields() {
-		return ORDER_BY_CONDITION_FIELDS;
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }
