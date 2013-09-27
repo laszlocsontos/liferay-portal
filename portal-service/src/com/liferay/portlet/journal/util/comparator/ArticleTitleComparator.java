@@ -14,18 +14,14 @@
 
 package com.liferay.portlet.journal.util.comparator;
 
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.util.DefaultOrderByComparator;
 import com.liferay.portlet.journal.model.JournalArticle;
 
 /**
  * @author Brian Wing Shun Chan
  */
-public class ArticleTitleComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC = "title ASC";
-
-	public static final String ORDER_BY_DESC = "title DESC";
+public class ArticleTitleComparator extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"title"};
 
@@ -34,11 +30,11 @@ public class ArticleTitleComparator extends OrderByComparator {
 	}
 
 	public ArticleTitleComparator(boolean ascending) {
-		_ascending = ascending;
+		super(null, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
+	protected int doCompare(Object obj1, Object obj2) {
 		JournalArticle article1 = (JournalArticle)obj1;
 		JournalArticle article2 = (JournalArticle)obj2;
 
@@ -47,34 +43,7 @@ public class ArticleTitleComparator extends OrderByComparator {
 
 		int value = title1.compareTo(title2);
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }
