@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +32,134 @@ import java.util.Map;
 public class DefaultOrderByComparator extends OrderByComparator {
 
 	@Override
-	public int compare(Object object1, Object object2) {
+	public String getOrderBy() {
+		return getOrderBy(_tableName);
+	}
+
+	public String getOrderBy(String tableName) {
+		StringBundler sb = new StringBundler();
+
+		for (int i = 0; i < _columns.length; i += 2) {
+			if (i != 0) {
+				sb.append(StringPool.COMMA);
+			}
+
+			if (Validator.isNotNull(tableName)) {
+				sb.append(tableName);
+				sb.append(StringPool.PERIOD);
+			}
+
+			String columnName = String.valueOf(_columns[i]);
+			boolean columnAscending = Boolean.valueOf(
+				String.valueOf(_columns[i + 1]));
+
+			sb.append(columnName);
+
+			if (columnAscending) {
+				sb.append(_ORDER_BY_ASC);
+			}
+			else {
+				sb.append(_ORDER_BY_DESC);
+			}
+		}
+
+		return sb.toString();
+	}
+
+	@Override
+	public String[] getOrderByConditionFields() {
+		return getOrderByFields();
+	}
+
+	@Override
+	public Object[] getOrderByConditionValues(Object obj) {
+		String[] fields = getOrderByConditionFields();
+
+		Object[] values = new Object[fields.length];
+
+		for (int i = 0; i < fields.length; i++) {
+			values[i] = BeanPropertiesUtil.getObject(obj, fields[i]);
+		}
+
+		return values;
+	}
+
+	@Override
+	public String[] getOrderByFields() {
+		String[] fields = new String[_columns.length / 2];
+
+		for (int i = 0; i < _columns.length; i += 2) {
+			String column = (String)_columns[i];
+
+			int x = column.indexOf(CharPool.PERIOD);
+			int y = column.indexOf(CharPool.SPACE, x);
+
+			if (y == -1) {
+				y = column.length();
+			}
+
+			fields[i] = column.substring(x + 1, y);
+		}
+
+		return fields;
+	}
+
+	@Override
+	public boolean isAscending(String field) {
+		String orderBy = getOrderBy();
+
+		if (orderBy == null) {
+			return false;
+		}
+
+		int x = orderBy.indexOf(StringPool.PERIOD + field + StringPool.SPACE);
+
+		if (x == -1) {
+			return false;
+		}
+
+		int y = orderBy.indexOf(_ORDER_BY_ASC, x);
+
+		if (y == -1) {
+			return false;
+		}
+
+		int z = orderBy.indexOf(_ORDER_BY_DESC, x);
+
+		if ((z >= 0) && (z < y)) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	protected DefaultOrderByComparator(String tableName, Object... columns) {
+		_tableName = tableName;
+		_columns = columns;
+	}
+
+	protected DefaultOrderByComparator(String tableName, String[] columns) {
+		this(tableName, columns, false);
+	}
+
+	protected DefaultOrderByComparator(
+		String tableName, String[] columns, boolean ascending) {
+
+		super(ascending);
+
+		_tableName = tableName;
+
+		_columns = new Object[columns.length * 2];
+
+		for (int i = 0; i < columns.length; i++) {
+			_columns[i * 2] = columns[i];
+			_columns[i * 2 + 1] = ascending;
+		}
+	}
+
+	@Override
+	protected int doCompare(Object object1, Object object2) {
 		for (int i = 0; i < _columns.length; i += 2) {
 			String columnName = String.valueOf(_columns[i]);
 			boolean columnAscending = Boolean.valueOf(
@@ -100,116 +227,6 @@ public class DefaultOrderByComparator extends OrderByComparator {
 		}
 
 		return 0;
-	}
-
-	@Override
-	public String getOrderBy() {
-		StringBundler sb = new StringBundler();
-
-		for (int i = 0; i < _columns.length; i += 2) {
-			if (i != 0) {
-				sb.append(StringPool.COMMA);
-			}
-
-			sb.append(_tableName);
-			sb.append(StringPool.PERIOD);
-
-			String columnName = String.valueOf(_columns[i]);
-			boolean columnAscending = Boolean.valueOf(
-				String.valueOf(_columns[i + 1]));
-
-			sb.append(columnName);
-
-			if (columnAscending) {
-				sb.append(_ORDER_BY_ASC);
-			}
-			else {
-				sb.append(_ORDER_BY_DESC);
-			}
-		}
-
-		return sb.toString();
-	}
-
-	@Override
-	public String[] getOrderByConditionFields() {
-		return getOrderByFields();
-	}
-
-	@Override
-	public Object[] getOrderByConditionValues(Object obj) {
-		String[] fields = getOrderByConditionFields();
-
-		Object[] values = new Object[fields.length];
-
-		for (int i = 0; i < fields.length; i++) {
-			values[i] = BeanPropertiesUtil.getObject(obj, fields[i]);
-		}
-
-		return values;
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		String orderBy = getOrderBy();
-
-		if (orderBy == null) {
-			return null;
-		}
-
-		String[] parts = StringUtil.split(orderBy);
-
-		String[] fields = new String[parts.length];
-
-		for (int i = 0; i < parts.length; i++) {
-			String part = parts[i];
-
-			int x = part.indexOf(CharPool.PERIOD);
-			int y = part.indexOf(CharPool.SPACE, x);
-
-			if (y == -1) {
-				y = part.length();
-			}
-
-			fields[i] = part.substring(x + 1, y);
-		}
-
-		return fields;
-	}
-
-	@Override
-	public boolean isAscending(String field) {
-		String orderBy = getOrderBy();
-
-		if (orderBy == null) {
-			return false;
-		}
-
-		int x = orderBy.indexOf(StringPool.PERIOD + field + StringPool.SPACE);
-
-		if (x == -1) {
-			return false;
-		}
-
-		int y = orderBy.indexOf(_ORDER_BY_ASC, x);
-
-		if (y == -1) {
-			return false;
-		}
-
-		int z = orderBy.indexOf(_ORDER_BY_DESC, x);
-
-		if ((z >= 0) && (z < y)) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-
-	protected DefaultOrderByComparator(String tableName, Object... columns) {
-		_tableName = tableName;
-		_columns = columns;
 	}
 
 	private static final String _ORDER_BY_ASC = " ASC";

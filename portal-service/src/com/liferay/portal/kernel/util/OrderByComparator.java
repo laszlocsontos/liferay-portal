@@ -25,10 +25,29 @@ import java.util.Comparator;
 @SuppressWarnings("rawtypes")
 public abstract class OrderByComparator implements Comparator, Serializable {
 
+	public OrderByComparator() {
+		this(true);
+	}
+
+	public OrderByComparator(boolean ascending) {
+		_ascending = ascending;
+	}
+
 	@Override
-	public abstract int compare(Object obj1, Object obj2);
+	public int compare(Object obj1, Object obj2) {
+		int value = doCompare(obj1, obj2);
+
+		if (isAscending()) {
+			return value;
+		}
+		else {
+			return -value;
+		}
+	}
 
 	public abstract String getOrderBy();
+
+	public abstract String getOrderBy(String tableName);
 
 	public abstract String[] getOrderByConditionFields();
 
@@ -37,27 +56,18 @@ public abstract class OrderByComparator implements Comparator, Serializable {
 	public abstract String[] getOrderByFields();
 
 	public boolean isAscending() {
-		String orderBy = getOrderBy();
-
-		if ((orderBy == null) ||
-			StringUtil.toUpperCase(orderBy).endsWith(_ORDER_BY_DESC)) {
-
-			return false;
-		}
-		else {
-			return true;
-		}
+		return _ascending;
 	}
 
-	public boolean isAscending(String field) {
-		return isAscending();
-	}
+	public abstract boolean isAscending(String field);
 
 	@Override
 	public String toString() {
 		return getOrderBy();
 	}
 
-	private static final String _ORDER_BY_DESC = " DESC";
+	protected abstract int doCompare(Object obj1, Object obj2);
+
+	private boolean _ascending;
 
 }
