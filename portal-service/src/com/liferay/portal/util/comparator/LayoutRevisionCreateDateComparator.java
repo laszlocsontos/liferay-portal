@@ -15,26 +15,25 @@
 package com.liferay.portal.util.comparator;
 
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.LayoutRevision;
+import com.liferay.portal.util.DefaultOrderByComparator;
 
 /**
  * @author Julio Camarero
  */
-public class LayoutRevisionCreateDateComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC = "LayoutRevision.createDate ASC";
-
-	public static final String ORDER_BY_DESC = "LayoutRevision.createDate DESC";
+public class LayoutRevisionCreateDateComparator
+	extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"createDate"};
+
+	public static final String TABLE_NAME = "LayoutRevision";
 
 	public LayoutRevisionCreateDateComparator() {
 		this(false);
 	}
 
 	public LayoutRevisionCreateDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
@@ -45,34 +44,7 @@ public class LayoutRevisionCreateDateComparator extends OrderByComparator {
 		int value = DateUtil.compareTo(
 			layoutRevision1.getCreateDate(), layoutRevision2.getCreateDate());
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }

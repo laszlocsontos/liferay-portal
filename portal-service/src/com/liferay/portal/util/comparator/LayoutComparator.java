@@ -14,28 +14,24 @@
 
 package com.liferay.portal.util.comparator;
 
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.util.DefaultOrderByComparator;
 
 /**
  * @author Brian Wing Shun Chan
  */
-public class LayoutComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC =
-		"Layout.groupId ASC, Layout.layoutId ASC";
-
-	public static final String ORDER_BY_DESC =
-		"Layout.groupId DESC, Layout.layoutId DESC";
+public class LayoutComparator extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"groupId", "layoutId"};
+
+	public static final String TABLE_NAME = "Layout";
 
 	public LayoutComparator() {
 		this(false);
 	}
 
 	public LayoutComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
@@ -49,7 +45,7 @@ public class LayoutComparator extends OrderByComparator {
 		int value = groupId1.compareTo(groupId2);
 
 		if (value != 0) {
-			if (_ascending) {
+			if (isAscending()) {
 				return value;
 			}
 			else {
@@ -62,34 +58,12 @@ public class LayoutComparator extends OrderByComparator {
 
 		value = layoutId1.compareTo(layoutId2);
 
-		if (_ascending) {
+		if (isAscending()) {
 			return value;
 		}
 		else {
 			return -value;
 		}
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }
