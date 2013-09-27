@@ -14,30 +14,28 @@
 
 package com.liferay.portlet.asset.util.comparator;
 
-import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.util.DefaultOrderByComparator;
 import com.liferay.portlet.asset.model.AssetTag;
 
 /**
  * @author Miguel Pastor
  */
-public class AssetTagCountComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC = "AssetTag.assetCount ASC";
-
-	public static final String ORDER_BY_DESC = "AssetTag.assetCount DESC";
+public class AssetTagCountComparator extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"assetCount"};
+
+	public static final String TABLE_NAME = "AssetTag";
 
 	public AssetTagCountComparator() {
 		this(false);
 	}
 
 	public AssetTagCountComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
+	protected int doCompare(Object obj1, Object obj2) {
 		AssetTag assetTag1 = (AssetTag)obj1;
 		AssetTag assetTag2 = (AssetTag)obj2;
 
@@ -50,34 +48,7 @@ public class AssetTagCountComparator extends OrderByComparator {
 			value = 1;
 		}
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }

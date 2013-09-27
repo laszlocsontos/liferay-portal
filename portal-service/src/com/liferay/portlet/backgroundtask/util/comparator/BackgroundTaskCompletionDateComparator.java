@@ -15,32 +15,29 @@
 package com.liferay.portlet.backgroundtask.util.comparator;
 
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.BackgroundTask;
+import com.liferay.portal.util.DefaultOrderByComparator;
 
 /**
  * @author Eduardo Garcia
  */
-public class BackgroundTaskCompletionDateComparator extends OrderByComparator {
-
-	public static final String ORDER_BY_ASC =
-		"BackgroundTask.completionDate ASC";
-
-	public static final String ORDER_BY_DESC =
-		"BackgroundTask.completionDate DESC";
+public class BackgroundTaskCompletionDateComparator
+	extends DefaultOrderByComparator {
 
 	public static final String[] ORDER_BY_FIELDS = {"completionDate"};
+
+	public static final String TABLE_NAME = "BackgroundTask";
 
 	public BackgroundTaskCompletionDateComparator() {
 		this(false);
 	}
 
 	public BackgroundTaskCompletionDateComparator(boolean ascending) {
-		_ascending = ascending;
+		super(TABLE_NAME, ORDER_BY_FIELDS, ascending);
 	}
 
 	@Override
-	public int compare(Object obj1, Object obj2) {
+	protected int doCompare(Object obj1, Object obj2) {
 		BackgroundTask backgroundTask1 = (BackgroundTask)obj1;
 		BackgroundTask backgroundTask2 = (BackgroundTask)obj2;
 
@@ -48,34 +45,7 @@ public class BackgroundTaskCompletionDateComparator extends OrderByComparator {
 			backgroundTask1.getCompletionDate(),
 			backgroundTask2.getCompletionDate());
 
-		if (_ascending) {
-			return value;
-		}
-		else {
-			return -value;
-		}
+		return value;
 	}
-
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-		else {
-			return ORDER_BY_DESC;
-		}
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private boolean _ascending;
 
 }
