@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
-
 import java.io.Serializable;
 
 import java.util.Comparator;
@@ -30,52 +28,13 @@ public abstract class OrderByComparator implements Comparator, Serializable {
 	@Override
 	public abstract int compare(Object obj1, Object obj2);
 
-	public String getOrderBy() {
-		return null;
-	}
+	public abstract String getOrderBy();
 
-	public String[] getOrderByConditionFields() {
-		return getOrderByFields();
-	}
+	public abstract String[] getOrderByConditionFields();
 
-	public Object[] getOrderByConditionValues(Object obj) {
-		String[] fields = getOrderByConditionFields();
+	public abstract Object[] getOrderByConditionValues(Object obj);
 
-		Object[] values = new Object[fields.length];
-
-		for (int i = 0; i < fields.length; i++) {
-			values[i] = BeanPropertiesUtil.getObject(obj, fields[i]);
-		}
-
-		return values;
-	}
-
-	public String[] getOrderByFields() {
-		String orderBy = getOrderBy();
-
-		if (orderBy == null) {
-			return null;
-		}
-
-		String[] parts = StringUtil.split(orderBy);
-
-		String[] fields = new String[parts.length];
-
-		for (int i = 0; i < parts.length; i++) {
-			String part = parts[i];
-
-			int x = part.indexOf(CharPool.PERIOD);
-			int y = part.indexOf(CharPool.SPACE, x);
-
-			if (y == -1) {
-				y = part.length();
-			}
-
-			fields[i] = part.substring(x + 1, y);
-		}
-
-		return fields;
-	}
+	public abstract String[] getOrderByFields();
 
 	public boolean isAscending() {
 		String orderBy = getOrderBy();

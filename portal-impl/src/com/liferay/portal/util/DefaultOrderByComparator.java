@@ -15,10 +15,12 @@
 package com.liferay.portal.util;
 
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -127,6 +129,52 @@ public class DefaultOrderByComparator extends OrderByComparator {
 		}
 
 		return sb.toString();
+	}
+
+	@Override
+	public String[] getOrderByConditionFields() {
+		return getOrderByFields();
+	}
+
+	@Override
+	public Object[] getOrderByConditionValues(Object obj) {
+		String[] fields = getOrderByConditionFields();
+
+		Object[] values = new Object[fields.length];
+
+		for (int i = 0; i < fields.length; i++) {
+			values[i] = BeanPropertiesUtil.getObject(obj, fields[i]);
+		}
+
+		return values;
+	}
+
+	@Override
+	public String[] getOrderByFields() {
+		String orderBy = getOrderBy();
+
+		if (orderBy == null) {
+			return null;
+		}
+
+		String[] parts = StringUtil.split(orderBy);
+
+		String[] fields = new String[parts.length];
+
+		for (int i = 0; i < parts.length; i++) {
+			String part = parts[i];
+
+			int x = part.indexOf(CharPool.PERIOD);
+			int y = part.indexOf(CharPool.SPACE, x);
+
+			if (y == -1) {
+				y = part.length();
+			}
+
+			fields[i] = part.substring(x + 1, y);
+		}
+
+		return fields;
 	}
 
 	@Override
