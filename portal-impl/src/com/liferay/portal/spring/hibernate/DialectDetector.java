@@ -15,6 +15,7 @@
 package com.liferay.portal.spring.hibernate;
 
 import com.liferay.portal.dao.orm.hibernate.DB2Dialect;
+import com.liferay.portal.dao.orm.hibernate.InformixDialect;
 import com.liferay.portal.dao.orm.hibernate.SQLServer2005Dialect;
 import com.liferay.portal.dao.orm.hibernate.SQLServer2008Dialect;
 import com.liferay.portal.dao.orm.hibernate.SybaseASE157Dialect;
@@ -101,6 +102,9 @@ public class DialectDetector {
 			}
 			else if (dbName.startsWith("Oracle") && (dbMajorVersion >= 10)) {
 				dialect = new Oracle10gDialect();
+			}
+			else if (dbName.startsWith("IDS") && (dbMajorVersion >= 11)) {
+				dialect = new InformixDialect();
 			}
 			else {
 				dialect = DialectFactory.buildDialect(
