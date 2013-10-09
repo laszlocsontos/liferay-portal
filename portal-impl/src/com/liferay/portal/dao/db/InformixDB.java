@@ -17,11 +17,15 @@ package com.liferay.portal.dao.db;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Neil Griffin
@@ -98,6 +102,27 @@ public class InformixDB extends BaseDB {
 	}
 
 	@Override
+	protected String replaceTemplate(String template, String[] actual) {
+		Matcher matcher = _varcharPattern.matcher(template);
+
+		StringBuffer sb = new StringBuffer();
+
+		while (matcher.find()) {
+			int size = GetterUtil.getInteger(matcher.group(1));
+
+			if (size > 255) {
+				matcher.appendReplacement(sb, "LVARCHAR(" + size + ")");
+			}
+		}
+
+		matcher.appendTail(sb);
+
+		template = sb.toString();
+
+		return super.replaceTemplate(template, actual);
+	}
+
+	@Override
 	protected String reword(String data) throws IOException {
 		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
 			new UnsyncStringReader(data));
@@ -140,22 +165,6 @@ public class InformixDB extends BaseDB {
 				line = StringUtil.replace(
 					line, "typeSettings text", "typeSettings lvarchar(4096)");
 			}
-			else if (line.indexOf("varchar(300)") > 0) {
-				line = StringUtil.replace(
-					line, "varchar(300)", "lvarchar(300)");
-			}
-			else if (line.indexOf("varchar(500)") > 0) {
-				line = StringUtil.replace(
-					line, "varchar(500)", "lvarchar(500)");
-			}
-			else if (line.indexOf("varchar(1000)") > 0) {
-				line = StringUtil.replace(
-					line, "varchar(1000)", "lvarchar(1000)");
-			}
-			else if (line.indexOf("varchar(1024)") > 0) {
-				line = StringUtil.replace(
-					line, "varchar(1024)", "lvarchar(1024)");
-			}
 			else if (line.indexOf("1970-01-01") > 0) {
 				line = StringUtil.replace(
 					line, "1970-01-01", "1970-01-01 00:00:00.0");
@@ -190,5 +199,8 @@ public class InformixDB extends BaseDB {
 	};
 
 	private static InformixDB _instance = new InformixDB();
+
+	private static Pattern _varcharPattern = Pattern.compile(
+		"VARCHAR\\((\\d+)\\)");
 
 }
