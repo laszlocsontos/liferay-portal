@@ -15,6 +15,7 @@
 package com.liferay.portal.dao.db;
 
 import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
 
@@ -22,9 +23,21 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * @author László Csontos
  * @author Miguel Pastor
  */
 public class InformixDBTest extends BaseDBTestCase {
+
+	@Test
+	public void testReplaceTemplate() throws IOException {
+		String actualCreateTableQuery = StringUtil.toLowerCase(
+			buildSQL(_CREATE_TABLE_QUERY));
+
+		Assert.assertEquals(
+			"create table test (" +
+				"c1 varchar(200), c2 varchar(255), c3 lvarchar(256))\n",
+			actualCreateTableQuery);
+	}
 
 	@Test
 	public void testRewordRenameTable() throws IOException {
@@ -36,5 +49,8 @@ public class InformixDBTest extends BaseDBTestCase {
 	protected DB getDB() {
 		return InformixDB.getInstance();
 	}
+
+	private static final String _CREATE_TABLE_QUERY =
+		"CREATE TABLE test (c1 VARCHAR(200), c2 VARCHAR(255), c3 VARCHAR(256))";
 
 }
