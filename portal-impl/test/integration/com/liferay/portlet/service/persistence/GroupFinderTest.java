@@ -29,11 +29,13 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourceTypePermissionLocalServiceUtil;
+import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.persistence.GroupFinderUtil;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.GroupTestUtil;
+import com.liferay.portal.util.LayoutTestUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.ResourcePermissionTestUtil;
 import com.liferay.portal.util.ResourceTypePermissionTestUtil;
@@ -52,6 +54,7 @@ import org.junit.runner.RunWith;
 
 /**
  * @author Alberto Chaparro
+ * @author László Csontos
  */
 @ExecutionTestListeners(
 	listeners = {
@@ -137,6 +140,52 @@ public class GroupFinderTest {
 			_group.getGroupId());
 	}
 
+	@Test
+	public void testFindByLayouts() throws Exception {
+		long companyId = TestPropsValues.getCompanyId();
+
+		List<Group> groups = GroupFinderUtil.findByLayouts(
+			companyId, GroupConstants.DEFAULT_PARENT_GROUP_ID, true, -1, -1);
+
+		Assert.assertNotNull(groups);
+		Assert.assertFalse(groups.isEmpty());
+
+		Group[] hierarchy = generateHierarchy();
+
+		int initialGroupCount = groups.size();
+
+		groups = GroupFinderUtil.findByLayouts(
+			companyId, GroupConstants.DEFAULT_PARENT_GROUP_ID, true, -1, -1);
+
+		Assert.assertNotNull(groups);
+		Assert.assertEquals(initialGroupCount + 1, groups.size());
+
+		groups = GroupFinderUtil.findByLayouts(
+			companyId, hierarchy[0].getGroupId(), true, -1, -1);
+
+		Assert.assertNotNull(groups);
+		Assert.assertEquals(2, groups.size());
+
+		groups = GroupFinderUtil.findByLayouts(
+			companyId, hierarchy[1].getGroupId(), true, -1, -1);
+
+		Assert.assertNotNull(groups);
+		Assert.assertTrue(groups.isEmpty());
+
+		groups = GroupFinderUtil.findByLayouts(
+			companyId, hierarchy[2].getGroupId(), true, -1, -1);
+
+		Assert.assertNotNull(groups);
+		Assert.assertTrue(groups.isEmpty());
+	}
+
+	protected void addLayout(long groupId) throws Exception {
+		LayoutTestUtil.addLayout(
+			groupId, ServiceTestUtil.randomString(), false);
+
+		LayoutTestUtil.addLayout(groupId, ServiceTestUtil.randomString(), true);
+	}
+
 	protected List<Group> findByC_C_N_D(
 			String actionId, String name, long roleId)
 		throws Exception {
@@ -160,6 +209,22 @@ public class GroupFinderTest {
 			GroupConstants.ANY_PARENT_GROUP_ID, new String[] {null},
 			new String[] {null}, groupParams, true, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
+	}
+
+	protected Group[] generateHierarchy() throws Exception {
+		Group parentGroup = GroupTestUtil.addGroup("parentGroup");
+
+		addLayout(parentGroup.getGroupId());
+
+		Group childGroup1 = GroupTestUtil.addGroup(
+			parentGroup.getGroupId(), "childGroup1");
+		Group childGroup2 = GroupTestUtil.addGroup(
+			parentGroup.getGroupId(), "childGroup2");
+
+		addLayout(childGroup1.getGroupId());
+		addLayout(childGroup2.getGroupId());
+
+		return new Group[] {parentGroup, childGroup1, childGroup2};
 	}
 
 	private static ResourceAction _arbitraryResourceAction;
