@@ -108,7 +108,7 @@ public interface ${entity.name}${sessionTypeName}Service
 			public ${serviceBuilder.getTypeGenericsName(method.returns)} ${method.name}(
 
 			<#list method.parameters as parameter>
-				${serviceBuilder.getTypeGenericsName(parameter.type)} ${parameter.name}
+				${serviceBuilder.getParameterAnnotations(parameter)} ${serviceBuilder.getTypeGenericsName(parameter.type)} ${parameter.name}
 
 				<#if parameter_has_next>
 					,
