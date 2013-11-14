@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.spring.aop.ShardSelectorParam;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ArrayUtil_IW;
 import com.liferay.portal.kernel.util.CharPool;
@@ -1146,6 +1147,12 @@ public class ServiceBuilder {
 		noSuchEntityException = "NoSuch" + noSuchEntityException;
 
 		return noSuchEntityException;
+	}
+
+	public String getParameterAnnotations(JavaParameter parameter) {
+		Annotation[] parameterAnnotations = parameter.getAnnotations();
+
+		return _getAnnotationList(parameterAnnotations);
 	}
 
 	public String getParameterType(JavaParameter parameter) {
@@ -3941,6 +3948,24 @@ public class ServiceBuilder {
 		return xml;
 	}
 
+	private String _getAnnotationList(Annotation[] annotations) {
+		int parts = (annotations.length * 3);
+
+		StringBundler sb = new StringBundler(parts);
+
+		for (Annotation annotation : annotations) {
+			String annotationType = annotation.getType().toString();
+
+			if (_parameterAnnotations.contains(annotationType)) {
+				sb.append(CharPool.AT);
+				sb.append(annotationType);
+				sb.append(CharPool.SPACE);
+			}
+		}
+
+		return sb.toString();
+	}
+
 	private JavaField[] _getCacheFields(JavaClass javaClass) {
 		if (javaClass == null) {
 			return new JavaField[0];
@@ -5024,8 +5049,14 @@ public class ServiceBuilder {
 	private static Pattern _getterPattern = Pattern.compile(
 		"public .* get.*" + Pattern.quote("(") + "|public boolean is.*" +
 			Pattern.quote("("));
+	private static Set<String> _parameterAnnotations =
+		new HashSet<String>();
 	private static Pattern _setterPattern = Pattern.compile(
 		"public void set.*" + Pattern.quote("("));
+
+	static {
+		_parameterAnnotations.add(ShardSelectorParam.class.getName());
+	}
 
 	private String _apiDir;
 	private String _author;
