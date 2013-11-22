@@ -1789,6 +1789,21 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	}
 
 	/**
+	* Returns the user with the primary key.
+	*
+	* @param companyId the primary key of the user's company
+	* @param userId the primary key of the user
+	* @return the user with the primary key, or <code>null</code> if a user
+	with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.User fetchUserByUserId(long companyId,
+		long userId) throws com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.fetchUserByUserId(companyId, userId);
+	}
+
+	/**
 	* Returns a range of all the users belonging to the company.
 	*
 	* <p>
@@ -2942,6 +2957,26 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	}
 
 	/**
+	* Updates whether the user has agreed to the terms of use.
+	*
+	* @param companyId the primary key of the company
+	* @param userId the primary key of the user
+	* @param agreedToTermsOfUse whether the user has agreet to the terms of
+	use
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.User updateAgreedToTermsOfUse(
+		long companyId, long userId, boolean agreedToTermsOfUse)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.updateAgreedToTermsOfUse(companyId, userId,
+			agreedToTermsOfUse);
+	}
+
+	/**
 	* Updates the user's asset with the new asset categories and tag names,
 	* removing and adding asset categories and tag names as necessary.
 	*
@@ -3160,6 +3195,24 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	/**
 	* Updates the user's last login with the current time and the IP address.
 	*
+	* @param companyId
+	* @param userId the primary key of the user
+	* @param loginIP the IP address the user logged in from
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.User updateLastLogin(long companyId,
+		long userId, java.lang.String loginIP)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.updateLastLogin(companyId, userId, loginIP);
+	}
+
+	/**
+	* Updates the user's last login with the current time and the IP address.
+	*
 	* @param userId the primary key of the user
 	* @param loginIP the IP address the user logged in from
 	* @return the user
@@ -3304,6 +3357,55 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	/**
 	* Updates the user's password without tracking or validation of the change.
 	*
+	* @param companyId the primary key of the company
+	* @param userId the primary key of the user
+	* @param password1 the user's new password
+	* @param password2 the user's new password confirmation
+	* @param passwordReset whether the user should be asked to reset their
+	password the next time they log in
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.User updatePassword(long companyId,
+		long userId, java.lang.String password1, java.lang.String password2,
+		boolean passwordReset)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.updatePassword(companyId, userId, password1,
+			password2, passwordReset);
+	}
+
+	/**
+	* Updates the user's password, optionally with tracking and validation of
+	* the change.
+	*
+	* @param companyId the primary key of the company
+	* @param userId the primary key of the user
+	* @param password1 the user's new password
+	* @param password2 the user's new password confirmation
+	* @param passwordReset whether the user should be asked to reset their
+	password the next time they login
+	* @param silentUpdate whether the password should be updated without being
+	tracked, or validated. Primarily used for password imports.
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.User updatePassword(long companyId,
+		long userId, java.lang.String password1, java.lang.String password2,
+		boolean passwordReset, boolean silentUpdate)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.updatePassword(companyId, userId, password1,
+			password2, passwordReset, silentUpdate);
+	}
+
+	/**
+	* Updates the user's password without tracking or validation of the change.
+	*
 	* @param userId the primary key of the user
 	* @param password1 the user's new password
 	* @param password2 the user's new password confirmation
@@ -3392,6 +3494,27 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	}
 
 	/**
+	* Updates whether the user should be asked to reset their password the next
+	* time they login.
+	*
+	* @param companyId the primary key of the company
+	* @param userId the primary key of the user
+	* @param passwordReset whether the user should be asked to reset their
+	password the next time they login
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.User updatePasswordReset(long companyId,
+		long userId, boolean passwordReset)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.updatePasswordReset(companyId, userId,
+			passwordReset);
+	}
+
+	/**
 	* Updates the user's portrait image.
 	*
 	* @param userId the primary key of the user
@@ -3407,6 +3530,27 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _userLocalService.updatePortrait(userId, bytes);
+	}
+
+	/**
+	* Updates the user's password reset question and answer.
+	*
+	* @param companyId the primary key of the company
+	* @param userId the primary key of the user
+	* @param question the user's new password reset question
+	* @param answer the user's new password reset answer
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	or if the new question or answer were invalid
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public com.liferay.portal.model.User updateReminderQuery(long companyId,
+		long userId, java.lang.String question, java.lang.String answer)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.updateReminderQuery(companyId, userId,
+			question, answer);
 	}
 
 	/**
