@@ -824,6 +824,31 @@ public class UserServiceSoap {
 	}
 
 	/**
+	* Returns the user with the primary key.
+	*
+	* @param compnayId the primary key of the user's company
+	* @param userId the primary key of the user
+	* @return the user with the primary key
+	* @throws PortalException if a user with the primary key could not be found
+	or if the current user did not have permission to view the user
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.UserSoap getUserById(
+		long companyId, long userId) throws RemoteException {
+		try {
+			com.liferay.portal.model.User returnValue = UserServiceUtil.getUserById(companyId,
+					userId);
+
+			return com.liferay.portal.model.UserSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
 	* Returns the user with the screen name.
 	*
 	* @param companyId the primary key of the user's company
@@ -1216,6 +1241,33 @@ public class UserServiceSoap {
 	}
 
 	/**
+	* Updates the user's response to the terms of use agreement.
+	*
+	* @param companyId the primary key of the company
+	* @param userId the primary key of the user
+	* @param agreedToTermsOfUse whether the user has agree to the terms of use
+	* @return the user
+	* @throws PortalException if the current user did not have permission to
+	update the user's agreement to terms-of-use
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.UserSoap updateAgreedToTermsOfUse(
+		long companyId, long userId, boolean agreedToTermsOfUse)
+		throws RemoteException {
+		try {
+			com.liferay.portal.model.User returnValue = UserServiceUtil.updateAgreedToTermsOfUse(companyId,
+					userId, agreedToTermsOfUse);
+
+			return com.liferay.portal.model.UserSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
 	* Updates the user's email address.
 	*
 	* @param userId the primary key of the user
@@ -1396,6 +1448,37 @@ public class UserServiceSoap {
 	/**
 	* Updates the user's password without tracking or validation of the change.
 	*
+	* @param companyId the primary key of the company
+	* @param userId the primary key of the user
+	* @param password1 the user's new password
+	* @param password2 the user's new password confirmation
+	* @param passwordReset whether the user should be asked to reset their
+	password the next time they log in
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be found
+	or if the current user did not have permission to update the user
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.UserSoap updatePassword(
+		long companyId, long userId, java.lang.String password1,
+		java.lang.String password2, boolean passwordReset)
+		throws RemoteException {
+		try {
+			com.liferay.portal.model.User returnValue = UserServiceUtil.updatePassword(companyId,
+					userId, password1, password2, passwordReset);
+
+			return com.liferay.portal.model.UserSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Updates the user's password without tracking or validation of the change.
+	*
 	* @param userId the primary key of the user
 	* @param password1 the user's new password
 	* @param password2 the user's new password confirmation
@@ -1438,6 +1521,35 @@ public class UserServiceSoap {
 		try {
 			com.liferay.portal.model.User returnValue = UserServiceUtil.updatePortrait(userId,
 					bytes);
+
+			return com.liferay.portal.model.UserSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Updates the user's password reset question and answer.
+	*
+	* @param companyId the primary key of the company
+	* @param userId the primary key of the user
+	* @param question the user's new password reset question
+	* @param answer the user's new password reset answer
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be
+	found, if the new question or answer were invalid, or if the
+	current user did not have permission to update the user
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.UserSoap updateReminderQuery(
+		long companyId, long userId, java.lang.String question,
+		java.lang.String answer) throws RemoteException {
+		try {
+			com.liferay.portal.model.User returnValue = UserServiceUtil.updateReminderQuery(companyId,
+					userId, question, answer);
 
 			return com.liferay.portal.model.UserSoap.toSoapModel(returnValue);
 		}
