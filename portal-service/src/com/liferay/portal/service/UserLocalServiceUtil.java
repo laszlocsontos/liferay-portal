@@ -2160,6 +2160,9 @@ public class UserLocalServiceUtil {
 	* @return the user with the primary key
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0 as shard selection is not possible without
+	companyId or other object which has getCompanyId method.
+	Replaced by {@link #getUserById(long, long)}
 	*/
 	public static com.liferay.portal.model.User getUserById(long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -2801,6 +2804,10 @@ public class UserLocalServiceUtil {
 	* @return the user
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0 as shard selection is not possible without
+	companyId or other object which has getCompanyId method.
+	Replaced by {@link #updateAgreedToTermsOfUse(
+	long, long, boolean)}
 	*/
 	public static com.liferay.portal.model.User updateAgreedToTermsOfUse(
 		long userId, boolean agreedToTermsOfUse)
@@ -3253,6 +3260,10 @@ public class UserLocalServiceUtil {
 	* @return the user
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0 as shard selection is not possible without
+	companyId or other object which has getCompanyId method.
+	Replaced by {@link #updatePassword(
+	long, long, String, String, boolean)}
 	*/
 	public static com.liferay.portal.model.User updatePassword(long userId,
 		java.lang.String password1, java.lang.String password2,
@@ -3277,6 +3288,10 @@ public class UserLocalServiceUtil {
 	* @return the user
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0 as shard selection is not possible without
+	companyId or other object which has getCompanyId method.
+	Replaced by {@link #updatePassword(
+	long, long, String, String, boolean, boolean)}
 	*/
 	public static com.liferay.portal.model.User updatePassword(long userId,
 		java.lang.String password1, java.lang.String password2,
@@ -3322,6 +3337,9 @@ public class UserLocalServiceUtil {
 	* @return the user
 	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0 as shard selection is not possible without
+	companyId or other object which has getCompanyId method.
+	Replaced by {@link #updatePasswordReset(long, long, boolean)}
 	*/
 	public static com.liferay.portal.model.User updatePasswordReset(
 		long userId, boolean passwordReset)
@@ -3377,6 +3395,9 @@ public class UserLocalServiceUtil {
 	* @throws PortalException if a user with the primary key could not be found
 	or if the new question or answer were invalid
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0 as shard selection is not possible without
+	companyId or other object which has getCompanyId method.
+	Replaced by {@link #getUserById(long, long)}
 	*/
 	public static com.liferay.portal.model.User updateReminderQuery(
 		long companyId, long userId, java.lang.String question,
