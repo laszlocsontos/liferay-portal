@@ -44,6 +44,9 @@ for (int assetEntryIndex = 0; assetEntryIndex < results.size(); assetEntryIndex+
 
 	String title = assetRenderer.getTitle(locale);
 
+	boolean show = true;
+	boolean print = false;
+
 	request.setAttribute("view.jsp-assetEntryIndex", new Integer(assetEntryIndex));
 
 	request.setAttribute("view.jsp-assetEntry", assetEntry);
@@ -52,8 +55,8 @@ for (int assetEntryIndex = 0; assetEntryIndex < results.size(); assetEntryIndex+
 
 	request.setAttribute("view.jsp-title", title);
 
-	request.setAttribute("view.jsp-show", Boolean.TRUE);
-	request.setAttribute("view.jsp-print", Boolean.FALSE);
+	request.setAttribute("view.jsp-show", new Boolean(show));
+	request.setAttribute("view.jsp-print", new Boolean(print));
 
 	try {
 %>

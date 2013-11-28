@@ -37,6 +37,8 @@ if (Validator.isNull(title)) {
 	title = assetRenderer.getTitle(locale);
 }
 
+boolean show = ((Boolean)request.getAttribute("view.jsp-show")).booleanValue();
+
 PortletURL editPortletURL = assetRenderer.getURLEdit(liferayPortletRequest, liferayPortletResponse);
 
 PortletURL viewFullContentURL = renderResponse.createRenderURL();
@@ -55,8 +57,6 @@ if (Validator.isNotNull(assetRenderer.getUrlTitle())) {
 
 String viewURL = null;
 
-boolean viewInContext = ((Boolean)request.getAttribute("view.jsp-viewInContext")).booleanValue();
-
 if (viewInContext) {
 	String viewFullContentURLString = viewFullContentURL.toString();
 
@@ -68,7 +68,7 @@ else {
 	viewURL = viewFullContentURL.toString();
 }
 
-viewURL = AssetUtil.checkViewURL(assetEntry, viewInContext, viewURL, currentURL, themeDisplay);
+viewURL = _checkViewURL(assetEntry, viewInContext, viewURL, currentURL, themeDisplay);
 
 request.setAttribute("view.jsp-showIconLabel", false);
 %>

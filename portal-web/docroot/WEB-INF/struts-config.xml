@@ -450,6 +450,12 @@
 
 		<action path="/dockbar/add_panel" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction" >
 			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.dockbar.add_panel" />
+			<forward name="portlet.layouts_admin.error" path="portlet.dockbar.add_panel" />
+		</action>
+
+		<action path="/dockbar/edit_layout_icon_image" type="com.liferay.portlet.layoutsadmin.action.EditLayoutIconImageAction">
+			<forward name="portlet.layouts_admin.edit_layout_icon_image" path="portlet.layouts_admin.edit_layout_icon_image" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
 		</action>
 
 		<action path="/dockbar/edit_layout_panel" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction">
@@ -458,8 +464,8 @@
 		</action>
 
 		<action path="/dockbar/edit_layouts" type="com.liferay.portlet.grouppages.action.EditLayoutsAction">
-			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.dockbar.add_layout" />
-			<forward name="portlet.layouts_admin.error" path="portlet.dockbar.add_layout" />
+			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.dockbar.edit_layout_panel" />
+			<forward name="portlet.layouts_admin.error" path="portlet.dockbar.edit_layout_panel" />
 		</action>
 
 		<action path="/dockbar/preview_panel" forward="portlet.dockbar.preview_panel" />
@@ -719,6 +725,11 @@
 			<forward name="portlet.staging_bar.error" path="portlet.staging_bar.error" />
 		</action>
 
+		<action path="/group_pages/edit_layout_icon_image" type="com.liferay.portlet.layoutsadmin.action.EditLayoutIconImageAction">
+			<forward name="portlet.layouts_admin.edit_layout_icon_image" path="portlet.layouts_admin.edit_layout_icon_image" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
+		</action>
+
 		<action path="/group_pages/edit_layout_set" type="com.liferay.portlet.layoutsadmin.action.EditLayoutSetAction">
 			<forward name="portlet.layouts_admin.edit_layouts" path="portlet.layouts_admin.edit_layouts" />
 			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
@@ -933,6 +944,8 @@
 
 		<!-- Journal Content -->
 
+		<action path="/journal_content/add_asset_redirect" forward="portlet.journal.asset.add_asset_redirect" />
+
 		<action path="/journal_content/edit_article_discussion" type="com.liferay.portlet.messageboards.action.EditDiscussionAction">
 			<forward name="portlet.message_boards.error" path="portlet.journal_content.error" />
 		</action>
@@ -1026,6 +1039,11 @@
 		<action path="/layouts_admin/edit_layout_branch" type="com.liferay.portlet.stagingbar.action.EditLayoutBranchAction">
 			<forward name="portlet.staging_bar.edit_layout_branch" path="portlet.staging_bar.edit_layout_branch" />
 			<forward name="portlet.staging_bar.error" path="portlet.staging_bar.error" />
+		</action>
+
+		<action path="/layouts_admin/edit_layout_icon_image" type="com.liferay.portlet.layoutsadmin.action.EditLayoutIconImageAction">
+			<forward name="portlet.layouts_admin.edit_layout_icon_image" path="portlet.layouts_admin.edit_layout_icon_image" />
+			<forward name="portlet.layouts_admin.error" path="portlet.layouts_admin.error" />
 		</action>
 
 		<action path="/layouts_admin/edit_layout_set" type="com.liferay.portlet.layoutsadmin.action.EditLayoutSetAction">
