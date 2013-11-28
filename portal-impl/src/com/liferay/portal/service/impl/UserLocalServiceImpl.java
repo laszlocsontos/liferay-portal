@@ -2712,6 +2712,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @return the user with the primary key
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 7.0.0 as shard selection is not possible without
+	 *             companyId or other object which has getCompanyId method.
+	 *             Replaced by {@link #getUserById(long, long)}
 	 */
 	@Override
 	public User getUserById(long userId)
@@ -3894,6 +3897,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @return the user
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 7.0.0 as shard selection is not possible without
+	 *             companyId or other object which has getCompanyId method.
+	 *             Replaced by {@link #updateAgreedToTermsOfUse(
+	 *             long, long, boolean)}
 	 */
 	@Override
 	public User updateAgreedToTermsOfUse(
@@ -4723,6 +4730,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @return the user
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 7.0.0 as shard selection is not possible without
+	 *             companyId or other object which has getCompanyId method.
+	 *             Replaced by {@link #updatePassword(
+	 *             long, long, String, String, boolean)}
 	 */
 	@Override
 	public User updatePassword(
@@ -4748,6 +4759,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @return the user
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 7.0.0 as shard selection is not possible without
+	 *             companyId or other object which has getCompanyId method.
+	 *             Replaced by {@link #updatePassword(
+	 *             long, long, String, String, boolean, boolean)}
 	 */
 	@Override
 	public User updatePassword(
@@ -4859,6 +4874,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @return the user
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 7.0.0 as shard selection is not possible without
+	 *             companyId or other object which has getCompanyId method.
+	 *             Replaced by {@link #updatePasswordReset(long, long, boolean)}
 	 */
 	@Override
 	public User updatePasswordReset(long userId, boolean passwordReset)
@@ -4936,6 +4954,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws PortalException if a user with the primary key could not be found
 	 *         or if the new question or answer were invalid
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 7.0.0 as shard selection is not possible without
+	 *             companyId or other object which has getCompanyId method.
+	 *             Replaced by {@link #getUserById(long, long)}
 	 */
 	@Override
 	@ShardSelection(selectionMethod = ShardSelectionMethod.PARAMETER)
