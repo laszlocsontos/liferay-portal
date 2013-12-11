@@ -19,6 +19,6 @@ package com.liferay.portal.kernel.spring.aop;
  */
 public enum ShardSelectionMethod {
 
-	PARAMETER, SKIP, THREADLOCAL, NONE
+	NONE, PARAMETER, THREADLOCAL
 
 }
