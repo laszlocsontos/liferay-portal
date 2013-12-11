@@ -227,8 +227,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				Layout layout = LayoutLocalServiceUtil.getLayout(plid);
 
 				PortletPreferences preferences =
-					PortletPreferencesFactoryUtil.getPortletSetup(
-						layout, portletId, StringPool.BLANK);
+					PortletPreferencesFactoryUtil.getStrictPortletSetup(
+						layout, portletId);
 
 				lastPublishDate = GetterUtil.getLong(
 					preferences.getValue(
@@ -300,6 +300,224 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		return PortletConstants.getRootPortletId(portletId);
+	}
+
+	@Override
+	public boolean[] getExportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap)
+		throws Exception {
+
+		return getExportPortletControls(
+			companyId, portletId, parameterMap, "layout-set");
+	}
+
+	@Override
+	public boolean[] getExportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, String type)
+		throws Exception {
+
+		boolean exportPortletConfiguration = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PORTLET_CONFIGURATION);
+		boolean exportPortletConfigurationAll = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL);
+		boolean exportPortletData = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PORTLET_DATA);
+		boolean exportPortletDataAll = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PORTLET_DATA_ALL);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Export portlet data " + exportPortletData);
+			_log.debug("Export all portlet data " + exportPortletDataAll);
+			_log.debug(
+				"Export portlet configuration " + exportPortletConfiguration);
+		}
+
+		boolean exportCurPortletData = exportPortletData;
+
+		String rootPortletId = getExportableRootPortletId(companyId, portletId);
+
+		if (exportPortletDataAll) {
+			exportCurPortletData = true;
+		}
+		else if (rootPortletId != null) {
+
+			// PORTLET_DATA and the PORTLET_DATA for this specific data handler
+			// must be true
+
+			exportCurPortletData =
+				exportPortletData &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_DATA +
+						StringPool.UNDERLINE + rootPortletId);
+		}
+
+		boolean exportCurPortletArchivedSetups = exportPortletConfiguration;
+		boolean exportCurPortletSetup = exportPortletConfiguration;
+		boolean exportCurPortletUserPreferences = exportPortletConfiguration;
+
+		if (exportPortletConfigurationAll ||
+			(exportPortletConfiguration && type.equals("layout-prototype"))) {
+
+			exportCurPortletArchivedSetups =
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL);
+			exportCurPortletSetup =
+				MapUtil.getBoolean(
+					parameterMap, PortletDataHandlerKeys.PORTLET_SETUP_ALL);
+			exportCurPortletUserPreferences =
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL);
+		}
+		else if (rootPortletId != null) {
+			boolean exportCurPortletConfiguration =
+				exportPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_CONFIGURATION +
+						StringPool.UNDERLINE + rootPortletId);
+
+			exportCurPortletArchivedSetups =
+				exportCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS +
+						StringPool.UNDERLINE + rootPortletId);
+			exportCurPortletSetup =
+				exportCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_SETUP +
+						StringPool.UNDERLINE + rootPortletId);
+			exportCurPortletUserPreferences =
+				exportCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES +
+						StringPool.UNDERLINE + rootPortletId);
+		}
+
+		return new boolean[] {
+			exportCurPortletArchivedSetups, exportCurPortletData,
+			exportCurPortletSetup, exportCurPortletUserPreferences};
+	}
+
+	@Override
+	public boolean[] getImportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, Element portletDataElement)
+		throws Exception {
+
+		return getImportPortletControls(
+			companyId, portletId, parameterMap, portletDataElement, null);
+	}
+
+	@Override
+	public boolean[] getImportPortletControls(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, Element portletDataElement,
+			ManifestSummary manifestSummary)
+		throws Exception {
+
+		boolean importPortletConfiguration = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PORTLET_CONFIGURATION);
+		boolean importPortletConfigurationAll = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL);
+		boolean importPortletData = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PORTLET_DATA);
+		boolean importPortletDataAll = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PORTLET_DATA_ALL);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Import portlet data " + importPortletData);
+			_log.debug("Import all portlet data " + importPortletDataAll);
+			_log.debug(
+				"Import portlet configuration " + importPortletConfiguration);
+		}
+
+		boolean importCurPortletData = importPortletData;
+
+		String rootPortletId = getExportableRootPortletId(companyId, portletId);
+
+		if (portletDataElement == null) {
+			importCurPortletData = false;
+		}
+		else if (importPortletDataAll) {
+			importCurPortletData = true;
+		}
+		else if (rootPortletId != null) {
+			importCurPortletData =
+				importPortletData &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_DATA +
+						StringPool.UNDERLINE + rootPortletId);
+		}
+
+		boolean importCurPortletArchivedSetups = importPortletConfiguration;
+		boolean importCurPortletSetup = importPortletConfiguration;
+		boolean importCurPortletUserPreferences = importPortletConfiguration;
+
+		if (importPortletConfigurationAll) {
+			boolean importCurPortletConfiguration = true;
+
+			if ((manifestSummary != null) &&
+				(manifestSummary.getConfigurationPortletOptions(
+					rootPortletId) == null)) {
+
+				importCurPortletConfiguration = false;
+			}
+
+			importCurPortletArchivedSetups =
+				importCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL);
+			importCurPortletSetup =
+				importCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap, PortletDataHandlerKeys.PORTLET_SETUP_ALL);
+			importCurPortletUserPreferences =
+				importCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL);
+		}
+		else if (rootPortletId != null) {
+			boolean importCurPortletConfiguration =
+				importPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_CONFIGURATION +
+						StringPool.UNDERLINE + rootPortletId);
+
+			importCurPortletArchivedSetups =
+				importCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS +
+						StringPool.UNDERLINE + rootPortletId);
+			importCurPortletSetup =
+				importCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_SETUP +
+						StringPool.UNDERLINE + rootPortletId);
+			importCurPortletUserPreferences =
+				importCurPortletConfiguration &&
+				MapUtil.getBoolean(
+					parameterMap,
+					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES +
+						StringPool.UNDERLINE + rootPortletId);
+		}
+
+		return new boolean[] {
+			importCurPortletArchivedSetups, importCurPortletData,
+			importCurPortletSetup, importCurPortletUserPreferences};
 	}
 
 	@Override
@@ -1853,10 +2071,10 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		ExportImportHelperImpl.class);
 
 	private Pattern _exportLinksToLayoutPattern = Pattern.compile(
-		"\\[([0-9]+)@(public|private\\-[a-z]*)\\]");
+		"\\[([\\d]+)@(public|private)(@([\\d]+))?\\]");
 	private Pattern _importLinksToLayoutPattern = Pattern.compile(
-		"\\[([0-9]+)@(public|private\\-[a-z]*)@(\\p{XDigit}{8}\\-" +
-		"(?:\\p{XDigit}{4}\\-){3}\\p{XDigit}{12})@([^\\]]*)\\]");
+		"\\[([\\d]+)@(public|private)@(\\p{XDigit}{8}\\-(?:\\p{XDigit}{4}\\-)" +
+			"{3}\\p{XDigit}{12})@(\\/[\\w]*)(@([\\d]+))?\\]");
 
 	private class ManifestSummaryElementProcessor implements ElementProcessor {
 
@@ -1915,6 +2133,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 				if (!(portletDataHandler instanceof
 						DefaultConfigurationPortletDataHandler) &&
+					portletDataHandler.isDataSiteLevel() &&
 					GetterUtil.getBoolean(
 						element.attributeValue("portlet-data"))) {
 

@@ -688,20 +688,20 @@ $editLayoutPanelWidth: 460px;
 			background: #F5AF45;
 		}
 
-		&.lfr-has-add-content .nav-add-controls {
+		&.lfr-has-add-content .nav-add-controls ul.dropdown-menu {
 			left: $addContentPanelWidth;
 		}
 
-		&.lfr-has-device-preview .nav-add-controls {
+		&.lfr-has-device-preview .nav-add-controls ul.dropdown-menu {
 			left: $devicePreviewPanelWidth;
 		}
 
-		&.lfr-has-edit-layout .nav-add-controls {
+		&.lfr-has-edit-layout .nav-add-controls ul.dropdown-menu {
 			left: $editLayoutPanelWidth;
 		}
 	}
 
-	&.dialog-iframe-root-node .dockbar .nav-add-controls .page-preview-controls {
+	&.dialog-iframe-root-node .dockbar .navbar-inner .container .nav-collapse > .nav.nav-add-controls .dropdown-menu .page-preview-controls {
 		display: none;
 	}
 
@@ -868,8 +868,10 @@ $editLayoutPanelWidth: 460px;
 
 	/* ---------- Menus ---------- */
 
-	.dropdown-menu > li > a:focus > [class^="icon-"] {
-		background-image: none;
+	.dropdown-menu > li > a:focus, .dropdown-submenu:focus > a {
+		> [class^="icon-"], > [class*=" icon-"] {
+			background-image: none;
+		}
 	}
 
 	.my-sites-menu {
@@ -1045,5 +1047,11 @@ $editLayoutPanelWidth: 460px;
 		.dockbar-split .dockbar .info-items {
 			width: 515px;
 		}
+	}
+
+	/* LPS-42547 */
+
+	.dockbar-split .dockbar .nav-collapse {
+		-webkit-transform: none;
 	}
 }

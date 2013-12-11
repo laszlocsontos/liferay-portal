@@ -347,7 +347,6 @@
 
 							ul.dropdown-menu, .site-administration-menu {
 								border-width: 0;
-								left: 0;
 								margin: 0;
 								right: auto;
 
@@ -488,9 +487,13 @@
 	/* ---------- Breadcrumbs ---------- */
 
 	.breadcrumb {
+		@include ellipsis;
+
 		padding: 3px 15px 2px;
 
 		li {
+			display: inline;
+
 			span.divider {
 				color: #999;
 				font-weight: bold;

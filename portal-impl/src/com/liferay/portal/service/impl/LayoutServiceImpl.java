@@ -1348,6 +1348,16 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			jobName, groupName, StorageType.PERSISTED);
 	}
 
+	@Override
+	public Layout updateIconImage(long plid, byte[] bytes)
+		throws PortalException, SystemException {
+
+		LayoutPermissionUtil.check(
+			getPermissionChecker(), plid, ActionKeys.UPDATE);
+
+		return layoutLocalService.updateIconImage(plid, bytes);
+	}
+
 	/**
 	 * Updates the layout with additional parameters.
 	 *
@@ -1389,7 +1399,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			Map<Locale, String> localeTitlesMap,
 			Map<Locale, String> descriptionMap, Map<Locale, String> keywordsMap,
 			Map<Locale, String> robotsMap, String type, boolean hidden,
-			Map<Locale, String> friendlyURLMap, Boolean iconImage,
+			Map<Locale, String> friendlyURLMap, boolean iconImage,
 			byte[] iconBytes, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
@@ -1768,8 +1778,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 		for (Layout layout : layouts) {
 			if (LayoutPermissionUtil.contains(
-					getPermissionChecker(), layout.getPlid(),
-					ActionKeys.VIEW)) {
+					getPermissionChecker(), layout, ActionKeys.VIEW)) {
 
 				filteredLayouts.add(layout);
 			}

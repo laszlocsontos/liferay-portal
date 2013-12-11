@@ -17,8 +17,6 @@
 <%@ include file="/html/portlet/asset_publisher/init.jsp" %>
 
 <%
-boolean anyAssetType = GetterUtil.getBoolean(portletPreferences.getValue("anyAssetType", null), true);
-
 List<AssetRendererFactory> classTypesAssetRendererFactories = (List<AssetRendererFactory>)request.getAttribute("configuration.jsp-classTypesAssetRendererFactories");
 PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configuration.jsp-configurationRenderURL");
 String redirect = (String)request.getAttribute("configuration.jsp-redirect");
@@ -174,7 +172,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 
 							<span class="asset-subtypefields-message" id="<portlet:namespace /><%= className %>ddmStructureFieldMessage">
 								<c:if test="<%= (Validator.isNotNull(ddmStructureFieldLabel) && (classNameIds[0] == PortalUtil.getClassNameId(assetRendererFactory.getClassName()))) %>">
-									<%= ddmStructureFieldLabel + ": " + ddmStructureDisplayFieldValue %>
+									<%= HtmlUtil.escape(ddmStructureFieldLabel) + ": " + HtmlUtil.escape(ddmStructureDisplayFieldValue) %>
 								</c:if>
 							</span>
 
@@ -407,11 +405,6 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 						</span>
 
 						<span class="field-row">
-
-							<%
-							long assetVocabularyId = GetterUtil.getLong(portletPreferences.getValue("assetVocabularyId", null));
-							%>
-
 							<aui:select inlineField="<%= true %>" inlineLabel="left" label="group-by" name="preferences--assetVocabularyId--">
 								<aui:option value="" />
 								<aui:option label="asset-types" selected="<%= assetVocabularyId == -1 %>" value="-1" />
@@ -488,16 +481,6 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 		<liferay-ui:error-marker key="errorSection" value="subscriptions" />
 
 		<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
-
-			<%
-			boolean enableRSS = GetterUtil.getBoolean(portletPreferences.getValue("enableRss", null));
-
-			int rssDelta = GetterUtil.getInteger(portletPreferences.getValue("rssDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
-			String rssDisplayStyle = portletPreferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_ABSTRACT);
-			String rssFeedType = portletPreferences.getValue("rssFeedType", RSSUtil.FEED_TYPE_DEFAULT);
-			String rssName = portletPreferences.getValue("rssName", portletDisplay.getTitle());
-			%>
-
 			<liferay-ui:rss-settings
 				delta="<%= rssDelta %>"
 				displayStyle="<%= rssDisplayStyle %>"
@@ -603,8 +586,8 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 				}
 			%>
 
-				columnBuffer1.push('<option <%= selectedOrderByColumn1 %> value="<%= value %>"><%= (String)classTypeFieldName.getObject(0) %></option>');
-				columnBuffer2.push('<option <%= selectedOrderByColumn2 %> value="<%= value %>"><%= (String)classTypeFieldName.getObject(0) %></option>');
+				columnBuffer1.push('<option <%= selectedOrderByColumn1 %> value="<%= value %>"><%= HtmlUtil.escapeJS((String)classTypeFieldName.getObject(0)) %></option>');
+				columnBuffer2.push('<option <%= selectedOrderByColumn2 %> value="<%= value %>"><%= HtmlUtil.escapeJS((String)classTypeFieldName.getObject(0)) %></option>');
 
 			<%
 			}
@@ -776,7 +759,7 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 
 		var ddmStructureFieldMessage = A.one('#<portlet:namespace />' + className + 'ddmStructureFieldMessage');
 
-		ddmStructureFieldMessage.html(message);
+		ddmStructureFieldMessage.html(Liferay.Util.escapeHTML(message));
 	}
 </aui:script>
 

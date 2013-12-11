@@ -929,8 +929,14 @@ public class JournalArticleLocalServiceImpl
 
 		// Images
 
+		String articleId = article.getArticleId();
+
+		if (article.isInTrash()) {
+			articleId = TrashUtil.getOriginalTitle(article.getArticleId());
+		}
+
 		journalArticleImageLocalService.deleteImages(
-			article.getGroupId(), article.getArticleId(), article.getVersion());
+			article.getGroupId(), articleId, article.getVersion());
 
 		// Expando
 
@@ -943,8 +949,7 @@ public class JournalArticleLocalServiceImpl
 
 			if (trashEntry != null) {
 				trashVersionLocalService.deleteTrashVersion(
-					trashEntry.getEntryId(), JournalArticle.class.getName(),
-					article.getId());
+					JournalArticle.class.getName(), article.getId());
 			}
 		}
 
@@ -5952,7 +5957,11 @@ public class JournalArticleLocalServiceImpl
 				"/image/journal/article?img_id=" + imageId + "&t=" +
 					WebServerServletTokenUtil.getToken(imageId);
 
-			byte[] bytes = images.get(elInstanceId + "_" + elName + elLanguage);
+			byte[] bytes = null;
+
+			if (images != null) {
+				bytes = images.get(elInstanceId + "_" + elName + elLanguage);
+			}
 
 			if (ArrayUtil.isNotEmpty(bytes)) {
 				dynamicContent.setText(elContent);
@@ -6588,7 +6597,8 @@ public class JournalArticleLocalServiceImpl
 				PortalUtil.getClassNameId(JournalArticle.class),
 				ddmStructureKey, true);
 
-			validateDDMStructureFields(ddmStructure, serviceContext);
+			validateDDMStructureFields(
+				ddmStructure, classNameId, serviceContext);
 
 			if (Validator.isNotNull(ddmTemplateKey)) {
 				DDMTemplate ddmTemplate = ddmTemplateLocalService.getTemplate(
@@ -6707,7 +6717,8 @@ public class JournalArticleLocalServiceImpl
 	}
 
 	protected void validateDDMStructureFields(
-			DDMStructure ddmStructure, ServiceContext serviceContext)
+			DDMStructure ddmStructure, long classNameId,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		Fields fields = DDMUtil.getFields(
@@ -6721,7 +6732,8 @@ public class JournalArticleLocalServiceImpl
 			}
 
 			if (ddmStructure.getFieldRequired(field.getName()) &&
-				Validator.isNull(field.getValue())) {
+				Validator.isNull(field.getValue()) &&
+				(classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT)) {
 
 				throw new StorageFieldRequiredException();
 			}

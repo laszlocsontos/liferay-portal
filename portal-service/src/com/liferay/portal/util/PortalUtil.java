@@ -886,6 +886,13 @@ public class PortalUtil {
 		return getPortal().getLayoutURL(layout, themeDisplay, doAsUser);
 	}
 
+	public static String getLayoutURL(
+			Layout layout, ThemeDisplay themeDisplay, Locale locale)
+		throws PortalException, SystemException {
+
+		return getPortal().getLayoutURL(layout, themeDisplay, locale);
+	}
+
 	public static String getLayoutURL(ThemeDisplay themeDisplay)
 		throws PortalException, SystemException {
 
@@ -1961,6 +1968,15 @@ public class PortalUtil {
 
 	public static String transformSQL(String sql) {
 		return getPortal().transformSQL(sql);
+	}
+
+	public static void updateImageId(
+			BaseModel<?> baseModel, boolean image, byte[] bytes,
+			String fieldName, long maxSize, int maxHeight, int maxWidth)
+		throws PortalException, SystemException {
+
+		getPortal().updateImageId(
+			baseModel, image, bytes, fieldName, maxSize, maxHeight, maxWidth);
 	}
 
 	public static PortletMode updatePortletMode(

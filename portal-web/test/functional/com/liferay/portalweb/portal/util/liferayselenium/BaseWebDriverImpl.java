@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
@@ -517,6 +518,10 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
+	public void pauseLoggerCheck() throws Exception {
+	}
+
+	@Override
 	public void refreshAndWait() {
 		super.refresh();
 		super.waitForPageToLoad("30000");
@@ -529,10 +534,6 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public void saveScreenshot(String fileName) throws Exception {
-		if (!TestPropsValues.SAVE_SCREENSHOT) {
-			return;
-		}
-
 		if (_screenshotFileName.equals(fileName)) {
 			_screenshotCount++;
 		}
@@ -556,7 +557,7 @@ public abstract class BaseWebDriverImpl
 			file,
 			new File(
 				getProjectDir() + "portal-web\\test-results\\functional\\" +
-					_screenshotFileName + "/" + _screenshotFileName +
+					_screenshotFileName + "\\" + _screenshotFileName +
 					_screenshotCount + ".jpg"));
 	}
 
@@ -589,6 +590,11 @@ public abstract class BaseWebDriverImpl
 
 	@Override
 	public void sendLogger(String id, String status) {
+	}
+
+	@Override
+	public void sendLogger(
+		String id, String status, Map<String, String> context) {
 	}
 
 	@Override

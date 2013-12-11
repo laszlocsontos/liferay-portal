@@ -14,6 +14,8 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.portal.ImageTypeException;
 import com.liferay.portal.NoSuchImageException;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.NoSuchUserException;
@@ -26,6 +28,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.image.ImageBag;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -70,6 +74,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ListMergeable;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -134,6 +139,7 @@ import com.liferay.portal.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.GroupServiceUtil;
+import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
@@ -182,6 +188,7 @@ import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
 import com.liferay.portlet.calendar.model.CalEvent;
+import com.liferay.portlet.documentlibrary.ImageSizeException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.expando.ValueDataException;
@@ -202,6 +209,8 @@ import com.liferay.portlet.social.util.FacebookUtil;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.util.Encryptor;
 import com.liferay.util.JS;
+
+import java.awt.image.RenderedImage;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -2193,6 +2202,10 @@ public class PortalImpl implements Portal {
 		else if (type == ExpandoColumnConstants.STRING_ARRAY) {
 			value = portletRequest.getParameterValues(name);
 		}
+		else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
+			value = (Serializable)LocalizationUtil.getLocalizationMap(
+				portletRequest, name);
+		}
 		else {
 			value = ParamUtil.getString(portletRequest, name);
 		}
@@ -2317,6 +2330,10 @@ public class PortalImpl implements Portal {
 		}
 		else if (type == ExpandoColumnConstants.STRING_ARRAY) {
 			value = uploadPortletRequest.getParameterValues(name);
+		}
+		else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
+			value = (Serializable)LocalizationUtil.getLocalizationMap(
+				uploadPortletRequest, name);
 		}
 		else {
 			value = ParamUtil.getString(uploadPortletRequest, name);
@@ -3048,7 +3065,9 @@ public class PortalImpl implements Portal {
 			}
 		}
 
-		if (Validator.isNotNull(virtualHostname)) {
+		if (Validator.isNotNull(virtualHostname) &&
+			!StringUtil.equalsIgnoreCase(virtualHostname, _LOCALHOST)) {
+
 			String portalURL = getPortalURL(
 				virtualHostname, themeDisplay.getServerPort(),
 				themeDisplay.isSecure());
@@ -3150,6 +3169,26 @@ public class PortalImpl implements Portal {
 			themeDisplay, layout, layoutURL, doAsUser);
 
 		return layoutURL;
+	}
+
+	@Override
+	public String getLayoutURL(
+			Layout layout, ThemeDisplay themeDisplay, Locale locale)
+		throws PortalException, SystemException {
+
+		String i18nLanguageId = themeDisplay.getI18nLanguageId();
+		String i18nPath = themeDisplay.getI18nPath();
+		Locale originalLocale = themeDisplay.getLocale();
+
+		try {
+			setThemeDisplayI18n(themeDisplay, locale);
+
+			return getLayoutURL(layout, themeDisplay, true);
+		}
+		finally {
+			resetThemeDisplayI18n(
+				themeDisplay, i18nLanguageId, i18nPath, originalLocale);
+		}
 	}
 
 	@Override
@@ -4674,16 +4713,18 @@ public class PortalImpl implements Portal {
 			HttpServletRequest request, boolean checkPermission)
 		throws PortalException, SystemException {
 
+		long companyId = getCompanyId(request);
+
 		long userId = ParamUtil.getLong(request, "p_u_i_d");
 
 		User user = null;
 
 		try {
 			if (checkPermission) {
-				user = UserServiceUtil.getUserById(userId);
+				user = UserServiceUtil.getUserById(companyId, userId);
 			}
 			else {
-				user = UserLocalServiceUtil.getUserById(userId);
+				user = UserLocalServiceUtil.getUserById(companyId, userId);
 			}
 		}
 		catch (NoSuchUserException nsue) {
@@ -5298,7 +5339,9 @@ public class PortalImpl implements Portal {
 		}
 
 		if (userId > 0) {
-			user = UserLocalServiceUtil.getUserById(userId);
+			long companyId = getCompanyId(request);
+
+			user = UserLocalServiceUtil.getUserById(companyId, userId);
 
 			request.setAttribute(WebKeys.USER, user);
 		}
@@ -6716,6 +6759,62 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
+	public void updateImageId(
+			BaseModel<?> baseModel, boolean image, byte[] bytes,
+			String fieldName, long maxSize, int maxHeight, int maxWidth)
+		throws PortalException, SystemException {
+
+		long imageId = BeanPropertiesUtil.getLong(baseModel, fieldName);
+
+		if (!image) {
+			if (imageId > 0) {
+				ImageLocalServiceUtil.deleteImage(imageId);
+
+				BeanPropertiesUtil.setProperty(baseModel, fieldName, 0);
+			}
+
+			return;
+		}
+
+		if (ArrayUtil.isEmpty(bytes)) {
+			return;
+		}
+
+		if ((maxSize > 0) && ((bytes == null) || (bytes.length > maxSize))) {
+			throw new ImageSizeException();
+		}
+
+		if (imageId <= 0) {
+			imageId = CounterLocalServiceUtil.increment();
+
+			BeanPropertiesUtil.setProperty(baseModel, fieldName, imageId);
+		}
+
+		if ((maxHeight > 0) || (maxWidth > 0)) {
+			try {
+				ImageBag imageBag = ImageToolUtil.read(bytes);
+
+				RenderedImage renderedImage = imageBag.getRenderedImage();
+
+				if (renderedImage == null) {
+					throw new ImageTypeException();
+				}
+
+				renderedImage = ImageToolUtil.scale(
+					renderedImage, maxHeight, maxWidth);
+
+				bytes = ImageToolUtil.getBytes(
+					renderedImage, imageBag.getType());
+			}
+			catch (IOException ioe) {
+				throw new ImageSizeException(ioe);
+			}
+		}
+
+		ImageLocalServiceUtil.updateImage(imageId, bytes);
+	}
+
+	@Override
 	public PortletMode updatePortletMode(
 		String portletId, User user, Layout layout, PortletMode portletMode,
 		HttpServletRequest request) {
@@ -7315,7 +7414,10 @@ public class PortalImpl implements Portal {
 
 		String portalURL = themeDisplay.getPortalURL();
 
-		if (canonicalURL || !themeDisplay.getServerName().equals(_LOCALHOST)) {
+		if (canonicalURL ||
+			!StringUtil.equalsIgnoreCase(
+				themeDisplay.getServerName(), _LOCALHOST)) {
+
 			String virtualHostname = layoutSet.getVirtualHostname();
 
 			if (Validator.isNull(virtualHostname) &&
