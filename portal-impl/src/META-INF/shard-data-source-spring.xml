@@ -8,7 +8,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 >
-	<bean id="chainableMethodAdviceInjector.dynamicDataSourceAdvice" class="com.liferay.portal.spring.aop.ChainableMethodAdviceInjector">
+	<bean id="chainableMethodAdviceInjector.shardAnnotationAdvice" class="com.liferay.portal.spring.aop.ChainableMethodAdviceInjector">
 		<property name="childMethodInterceptor" ref="transactionAdvice" />
 		<property name="injectCondition" value="true" />
 		<property name="newChainableMethodAdvice" ref="shardAnnotationAdvice" />

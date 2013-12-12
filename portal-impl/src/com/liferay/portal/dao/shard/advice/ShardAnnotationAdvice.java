@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.spring.aop.ShardSelection;
 import com.liferay.portal.kernel.spring.aop.ShardSelectionMethod;
 import com.liferay.portal.kernel.spring.aop.ShardSelectorParam;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Shard;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
@@ -55,15 +57,15 @@ public class ShardAnnotationAdvice
 
 		if (annotation.isClassAnnotation()) {
 			if (selectionMethod.equals(ShardSelectionMethod.THREADLOCAL)) {
-				_setShardFromThreadLocal(methodInvocation);
+				setShardFromThreadLocal(methodInvocation);
 			}
 			else if (selectionMethod.equals(ShardSelectionMethod.PARAMETER)) {
-				_setShardByParameter(methodInvocation);
+				setShardByParameter(methodInvocation);
 			}
 		}
 		else {
 			if (selectionMethod.equals(ShardSelectionMethod.PARAMETER)) {
-				_setShardByParameter(methodInvocation);
+				setShardByParameter(methodInvocation);
 			}
 		}
 
@@ -72,7 +74,7 @@ public class ShardAnnotationAdvice
 
 	@Override
 	public void duringFinally(MethodInvocation methodInvocation) {
-		_popMethodInvocation(methodInvocation);
+		popMethodInvocation(methodInvocation);
 	}
 
 	@Override
@@ -84,21 +86,7 @@ public class ShardAnnotationAdvice
 		_shardAdvice = shardAdvice;
 	}
 
-	@Override
-	protected void setServiceBeanAopCacheManager(
-		ServiceBeanAopCacheManager serviceBeanAopCacheManager) {
-
-		if (this.serviceBeanAopCacheManager != null) {
-			return;
-		}
-
-		this.serviceBeanAopCacheManager = serviceBeanAopCacheManager;
-
-		serviceBeanAopCacheManager.registerAnnotationChainableMethodAdvice(
-			ShardSelection.class, null);
-	}
-
-	private Object _getCompanyIdParam(
+	protected Object getCompanyIdParam(
 			Object[] arguments, Annotation[][] parameterAnnotations)
 		throws NoShardSelectedException {
 
@@ -130,25 +118,39 @@ public class ShardAnnotationAdvice
 		return companyIdParamObject;
 	}
 
-	private Set<MethodInvocation> _getShardStateStack() {
+	protected Set<MethodInvocation> getShardStateStack() {
 		Set<MethodInvocation> shardStackState = _shardStackState.get();
 
 		return shardStackState;
 	}
 
-	private void _popMethodInvocation(MethodInvocation methodInvocation) {
-		if (_getShardStateStack().contains(methodInvocation)) {
-			_getShardStateStack().remove(methodInvocation);
+	protected void popMethodInvocation(MethodInvocation methodInvocation) {
+		if (getShardStateStack().contains(methodInvocation)) {
+			getShardStateStack().remove(methodInvocation);
 
 			_shardAdvice.popCompanyService();
 		}
 	}
 
-	private void _pushMethodInvocation(MethodInvocation methodInvocation) {
-		_getShardStateStack().add(methodInvocation);
+	protected void pushMethodInvocation(MethodInvocation methodInvocation) {
+		getShardStateStack().add(methodInvocation);
 	}
 
-	private void _setShard(Long companyId, MethodInvocation methodInvocation)
+	@Override
+	protected void setServiceBeanAopCacheManager(
+		ServiceBeanAopCacheManager serviceBeanAopCacheManager) {
+
+		if (this.serviceBeanAopCacheManager != null) {
+			return;
+		}
+
+		this.serviceBeanAopCacheManager = serviceBeanAopCacheManager;
+
+		serviceBeanAopCacheManager.registerAnnotationChainableMethodAdvice(
+			ShardSelection.class, null);
+	}
+
+	protected void setShard(Long companyId, MethodInvocation methodInvocation)
 		throws Throwable {
 
 		Shard shard = ShardLocalServiceUtil.getShard(
@@ -164,10 +166,10 @@ public class ShardAnnotationAdvice
 
 		_shardAdvice.pushCompanyService(shardName);
 
-		_pushMethodInvocation(methodInvocation);
+		pushMethodInvocation(methodInvocation);
 	}
 
-	private void _setShardByParameter(MethodInvocation methodInvocation)
+	protected void setShardByParameter(MethodInvocation methodInvocation)
 		throws Throwable {
 
 		Object[] arguments = methodInvocation.getArguments();
@@ -178,27 +180,34 @@ public class ShardAnnotationAdvice
 		Annotation[][] parameterAnnotations = AnnotationLocator.locate(
 			method, targetClass, arguments);
 
-		Object companyIdParam = _getCompanyIdParam(
+		Object companyIdParam = getCompanyIdParam(
 			arguments, parameterAnnotations);
 
 		Long companyId = null;
 
 		if (companyIdParam == null) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"No parameter annotation found for method: " +
-						methodInvocation.getMethod().getName() +
-							" try to get companyId from first" +
-								"method parameter for: " +
-									methodInvocation.toString());
+				StringBundler sb = new StringBundler(5);
+
+				sb.append("No parameter annotation found for method ");
+				sb.append(method.getName());
+				sb.append(StringPool.PERIOD);
+				sb.append(" Trying to get companyId from first argument of ");
+				sb.append(methodInvocation.toString());
+
+				_log.debug(sb.toString());
 			}
 
 			if (arguments[0] instanceof Long) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Set first method parameter: " + arguments[0] +
-							" as companyId for shard selection for method: " +
-								methodInvocation.toString());
+					StringBundler sb = new StringBundler(4);
+
+					sb.append("Set the first method parameter ");
+					sb.append(arguments[0]);
+					sb.append(" as companyId for shard selection for method ");
+					sb.append(methodInvocation.toString());
+
+					_log.debug(sb.toString());
 				}
 
 				companyId = (Long)arguments[0];
@@ -207,22 +216,26 @@ public class ShardAnnotationAdvice
 		else {
 			if (companyIdParam instanceof Long) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Set companyId for shard selection from long" +
-								" value: " + (Long)companyIdParam +
-								" for method: " + methodInvocation.toString());
+					StringBundler sb = new StringBundler(4);
+
+					sb.append("Set companyId for shard selection from value ");
+					sb.append(companyIdParam);
+					sb.append(" for method ");
+					sb.append(methodInvocation.toString());
+
+					_log.debug(sb.toString());
 				}
 
 				companyId = (Long)companyIdParam;
 			}
 			else {
-				Class clazz = companyIdParam.getClass();
+				Class<?> clazz = companyIdParam.getClass();
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Try to retrive companyId from class: " +
+						"Try to retrive companyId from class " +
 							clazz.getName() +
-								" by invoke getCompanyId() on it.");
+							" by invoke getCompanyId() on it.");
 				}
 
 				try {
@@ -230,28 +243,25 @@ public class ShardAnnotationAdvice
 
 					if (_log.isDebugEnabled()) {
 						_log.debug(
-							"Class: " + clazz.getName() +
+							"Class " + clazz.getName() +
 								" implements getCompanyId() method.");
 					}
 
-					try {
-						if (_log.isDebugEnabled()) {
-							_log.debug(
-								"Invoke getCompanyId() on class: " +
-									clazz.getName());
-						}
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							"Invoking getCompanyId() on class " +
+								clazz.getName());
+					}
 
-						companyId = (Long)getCompanyIdMethod.invoke(
-							companyIdParam);
-					}
-					catch (IllegalArgumentException iae) {
-						throw new NoShardSelectedException();
-					}
+					companyId = (Long)getCompanyIdMethod.invoke(companyIdParam);
+				}
+				catch (IllegalArgumentException iae) {
+					throw new NoShardSelectedException();
 				}
 				catch (NoSuchMethodException nsme) {
 					if (_log.isDebugEnabled()) {
 						_log.debug(
-							"Class: " + clazz.getName() +
+							"Class " + clazz.getName() +
 								" doesn't implement getCompanyId() method.");
 					}
 				}
@@ -263,16 +273,20 @@ public class ShardAnnotationAdvice
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"CompanyId retrived for shard selection: " +
-					companyId.longValue() + " for method invocation: " +
-						methodInvocation.toString());
+			StringBundler sb = new StringBundler(4);
+
+			sb.append("companyId retrived for shard selection is ");
+			sb.append(companyId.longValue());
+			sb.append(" for invocation of method ");
+			sb.append(methodInvocation.toString());
+
+			_log.debug(sb.toString());
 		}
 
-		_setShard(companyId, methodInvocation);
+		setShard(companyId, methodInvocation);
 	}
 
-	private void _setShardFromThreadLocal(MethodInvocation methodInvocation)
+	protected void setShardFromThreadLocal(MethodInvocation methodInvocation)
 		throws Throwable {
 
 		if (_log.isDebugEnabled()) {
@@ -281,7 +295,7 @@ public class ShardAnnotationAdvice
 					"from CompanyThreadLocal: " + methodInvocation.toString());
 		}
 
-		_setShard(CompanyThreadLocal.getCompanyId(), methodInvocation);
+		setShard(CompanyThreadLocal.getCompanyId(), methodInvocation);
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(
