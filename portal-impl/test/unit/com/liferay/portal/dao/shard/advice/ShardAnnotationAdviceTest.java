@@ -16,8 +16,6 @@ package com.liferay.portal.dao.shard.advice;
 
 import com.liferay.portal.NoShardSelectedException;
 import com.liferay.portal.kernel.dao.shard.ShardUtil;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.spring.aop.ShardSelection;
 import com.liferay.portal.kernel.spring.aop.ShardSelectionMethod;
 import com.liferay.portal.kernel.spring.aop.ShardSelectorParam;
@@ -58,25 +56,17 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 public class ShardAnnotationAdviceTest extends PowerMockito {
 
-	public static final long DEFAULT_SHARD_COMPANY_ID = 1;
-
-	public static final String DEFAULT_SHARD_NAME = "default";
-
-	public static final long ONE_SHARD_COMPANY_ID = 2;
-
-	public static final String ONE_SHARD_NAME = "one";
-
 	@ClassRule
 	public static CodeCoverageAssertor codeCoverageAssertor =
 		new CodeCoverageAssertor();
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		Shard defaultShard = mock(Shard.class);
-		defaultShard.setName(DEFAULT_SHARD_NAME);
+		defaultShard.setName(_DEFAULT_SHARD_NAME);
 
 		Shard oneShard = mock(Shard.class);
-		oneShard.setName(ONE_SHARD_NAME);
+		oneShard.setName(_ONE_SHARD_NAME);
 
 		ShardAdvice shardAdvice = mock(ShardAdvice.class);
 
@@ -86,27 +76,19 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 
 		mockStatic(ShardLocalServiceUtil.class);
 
-		try {
-			when(
-				ShardLocalServiceUtil.getShard(
-					Company.class.getName(), DEFAULT_SHARD_COMPANY_ID)
-			).thenReturn(
-				defaultShard
-			);
+		when(
+			ShardLocalServiceUtil.getShard(
+				Company.class.getName(), _DEFAULT_SHARD_COMPANY_ID)
+		).thenReturn(
+			defaultShard
+		);
 
-			when(
-				ShardLocalServiceUtil.getShard(
-					Company.class.getName(), ONE_SHARD_COMPANY_ID)
-			).thenReturn(
-				oneShard
-			);
-		}
-		catch (PortalException pe) {
-			pe.printStackTrace();
-		}
-		catch (SystemException se) {
-			se.printStackTrace();
-		}
+		when(
+			ShardLocalServiceUtil.getShard(
+				Company.class.getName(), _ONE_SHARD_COMPANY_ID)
+		).thenReturn(
+			oneShard
+		);
 
 		ServiceBeanAopCacheManager serviceBeanAopCacheManager =
 			new ServiceBeanAopCacheManager();
@@ -135,11 +117,11 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 	public void testAnnotatedMethodWithFirstParamAndNoneAnnotation()
 		throws Throwable {
 
-		setupShardUtil(DEFAULT_SHARD_COMPANY_ID);
+		setupShardUtil(_DEFAULT_SHARD_COMPANY_ID);
 
 		TestClass testClass = new TestClass();
 
-		Object[] companyIdFirst = new Object[] {ONE_SHARD_COMPANY_ID};
+		Object[] companyIdFirst = new Object[] {_ONE_SHARD_COMPANY_ID};
 
 		MethodInvocation methodInvocation = createMethodInvocation(
 			testClass, "methodFirstParamWithNoneAnnotation", companyIdFirst);
@@ -151,11 +133,11 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 	public void testAnnotatedMethodWithFirstParamAndParamAnnotation()
 		throws Throwable {
 
-		setupShardUtil(ONE_SHARD_COMPANY_ID);
+		setupShardUtil(_ONE_SHARD_COMPANY_ID);
 
 		TestClass testClass = new TestClass();
 
-		Object[] companyIdFirst = new Object[] {ONE_SHARD_COMPANY_ID};
+		Object[] companyIdFirst = new Object[] {_ONE_SHARD_COMPANY_ID};
 
 		MethodInvocation methodInvocation = createMethodInvocation(
 			testClass, "methodFirstParamWithParamAnnotation", companyIdFirst);
@@ -167,7 +149,7 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 	public void testAnnotatedMethodWithoutMethodParam() throws Throwable {
 		TestClass testClass = new TestClass();
 
-		setupShardUtil(DEFAULT_SHARD_COMPANY_ID);
+		setupShardUtil(_DEFAULT_SHARD_COMPANY_ID);
 
 		MethodInvocation methodInvocation = createMethodInvocation(
 			testClass, "methodWithoutParamWithAnnotation", null);
@@ -179,10 +161,10 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 	public void testAnnotatedMethodWithoutParamAnnotation() throws Throwable {
 		TestClass testClass = new TestClass();
 
-		setupShardUtil(DEFAULT_SHARD_COMPANY_ID);
+		setupShardUtil(_DEFAULT_SHARD_COMPANY_ID);
 
 		Object[] companyIdSecond = new Object[] {
-			StringPool.BLANK, ONE_SHARD_COMPANY_ID
+			StringPool.BLANK, _ONE_SHARD_COMPANY_ID
 		};
 
 		MethodInvocation methodInvocation = createMethodInvocation(
@@ -197,12 +179,12 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 	public void testAnnotatedMethodWithSecondParamAndParamAnnotation()
 		throws Throwable {
 
-		setupShardUtil(ONE_SHARD_COMPANY_ID);
+		setupShardUtil(_ONE_SHARD_COMPANY_ID);
 
 		TestClass testClass = new TestClass();
 
 		Object[] companyIdSecond = new Object[] {
-			StringPool.BLANK, ONE_SHARD_COMPANY_ID
+			StringPool.BLANK, _ONE_SHARD_COMPANY_ID
 		};
 
 		MethodInvocation methodInvocation = createMethodInvocation(
@@ -217,12 +199,12 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 	public void testAnnotatedMethodWithSecondParamWithNoneAnnotation()
 		throws Throwable {
 
-		setupShardUtil(DEFAULT_SHARD_COMPANY_ID);
+		setupShardUtil(_DEFAULT_SHARD_COMPANY_ID);
 
 		TestClass testClass = new TestClass();
 
 		Object[] companyIdSecond = new Object[] {
-			StringPool.BLANK, ONE_SHARD_COMPANY_ID
+			StringPool.BLANK, _ONE_SHARD_COMPANY_ID
 		};
 
 		MethodInvocation methodInvocation = createMethodInvocation(
@@ -235,12 +217,12 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 	public void testAnnotatedMethodWithSecondParamWithoutParamAnnotation()
 		throws Throwable {
 
-		setupShardUtil(DEFAULT_SHARD_COMPANY_ID);
+		setupShardUtil(_DEFAULT_SHARD_COMPANY_ID);
 
 		TestClass testClass = new TestClass();
 
 		Object[] companyIdSecond = new Object[] {
-			StringPool.BLANK, ONE_SHARD_COMPANY_ID
+			StringPool.BLANK, _ONE_SHARD_COMPANY_ID
 		};
 
 		MethodInvocation methodInvocation = createMethodInvocation(
@@ -265,10 +247,10 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 	public void testNotAnnotatedMethodWithoutWithoutParam() throws Throwable {
 		TestClass testClass = new TestClass();
 
-		setupShardUtil(DEFAULT_SHARD_COMPANY_ID);
+		setupShardUtil(_DEFAULT_SHARD_COMPANY_ID);
 
 		MethodInvocation methodInvocation = createMethodInvocation(
-				testClass, "methodWithoutParamWithoutAnnotation", null);
+			testClass, "methodWithoutParamWithoutAnnotation", null);
 
 		methodInvocation.proceed();
 	}
@@ -283,13 +265,13 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 			method = TestClass.class.getMethod(methodName);
 		}
 		else if (arguments.length == 1) {
-			Class clazz[] = new Class[1];
+			Class<?> clazz[] = new Class[1];
 			clazz[0] = long.class;
 
 			method = TestClass.class.getMethod(methodName, clazz);
 		}
 		else if (arguments.length == 2) {
-			Class clazz[] = new Class[2];
+			Class<?> clazz[] = new Class[2];
 			clazz[0] = String.class;
 			clazz[1] = long.class;
 
@@ -327,27 +309,36 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 		when(
 			ShardUtil.getDefaultShardName()
 		).thenReturn(
-			DEFAULT_SHARD_NAME
+			_DEFAULT_SHARD_NAME
 		);
 
-		if (companyId == ONE_SHARD_COMPANY_ID) {
+		if (companyId == _ONE_SHARD_COMPANY_ID) {
 			when(
 				ShardUtil.getCurrentShardName()
 			).thenReturn(
-				ONE_SHARD_NAME
+				_ONE_SHARD_NAME
 			);
 		}
 		else {
 			when(
 				ShardUtil.getCurrentShardName()
 			).thenReturn(
-				DEFAULT_SHARD_NAME
+				_DEFAULT_SHARD_NAME
 			);
 		}
 	}
 
+	private static final long _DEFAULT_SHARD_COMPANY_ID = 1;
+
+	private static final String _DEFAULT_SHARD_NAME = "default";
+
+	private static final long _ONE_SHARD_COMPANY_ID = 2;
+
+	private static final String _ONE_SHARD_NAME = "one";
+
 	private ShardAnnotationAdvice _shardAnnotationAdvice;
 
+	@SuppressWarnings("unused")
 	private class TestClass {
 
 		@ShardSelection(selectionMethod = ShardSelectionMethod.NONE)
@@ -360,7 +351,7 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 		@ShardSelection(selectionMethod = ShardSelectionMethod.PARAMETER)
 		public void methodFirstParamWithParamAnnotation(long companyId) {
 			Assert.assertEquals(
-				ShardUtil.getCurrentShardName(), ONE_SHARD_NAME);
+				ShardUtil.getCurrentShardName(), _ONE_SHARD_NAME);
 		}
 
 		@ShardSelection(selectionMethod = ShardSelectionMethod.PARAMETER)
@@ -368,7 +359,7 @@ public class ShardAnnotationAdviceTest extends PowerMockito {
 				String dummy, @ShardSelectorParam long companyId) {
 
 			Assert.assertEquals(
-				ShardUtil.getCurrentShardName(), ONE_SHARD_NAME);
+				ShardUtil.getCurrentShardName(), _ONE_SHARD_NAME);
 		}
 
 		@ShardSelection(selectionMethod = ShardSelectionMethod.NONE)
