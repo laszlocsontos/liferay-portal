@@ -155,7 +155,7 @@ else {
 						%>
 
 						<%
-						liferayPortletRequest.setAttribute(WebKeys.LAYOUT_LISTER_LIST, layoutView.getList());
+						liferayPortletRequest.setAttribute(WebKeys.LAYOUT_LISTER_LIST, layoutDescriptions);
 
 						for (int i = 0; i < PropsValues.LAYOUT_TYPES.length; i++) {
 							if (PropsValues.LAYOUT_TYPES[i].equals("portlet")) {
