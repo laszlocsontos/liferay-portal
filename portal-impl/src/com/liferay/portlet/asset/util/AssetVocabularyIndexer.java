@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PortletKeys;
@@ -35,7 +36,7 @@ import com.liferay.portlet.asset.service.AssetVocabularyServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetVocabularyActionableDynamicQuery;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletURL;
@@ -81,7 +82,7 @@ public class AssetVocabularyIndexer extends BaseIndexer {
 
 	long[] groupIds = searchContext.getGroupIds();
 
-	if (Validator.isNull(groupIds)) {
+	if (ArrayUtil.isEmpty(groupIds)) {
 		return;
 	}
 
@@ -122,6 +123,7 @@ public class AssetVocabularyIndexer extends BaseIndexer {
 	@Override
 	protected void doDelete(Object obj) throws Exception {
 		AssetVocabulary assetVocabulary = (AssetVocabulary)obj;
+
 		deleteDocument(
 			assetVocabulary.getCompanyId(), assetVocabulary.getVocabularyId());
 	}
@@ -184,7 +186,7 @@ public class AssetVocabularyIndexer extends BaseIndexer {
 	protected void reindexAssetVocabularies(long companyId)
 		throws PortalException, SystemException {
 
-		final Collection<Document> documents = new ArrayList<Document>();
+		final List<Document> documents = new ArrayList<Document>();
 
 		ActionableDynamicQuery actionalbleDynamicQuery =
 			new AssetVocabularyActionableDynamicQuery() {
@@ -196,6 +198,7 @@ public class AssetVocabularyIndexer extends BaseIndexer {
 					AssetVocabulary assetVocabulary = (AssetVocabulary)object;
 
 					Document document = getDocument(assetVocabulary);
+
 					documents.add(document);
 				}
 			};
