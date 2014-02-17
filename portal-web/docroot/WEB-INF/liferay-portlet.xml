@@ -1464,6 +1464,8 @@
 		<portlet-name>147</portlet-name>
 		<icon>/html/icons/asset_category_admin.png</icon>
 		<struts-path>asset_category_admin</struts-path>
+		<indexer-class>com.liferay.portlet.asset.util.AssetCategoryIndexer</indexer-class>
+		<indexer-class>com.liferay.portlet.asset.util.AssetVocabularyIndexer</indexer-class>
 		<staged-model-data-handler-class>com.liferay.portlet.asset.lar.AssetCategoryStagedModelDataHandler</staged-model-data-handler-class>
 		<staged-model-data-handler-class>com.liferay.portlet.asset.lar.AssetVocabularyStagedModelDataHandler</staged-model-data-handler-class>
 		<control-panel-entry-category>site_administration.content</control-panel-entry-category>
