@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
-import com.liferay.portal.kernel.search.Indexable;
-import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -59,7 +57,6 @@ import java.util.Map;
  */
 public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetCategory addCategory(
 			long parentCategoryId, Map<Locale, String> titleMap,
@@ -76,7 +73,6 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			vocabularyId, categoryProperties, serviceContext);
 	}
 
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetCategory addCategory(
 			String title, long vocabularyId, ServiceContext serviceContext)
@@ -103,7 +99,6 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 		deleteCategories(categoryIds, null);
 	}
 
-	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public List<AssetCategory> deleteCategories(
 			long[] categoryIds, ServiceContext serviceContext)
@@ -141,7 +136,6 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 		return failedCategories;
 	}
 
-	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public void deleteCategory(long categoryId)
 		throws PortalException, SystemException {
@@ -534,7 +528,6 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 		return jsonArray;
 	}
 
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetCategory updateCategory(
 			long categoryId, long parentCategoryId,
