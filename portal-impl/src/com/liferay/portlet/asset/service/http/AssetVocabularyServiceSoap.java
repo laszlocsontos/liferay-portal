@@ -302,23 +302,6 @@ public class AssetVocabularyServiceSoap {
 		}
 	}
 
-	public static com.liferay.portlet.asset.model.AssetVocabularySoap[] getGroupVocabulariesByTitle(
-		long groupId, java.lang.String title, int start, int end)
-		throws RemoteException {
-		try {
-			java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> returnValue =
-				AssetVocabularyServiceUtil.getGroupVocabulariesByTitle(groupId,
-					title, start, end);
-
-			return com.liferay.portlet.asset.model.AssetVocabularySoap.toSoapModels(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
 	public static int getGroupVocabulariesCount(long groupId)
 		throws RemoteException {
 		try {
