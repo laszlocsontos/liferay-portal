@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
-import com.liferay.portal.kernel.search.Indexable;
-import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
@@ -69,7 +67,6 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			serviceContext);
 	}
 
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetVocabulary addVocabulary(
 			String title, Map<Locale, String> titleMap,
@@ -86,7 +83,6 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			serviceContext);
 	}
 
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetVocabulary addVocabulary(
 			String title, ServiceContext serviceContext)
@@ -112,7 +108,6 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 		deleteVocabularies(vocabularyIds, null);
 	}
 
-	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public List<AssetVocabulary> deleteVocabularies(
 			long[] vocabularyIds, ServiceContext serviceContext)
@@ -152,7 +147,6 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 		return failedVocabularies;
 	}
 
-	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public void deleteVocabulary(long vocabularyId)
 		throws PortalException, SystemException {
@@ -397,7 +391,6 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			serviceContext);
 	}
 
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, String title, Map<Locale, String> titleMap,
