@@ -359,23 +359,6 @@ public class AssetCategoryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portlet.asset.model.AssetCategorySoap[] getVocabularyCategoriesByTitle(
-		long groupId, java.lang.String title, long vocabularyId, int start,
-		int end) throws RemoteException {
-		try {
-			java.util.List<com.liferay.portlet.asset.model.AssetCategory> returnValue =
-				AssetCategoryServiceUtil.getVocabularyCategoriesByTitle(groupId,
-					title, vocabularyId, start, end);
-
-			return com.liferay.portlet.asset.model.AssetCategorySoap.toSoapModels(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
 	public static int getVocabularyCategoriesCount(long groupId,
 		long vocabularyId) throws RemoteException {
 		try {

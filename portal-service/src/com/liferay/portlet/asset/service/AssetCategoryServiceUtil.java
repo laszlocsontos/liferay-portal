@@ -217,16 +217,6 @@ public class AssetCategoryServiceUtil {
 			end, obc);
 	}
 
-	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getVocabularyCategoriesByTitle(
-		long groupId, java.lang.String title, long vocabularyId, int start,
-		int end)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .getVocabularyCategoriesByTitle(groupId, title,
-			vocabularyId, start, end);
-	}
-
 	public static int getVocabularyCategoriesCount(long groupId,
 		long vocabularyId)
 		throws com.liferay.portal.kernel.exception.SystemException {

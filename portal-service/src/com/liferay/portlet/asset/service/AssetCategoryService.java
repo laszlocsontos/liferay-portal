@@ -187,13 +187,6 @@ public interface AssetCategoryService extends BaseService {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getVocabularyCategoriesByTitle(
-		long groupId, java.lang.String title, long vocabularyId, int start,
-		int end)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getVocabularyCategoriesCount(long groupId, long vocabularyId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
