@@ -277,7 +277,6 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 		jsonObject.put("page", page);
 
 		List<AssetCategory> categories;
-		int total = 0;
 
 		if (Validator.isNotNull(title)) {
 			BaseModelSearchResult<AssetCategory> results =
@@ -286,16 +285,14 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 					vocabularyId, start, end);
 
 			categories = results.getBaseModels();
-			total = results.getLength();
 		}
 		else {
 			categories = getVocabularyCategories(
 				vocabularyId, start, end, null);
-			total = getVocabularyCategoriesCount(groupId, vocabularyId);
 		}
 
 		jsonObject.put("categories", toJSONArray(categories));
-		jsonObject.put("total", total);
+		jsonObject.put("total", categories.size());
 
 		return jsonObject;
 	}
