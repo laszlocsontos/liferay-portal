@@ -389,7 +389,7 @@ public class PermissionCheckerBagImpl
 		else if (group.isUser()) {
 			long userId = group.getClassPK();
 
-			if (userId == userId) {
+			if (this.userId == userId) {
 				return true;
 			}
 		}
