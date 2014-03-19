@@ -14,17 +14,29 @@
 
 package com.liferay.portlet.documentlibrary.service;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.GroupTestUtil;
+import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +45,7 @@ import org.junit.runner.RunWith;
 
 /**
  * @author Manuel de la Peña
+ * @author László Csontos
  */
 @ExecutionTestListeners(
 	listeners = {
@@ -46,6 +59,86 @@ public class DLAppLocalServiceTest {
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testAddFileEntryConcurrent() throws Exception {
+		ExecutorService executorService = Executors.newFixedThreadPool(
+			_THREAD_POOL_SIZE);
+
+		try {
+			String sourceFileName = ServiceTestUtil.randomString();
+			String title = ServiceTestUtil.randomString();
+
+			CountDownLatch countDownLatch = new CountDownLatch(
+				_NUM_FILE_ENTRIES);
+
+			Future<Object[]>[] futures = new Future[_NUM_FILE_ENTRIES];
+
+			for (int i = 0; i < _NUM_FILE_ENTRIES; i++) {
+				futures[i] = executorService.submit(
+					new AddFileEntryCallable(
+						sourceFileName, title, countDownLatch));
+			}
+
+			countDownLatch.await(60, TimeUnit.SECONDS);
+
+			Assert.assertEquals(0, countDownLatch.getCount());
+
+			int addedFileEntryCount = 0;
+			int portalExceptionCount = 0;
+			int otherExceptionCount = 0;
+
+			for (int i = 0; i < _NUM_FILE_ENTRIES; i++) {
+				Object[] result = futures[i].get();
+
+				if (result[0] != null) {
+					addedFileEntryCount++;
+
+					continue;
+				}
+
+				if (result[1] instanceof PortalException) {
+					portalExceptionCount++;
+				}
+				else {
+					otherExceptionCount++;
+				}
+			}
+
+			Assert.assertEquals(
+				_NUM_FILE_ENTRIES,
+				addedFileEntryCount + portalExceptionCount +
+					otherExceptionCount);
+
+			// Only one thread should succeed
+
+			Assert.assertEquals(1, addedFileEntryCount);
+
+			// All the threads should throw DuplicateFileException and they
+			// shouldn't propagate technical ORMExceptions to the caller
+
+			Assert.assertEquals(_NUM_FILE_ENTRIES - 1, portalExceptionCount);
+			Assert.assertEquals(0, otherExceptionCount);
+		}
+		finally {
+			executorService.shutdownNow();
+		}
+	}
+
+	@Test
+	public void testAddFileEntrySerial() throws Exception {
+		String sourceFileName = ServiceTestUtil.randomString();
+		String title = ServiceTestUtil.randomString();
+
+		Callable<Object[]> addFileEntryCallable = new AddFileEntryCallable(
+			sourceFileName, title, null);
+
+		Object[] result = addFileEntryCallable.call();
+
+		Assert.assertNotNull(result[0]);
+		Assert.assertNull(result[1]);
 	}
 
 	@Test
@@ -95,6 +188,52 @@ public class DLAppLocalServiceTest {
 			_group.getGroupId(), parentFolderId, name, deleteExisting);
 	}
 
+	private static final int _NUM_FILE_ENTRIES = 50;
+
+	private static final int _THREAD_POOL_SIZE = 5;
+
 	private Group _group;
+
+	private class AddFileEntryCallable implements Callable<Object[]> {
+
+		public AddFileEntryCallable(
+			String sourceFileName, String title,
+			CountDownLatch countDownLatch) {
+
+			_countDownLatch = countDownLatch;
+			_sourceFileName = sourceFileName;
+			_title = title;
+		}
+
+		@Override
+		public Object[] call() throws Exception {
+			FileEntry addedFileEntry = null;
+
+			Exception addFileEntryException = null;
+
+			try {
+				Group group = GroupLocalServiceUtil.getGroup(
+					TestPropsValues.getCompanyId(), GroupConstants.GUEST);
+
+				addedFileEntry = DLAppTestUtil.addFileEntry(
+					group.getGroupId(),
+					DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, _sourceFileName,
+					_title);
+			}
+			catch (Exception e) {
+				addFileEntryException = e;
+			}
+
+			if (_countDownLatch != null) {
+				_countDownLatch.countDown();
+			}
+
+			return new Object[] {addedFileEntry, addFileEntryException};
+		}
+
+		private CountDownLatch _countDownLatch;
+		private String _sourceFileName;
+		private String _title;
+	}
 
 }
