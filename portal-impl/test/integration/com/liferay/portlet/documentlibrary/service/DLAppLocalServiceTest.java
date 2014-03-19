@@ -17,17 +17,14 @@ package com.liferay.portlet.documentlibrary.service;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.GroupTestUtil;
-import com.liferay.portal.util.TestPropsValues;
-import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,14 +52,14 @@ public class DLAppLocalServiceTest {
 	public void testAddFolder() throws Exception {
 		Folder folder = addFolder(true);
 
-		Assert.assertTrue(folder != null);
+		Assert.assertNotNull(folder);
 	}
 
 	@Test
 	public void testAddRootFolder() throws Exception {
 		Folder folder = addFolder(false);
 
-		Assert.assertTrue(folder != null);
+		Assert.assertNotNull(folder);
 	}
 
 	protected Folder addFolder(boolean rootFolder) throws Exception {
@@ -94,23 +91,8 @@ public class DLAppLocalServiceTest {
 			long parentFolderId, String name, boolean deleteExisting)
 		throws Exception {
 
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			_group.getGroupId());
-
-		if (deleteExisting) {
-			try {
-				Folder folder = DLAppLocalServiceUtil.getFolder(
-					_group.getGroupId(), parentFolderId, name);
-
-				DLAppLocalServiceUtil.deleteFolder(folder.getFolderId());
-			}
-			catch (NoSuchFolderException nsfe) {
-			}
-		}
-
-		return DLAppLocalServiceUtil.addFolder(
-			TestPropsValues.getUserId(), _group.getGroupId(), parentFolderId,
-			name, StringPool.BLANK, serviceContext);
+		return DLAppTestUtil.addFolder(
+			_group.getGroupId(), parentFolderId, name, deleteExisting);
 	}
 
 	private Group _group;
