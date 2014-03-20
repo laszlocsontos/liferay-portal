@@ -15,6 +15,7 @@
 package com.liferay.portal.lar;
 
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.ExportImportClassedModelUtil;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -24,6 +25,8 @@ import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
@@ -40,6 +43,7 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.util.CompanyTestUtil;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.asset.model.AssetCategory;
@@ -65,6 +69,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.After;
@@ -89,10 +94,22 @@ public abstract class BaseStagedModelDataHandlerTestCase {
 			stagingGroup.getGroupId());
 
 		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+
+		companyLocales = LanguageUtil.getAvailableLocales(
+			TestPropsValues.getCompanyId());
+		companyDefaultLocale = LocaleThreadLocal.getDefaultLocale();
+
+		CompanyTestUtil.resetCompanyLocales(
+			TestPropsValues.getCompanyId(), new Locale[] {LocaleUtil.US},
+			LocaleUtil.US);
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		CompanyTestUtil.resetCompanyLocales(
+			TestPropsValues.getCompanyId(), companyLocales,
+			companyDefaultLocale);
+
 		GroupLocalServiceUtil.deleteGroup(liveGroup);
 		GroupLocalServiceUtil.deleteGroup(stagingGroup);
 
@@ -261,6 +278,10 @@ public abstract class BaseStagedModelDataHandlerTestCase {
 	}
 
 	protected void initImport() throws Exception {
+		CompanyTestUtil.resetCompanyLocales(
+			TestPropsValues.getCompanyId(),
+			new Locale[] {LocaleUtil.SPAIN, Locale.US}, LocaleUtil.SPAIN);
+
 		PortletExporter portletExporter = new PortletExporter();
 
 		portletExporter.exportAssetTags(portletDataContext);
@@ -579,6 +600,8 @@ public abstract class BaseStagedModelDataHandlerTestCase {
 		Assert.assertTrue(importedRatingsEntries.isEmpty());
 	}
 
+	protected Locale companyDefaultLocale;
+	protected Locale[] companyLocales;
 	protected Group liveGroup;
 	protected Element missingReferencesElement;
 	protected PortletDataContext portletDataContext;

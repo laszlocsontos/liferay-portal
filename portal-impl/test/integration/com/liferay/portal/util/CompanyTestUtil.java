@@ -15,9 +15,11 @@
 package com.liferay.portal.util;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.Accessor;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
@@ -44,35 +46,46 @@ public class CompanyTestUtil {
 			PropsValues.SHARD_DEFAULT_NAME, false, 0, true);
 	}
 
-	public static void resetCompanyLocales(long companyId, Locale[] locales)
+	public static void resetCompanyLocales(
+			long companyId, Locale[] locales, Locale defaultLocale)
 		throws Exception {
 
-		StringBundler sb = new StringBundler();
+		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
-		for (int i = 0; i < locales.length; i++) {
-			sb.append(LanguageUtil.getLanguageId(locales[i]));
+		String languageIds = ArrayUtil.toString(
+			locales, _LOCALE_LANGUAGE_ID_ACCESSOR);
 
-			if ((i + 1) < locales.length) {
-				sb.append(StringPool.COMMA);
-			}
-		}
-
-		resetCompanyLocales(companyId, sb.toString());
+		resetCompanyLocales(companyId, languageIds, defaultLanguageId);
 	}
 
-	public static void resetCompanyLocales(long companyId, String languageIds)
+	public static void resetCompanyLocales(
+			long companyId, String languageIds, String defaultLanguageId)
 		throws Exception {
+
+		CompanyLocalServiceUtil.updateDisplay(
+			companyId, defaultLanguageId, TimeZoneUtil.getDefault().getID());
 
 		PortletPreferences preferences = PrefsPropsUtil.getPreferences(
 			companyId);
-
-		LanguageUtil.resetAvailableLocales(companyId);
 
 		preferences.setValue(PropsKeys.LOCALES, languageIds);
 
 		preferences.store();
 
+		LanguageUtil.resetAvailableLocales(companyId);
+
 		CompanyThreadLocal.setCompanyId(companyId);
 	}
+
+	private static final Accessor<Locale, String> _LOCALE_LANGUAGE_ID_ACCESSOR =
+
+		new Accessor<Locale, String>() {
+
+			@Override
+			public String get(Locale locale) {
+				return LocaleUtil.toLanguageId(locale);
+			}
+
+		};
 
 }
