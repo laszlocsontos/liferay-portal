@@ -123,10 +123,12 @@ public class JournalTestUtilTest {
 	@Test
 	public void testAddDDMStructureWithNonexistingLocale() throws Exception {
 		Locale[] availableLocales = LanguageUtil.getAvailableLocales();
+		Locale defaultLocale = LocaleUtil.getDefault();
 
 		try {
 			CompanyTestUtil.resetCompanyLocales(
-				PortalUtil.getDefaultCompanyId(), "en_US");
+				PortalUtil.getDefaultCompanyId(), new Locale[] {LocaleUtil.US},
+				LocaleUtil.US);
 
 			DDMStructureTestUtil.addStructure(
 				JournalArticle.class.getName(), LocaleUtil.CANADA);
@@ -137,7 +139,8 @@ public class JournalTestUtilTest {
 		}
 		finally {
 			CompanyTestUtil.resetCompanyLocales(
-				PortalUtil.getDefaultCompanyId(), availableLocales);
+				PortalUtil.getDefaultCompanyId(), availableLocales,
+				defaultLocale);
 		}
 	}
 
