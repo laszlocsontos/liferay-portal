@@ -93,6 +93,7 @@ import com.liferay.portlet.documentlibrary.model.DLSyncConstants;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFolderModelImpl;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalService;
 import com.liferay.portlet.documentlibrary.service.base.DLFileEntryLocalServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 import com.liferay.portlet.documentlibrary.util.DL;
@@ -160,7 +161,7 @@ public class DLFileEntryLocalServiceImpl
 
 		LockProtectedAction<DLFileEntry> addFileEntryLockProtectedAction =
 			new LockProtectedAction<DLFileEntry>(
-				DLFileEntryLocalServiceImpl.class, lockKey,
+				DLFileEntryLocalService.class, lockKey,
 				_ADD_FILE_ENTRY_LOCK_TIMEOUT,
 				_ADD_FILE_ENTRY_LOCK_RETRY_DELAY) {
 
