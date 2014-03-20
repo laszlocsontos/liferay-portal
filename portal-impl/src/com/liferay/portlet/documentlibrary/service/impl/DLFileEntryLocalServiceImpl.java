@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
+import com.liferay.portal.kernel.lock.LockProtectedAction;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -145,17 +146,38 @@ public class DLFileEntryLocalServiceImpl
 
 	@Override
 	public DLFileEntry addFileEntry(
-			long userId, long groupId, long repositoryId, long folderId,
-			String sourceFileName, String mimeType, String title,
-			String description, String changeLog, long fileEntryTypeId,
-			Map<String, Fields> fieldsMap, File file, InputStream is, long size,
-			ServiceContext serviceContext)
+			final long userId, final long groupId, final long repositoryId,
+			final long folderId, final String sourceFileName,
+			final String mimeType, final String title, final String description,
+			final String changeLog, final long fileEntryTypeId,
+			final Map<String, Fields> fieldsMap, final File file,
+			final InputStream is, final long size,
+			final ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		return addFileEntryImpl(
-			userId, groupId, repositoryId, folderId, sourceFileName, mimeType,
-			title, description, changeLog, fileEntryTypeId, fieldsMap, file, is,
-			size, serviceContext);
+		String lockKey = StringUtil.merge(
+			new Object[] {groupId, folderId, title}, StringPool.POUND);
+
+		LockProtectedAction<DLFileEntry> addFileEntryLockProtectedAction =
+			new LockProtectedAction<DLFileEntry>(
+				DLFileEntryLocalServiceImpl.class, lockKey,
+				_ADD_FILE_ENTRY_LOCK_TIMEOUT,
+				_ADD_FILE_ENTRY_LOCK_RETRY_DELAY) {
+
+			@Override
+			protected DLFileEntry performProtectedAction()
+				throws PortalException, SystemException {
+
+				return addFileEntryImpl(
+					userId, groupId, repositoryId, folderId, sourceFileName,
+					mimeType, title, description, changeLog, fileEntryTypeId,
+					fieldsMap, file, is, size, serviceContext);
+			}
+		};
+
+		addFileEntryLockProtectedAction.performAction();
+
+		return addFileEntryLockProtectedAction.getReturnValue();
 	}
 
 	@Override
@@ -2535,6 +2557,10 @@ public class DLFileEntryLocalServiceImpl
 			throw new FileNameException(fileName);
 		}
 	}
+
+	private static final int _ADD_FILE_ENTRY_LOCK_RETRY_DELAY = 100;
+
+	private static final int _ADD_FILE_ENTRY_LOCK_TIMEOUT = 10000;
 
 	private static final int _DELETE_INTERVAL = 100;
 
