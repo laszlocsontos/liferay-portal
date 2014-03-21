@@ -31,6 +31,8 @@ import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -88,7 +90,8 @@ public class DLAppLocalServiceTest {
 
 			int addedFileEntryCount = 0;
 			int portalExceptionCount = 0;
-			int otherExceptionCount = 0;
+
+			List<Exception> otherExceptions = new ArrayList<Exception>();
 
 			for (int i = 0; i < _NUM_FILE_ENTRIES; i++) {
 				Object[] result = futures[i].get();
@@ -99,13 +102,17 @@ public class DLAppLocalServiceTest {
 					continue;
 				}
 
-				if (result[1] instanceof PortalException) {
+				Exception e = (Exception)result[1];
+
+				if (e instanceof PortalException) {
 					portalExceptionCount++;
 				}
 				else {
-					otherExceptionCount++;
+					otherExceptions.add(e);
 				}
 			}
+
+			int otherExceptionCount = otherExceptions.size();
 
 			Assert.assertEquals(
 				_NUM_FILE_ENTRIES,
@@ -119,8 +126,11 @@ public class DLAppLocalServiceTest {
 			// All the threads should throw DuplicateFileException and they
 			// shouldn't propagate technical ORMExceptions to the caller
 
+			Assert.assertEquals(
+				"Unexpected exceptions: " + otherExceptions.toString(), 0,
+				otherExceptionCount);
+
 			Assert.assertEquals(_NUM_FILE_ENTRIES - 1, portalExceptionCount);
-			Assert.assertEquals(0, otherExceptionCount);
 		}
 		finally {
 			executorService.shutdownNow();
