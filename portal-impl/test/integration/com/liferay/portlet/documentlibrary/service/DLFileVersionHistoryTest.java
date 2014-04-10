@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,8 +120,7 @@ public class DLFileVersionHistoryTest extends BaseDLAppTestCase {
 		throws Exception {
 
 		_fileEntry = DLAppTestUtil.addFileEntry(
-			group.getGroupId(), parentFolder.getFolderId(), false,
-			_VERSION_1_0);
+			group.getGroupId(), parentFolder.getFolderId(), _VERSION_1_0);
 
 		long fileEntryId = _fileEntry.getFileEntryId();
 
@@ -218,8 +217,7 @@ public class DLFileVersionHistoryTest extends BaseDLAppTestCase {
 		throws Exception {
 
 		_fileEntry = DLAppTestUtil.addFileEntry(
-			group.getGroupId(), parentFolder.getFolderId(), false,
-			_VERSION_1_0);
+			group.getGroupId(), parentFolder.getFolderId(), _VERSION_1_0);
 
 		long fileEntryId = _fileEntry.getFileEntryId();
 

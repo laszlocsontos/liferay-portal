@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_input_
 String amPmParam = namespace + request.getAttribute("liferay-ui:input-time:amPmParam");
 int amPmValue = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:input-time:amPmValue"));
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-time:cssClass"));
-String dateParam = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-time:dateParam"));
+String dateParam = namespace + GetterUtil.getString((String)request.getAttribute("liferay-ui:input-time:dateParam"), "date");
 Date dateValue = (Date)GetterUtil.getObject(request.getAttribute("liferay-ui:input-time:dateValue"));
 boolean disabled = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-time:disabled"));
 String hourParam = namespace + request.getAttribute("liferay-ui:input-time:hourParam");

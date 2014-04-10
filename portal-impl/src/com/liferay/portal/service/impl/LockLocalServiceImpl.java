@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.lock.LockListener;
 import com.liferay.portal.kernel.lock.LockListenerRegistryUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.User;
@@ -73,7 +74,15 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		List<Lock> locks = lockPersistence.findByUuid_C(uuid, companyId);
 
 		if (locks.isEmpty()) {
-			throw new NoSuchLockException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("{uuid=");
+			sb.append(uuid);
+			sb.append(", companyId=");
+			sb.append(companyId);
+			sb.append("}");
+
+			throw new NoSuchLockException(sb.toString());
 		}
 
 		return locks.get(0);
@@ -273,7 +282,15 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		List<Lock> locks = lockPersistence.findByUuid_C(uuid, companyId);
 
 		if (locks.isEmpty()) {
-			throw new NoSuchLockException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("{uuid=");
+			sb.append(uuid);
+			sb.append(", companyId=");
+			sb.append(companyId);
+			sb.append("}");
+
+			throw new NoSuchLockException(sb.toString());
 		}
 
 		Lock lock = locks.get(0);

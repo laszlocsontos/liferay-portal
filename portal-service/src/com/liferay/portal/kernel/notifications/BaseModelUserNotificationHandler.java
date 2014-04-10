@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.notifications;
+
+import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -31,6 +33,7 @@ import com.liferay.portlet.asset.model.AssetRendererFactory;
  * @author Brian Wing Shun Chan
  * @author Sergio González
  */
+@ProviderType
 public abstract class BaseModelUserNotificationHandler
 	extends BaseUserNotificationHandler {
 
@@ -119,7 +122,7 @@ public abstract class BaseModelUserNotificationHandler
 				assetRenderer.getClassName());
 
 		String typeName = assetRendererFactory.getTypeName(
-			serviceContext.getLocale(), true);
+			serviceContext.getLocale());
 
 		int notificationType = jsonObject.getInt("notificationType");
 

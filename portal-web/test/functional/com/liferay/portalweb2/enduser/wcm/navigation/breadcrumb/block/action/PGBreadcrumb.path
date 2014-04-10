@@ -30,12 +30,12 @@
 </tr>
 <tr>
 	<td>BREADCRUMB_ENTRY</td>
-	<td>//div[@class='portlet-content']//ul[@class='breadcrumb']</td>
+	<td>//div[@class='portlet-content']//ul[@aria-label='Breadcrumb']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>BREADCRUMB_PAGE</td>
-	<td>//div/ul[@class='breadcrumb']/li/a[contains(.,'${key_breadcrumbName}')]</td>
+	<td>//div/ul[contains(@class,'breadcrumb')]/li/a[contains(.,'${key_breadcrumbName}')]</td>
 	<td></td>
 </tr>
 </tbody>

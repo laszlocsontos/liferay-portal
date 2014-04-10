@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,6 +49,8 @@ public class PortletAutoDeployer
 				"liferay-portlet-ext.tld");
 			securityTaglibDTD = DeployUtil.getResourcePath(
 				"liferay-security.tld");
+			stagingTaglibDTD = DeployUtil.getResourcePath(
+				"liferay-staging.tld");
 			themeTaglibDTD = DeployUtil.getResourcePath("liferay-theme.tld");
 			uiTaglibDTD = DeployUtil.getResourcePath("liferay-ui.tld");
 			utilTaglibDTD = DeployUtil.getResourcePath("liferay-util.tld");

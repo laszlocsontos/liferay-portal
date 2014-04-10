@@ -1,0 +1,58 @@
+<definition component-name="portal-tools">
+	<property name="testray.main.component.name" value="Tools" />
+
+	<set-up>
+		<execute macro="User#firstLoginPG" />
+	</set-up>
+
+	<command name="UsingMethods" priority="5">
+		<var name="url" method="selenium#getLocation()" />
+
+		<execute macro="TestUtils#assertEquals">
+			<var name="actual" value="${url}" />
+			<var name="expected" value="http://localhost:8080/web/guest" />
+		</execute>
+
+		<var name="url" method='StringUtil#replace("${url}", "guest", "hello")' />
+
+		<execute macro="TestUtils#assertEquals">
+			<var name="actual" value="${url}" />
+			<var name="expected" value="http://localhost:8080/web/hello" />
+		</execute>
+
+		<var name="boolean" method='StringUtil#startsWith("This is a test", "This")' />
+
+		<execute macro="TestUtils#assertEquals">
+			<var name="actual" value="${boolean}" />
+			<var name="expected" value="true" />
+		</execute>
+
+		<var name="boolean" method='StringUtil#isLowerCase("Hello")' />
+
+		<execute macro="TestUtils#assertEquals">
+			<var name="actual" value="${boolean}" />
+			<var name="expected" value="false" />
+		</execute>
+
+		<var name="int" method='StringUtil#count("Life Ray is Life of Portal", "Life")' />
+
+		<execute macro="TestUtils#assertEquals">
+			<var name="actual" value="${int}" />
+			<var name="expected" value="2" />
+		</execute>
+
+		<var name="regex" input="regularexpression=32132" pattern="[a-z]*=([0-9]*)" group="0" />
+
+		<execute macro="TestUtils#assertEquals">
+			<var name="actual" value="${regex}" />
+			<var name="expected" value="regularexpression=32132" />
+		</execute>
+
+		<var name="regex" input="regularexpression=32132" pattern="[a-z]*=([0-9]*)" group="1" />
+
+		<execute macro="TestUtils#assertEquals">
+			<var name="actual" value="${regex}" />
+			<var name="expected" value="32132" />
+		</execute>
+	</command>
+</definition>

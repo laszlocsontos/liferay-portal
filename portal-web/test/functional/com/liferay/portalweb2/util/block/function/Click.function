@@ -63,13 +63,9 @@
 
 		<execute selenium="waitForElementPresent" argument1="//script[contains(@src,'/html/js/liferay/node.js')]" />
 
+		<execute selenium="pause" argument1="1000" />
+
 		<execute function="Click#clickAt" />
-	</command>
-
-	<command name="clickImageElement">
-		<execute selenium="clickImageElement" />
-
-		<execute selenium="pause" argument1="2000" />
 	</command>
 
 	<command name="clickWaitForInlineCKEditor">
@@ -131,6 +127,12 @@
 		<execute selenium="pause" argument1="1000" />
 
 		<execute function="Click#textClickAtAndWait" />
+	</command>
+
+	<command name="sikuliClick">
+		<execute selenium="sikuliClick" />
+
+		<execute selenium="pause" argument1="2000" />
 	</command>
 
 	<command name="textClick">

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,15 +24,6 @@ String templateId = GetterUtil.getString((String)request.getAttribute("liferay-u
 String languageId = GetterUtil.getString((String)request.getAttribute("liferay-ui:journal-article:languageId"), LanguageUtil.getLanguageId(request));
 int articlePage = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:journal-article:articlePage"));
 
-String xmlRequest = GetterUtil.getString((String)request.getAttribute("liferay-ui:journal-article:xmlRequest"));
-
-if (Validator.isNull(xmlRequest) && (portletRequest != null) && (portletResponse != null)) {
-	xmlRequest = PortletRequestUtil.toXML(portletRequest, portletResponse);
-}
-
-boolean showTitle = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:journal-article:showTitle"));
-boolean showAvailableLocales = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:journal-article:showAvailableLocales"));
-
 if (articleResourcePrimKey > 0) {
 	JournalArticleResource articleResource = JournalArticleResourceLocalServiceUtil.getArticleResource(articleResourcePrimKey);
 
@@ -40,13 +31,28 @@ if (articleResourcePrimKey > 0) {
 	articleId = articleResource.getArticleId();
 }
 
-JournalArticleDisplay articleDisplay = JournalContentUtil.getDisplay(groupId, articleId, templateId, null, languageId, themeDisplay, articlePage, xmlRequest);
+PortletRequestModel portletRequestModel = (PortletRequestModel)request.getAttribute("liferay-ui:journal-article:portletRequestModel");
+
+if ((portletRequestModel == null) && (portletRequest != null) && (portletResponse != null)) {
+	portletRequestModel = new PortletRequestModel(portletRequest, portletResponse);
+}
+
+JournalArticleDisplay articleDisplay = JournalContentUtil.getDisplay(groupId, articleId, templateId, null, languageId, articlePage, portletRequestModel, themeDisplay);
 %>
 
 <c:if test="<%= articleDisplay != null %>">
+
+	<%
+	boolean showTitle = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:journal-article:showTitle"));
+	%>
+
 	<c:if test="<%= showTitle %>">
 		<h3 class="journal-content-title"><%= articleDisplay.getTitle() %></h3>
 	</c:if>
+
+	<%
+	boolean showAvailableLocales = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:journal-article:showAvailableLocales"));
+	%>
 
 	<c:if test="<%= showAvailableLocales %>">
 

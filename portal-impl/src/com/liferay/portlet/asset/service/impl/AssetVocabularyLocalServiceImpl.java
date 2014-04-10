@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,12 +16,19 @@ package com.liferay.portlet.asset.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
@@ -32,6 +39,8 @@ import com.liferay.portlet.asset.DuplicateVocabularyException;
 import com.liferay.portlet.asset.VocabularyNameException;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.base.AssetVocabularyLocalServiceBaseImpl;
+import com.liferay.portlet.asset.util.AssetUtil;
+import com.liferay.portlet.asset.util.AssetVocabularyUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,7 +79,7 @@ public class AssetVocabularyLocalServiceImpl
 
 		serviceContext.setScopeGroupId(groupId);
 
-		return addVocabulary(
+		return assetVocabularyLocalService.addVocabulary(
 			defaultUserId, StringPool.BLANK, titleMap, null, StringPool.BLANK,
 			serviceContext);
 	}
@@ -86,11 +95,12 @@ public class AssetVocabularyLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		return addVocabulary(
+		return assetVocabularyLocalService.addVocabulary(
 			userId, StringPool.BLANK, titleMap, descriptionMap, settings,
 			serviceContext);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetVocabulary addVocabulary(
 			long userId, String title, Map<Locale, String> titleMap,
@@ -167,7 +177,7 @@ public class AssetVocabularyLocalServiceImpl
 
 		descriptionMap.put(locale, StringPool.BLANK);
 
-		return addVocabulary(
+		return assetVocabularyLocalService.addVocabulary(
 			userId, title, titleMap, descriptionMap, null, serviceContext);
 	}
 
@@ -204,10 +214,11 @@ public class AssetVocabularyLocalServiceImpl
 			assetVocabularyPersistence.findByGroupId(groupId);
 
 		for (AssetVocabulary vocabulary : vocabularies) {
-			deleteVocabulary(vocabulary);
+			assetVocabularyLocalService.deleteVocabulary(vocabulary);
 		}
 	}
 
+	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public void deleteVocabulary(AssetVocabulary vocabulary)
 		throws PortalException, SystemException {
@@ -235,7 +246,7 @@ public class AssetVocabularyLocalServiceImpl
 		AssetVocabulary vocabulary =
 			assetVocabularyPersistence.findByPrimaryKey(vocabularyId);
 
-		deleteVocabulary(vocabulary);
+		assetVocabularyLocalService.deleteVocabulary(vocabulary);
 	}
 
 	@Override
@@ -247,7 +258,7 @@ public class AssetVocabularyLocalServiceImpl
 
 	@Override
 	public List<AssetVocabulary> getGroupsVocabularies(long[] groupIds)
-		throws PortalException, SystemException {
+		throws SystemException {
 
 		return getGroupsVocabularies(groupIds, null);
 	}
@@ -255,41 +266,16 @@ public class AssetVocabularyLocalServiceImpl
 	@Override
 	public List<AssetVocabulary> getGroupsVocabularies(
 			long[] groupIds, String className)
-		throws PortalException, SystemException {
+		throws SystemException {
 
-		List<AssetVocabulary> vocabularies = new ArrayList<AssetVocabulary>();
+		List<AssetVocabulary> vocabularies =
+			assetVocabularyPersistence.findByGroupId(groupIds);
 
-		groupIds = ArrayUtil.unique(groupIds);
-
-		for (long groupId : groupIds) {
-			List<AssetVocabulary> groupVocabularies = getGroupVocabularies(
-				groupId);
-
-			if (Validator.isNull(className)) {
-				vocabularies.addAll(groupVocabularies);
-
-				continue;
-			}
-
-			for (AssetVocabulary groupVocabulary : groupVocabularies) {
-				UnicodeProperties settingsProperties =
-					groupVocabulary.getSettingsProperties();
-
-				long[] selectedClassNameIds = StringUtil.split(
-					settingsProperties.getProperty("selectedClassNameIds"), 0L);
-				long classNameId = classNameLocalService.getClassNameId(
-					className);
-
-				if ((selectedClassNameIds.length == 0) ||
-					(selectedClassNameIds[0] == 0) ||
-					ArrayUtil.contains(selectedClassNameIds, classNameId)) {
-
-					vocabularies.add(groupVocabulary);
-				}
-			}
+		if (Validator.isNull(className)) {
+			return vocabularies;
 		}
 
-		return vocabularies;
+		return AssetUtil.filterVocabularies(vocabularies, className);
 	}
 
 	@Override
@@ -330,6 +316,20 @@ public class AssetVocabularyLocalServiceImpl
 	}
 
 	@Override
+	public List<AssetVocabulary> getGroupVocabularies(long[] groupIds)
+		throws SystemException {
+
+		return assetVocabularyPersistence.findByGroupId(groupIds);
+	}
+
+	@Override
+	public int getGroupVocabulariesCount(long[] groupIds)
+		throws SystemException {
+
+		return assetVocabularyPersistence.countByGroupId(groupIds);
+	}
+
+	@Override
 	public AssetVocabulary getGroupVocabulary(long groupId, String name)
 		throws PortalException, SystemException {
 
@@ -358,6 +358,17 @@ public class AssetVocabularyLocalServiceImpl
 		return assetVocabularyPersistence.findByPrimaryKey(vocabularyId);
 	}
 
+	@Override
+	public BaseModelSearchResult<AssetVocabulary> searchVocabularies(
+			long companyId, long groupId, String title, int start, int end)
+		throws PortalException, SystemException {
+
+		SearchContext searchContext = buildSearchContext(
+			companyId, groupId, title, start, end);
+
+		return searchVocabularies(searchContext);
+	}
+
 	/**
 	 * @deprecated As of 6.1.0
 	 */
@@ -369,11 +380,12 @@ public class AssetVocabularyLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		return updateVocabulary(
+		return assetVocabularyLocalService.updateVocabulary(
 			vocabularyId, StringPool.BLANK, titleMap, descriptionMap, settings,
 			serviceContext);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, String title, Map<Locale, String> titleMap,
@@ -407,6 +419,25 @@ public class AssetVocabularyLocalServiceImpl
 		return vocabulary;
 	}
 
+	protected SearchContext buildSearchContext(
+		long companyId, long groupId, String title, int start, int end) {
+
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setAttribute(Field.TITLE, title);
+		searchContext.setCompanyId(companyId);
+		searchContext.setEnd(end);
+		searchContext.setGroupIds(new long[]{groupId});
+		searchContext.setStart(start);
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
+
+		return searchContext;
+	}
+
 	protected boolean hasVocabulary(long groupId, String name)
 		throws SystemException {
 
@@ -416,6 +447,29 @@ public class AssetVocabularyLocalServiceImpl
 		else {
 			return true;
 		}
+	}
+
+	protected BaseModelSearchResult<AssetVocabulary> searchVocabularies(
+			SearchContext searchContext)
+		throws PortalException, SystemException {
+
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			AssetVocabulary.class);
+
+		for (int i = 0; i < 10; i++) {
+			Hits hits = indexer.search(searchContext);
+
+			List<AssetVocabulary> vocabularies =
+				AssetVocabularyUtil.getVocabularies(hits);
+
+			if (vocabularies != null) {
+				return new BaseModelSearchResult<AssetVocabulary>(
+					vocabularies, hits.getLength());
+			}
+		}
+
+		throw new SearchException(
+			"Unable to fix the search index after 10 attempts");
 	}
 
 	protected void validate(long groupId, String name)

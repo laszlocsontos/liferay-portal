@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -190,13 +190,7 @@ public class PortletKeys {
 
 	public static final int PREFS_OWNER_TYPE_GROUP = 2;
 
-	public static final int PREFS_OWNER_TYPE_GROUP_DEFAULTS_COMPANY = 9;
-
 	public static final int PREFS_OWNER_TYPE_LAYOUT = 3;
-
-	public static final int PREFS_OWNER_TYPE_LAYOUT_DEFAULTS_COMPANY = 8;
-
-	public static final int PREFS_OWNER_TYPE_LAYOUT_DEFAULTS_GROUP = 7;
 
 	public static final int PREFS_OWNER_TYPE_ORGANIZATION = 6;
 

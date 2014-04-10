@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,7 @@ import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
 import com.liferay.portlet.documentlibrary.FolderNameException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
+import com.liferay.portlet.documentlibrary.RequiredFileEntryTypeException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
@@ -74,12 +75,6 @@ public class EditFolderAction extends PortletAction {
 			else if (cmd.equals(Constants.DELETE)) {
 				deleteFolders(actionRequest, false);
 			}
-			else if (cmd.equals(Constants.MOVE)) {
-				moveFolders(actionRequest, false);
-			}
-			else if (cmd.equals(Constants.MOVE_FROM_TRASH)) {
-				moveFolders(actionRequest, true);
-			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteFolders(actionRequest, true);
 			}
@@ -105,7 +100,8 @@ public class EditFolderAction extends PortletAction {
 			}
 			else if (e instanceof DuplicateFileException ||
 					 e instanceof DuplicateFolderNameException ||
-					 e instanceof FolderNameException) {
+					 e instanceof FolderNameException ||
+					 e instanceof RequiredFileEntryTypeException) {
 
 				SessionErrors.add(actionRequest, e.getClass());
 			}
@@ -182,40 +178,6 @@ public class EditFolderAction extends PortletAction {
 			TrashUtil.addTrashSessionMessages(actionRequest, trashedModels);
 
 			hideDefaultSuccessMessage(actionRequest);
-		}
-	}
-
-	protected void moveFolders(
-			ActionRequest actionRequest, boolean moveFromTrash)
-		throws Exception {
-
-		long[] folderIds = null;
-
-		long folderId = ParamUtil.getLong(actionRequest, "folderId");
-
-		if (folderId > 0) {
-			folderIds = new long[] {folderId};
-		}
-		else {
-			folderIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "folderIds"), 0L);
-		}
-
-		long parentFolderId = ParamUtil.getLong(
-			actionRequest, "parentFolderId");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DLFileEntry.class.getName(), actionRequest);
-
-		for (long moveFolderId : folderIds) {
-			if (moveFromTrash) {
-				DLAppServiceUtil.moveFolderFromTrash(
-					moveFolderId, parentFolderId, serviceContext);
-			}
-			else {
-				DLAppServiceUtil.moveFolder(
-					moveFolderId, parentFolderId, serviceContext);
-			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -75,8 +75,8 @@ public class LayoutsLocalPublisherMessageListener
 		long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
 		boolean privateLayout = MapUtil.getBoolean(
 			settingsMap, "privateLayout");
-		Map<Long, Boolean> layoutIdMap = (Map<Long, Boolean>)settingsMap.get(
-			"layoutIdMap");
+		long[] layoutIds = GetterUtil.getLongValues(
+			settingsMap.get("layoutIds"));
 		Map<String, String[]> parameterMap =
 			(Map<String, String[]>)settingsMap.get("parameterMap");
 		Date startDate = (Date)settingsMap.get("startDate");
@@ -148,7 +148,7 @@ public class LayoutsLocalPublisherMessageListener
 		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
 		try {
-			if (layoutIdMap == null) {
+			if (layoutIds == null) {
 				StagingUtil.publishLayouts(
 					userId, sourceGroupId, targetGroupId, privateLayout,
 					parameterMap, startDate, endDate);
@@ -156,7 +156,7 @@ public class LayoutsLocalPublisherMessageListener
 			else {
 				StagingUtil.publishLayouts(
 					userId, sourceGroupId, targetGroupId, privateLayout,
-					layoutIdMap, parameterMap, startDate, endDate);
+					layoutIds, parameterMap, startDate, endDate);
 			}
 		}
 		finally {

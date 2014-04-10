@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -157,8 +157,11 @@ public class DLFileEntryTypeLocalServiceImpl
 	public void cascadeFileEntryTypes(long userId, DLFolder dlFolder)
 		throws PortalException, SystemException {
 
+		long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(
+			dlFolder.getGroupId());
+
 		List<DLFileEntryType> dlFileEntryTypes = getFolderFileEntryTypes(
-			new long[] {dlFolder.getGroupId()}, dlFolder.getFolderId(), true);
+			groupIds, dlFolder.getFolderId(), true);
 
 		List<Long> fileEntryTypeIds = getFileEntryTypeIds(dlFileEntryTypes);
 
@@ -372,7 +375,8 @@ public class DLFileEntryTypeLocalServiceImpl
 		}
 
 		List<DLFileEntryType> dlFileEntryTypes = getFolderFileEntryTypes(
-			PortalUtil.getSiteAndCompanyGroupIds(groupId), folderId, true);
+			PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId), folderId,
+			true);
 
 		List<Long> fileEntryTypeIds = getFileEntryTypeIds(dlFileEntryTypes);
 
@@ -670,7 +674,8 @@ public class DLFileEntryTypeLocalServiceImpl
 				ddmStructurePersistence.fetchByPrimaryKey(ddmStructureId);
 
 			if (ddmStructure == null) {
-				throw new NoSuchMetadataSetException();
+				throw new NoSuchMetadataSetException(
+					"{ddmStructureId=" + ddmStructureId);
 			}
 		}
 	}

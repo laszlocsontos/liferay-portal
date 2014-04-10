@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -130,6 +130,8 @@ public interface WebKeys {
 	public static final String PORTLET_ID = "PORTLET_ID";
 
 	public static final String PORTLET_PREFERENCES_MAP = "PORTLET_PREFERENCES_MAP";
+
+	public static final String PORTLET_QUICK_ACCESS_ENTRIES = "LIFERAY_SHARED_PORTLET_QUICK_ACCESS_ENTRIES";
 
 	public static final String PORTLET_RESOURCE_STATIC_URLS = "PORTLET_RESOURCE_STATIC_URLS";
 

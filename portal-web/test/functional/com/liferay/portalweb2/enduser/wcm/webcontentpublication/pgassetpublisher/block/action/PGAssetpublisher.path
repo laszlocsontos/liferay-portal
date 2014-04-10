@@ -20,7 +20,7 @@
 </tr>
 <tr>
 	<td>OPTIONS_WRENCH_ICON</td>
-	<td>//section[contains(.,'Asset Publisher')]//a[contains(.,'Options')]</td>
+	<td>//div[contains(@class,'portlet-asset-publisher')]//a[contains(.,'Options')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -59,6 +59,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ADD_BLOGS_ENTRY_BUTTON</td>
+	<td>//ul[@aria-label='Asset Publisher']/li/a[@title='Add Blogs Entry']/span</td>
+	<td></td>
+</tr>
+<tr>
 	<td>INFO_MESSAGE</td>
 	<td>//div[contains(@class,'alert') and contains(@class,'alert-info')]</td>
 	<td></td>
@@ -71,7 +76,7 @@
 <!--CATEGORIES_FILTER-->
 <tr>
 	<td>CATEGORIES_FILTER_CATEGORY</td>
-	<td>//section[contains(.,'Asset Publisher')]//div[@class='portlet-body']//span[contains(.,'${key_categoryName}')]</td>
+	<td>//div[contains(@class,'portlet-asset-publisher')]//div[@class='portlet-body']//span[contains(.,'${key_categoryName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -122,11 +127,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ADD_NEW_MENULIST_WEB_CONTENT</td>
-	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(@href,'asset_publisher')]/span[contains(.,'Web Content Article')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>ADD_NEW_MENULIST_CONTRACT</td>
 	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(@href,'asset_publisher')]/span[contains(.,'Contract')]</td>
 	<td></td>
@@ -146,7 +146,16 @@
 	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(@href,'asset_publisher')]/span[contains(.,'Sales Presentation')]</td>
 	<td></td>
 </tr>
-<!---->
+<tr>
+	<td>ADD_NEW_MENULIST_BASIC_WEB_CONTENT</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/a[contains(@href,'asset_publisher')]/span[contains(.,'Basic Web Content')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--ASSET_ABSTRACT-->
 <tr>
 	<td>ASSET_ABSTRACT_TITLE</td>
@@ -166,6 +175,11 @@
 <tr>
 	<td>ASSET_ABSTRACT_DESCRIPTION</td>
 	<td>//div[contains(.,'${key_assetTitle}')]//div[@class='asset-summary']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSET_ABSTRACT_DESCRIPTION_SMALL_IMAGE</td>
+	<td>//div[contains(.,'${key_assetTitle}')]//div[@class='asset-small-image']</td>
 	<td></td>
 </tr>
 <tr>
@@ -189,8 +203,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td></td>
-	<td></td>
+	<td>ASSET_ABSTRACT_GENERIC</td>
+	<td>//div[contains(@class,'asset-abstract')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -325,52 +339,52 @@
 </tr>
 <tr>
 	<td>AVERAGE_STAR_1</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[1][@class='rating-element icon-star']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[1]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_2</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[2][@class='rating-element icon-star']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[2]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_3</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[3][@class='rating-element icon-star']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[3]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_4</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[4][@class='rating-element icon-star']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[contains(@title,'4 stars out of 5')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_5</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[5][@class='rating-element icon-star']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[5]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_EMPTY_1</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[1][@class='rating-element icon-star-empty']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[1][contains(@class,'rating-element icon-star-empty')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_EMPTY_2</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[2][@class='rating-element icon-star-empty']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[2][contains(@class,'rating-element icon-star-empty')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_EMPTY_3</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[3][@class='rating-element icon-star-empty']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[3][contains(@class,'rating-element icon-star-empty')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_EMPTY_4</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[4][@class='rating-element icon-star-empty']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[4][contains(@class,'rating-element icon-star-empty')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>AVERAGE_STAR_EMPTY_5</td>
-	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]//a[5][@class='rating-element icon-star-empty']</td>
+	<td>//div[@class='taglib-header ' and contains(.,'${key_assetTitle}')]/following-sibling::div//div[contains(@id,'_ratingScore')]/span[5][contains(@class,'rating-element icon-star-empty')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -396,12 +410,12 @@
 </tr>
 <tr>
 	<td>DISPLAY_ICON_TWITTER</td>
-	<td>//li[@class='taglib-social-bookmark-twitter']</td>
+	<td>//span[@class='social-bookmark']//span[contains(.,'Twitter')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DISPLAY_ICON_GOOGLE_PLUS</td>
-	<td>//li[@class='taglib-social-bookmark-plusone']</td>
+	<td>//span[@class='social-bookmark']//span[contains(.,'Google+')]</td>
 	<td></td>
 </tr>
 <tr>

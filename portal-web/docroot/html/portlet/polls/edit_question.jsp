@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -113,9 +113,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 
 				if ((question != null) && ((i - 1) < choices.size())) {
 					choice = (PollsChoice)choices.get(i - 1);
-				}
-				else {
-					choice = new PollsChoiceImpl();
 				}
 			%>
 

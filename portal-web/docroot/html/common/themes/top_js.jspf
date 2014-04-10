@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -367,9 +367,16 @@
 			}
 			%>
 
-			<c:if test="<%= (sb.index() > 0) && !layoutTypePortlet.hasStateMax() %>">
-				Liferay.Portlet.list = ['<%= sb.toString() %>'];
-			</c:if>
+			<c:choose>
+				<c:when test="<%= (sb.index() > 0) && !layoutTypePortlet.hasStateMax() %>">
+					Liferay.Portlet.list = ['<%= sb.toString() %>'];
+				</c:when>
+				<c:otherwise>
+					<c:if test="<%= layoutTypePortlet.hasStateMax() %>">
+						Liferay.Portlet.list = ['<%= layoutTypePortlet.getStateMaxPortletId() %>'];
+					</c:if>
+				</c:otherwise>
+			</c:choose>
 		</c:if>
 
 		<%

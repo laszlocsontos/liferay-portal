@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portlet.wiki.action;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.model.Layout;
@@ -203,7 +204,17 @@ public class ActionUtil {
 			page = WikiPageServiceUtil.getPage(nodeId, title, version);
 
 			if (page.isDraft()) {
-				throw new NoSuchPageException();
+				StringBundler sb = new StringBundler(7);
+
+				sb.append("{nodeId=");
+				sb.append(nodeId);
+				sb.append(", title=");
+				sb.append(title);
+				sb.append(", version=");
+				sb.append(version);
+				sb.append("}");
+
+				throw new NoSuchPageException(sb.toString());
 			}
 		}
 		catch (NoSuchPageException nspe) {

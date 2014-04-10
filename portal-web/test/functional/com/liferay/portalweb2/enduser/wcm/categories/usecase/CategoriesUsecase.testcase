@@ -1,4 +1,6 @@
 <definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="WCM" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -112,6 +114,10 @@
 			<var name="portletName" value="Search" />
 		</execute>
 
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Web Content Display" />
 		</execute>
@@ -146,9 +152,12 @@
 
 		<execute macro="Search#searchPG">
 			<var name="localizationIDName" value="Suchen" />
+			<var name="searchTerm" value="Kategorienamen" />
+		</execute>
+
+		<execute macro="Search#viewSearchPG">
 			<var name="searchAssetTitle" value="${webContentTitle}" />
 			<var name="searchAssetType" value="Webcontent" />
-			<var name="searchTerm" value="Kategorienamen" />
 		</execute>
 
 		<execute macro="User#logoutAndLoginPG">

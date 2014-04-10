@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -582,7 +582,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 			return snippet;
 		}
 		catch (InvalidTokenOffsetsException itoe) {
-			throw new IOException(itoe.getMessage());
+			throw new IOException(itoe);
 		}
 	}
 
@@ -626,15 +626,13 @@ public class LuceneHelperImpl implements LuceneHelper {
 			return;
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
+
+		stopWatch.start();
 
 		if (_log.isInfoEnabled()) {
 			_log.info(
 				"Start loading Lucene index files for company " + companyId);
-
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
 		}
 
 		indexAccessor.loadIndex(inputStream);
@@ -752,7 +750,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 	public void shutdown(long companyId) {
 		IndexAccessor indexAccessor = getIndexAccessor(companyId);
 
-		_indexAccessors.remove(indexAccessor);
+		_indexAccessors.remove(companyId);
 
 		indexAccessor.close();
 	}

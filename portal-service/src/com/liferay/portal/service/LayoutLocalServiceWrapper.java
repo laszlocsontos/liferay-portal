@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1132,6 +1132,14 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 	}
 
 	@Override
+	public int getLayoutsCount(com.liferay.portal.model.Group group,
+		boolean privateLayout, long parentLayoutId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _layoutLocalService.getLayoutsCount(group, privateLayout,
+			parentLayoutId);
+	}
+
+	@Override
 	public int getLayoutsCount(com.liferay.portal.model.User user,
 		boolean privateLayout)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -1527,6 +1535,16 @@ public class LayoutLocalServiceWrapper implements LayoutLocalService,
 			com.liferay.portal.kernel.exception.SystemException {
 		_layoutLocalService.setLayouts(groupId, privateLayout, parentLayoutId,
 			layoutIds, serviceContext);
+	}
+
+	@Override
+	public void updateAsset(long userId,
+		com.liferay.portal.model.Layout layout, long[] assetCategoryIds,
+		java.lang.String[] assetTagNames)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_layoutLocalService.updateAsset(userId, layout, assetCategoryIds,
+			assetTagNames);
 	}
 
 	/**

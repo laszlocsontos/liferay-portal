@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,6 +66,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -117,6 +118,7 @@ import com.liferay.portal.service.http.GroupServiceHttp;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SessionClicks;
@@ -698,7 +700,7 @@ public class StagingImpl implements Staging {
 			errorMessage = LanguageUtil.format(
 				locale,
 				"please-enter-a-file-with-a-valid-file-size-no-larger-than-x",
-				fileMaxSize/1024, false);
+				TextFormatter.formatStorageSize(fileMaxSize, locale), false);
 			errorType = ServletResponseConstants.SC_FILE_SIZE_EXCEPTION;
 		}
 		else if (e instanceof LARTypeException) {
@@ -1035,9 +1037,6 @@ public class StagingImpl implements Staging {
 			new LinkedHashMap<String, String[]>();
 
 		parameterMap.put(
-			PortletDataHandlerKeys.CATEGORIES,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
 			PortletDataHandlerKeys.DATA_STRATEGY,
 			new String[] {
 				PortletDataHandlerKeys.DATA_STRATEGY_MIRROR_OVERWRITE});
@@ -1070,6 +1069,10 @@ public class StagingImpl implements Staging {
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
+				PortletKeys.ASSET_CATEGORIES_ADMIN,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA_ALL,
@@ -1216,8 +1219,8 @@ public class StagingImpl implements Staging {
 						"the-original-x-does-not-exist-in-the-current-" +
 							"environment",
 						ResourceActionsUtil.getModelResource(
-							locale, missingReference.getClassName()
-						), false));
+							locale, missingReference.getClassName()),
+						false));
 			}
 
 			errorMessageJSONObject.put("size", referrers.size());
@@ -1384,6 +1387,11 @@ public class StagingImpl implements Staging {
 			new ServiceContext());
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #publishLayouts(long, long,
+	 *             long, boolean, long[], Map, Date, Date)}
+	 */
+	@Deprecated
 	@Override
 	public void publishLayouts(
 			long userId, long sourceGroupId, long targetGroupId,
@@ -1679,7 +1687,7 @@ public class StagingImpl implements Staging {
 
 		String cmd = MapUtil.getString(parameterMap, Constants.CMD);
 
-		if (!cmd.equals("publish_to_live")) {
+		if (!cmd.equals(Constants.PUBLISH_TO_LIVE)) {
 			return;
 		}
 
@@ -2173,10 +2181,11 @@ public class StagingImpl implements Staging {
 
 		String scope = ParamUtil.getString(portletRequest, "scope");
 
-		Map<Long, Boolean> layoutIdMap = new LinkedHashMap<Long, Boolean>();
+		long[] layoutIds = null;
 
 		if (scope.equals("selected-pages")) {
-			layoutIdMap = ExportImportHelperUtil.getLayoutIdMap(portletRequest);
+			layoutIds = ExportImportHelperUtil.getLayoutIds(
+				portletRequest, targetGroupId);
 		}
 
 		DateRange dateRange = ExportImportDateUtil.getDateRange(
@@ -2212,7 +2221,7 @@ public class StagingImpl implements Staging {
 				portletRequest, "description");
 
 			LayoutServiceUtil.schedulePublishToLive(
-				sourceGroupId, targetGroupId, privateLayout, layoutIdMap,
+				sourceGroupId, targetGroupId, privateLayout, layoutIds,
 				parameterMap, scope, dateRange.getStartDate(),
 				dateRange.getEndDate(), groupName, cronText,
 				startCalendar.getTime(), schedulerEndDate, description);
@@ -2232,7 +2241,7 @@ public class StagingImpl implements Staging {
 				else {
 					publishLayouts(
 						themeDisplay.getUserId(), sourceGroupId, targetGroupId,
-						privateLayout, layoutIdMap, parameterMap,
+						privateLayout, layoutIds, parameterMap,
 						dateRange.getStartDate(), dateRange.getEndDate());
 				}
 			}
@@ -2248,7 +2257,7 @@ public class StagingImpl implements Staging {
 					ExportImportConfigurationSettingsMapFactory.
 						buildSettingsMap(
 							themeDisplay.getUserId(), sourceGroupId,
-							targetGroupId, privateLayout, layoutIdMap,
+							targetGroupId, privateLayout, layoutIds,
 							parameterMap, dateRange.getStartDate(),
 							dateRange.getEndDate(), themeDisplay.getLocale(),
 							themeDisplay.getTimeZone());
@@ -2301,10 +2310,6 @@ public class StagingImpl implements Staging {
 
 		Map<String, String[]> parameterMap = getStagingParameters(
 			portletRequest);
-
-		parameterMap.put(
-			PortletDataHandlerKeys.PUBLISH_TO_REMOTE,
-			new String[] {Boolean.TRUE.toString()});
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 

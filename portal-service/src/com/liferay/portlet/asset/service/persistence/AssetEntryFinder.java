@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,11 +21,10 @@ import aQute.bnd.annotation.ProviderType;
  */
 @ProviderType
 public interface AssetEntryFinder {
-	public int countEntries(
-		com.liferay.portlet.asset.service.persistence.AssetEntryQuery entryQuery)
+	public int countEntries(AssetEntryQuery entryQuery)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public java.util.List<com.liferay.portlet.asset.model.AssetEntry> findEntries(
-		com.liferay.portlet.asset.service.persistence.AssetEntryQuery entryQuery)
+		AssetEntryQuery entryQuery)
 		throws com.liferay.portal.kernel.exception.SystemException;
 }

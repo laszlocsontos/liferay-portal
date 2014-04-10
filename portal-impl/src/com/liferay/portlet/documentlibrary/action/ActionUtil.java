@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,7 +120,8 @@ public class ActionUtil {
 		String cmd = ParamUtil.getString(request, Constants.CMD);
 
 		if (fileEntry.isInTrash() && !cmd.equals(Constants.MOVE_FROM_TRASH)) {
-			throw new NoSuchFileEntryException();
+			throw new NoSuchFileEntryException(
+				"{fileEntryId=" + fileEntryId + "}");
 		}
 	}
 
@@ -213,7 +214,8 @@ public class ActionUtil {
 				DLFolder dlFolder = (DLFolder)folder.getModel();
 
 				if (dlFolder.isInTrash()) {
-					throw new NoSuchFolderException();
+					throw new NoSuchFolderException(
+						"{folderId=" + folderId + "}");
 				}
 			}
 		}

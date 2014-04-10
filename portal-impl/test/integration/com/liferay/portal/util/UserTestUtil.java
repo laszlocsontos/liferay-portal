@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -73,8 +73,7 @@ public class UserTestUtil {
 		Role administratorRole = RoleLocalServiceUtil.getRole(
 			PortalInstances.getDefaultCompanyId(), RoleConstants.ADMINISTRATOR);
 
-		UserLocalServiceUtil.setRoleUsers(
-			administratorRole.getRoleId(), new long[] {user.getUserId()});
+		UserLocalServiceUtil.addRoleUser(administratorRole.getRoleId(), user);
 
 		return user;
 	}

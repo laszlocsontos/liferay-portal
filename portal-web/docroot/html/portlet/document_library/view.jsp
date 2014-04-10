@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,9 @@
 
 <%
 String strutsAction = ParamUtil.getString(request, "struts_action");
+
+String navigation = ParamUtil.getString(request, "navigation");
+String browseBy = ParamUtil.getString(request, "browseBy");
 
 Folder folder = (com.liferay.portal.kernel.repository.model.Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 
@@ -60,6 +63,14 @@ int entryEnd = ParamUtil.getInteger(request, "entryEnd", entriesPerPage);
 int folderStart = ParamUtil.getInteger(request, "folderStart");
 int folderEnd = ParamUtil.getInteger(request, "folderEnd", SearchContainer.DEFAULT_DELTA);
 
+int total = DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(repositoryId, folderId, WorkflowConstants.STATUS_APPROVED, false);
+
+boolean showSelectAll = false;
+
+if (total > 0) {
+	showSelectAll = true;
+}
+
 String orderByCol = ParamUtil.getString(request, "orderByCol");
 String orderByType = ParamUtil.getString(request, "orderByType");
 
@@ -90,7 +101,7 @@ request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 		<aui:col cssClass="context-pane" width="<%= showFolderMenu ? 75 : 100 %>">
 			<liferay-ui:app-view-toolbar
 				includeDisplayStyle="<%= true %>"
-				includeSelectAll="<%= true %>"
+				includeSelectAll="<%= showSelectAll %>"
 			>
 				<liferay-util:include page="/html/portlet/document_library/toolbar.jsp" />
 			</liferay-ui:app-view-toolbar>
@@ -110,7 +121,9 @@ request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 			</div>
 
 			<div class="document-library-breadcrumb" id="<portlet:namespace />breadcrumbContainer">
-				<liferay-util:include page="/html/portlet/document_library/breadcrumb.jsp" />
+				<c:if test='<%= !navigation.equals("recent") && !navigation.equals("mine") && Validator.isNull(browseBy) %>'>
+					<liferay-util:include page="/html/portlet/document_library/breadcrumb.jsp" />
+				</c:if>
 			</div>
 
 			<div class="hide" id="<portlet:namespace />syncNotification">
@@ -211,6 +224,13 @@ if (!defaultFolderView && (folder != null) && portletName.equals(PortletKeys.DOC
 		{
 			columnNames: ['<%= StringUtil.merge(escapedEntryColumns, "','") %>'],
 			displayStyle: '<%= HtmlUtil.escapeJS(displayStyle) %>',
+
+			<%
+			DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
+			%>
+
+			decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+
 			folders: {
 				defaultParams: {
 					p_p_id: <%= HtmlUtil.escapeJS(portletId) %>,

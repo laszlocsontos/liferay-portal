@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.wiki.service.impl;
 
+import com.liferay.portal.kernel.diff.DiffHtmlUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.NotificationThreadLocal;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileUtil;
@@ -51,7 +53,7 @@ import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextUtil;
+import com.liferay.portal.settings.LocalizedValuesMap;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -73,6 +75,7 @@ import com.liferay.portlet.wiki.NoSuchPageException;
 import com.liferay.portlet.wiki.PageContentException;
 import com.liferay.portlet.wiki.PageTitleException;
 import com.liferay.portlet.wiki.PageVersionException;
+import com.liferay.portlet.wiki.WikiSettings;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.model.WikiPageConstants;
@@ -101,7 +104,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
@@ -311,7 +313,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			List<ObjectValuePair<String, InputStream>> inputStreamOVPs)
 		throws PortalException, SystemException {
 
-		if (inputStreamOVPs.size() == 0) {
+		if (inputStreamOVPs.isEmpty()) {
 			return;
 		}
 
@@ -497,15 +499,27 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			page.getNodeId(), page.getTitle());
 
 		for (WikiPage childrenPage : childrenPages) {
-			if (!childrenPage.isApproved() ||
-				(!childrenPage.isInTrash() && page.isInTrash())) {
-
+			if (!childrenPage.isApproved()) {
 				childrenPage.setParentTitle(StringPool.BLANK);
 
 				wikiPagePersistence.update(childrenPage);
 			}
 			else {
 				wikiPageLocalService.deletePage(childrenPage);
+			}
+		}
+
+		List<WikiPage> redirectPages = wikiPagePersistence.findByN_R(
+			page.getNodeId(), page.getTitle());
+
+		for (WikiPage redirectPage : redirectPages) {
+			if (!redirectPage.isApproved()) {
+				redirectPage.setRedirectTitle(StringPool.BLANK);
+
+				wikiPagePersistence.update(redirectPage);
+			}
+			else {
+				wikiPageLocalService.deletePage(redirectPage);
 			}
 		}
 
@@ -851,7 +865,15 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			return pages.get(0);
 		}
 		else {
-			throw new NoSuchPageException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("{nodeId=");
+			sb.append(nodeId);
+			sb.append(", title=");
+			sb.append(title);
+			sb.append("}");
+
+			throw new NoSuchPageException(sb.toString());
 		}
 	}
 
@@ -891,7 +913,15 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			resourcePrimKey, status, preferApproved);
 
 		if (page == null) {
-			throw new NoSuchPageException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("{resourcePrimKey=");
+			sb.append(resourcePrimKey);
+			sb.append(", status=");
+			sb.append(status);
+			sb.append("}");
+
+			throw new NoSuchPageException(sb.toString());
 		}
 
 		return page;
@@ -907,7 +937,17 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			resourcePrimKey, nodeId, status, preferApproved);
 
 		if (page == null) {
-			throw new NoSuchPageException();
+			StringBundler sb = new StringBundler(7);
+
+			sb.append("{resourcePrimKey=");
+			sb.append(resourcePrimKey);
+			sb.append(", nodeId=");
+			sb.append(nodeId);
+			sb.append(", status=");
+			sb.append(status);
+			sb.append("}");
+
+			throw new NoSuchPageException(sb.toString());
 		}
 
 		return page;
@@ -921,7 +961,17 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		WikiPage page = fetchLatestPage(nodeId, title, status, preferApproved);
 
 		if (page == null) {
-			throw new NoSuchPageException();
+			StringBundler sb = new StringBundler(7);
+
+			sb.append("{nodeId=");
+			sb.append(nodeId);
+			sb.append(", title=");
+			sb.append(title);
+			sb.append(", status=");
+			sb.append(status);
+			sb.append("}");
+
+			throw new NoSuchPageException(sb.toString());
 		}
 
 		return page;
@@ -1006,7 +1056,15 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			return page;
 		}
 		else {
-			throw new NoSuchPageException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("{nodeId=");
+			sb.append(nodeId);
+			sb.append(", title=");
+			sb.append(title);
+			sb.append("}");
+
+			throw new NoSuchPageException(sb.toString());
 		}
 	}
 
@@ -1027,7 +1085,17 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			return pages.get(0);
 		}
 		else {
-			throw new NoSuchPageException();
+			StringBundler sb = new StringBundler(7);
+
+			sb.append("{nodeId=");
+			sb.append(nodeId);
+			sb.append(", title=");
+			sb.append(title);
+			sb.append(", head=");
+			sb.append(head);
+			sb.append("}");
+
+			throw new NoSuchPageException(sb.toString());
 		}
 	}
 
@@ -1257,6 +1325,19 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		return wikiPagePersistence.countByFormat(format);
 	}
 
+	@Override
+	public WikiPage getPreviousVersionPage(WikiPage page)
+		throws PortalException, SystemException {
+
+		double previousVersion = MathUtil.format(page.getVersion() - 0.1, 1, 1);
+
+		if (previousVersion < 1) {
+			return null;
+		}
+
+		return getPage(page.getNodeId(), page.getTitle(), previousVersion);
+	}
+
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link #getRecentChanges(long, long,
 	 *             int, int)}
@@ -1369,12 +1450,18 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		List<WikiPage> versionPages = wikiPagePersistence.findByN_T(
 			nodeId, title);
 
-		if (versionPages.size() == 0) {
+		if (versionPages.isEmpty()) {
 			return;
 		}
 
 		for (WikiPage page : versionPages) {
 			page.setTitle(newTitle);
+
+			if (Validator.isNotNull(page.getRedirectTitle())) {
+				page.setRedirectTitle(StringPool.BLANK);
+
+				page.setSummary(StringPool.BLANK);
+			}
 
 			wikiPagePersistence.update(page);
 		}
@@ -2040,7 +2127,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			page = pages.get(0);
 		}
 		else {
-			throw new NoSuchPageException();
+			throw new NoSuchPageException(
+				"{resourcePrimKey=" + resourcePrimKey + "}");
 		}
 
 		return updateStatus(userId, page, status, serviceContext);
@@ -2356,18 +2444,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		}
 	}
 
-	protected WikiPage getPreviousVersionPage(WikiPage page)
-		throws PortalException, SystemException {
-
-		double previousVersion = MathUtil.format(page.getVersion() - 0.1, 1, 1);
-
-		if (previousVersion < 1) {
-			return null;
-		}
-
-		return getPage(page.getNodeId(), page.getTitle(), previousVersion);
-	}
-
 	protected boolean isLinkedTo(WikiPage page, String targetTitle)
 		throws PortalException {
 
@@ -2405,27 +2481,11 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			return;
 		}
 
-		PortletPreferences preferences = null;
+		WikiSettings wikiSettings = WikiUtil.getWikiSettings(node.getGroupId());
 
-		String rootPortletId = serviceContext.getRootPortletId();
-
-		if (Validator.isNull(rootPortletId) ||
-			!rootPortletId.equals(PortletKeys.WIKI_DISPLAY)) {
-
-			preferences = ServiceContextUtil.getPortletPreferences(
-				serviceContext);
+		if (!update && wikiSettings.getEmailPageAddedEnabled()) {
 		}
-
-		if (preferences == null) {
-			preferences = portletPreferencesLocalService.getPreferences(
-				node.getCompanyId(), node.getGroupId(),
-				PortletKeys.PREFS_OWNER_TYPE_GROUP,
-				PortletKeys.PREFS_PLID_SHARED, PortletKeys.WIKI_ADMIN, null);
-		}
-
-		if (!update && WikiUtil.getEmailPageAddedEnabled(preferences)) {
-		}
-		else if (update && WikiUtil.getEmailPageUpdatedEnabled(preferences)) {
+		else if (update && wikiSettings.getEmailPageUpdatedEnabled()) {
 		}
 		else {
 			return;
@@ -2464,33 +2524,24 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		String pageTitle = page.getTitle();
 		String pageURL = getPageURL(node, page, serviceContext);
 
-		String fromName = WikiUtil.getEmailFromName(
-			preferences, page.getCompanyId());
-		String fromAddress = WikiUtil.getEmailFromAddress(
-			preferences, page.getCompanyId());
+		String fromName = wikiSettings.getEmailFromName();
+		String fromAddress = wikiSettings.getEmailFromAddress();
 
-		String subject = null;
-		String body = null;
-		String signature = null;
+		LocalizedValuesMap subjectLocalizedValuesMap = null;
+		LocalizedValuesMap bodyLocalizedValuesMap = null;
 
 		if (update) {
-			subject = WikiUtil.getEmailPageUpdatedSubject(preferences);
-			body = WikiUtil.getEmailPageUpdatedBody(preferences);
-			signature = WikiUtil.getEmailPageUpdatedSignature(preferences);
+			subjectLocalizedValuesMap =
+				wikiSettings.getEmailPageUpdatedSubject();
+			bodyLocalizedValuesMap = wikiSettings.getEmailPageUpdatedBody();
 		}
 		else {
-			subject = WikiUtil.getEmailPageAddedSubject(preferences);
-			body = WikiUtil.getEmailPageAddedBody(preferences);
-			signature = WikiUtil.getEmailPageAddedSignature(preferences);
-		}
-
-		if (Validator.isNotNull(signature)) {
-			body += "\n" + signature;
+			subjectLocalizedValuesMap = wikiSettings.getEmailPageAddedSubject();
+			bodyLocalizedValuesMap = wikiSettings.getEmailPageAddedBody();
 		}
 
 		SubscriptionSender subscriptionSender = new SubscriptionSender();
 
-		subscriptionSender.setBody(body);
 		subscriptionSender.setClassName(page.getModelClassName());
 		subscriptionSender.setClassPK(page.getPageId());
 		subscriptionSender.setCompanyId(page.getCompanyId());
@@ -2504,12 +2555,14 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		subscriptionSender.setContextAttribute(
 			"[$PAGE_CONTENT$]", pageContent, false);
 		subscriptionSender.setContextAttribute(
-			"[$PAGE_DIFFS$]", replaceStyles(pageDiffs), false);
+			"[$PAGE_DIFFS$]", DiffHtmlUtil.replaceStyles(pageDiffs), false);
 		subscriptionSender.setContextUserPrefix("PAGE");
 		subscriptionSender.setEntryTitle(pageTitle);
 		subscriptionSender.setEntryURL(pageURL);
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
+		subscriptionSender.setLocalizedBodyMap(bodyLocalizedValuesMap);
+		subscriptionSender.setLocalizedSubjectMap(subjectLocalizedValuesMap);
 		subscriptionSender.setMailId(
 			"wiki_page", page.getNodeId(), page.getPageId());
 
@@ -2527,11 +2580,11 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		subscriptionSender.setReplyToAddress(fromAddress);
 		subscriptionSender.setScopeGroupId(node.getGroupId());
 		subscriptionSender.setServiceContext(serviceContext);
-		subscriptionSender.setSubject(subject);
 		subscriptionSender.setUserId(page.getUserId());
 
 		subscriptionSender.addPersistedSubscribers(
 			WikiNode.class.getName(), node.getNodeId());
+
 		subscriptionSender.addPersistedSubscribers(
 			WikiPage.class.getName(), page.getResourcePrimKey());
 
@@ -2569,28 +2622,6 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			expandoBridge.getAttributes());
 	}
 
-	protected String replaceStyles(String html) {
-		return StringUtil.replace(
-			html,
-			new String[] {
-				"class=\"diff-html-added\"", "class=\"diff-html-removed\"",
-				"class=\"diff-html-changed\"",
-				"changeType=\"diff-added-image\"",
-				"changeType=\"diff-removed-image\"",
-				"changeType=\"diff-changed-image\""
-			},
-			new String[] {
-				"style=\"background-color: #CFC;\"",
-				"style=\"background-color: #FDC6C6; text-decoration: " +
-					"line-through;\"",
-				"style=\"border-bottom: 2px dotted blue;\"",
-				"style=\"border: 10px solid #CFC;\"",
-				"style=\"border: 10px solid #FDC6C6;\"",
-				"style=\"border: 10px solid blue;\""
-			}
-		);
-	}
-
 	protected void validate(long nodeId, String content, String format)
 		throws PortalException {
 
@@ -2608,7 +2639,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		}
 
 		if (isUsedTitle(nodeId, title)) {
-			throw new DuplicatePageException();
+			throw new DuplicatePageException("{nodeId=" + nodeId + "}");
 		}
 
 		validateTitle(title);

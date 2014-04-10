@@ -116,6 +116,16 @@
 		<execute action="BasePortletConfiguration#assertClick" locator-key1="NAVIGATION_PERMISSIONS" value1="Permissions" />
 	</command>
 
+	<command name="gotoDMDocumentPG">
+		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
+
+		<execute action="CPDocumentsandmedia#assertElementPresent" locator-key1="DOCUMENT_CONTAINER_DOCUMENT" />
+		<execute action="CPDocumentsandmedia#assertClick" locator-key1="DOCUMENT_CONTAINER_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
+		<execute action="PGDocumentsandmediaDocument#assertClick" locator-key1="TOOLBAR_PERMISSIONS_BUTTON" value1="Permissions" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+	</command>
+
 	<command name="gotoDMFolderPG">
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
@@ -140,6 +150,40 @@
 
 		<execute action="PGDocumentsandmedia#click" locator-key1="FILTER_HOME_ACTIONS" />
 		<execute action="PGDocumentsandmedia#assertClick" locator-key1="HOME_MENULIST_PERMISSIONS" value1="Permissions" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+	</command>
+
+	<command name="gotoMessageBoardsCategoryPG">
+		<if>
+			<equals arg1="categoryDescriptionEnabled" arg2="true" />
+			<then>
+				<var name="key_categoryDescription" value="${categoryDescription}" />
+
+				<execute action="PGMessageboards#assertClick" locator-key1="CATEGORY_TABLE_CATEGORY_DESCRIPTION" value1="${categoryDescription}" />
+			</then>
+			<else>
+				<var name="key_categoryName" value="${categoryName}" />
+
+				<execute action="PGMessageboards#assertClick" locator-key1="CATEGORY_TABLE_CATEGORY" value1="${categoryName}" />
+			</else>
+		</if>
+
+		<execute action="PGMessageboardsCategory#assertClick" locator-key1="PERMISSIONS_BUTTON" value1="Permissions" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+	</command>
+
+	<command name="gotoMessageBoardsPG">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="${siteURLTemp}" />
+		</execute>
+
+		<execute action="PGMessageboards#assertClick" locator-key1="PERMISSIONS_BUTTON" value1="Permissions" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
 	</command>
 
 	<command name="gotoPagePG">
@@ -149,8 +193,56 @@
 			<var name="siteURL" value="${siteURLTemp}" />
 		</execute>
 
+		<if>
+			<condition action="SOUserBar#isElementPresent" locator-key1="USER_BAR" />
+			<then>
+				<if>
+					<condition action="SOUserBar#isElementNotPresent" locator-key1="VISIBLE_PAGE_CONTROLS" />
+					<then>
+						<execute action="SOUserBar#click" locator-key1="TOGGLE_DOCKBAR" />
+					</then>
+				</if>
+			</then>
+		</if>
+
 		<execute action="Dockbar#click" locator-key1="EDIT" />
 		<execute action="Dockbar#click" locator-key1="EDIT_PERMISSIONS" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+	</command>
+
+	<command name="gotoPollPermissionsCP">
+		<var name="key_pollsQuestionTitle" value="${pollsQuestionTitle}" />
+
+		<execute action="CPPolls#assertClick" locator-key1="POLLS_TABLE_ACTION" value1="Actions" />
+		<execute action="CPPolls#assertClick" locator-key1="POLLS_MENULIST_PERMISSIONS" value1="Permissions" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+	</command>
+
+	<command name="gotoSitepageCP">
+		<execute macro="SitePage#addCmd" />
+
+		<execute macro="SitePage#expandRootCP" />
+
+		<var name="key_sitePageName" value="${sitePageName}" />
+
+		<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_1" value1="${sitePageName}" />
+		<execute action="CPSitepages#assertClick" locator-key1="TOOLBAR_PERMISSIONS" value1="Permissions" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+	</command>
+
+	<command name="gotoSiteTemplateCP">
+		<execute macro="Page#gotoPagesCP">
+			<var name="portletName" value="${portletName}" />
+			<var name="siteScopeName" value="${siteScopeName}" />
+		</execute>
+
+		<var name="key_sitePageName" value="${sitePageName}" />
+
+		<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_1" value1="${sitePageName}" />
+		<execute action="CPSitepages#assertClick" locator-key1="TOOLBAR_PERMISSIONS" value1="Permissions" />
 
 		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
 	</command>

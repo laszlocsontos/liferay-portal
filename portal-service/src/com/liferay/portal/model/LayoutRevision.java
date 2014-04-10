@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -70,6 +70,11 @@ public interface LayoutRevision extends LayoutRevisionModel, PersistedModel {
 		java.lang.String device);
 
 	public com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties();
+
+	public java.lang.String getTypeSettingsProperty(java.lang.String key);
+
+	public java.lang.String getTypeSettingsProperty(java.lang.String key,
+		java.lang.String defaultValue);
 
 	public com.liferay.portal.model.ColorScheme getWapColorScheme()
 		throws com.liferay.portal.kernel.exception.PortalException,

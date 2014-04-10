@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -220,6 +220,18 @@ public class AssetVocabularyPersistenceTest {
 			_persistence.countByGroupId(ServiceTestUtil.nextLong());
 
 			_persistence.countByGroupId(0L);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByGroupIdArrayable() {
+		try {
+			_persistence.countByGroupId(new long[] {
+					ServiceTestUtil.nextLong(), 0L
+				});
 		}
 		catch (Exception e) {
 			Assert.fail(e.getMessage());

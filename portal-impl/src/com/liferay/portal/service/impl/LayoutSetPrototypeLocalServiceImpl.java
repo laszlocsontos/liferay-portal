@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,6 +34,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutSetPrototypeLocalServiceBaseImpl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,8 +49,8 @@ public class LayoutSetPrototypeLocalServiceImpl
 	@Override
 	public LayoutSetPrototype addLayoutSetPrototype(
 			long userId, long companyId, Map<Locale, String> nameMap,
-			String description, boolean active, boolean layoutsUpdateable,
-			ServiceContext serviceContext)
+			Map<Locale, String> descriptionMap, boolean active,
+			boolean layoutsUpdateable, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Layout set prototype
@@ -69,7 +70,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 		layoutSetPrototype.setCreateDate(serviceContext.getCreateDate(now));
 		layoutSetPrototype.setModifiedDate(serviceContext.getModifiedDate(now));
 		layoutSetPrototype.setNameMap(nameMap);
-		layoutSetPrototype.setDescription(description);
+		layoutSetPrototype.setDescriptionMap(descriptionMap);
 		layoutSetPrototype.setActive(active);
 
 		UnicodeProperties settingsProperties =
@@ -115,6 +116,27 @@ public class LayoutSetPrototypeLocalServiceImpl
 		}
 
 		return layoutSetPrototype;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #addLayoutSetPrototype(long,
+	 *             long, Map, Map, boolean, boolean, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public LayoutSetPrototype addLayoutSetPrototype(
+			long userId, long companyId, Map<Locale, String> nameMap,
+			String description, boolean active, boolean layoutsUpdateable,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+
+		descriptionMap.put(LocaleUtil.getDefault(), description);
+
+		return addLayoutSetPrototype(
+			userId, companyId, nameMap, descriptionMap, active,
+			layoutsUpdateable, serviceContext);
 	}
 
 	@Override
@@ -243,8 +265,8 @@ public class LayoutSetPrototypeLocalServiceImpl
 	@Override
 	public LayoutSetPrototype updateLayoutSetPrototype(
 			long layoutSetPrototypeId, Map<Locale, String> nameMap,
-			String description, boolean active, boolean layoutsUpdateable,
-			ServiceContext serviceContext)
+			Map<Locale, String> descriptionMap, boolean active,
+			boolean layoutsUpdateable, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Layout set prototype
@@ -256,7 +278,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 		layoutSetPrototype.setModifiedDate(
 			serviceContext.getModifiedDate(new Date()));
 		layoutSetPrototype.setNameMap(nameMap);
-		layoutSetPrototype.setDescription(description);
+		layoutSetPrototype.setDescriptionMap(descriptionMap);
 		layoutSetPrototype.setActive(active);
 
 		UnicodeProperties settingsProperties =
@@ -269,16 +291,29 @@ public class LayoutSetPrototypeLocalServiceImpl
 
 		layoutSetPrototypePersistence.update(layoutSetPrototype);
 
-		// Group
-
-		Group group = groupLocalService.getLayoutSetPrototypeGroup(
-			layoutSetPrototype.getCompanyId(), layoutSetPrototypeId);
-
-		group.setName(layoutSetPrototype.getName(LocaleUtil.getDefault()));
-
-		groupPersistence.update(group);
-
 		return layoutSetPrototype;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #updateLayoutSetPrototype(long, Map, Map, boolean, boolean,
+	 *             ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public LayoutSetPrototype updateLayoutSetPrototype(
+			long layoutSetPrototypeId, Map<Locale, String> nameMap,
+			String description, boolean active, boolean layoutsUpdateable,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+
+		descriptionMap.put(LocaleUtil.getDefault(), description);
+
+		return updateLayoutSetPrototype(
+			layoutSetPrototypeId, nameMap, descriptionMap, active,
+			layoutsUpdateable, serviceContext);
 	}
 
 	@Override

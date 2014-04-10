@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -514,9 +514,11 @@ public class SitesImpl implements Sites {
 				response);
 		}
 
-		LayoutSet layoutSet = layout.getLayoutSet();
+		if (group.isGuest() && !layout.isPrivateLayout() &&
+			layout.isRootLayout() &&
+			(LayoutLocalServiceUtil.getLayoutsCount(
+				group, false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) == 1)) {
 
-		if (group.isGuest() && (layoutSet.getPageCount() == 1)) {
 			throw new RequiredLayoutException(
 				RequiredLayoutException.AT_LEAST_ONE);
 		}
@@ -530,6 +532,8 @@ public class SitesImpl implements Sites {
 		long newPlid = layout.getParentPlid();
 
 		if (newPlid <= 0) {
+			LayoutSet layoutSet = layout.getLayoutSet();
+
 			Layout firstLayout = LayoutLocalServiceUtil.fetchFirstLayout(
 				layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
 				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
@@ -619,9 +623,6 @@ public class SitesImpl implements Sites {
 			new LinkedHashMap<String, String[]>();
 
 		parameterMap.put(
-			PortletDataHandlerKeys.CATEGORIES,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
 			PortletDataHandlerKeys.DATA_STRATEGY,
 			new String[] {PortletDataHandlerKeys.DATA_STRATEGY_MIRROR});
 		parameterMap.put(
@@ -659,6 +660,10 @@ public class SitesImpl implements Sites {
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
+				PortletKeys.ASSET_CATEGORIES_ADMIN,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA_ALL,
@@ -1698,9 +1703,6 @@ public class SitesImpl implements Sites {
 			new LinkedHashMap<String, String[]>();
 
 		parameterMap.put(
-			PortletDataHandlerKeys.CATEGORIES,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
 			PortletDataHandlerKeys.DELETE_MISSING_LAYOUTS,
 			new String[] {Boolean.FALSE.toString()});
 		parameterMap.put(
@@ -1729,6 +1731,10 @@ public class SitesImpl implements Sites {
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
+				PortletKeys.ASSET_CATEGORIES_ADMIN,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_SETUP_ALL,

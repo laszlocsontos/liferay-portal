@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1141,79 +1141,31 @@ public class JournalArticleLocalServiceUtil {
 			themeDisplay);
 	}
 
-	/**
-	* Returns a web content article display for the specified page of the
-	* latest version of the web content article, optionally based on the DDM
-	* template if the article is template driven. If the article is template
-	* driven, web content transformation tokens are added from the theme
-	* display (if not <code>null</code>) or the XML request otherwise.
-	*
-	* @param article the web content article
-	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
-	* @param viewMode the mode in which the web content is being viewed
-	* @param languageId the primary key of the language translation to get
-	* @param page the web content's page number. Page numbers start at
-	<code>1</code>.
-	* @param xmlRequest the request that serializes the web content into a
-	hierarchical hash map (optionally <code>null</code>)
-	* @param themeDisplay the theme display
-	* @return the web content article display
-	* @throws PortalException if a matching DDM template could not be found or
-	if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
 	public static com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		com.liferay.portlet.journal.model.JournalArticle article,
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
-		java.lang.String languageId, int page, java.lang.String xmlRequest,
+		java.lang.String languageId, int page,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getArticleDisplay(article, ddmTemplateKey, viewMode,
-			languageId, page, xmlRequest, themeDisplay);
+			languageId, page, portletRequestModel, themeDisplay);
 	}
 
-	/**
-	* Returns a web content article display for the first page of the specified
-	* version of the web content article, optionally based on the DDM template
-	* if the article is template driven. If the article is template driven, web
-	* content transformation tokens are added from the theme display (if not
-	* <code>null</code>) or the XML request otherwise.
-	*
-	* @param groupId the primary key of the web content article's group
-	* @param articleId the primary key of the web content article
-	* @param version the web content article's version
-	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
-	* @param viewMode the mode in which the web content is being viewed
-	* @param languageId the primary key of the language translation to get
-	* @param page the web content's page number
-	* @param xmlRequest the request that serializes the web content into a
-	hierarchical hash map
-	* @param themeDisplay the theme display
-	* @return the web content article display, or <code>null</code> if the
-	article has expired or if article's display date/time is after
-	the current date/time
-	* @throws PortalException if a matching web content article or DDM template
-	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
 	public static com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		long groupId, java.lang.String articleId, double version,
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
-		java.lang.String languageId, int page, java.lang.String xmlRequest,
+		java.lang.String languageId, int page,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getArticleDisplay(groupId, articleId, version,
-			ddmTemplateKey, viewMode, languageId, page, xmlRequest, themeDisplay);
+			ddmTemplateKey, viewMode, languageId, page, portletRequestModel,
+			themeDisplay);
 	}
 
 	/**
@@ -1252,76 +1204,29 @@ public class JournalArticleLocalServiceUtil {
 			ddmTemplateKey, viewMode, languageId, themeDisplay);
 	}
 
-	/**
-	* Returns a web content article display for the first page of the latest
-	* version of the web content article matching the group and article ID. If
-	* the article is template driven, web content transformation tokens are
-	* added from the theme display (if not <code>null</code>) or the XML
-	* request otherwise.
-	*
-	* @param groupId the primary key of the web content article's group
-	* @param articleId the primary key of the web content article
-	* @param viewMode the mode in which the web content is being viewed
-	* @param languageId the primary key of the language translation to get
-	* @param page the web content's page number
-	* @param xmlRequest the request that serializes the web content into a
-	hierarchical hash map
-	* @param themeDisplay the theme display
-	* @return the web content article display, or <code>null</code> if the
-	article has expired or if article's display date/time is after
-	the current date/time
-	* @throws PortalException if a matching web content article or DDM template
-	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
 	public static com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		long groupId, java.lang.String articleId, java.lang.String viewMode,
-		java.lang.String languageId, int page, java.lang.String xmlRequest,
+		java.lang.String languageId, int page,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getArticleDisplay(groupId, articleId, viewMode, languageId,
-			page, xmlRequest, themeDisplay);
+			page, portletRequestModel, themeDisplay);
 	}
 
-	/**
-	* Returns a web content article display for the specified page of the
-	* latest version of the web content article matching the group and article
-	* ID, optionally based on the DDM template if the article is template
-	* driven. If the article is template driven, web content transformation
-	* tokens are added from the theme display (if not <code>null</code>) or the
-	* XML request otherwise.
-	*
-	* @param groupId the primary key of the web content article's group
-	* @param articleId the primary key of the web content article
-	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
-	* @param viewMode the mode in which the web content is being viewed
-	* @param languageId the primary key of the language translation to get
-	* @param page the web content's page number
-	* @param xmlRequest the request that serializes the web content into a
-	hierarchical hash map
-	* @param themeDisplay the theme display
-	* @return the web content article display, or <code>null</code> if the
-	article has expired or if article's display date/time is after
-	the current date/time
-	* @throws PortalException if a matching web content article or DDM template
-	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
 	public static com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		long groupId, java.lang.String articleId,
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
-		java.lang.String languageId, int page, java.lang.String xmlRequest,
+		java.lang.String languageId, int page,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .getArticleDisplay(groupId, articleId, ddmTemplateKey,
-			viewMode, languageId, page, xmlRequest, themeDisplay);
+			viewMode, languageId, page, portletRequestModel, themeDisplay);
 	}
 
 	/**
@@ -1973,6 +1878,12 @@ public class JournalArticleLocalServiceUtil {
 	public static int getNotInTrashArticlesCount(long groupId, long folderId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getNotInTrashArticlesCount(groupId, folderId);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalArticle getPreviousApprovedArticle(
+		com.liferay.portlet.journal.model.JournalArticle article)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getPreviousApprovedArticle(article);
 	}
 
 	/**
@@ -2968,36 +2879,18 @@ public class JournalArticleLocalServiceUtil {
 			status, start, end);
 	}
 
-	/**
-	* Subscribes the user to notifications for the web content article matching
-	* the group, notifying him the instant versions of the article are created,
-	* deleted, or modified.
-	*
-	* @param userId the primary key of the user to subscribe
-	* @param groupId the primary key of the group
-	* @throws PortalException if a matching user or group could not be found
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void subscribe(long userId, long groupId)
+	public static void subscribeStructure(long groupId, long userId,
+		long ddmStructureId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().subscribe(userId, groupId);
+		getService().subscribeStructure(groupId, userId, ddmStructureId);
 	}
 
-	/**
-	* Unsubscribes the user from notifications for the web content article
-	* matching the group.
-	*
-	* @param userId the primary key of the user to unsubscribe
-	* @param groupId the primary key of the group
-	* @throws PortalException if a matching user or subscription could not be
-	found
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void unsubscribe(long userId, long groupId)
+	public static void unsubscribeStructure(long groupId, long userId,
+		long ddmStructureId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().unsubscribe(userId, groupId);
+		getService().unsubscribeStructure(groupId, userId, ddmStructureId);
 	}
 
 	/**

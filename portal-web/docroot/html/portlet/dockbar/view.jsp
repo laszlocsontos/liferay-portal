@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,7 +63,7 @@ String toggleControlsState = GetterUtil.getString(SessionClicks.get(request, "li
 					}
 				}
 
-				backURL = PortalUtil.getLayoutURL(refererLayout, themeDisplay);
+				backURL = PortalUtil.getLayoutRelativeURL(refererLayout, themeDisplay);
 
 				if (!CookieKeys.hasSessionId(request)) {
 					backURL = PortalUtil.getURLWithSessionId(backURL, session.getId());
@@ -122,8 +122,12 @@ String toggleControlsState = GetterUtil.getString(SessionClicks.get(request, "li
 	%>
 
 	<c:if test="<%= !(group.isControlPanel() && controlPanelCategory.startsWith(PortletCategoryKeys.CURRENT_SITE)) %>">
-		<aui:nav collapsible="<%= true %>" cssClass="nav-navigation" icon="reorder" id="navSiteNavigation">
-			<aui:nav-item dropdown="<%= true %>" iconCssClass="icon-cog">
+		<aui:nav collapsible="<%= true %>" cssClass="nav-navigation">
+			<c:if test="<%= !group.isControlPanel() %>">
+				<aui:nav-item anchorCssClass="site-navigation-btn" anchorId="navSiteNavigation" href="javascript:;" iconCssClass="icon-reorder" />
+			</c:if>
+
+			<aui:nav-item dropdown="<%= true %>" iconCssClass="icon-cog" toggleTouch="<%= false %>">
 				<c:if test="<%= group.isControlPanel() && !controlPanelCategory.equals(PortletCategoryKeys.MY) && !controlPanelCategory.startsWith(PortletCategoryKeys.CURRENT_SITE) %>">
 
 					<%
@@ -173,7 +177,7 @@ String toggleControlsState = GetterUtil.getString(SessionClicks.get(request, "li
 	%>
 
 	<aui:nav ariaLabel='<%= LanguageUtil.get(pageContext, "layout-controls") %>' collapsible="<%= true %>" cssClass='<%= portalMessageUseAnimation ? "nav-add-controls" : "nav-add-controls nav-add-controls-notice" %>' icon="pencil" id="navAddControls">
-		<aui:nav-item cssClass="dockbar-item" dropdown="<%= true %>" iconCssClass="icon-pencil">
+		<aui:nav-item cssClass="dockbar-item" dropdown="<%= true %>" iconCssClass="icon-pencil" toggleTouch="<%= false %>">
 
 			<%
 			boolean hasLayoutAddPermission = false;
@@ -247,7 +251,7 @@ List<LayoutPrototype> layoutPrototypes = LayoutPrototypeServiceUtil.search(compa
 				<li>
 					<a href="javascript:;">
 						<label>
-							<input name="template" type="radio" value="<%= layoutPrototype.getLayoutPrototypeId() %>" /> <%= HtmlUtil.escape(layoutPrototype.getName(user.getLanguageId())) %>
+							<input name="template" type="radio" value="<%= layoutPrototype.getLayoutPrototypeId() %>" /> <%= HtmlUtil.escape(layoutPrototype.getName(locale)) %>
 						</label>
 					</a>
 				</li>

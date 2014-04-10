@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -125,6 +125,8 @@ public interface PropsKeys {
 
 	public static final String ASSET_PUBLISHER_EMAIL_FROM_NAME = "asset.publisher.email.from.name";
 
+	public static final String ASSET_PUBLISHER_PERMISSION_CHECKING_CONFIGURABLE = "asset.publisher.permission.checking.configurable";
+
 	public static final String ASSET_PUBLISHER_QUERY_FORM_CONFIGURATION = "asset.publisher.query.form.configuration";
 
 	public static final String ASSET_PUBLISHER_SEARCH_WITH_INDEX = "asset.publisher.search.with.index";
@@ -249,6 +251,10 @@ public interface PropsKeys {
 
 	public static final String BASIC_AUTH_PASSWORD_REQUIRED = "basic.auth.password.required";
 
+	public static final String BLOGS_COMMENT_RATINGS_ENABLED = "blogs.comment.ratings.enabled";
+
+	public static final String BLOGS_DISPLAY_STYLE = "blogs.display.style";
+
 	public static final String BLOGS_DISPLAY_TEMPLATES_CONFIG = "blogs.display.templates.config";
 
 	public static final String BLOGS_EMAIL_ENTRY_ADDED_BODY = "blogs.email.entry.added.body";
@@ -273,6 +279,8 @@ public interface PropsKeys {
 
 	public static final String BLOGS_ENTRY_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED = "blogs.entry.previous.and.next.navigation.enabled";
 
+	public static final String BLOGS_FLAGS_ENABLED = "blogs.flags.enabled";
+
 	public static final String BLOGS_IMAGE_EXTENSIONS = "blogs.image.extensions";
 
 	public static final String BLOGS_IMAGE_SMALL_MAX_SIZE = "blogs.image.small.max.size";
@@ -289,7 +297,17 @@ public interface PropsKeys {
 
 	public static final String BLOGS_PUBLISH_TO_LIVE_BY_DEFAULT = "blogs.publish.to.live.by.default";
 
+	public static final String BLOGS_RATINGS_ENABLED = "blogs.ratings.enabled";
+
+	public static final String BLOGS_RELATED_ASSETS_ENABLED = "blogs.related.assets.enabled";
+
 	public static final String BLOGS_RSS_ABSTRACT_LENGTH = "blogs.rss.abstract.length";
+
+	public static final String BLOGS_RSS_ENABLED = "blogs.rss.enabled";
+
+	public static final String BLOGS_SOCIAL_BOOKMARKS_DISPLAY_POSITION = "blogs.social.bookmarks.display.position";
+
+	public static final String BLOGS_SOCIAL_BOOKMARKS_ENABLED = "blogs.social.bookmarks.enabled";
 
 	public static final String BLOGS_TRACKBACK_ENABLED = "blogs.trackback.enabled";
 
@@ -821,6 +839,8 @@ public interface PropsKeys {
 
 	public static final String EHCACHE_BLOCKING_CACHE_ALLOWED = "ehcache.blocking.cache.allowed";
 
+	public static final String EHCACHE_BOOTSTRAP_CACHE_LOADER_ENABLED = "ehcache.bootstrap.cache.loader.enabled";
+
 	public static final String EHCACHE_BOOTSTRAP_CACHE_LOADER_FACTORY = "ehcache.bootstrap.cache.loader.factory";
 
 	public static final String EHCACHE_CACHE_EVENT_LISTENER_FACTORY = "ehcache.cache.event.listener.factory";
@@ -1293,6 +1313,8 @@ public interface PropsKeys {
 
 	public static final String LAYOUT_REMEMBER_MAXIMIZED_WINDOW_STATE = "layout.remember.maximized.window.state";
 
+	public static final String LAYOUT_RESET_PORTLET_IDS = "layout.reset.portlet.ids";
+
 	public static final String LAYOUT_SET_FORM_UPDATE = "layout.set.form.update";
 
 	public static final String LAYOUT_SET_PROTOTYPE_MERGE_FAIL_THRESHOLD = "layout.set.prototype.merge.fail.threshold";
@@ -1615,21 +1637,19 @@ public interface PropsKeys {
 
 	public static final String MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_ENABLED = "message.boards.email.message.added.enabled";
 
-	public static final String MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SIGNATURE = "message.boards.email.message.added.signature";
-
 	public static final String MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SUBJECT = "message.boards.email.message.added.subject";
 
 	public static final String MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_BODY = "message.boards.email.message.updated.body";
 
 	public static final String MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_ENABLED = "message.boards.email.message.updated.enabled";
 
-	public static final String MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SIGNATURE = "message.boards.email.message.updated.signature";
-
 	public static final String MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SUBJECT = "message.boards.email.message.updated.subject";
 
 	public static final String MESSAGE_BOARDS_EXPIRE_BAN_INTERVAL = "message.boards.expire.ban.interval";
 
 	public static final String MESSAGE_BOARDS_EXPIRE_BAN_JOB_INTERVAL = "message.boards.expire.ban.job.interval";
+
+	public static final String MESSAGE_BOARDS_FLAGS_ENABLED = "message.boards.flags.enabled";
 
 	public static final String MESSAGE_BOARDS_MESSAGE_FORMATS = "message.boards.message.formats";
 
@@ -1639,15 +1659,25 @@ public interface PropsKeys {
 
 	public static final String MESSAGE_BOARDS_PUBLISH_TO_LIVE_BY_DEFAULT = "message.boards.publish.to.live.by.default";
 
+	public static final String MESSAGE_BOARDS_RATINGS_ENABLED = "message.boards.ratings.enabled";
+
+	public static final String MESSAGE_BOARDS_RECENT_POSTS_DATE_OFFSET = "message.boards.recent.posts.date.offset";
+
 	public static final String MESSAGE_BOARDS_RSS_ABSTRACT_LENGTH = "message.boards.rss.abstract.length";
+
+	public static final String MESSAGE_BOARDS_RSS_ENABLED = "message.boards.rss.enabled";
 
 	public static final String MESSAGE_BOARDS_SUBSCRIBE_BY_DEFAULT = "message.boards.subscribe.by.default";
 
 	public static final String MESSAGE_BOARDS_THREAD_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED = "message.boards.thread.previous.and.next.navigation.enabled";
 
+	public static final String MESSAGE_BOARDS_THREAD_PRIORITIES = "message.boards.thread.priorities";
+
 	public static final String MESSAGE_BOARDS_THREAD_VIEWS = "message.boards.thread.views";
 
 	public static final String MESSAGE_BOARDS_THREAD_VIEWS_DEFAULT = "message.boards.thread.views.default";
+
+	public static final String MESSAGE_BOARDS_USER_RANKS = "message.boards.user.ranks";
 
 	public static final String MICROSOFT_TRANSLATOR_CLIENT_ID = "microsoft.translator.client.id";
 
@@ -1664,6 +1694,8 @@ public interface PropsKeys {
 	public static final String MINIFIER_INLINE_CONTENT_CACHE_SKIP_CSS = "minifier.inline.content.cache.skip.css";
 
 	public static final String MINIFIER_INLINE_CONTENT_CACHE_SKIP_JAVASCRIPT = "minifier.inline.content.cache.skip.javascript";
+
+	public static final String MINIFIER_JAVASCRIPT_IMPL = "minifier.javascript.impl";
 
 	public static final String MOBILE_DEVICE_RULES_PUBLISH_TO_LIVE_BY_DEFAULT = "mobile.device.rules.publish.to.live.by.default";
 
@@ -2141,6 +2173,8 @@ public interface PropsKeys {
 
 	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_TOP = "search.container.show.pagination.top";
 
+	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA = "search.container.show.pagination.top.delta";
+
 	public static final String SEARCH_FACET_CONFIGURATION = "search.facet.configuration";
 
 	public static final String SERVICE_BUILDER_SERVICE_READ_ONLY_PREFIXES = "service.builder.service.read.only.prefixes";
@@ -2229,6 +2263,10 @@ public interface PropsKeys {
 
 	public static final String SHOPPING_CATEGORY_SHOW_SPECIAL_ITEMS = "shopping.category.show.special.items";
 
+	public static final String SHOPPING_CREDIT_CARD_TYPES = "shopping.credit.card.types";
+
+	public static final String SHOPPING_CURRENCY_ID = "shopping.currency.id";
+
 	public static final String SHOPPING_EMAIL_FROM_ADDRESS = "shopping.email.from.address";
 
 	public static final String SHOPPING_EMAIL_FROM_NAME = "shopping.email.from.name";
@@ -2253,9 +2291,19 @@ public interface PropsKeys {
 
 	public static final String SHOPPING_IMAGE_SMALL_MAX_SIZE = "shopping.image.small.max.size";
 
+	public static final String SHOPPING_INSURANCE = "shopping.insurance";
+
+	public static final String SHOPPING_INSURANCE_FORMULA = "shopping.insurance.formula";
+
 	public static final String SHOPPING_ITEM_SHOW_AVAILABILITY = "shopping.item.show.availability";
 
 	public static final String SHOPPING_ORDER_COMMENTS_ENABLED = "shopping.order.comments.enabled";
+
+	public static final String SHOPPING_SHIPPING = "shopping.shipping";
+
+	public static final String SHOPPING_SHIPPING_FORMULA = "shopping.shipping.formula";
+
+	public static final String SHOPPING_TAX_STATE = "shopping.tax.state";
 
 	public static final String SHUTDOWN_PROGRAMMATICALLY_EXIT = "shutdown.programmatically.exit";
 
@@ -2300,6 +2348,8 @@ public interface PropsKeys {
 	public static final String SITES_FORM_UPDATE_MISCELLANEOUS = "sites.form.update.miscellaneous";
 
 	public static final String SITES_FORM_UPDATE_SEO = "sites.form.update.seo";
+
+	public static final String SITES_FRIENDLY_URL_PAGE_NOT_FOUND = "sites.friendly.url.page.not.found";
 
 	public static final String SITES_SITEMAP_DEFAULT_CHANGE_FREQUENCY = "sites.sitemap.default.change.frequency";
 
@@ -2629,6 +2679,8 @@ public interface PropsKeys {
 
 	public static final String WIDGET_SERVLET_MAPPING = "widget.servlet.mapping";
 
+	public static final String WIKI_COMMENT_RATINGS_ENABLED = "wiki.comment.ratings.enabled";
+
 	public static final String WIKI_DISPLAY_TEMPLATES_CONFIG = "wiki.display.templates.config";
 
 	public static final String WIKI_EMAIL_FROM_ADDRESS = "wiki.email.from.address";
@@ -2639,15 +2691,11 @@ public interface PropsKeys {
 
 	public static final String WIKI_EMAIL_PAGE_ADDED_ENABLED = "wiki.email.page.added.enabled";
 
-	public static final String WIKI_EMAIL_PAGE_ADDED_SIGNATURE = "wiki.email.page.added.signature";
-
 	public static final String WIKI_EMAIL_PAGE_ADDED_SUBJECT = "wiki.email.page.added.subject";
 
 	public static final String WIKI_EMAIL_PAGE_UPDATED_BODY = "wiki.email.page.updated.body";
 
 	public static final String WIKI_EMAIL_PAGE_UPDATED_ENABLED = "wiki.email.page.updated.enabled";
-
-	public static final String WIKI_EMAIL_PAGE_UPDATED_SIGNATURE = "wiki.email.page.updated.signature";
 
 	public static final String WIKI_EMAIL_PAGE_UPDATED_SUBJECT = "wiki.email.page.updated.subject";
 
@@ -2689,7 +2737,13 @@ public interface PropsKeys {
 
 	public static final String WIKI_PAGE_TITLES_REMOVE_REGEXP = "wiki.page.titles.remove.regexp";
 
+	public static final String WIKI_PARSERS_CREOLE_SUPPORTED_PROTOCOLS = "wiki.parsers.creole.supported.protocols";
+
+	public static final String WIKI_RELATED_ASSETS_ENABLED = "wiki.related.assets.enabled";
+
 	public static final String WIKI_RSS_ABSTRACT_LENGTH = "wiki.rss.abstract.length";
+
+	public static final String WIKI_RSS_ENABLED = "wiki.rss.enabled";
 
 	public static final String XML_VALIDATION_ENABLED = "xml.validation.enabled";
 

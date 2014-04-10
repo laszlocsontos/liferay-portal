@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,6 +61,7 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.model.AssetTagProperty;
+import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetCategoryPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
@@ -68,6 +69,7 @@ import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 import com.liferay.portlet.asset.service.permission.AssetTagPermission;
+import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.assetpublisher.util.AssetSearcher;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -113,9 +115,6 @@ public class AssetUtil {
 		CharPool.QUESTION, CharPool.QUOTE, CharPool.RETURN, CharPool.SEMICOLON,
 		CharPool.SLASH, CharPool.STAR, CharPool.TILDE
 	};
-
-	public static final String[] SELECTED_FIELD_NAMES =
-		{Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK};
 
 	public static Set<String> addLayoutTags(
 		HttpServletRequest request, List<AssetTag> tags) {
@@ -248,6 +247,50 @@ public class AssetUtil {
 
 		return viewableTagIdsArray.toArray(
 			new long[viewableTagIdsArray.size()][]);
+	}
+
+	public static List<AssetVocabulary> filterVocabularies(
+		List<AssetVocabulary> vocabularies, String className) {
+
+		List<AssetVocabulary> filteredVocabularies =
+			new ArrayList<AssetVocabulary>();
+
+		for (AssetVocabulary vocabulary : vocabularies) {
+			UnicodeProperties settingsProperties =
+				vocabulary.getSettingsProperties();
+
+			long[] selectedClassNameIds = StringUtil.split(
+				settingsProperties.getProperty("selectedClassNameIds"), 0L);
+			long classNameId = PortalUtil.getClassNameId(className);
+
+			if ((selectedClassNameIds.length == 0) ||
+				(selectedClassNameIds[0] == 0) ||
+				ArrayUtil.contains(selectedClassNameIds, classNameId)) {
+
+				filteredVocabularies.add(vocabulary);
+			}
+		}
+
+		return filteredVocabularies;
+	}
+
+	public static long[] filterVocabularyIds(
+			PermissionChecker permissionChecker, long[] vocabularyIds)
+		throws PortalException, SystemException {
+
+		List<Long> viewableVocabularyIds = new ArrayList<Long>();
+
+		for (long vocabularyId : vocabularyIds) {
+			if (AssetVocabularyPermission.contains(
+					permissionChecker, vocabularyId, ActionKeys.VIEW)) {
+
+				viewableVocabularyIds.add(vocabularyId);
+			}
+		}
+
+		return ArrayUtil.toArray(
+			viewableVocabularyIds.toArray(
+				new Long[viewableVocabularyIds.size()]));
 	}
 
 	public static PortletURL getAddPortletURL(
@@ -670,7 +713,7 @@ public class AssetUtil {
 		AssetSearcher assetSearcher = getAssetSearcher(
 			searchContext, assetEntryQuery, start, end);
 
-		Hits hits = assetSearcher.search(searchContext, SELECTED_FIELD_NAMES);
+		Hits hits = assetSearcher.search(searchContext);
 
 		List<AssetEntry> assetEntries = getAssetEntries(hits);
 

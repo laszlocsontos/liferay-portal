@@ -64,6 +64,8 @@ AUI.add(
 
 		var TPL_INSTRUCTIONS_CONTAINER = '<div class="alert alert-info journal-article-instructions-container journal-article-instructions-message"></div>';
 
+		var TPL_OPTION = '<option></option>';
+
 		var TPL_STRUCTURE_FIELD_INPUT = '<input class="lfr-input-text" type="text" value="" size="40"/>';
 
 		var TPL_TOOLTIP_IMAGE = '<img align="top" class="journal-article-instructions-container" src="' + themeDisplay.getPathThemeImages() + '/portlet/help.png" />';
@@ -297,7 +299,6 @@ AUI.add(
 						dialogStructureId: instance.getById('saveStructureStructureId'),
 						dialogStructureName: instance.getById('saveStructureStructureName'),
 						idInput: instance.getById('saveStructureStructureId'),
-						loadDefaultStructure: instance.getById('loadDefaultStructure'),
 						messageElement: instance.getById('saveStructureMessage'),
 						saveStructureAutogenerateId: instance.getById('saveStructureAutogenerateId'),
 						saveStructureAutogenerateIdCheckbox: instance.getById('saveStructureAutogenerateIdCheckbox'),
@@ -321,10 +322,6 @@ AUI.add(
 							dialogFields.dialogStructureId.val(message.structureId);
 							dialogFields.structureNameLabel.html(Liferay.Util.escapeHTML(dialogFields.dialogStructureName.val()));
 							dialogFields.saveStructureAutogenerateIdCheckbox.hide();
-
-							if (dialogFields.loadDefaultStructure) {
-								dialogFields.loadDefaultStructure.show();
-							}
 
 							dialogFields.dialogStructureId.attr('disabled', 'disabled');
 
@@ -443,20 +440,6 @@ AUI.add(
 				var templateId = instance.getByName(form, 'templateId');
 
 				return templateId && templateId.val();
-			},
-
-			loadDefaultStructure: function() {
-				var instance = this;
-
-				var form = instance.getPrincipalForm();
-
-				var structureIdInput = instance.getByName(form, 'structureId');
-				var templateIdInput = instance.getByName(form, 'templateId');
-
-				structureIdInput.val('');
-				templateIdInput.val('');
-
-				submitForm(form, null, false, false);
 			},
 
 			normalizeValue: function(value) {
@@ -984,7 +967,7 @@ AUI.add(
 						var imageWrapper = imagePreview.one('.journal-image-wrapper');
 						var imageDelete = instance.getByName(imagePreview, 'journalImageDelete');
 
-						if (imageDelete.val() == '') {
+						if (imageDelete.val() === '') {
 							imageDelete.val('delete');
 							imageWrapper.hide();
 
@@ -1072,7 +1055,6 @@ AUI.add(
 
 				var changeStructureButton = instance.getById('changeStructureButton');
 				var editStructureLink = instance.getById('editStructureLink');
-				var loadDefaultStructureButton = instance.getById('loadDefaultStructure');
 				var publishButton = instance.getById('publishButton');
 				var saveButton = instance.getById('saveButton');
 				var translateButton = instance.getById('translateButton');
@@ -1106,17 +1088,6 @@ AUI.add(
 						}
 					);
 				}
-
-				if (loadDefaultStructureButton) {
-					loadDefaultStructureButton.detach('click');
-
-					loadDefaultStructureButton.on(
-						'click',
-						function() {
-							instance.loadDefaultStructure();
-						}
-					);
-				}
 			},
 
 			_createDynamicNode: function(nodeName, attributeMap) {
@@ -1128,7 +1099,7 @@ AUI.add(
 					nodeName = 'dynamic-element';
 				}
 
-				var typeElementModel = ['<', nodeName, (attributeMap ? ' ' : ''), , '>', ,'</', nodeName, '>'];
+				var typeElementModel = ['<', nodeName, (attributeMap ? ' ' : ''), '', '>', '','</', nodeName, '>'];
 
 				A.each(
 					attributeMap || {},
@@ -1140,7 +1111,8 @@ AUI.add(
 				);
 
 				typeElementModel[3] = attrs.join('').replace(/[\s]+$/g, '');
-				typeElement = typeElementModel.join('').replace(/></, '>><<').replace(/ +>/, '>').split(/></);
+
+				var typeElement = typeElementModel.join('').replace(/></, '>><<').replace(/ +>/, '>').split(/></);
 
 				return {
 					closeTag: typeElement[1],

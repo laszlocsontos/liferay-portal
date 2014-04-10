@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +39,10 @@ public class JournalFolderAssetRendererFactory
 	extends BaseAssetRendererFactory {
 
 	public static final String TYPE = "content_folder";
+
+	public JournalFolderAssetRendererFactory() {
+		setCategorizable(false);
+	}
 
 	@Override
 	public AssetRenderer getAssetRenderer(long classPK, int type)
@@ -94,22 +98,8 @@ public class JournalFolderAssetRendererFactory
 	}
 
 	@Override
-	public boolean isCategorizable() {
-		return _CATEGORIZABLE;
-	}
-
-	@Override
-	public boolean isLinkable() {
-		return _LINKABLE;
-	}
-
-	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/folder.png";
 	}
-
-	private static final boolean _CATEGORIZABLE = false;
-
-	private static final boolean _LINKABLE = false;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,8 +32,10 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.model.TrashedModel;
+import com.liferay.portal.model.User;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -473,12 +475,18 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 
 	@Override
 	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	@JSON
@@ -578,13 +586,18 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 
 	@Override
 	public String getRootMessageUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getRootMessageUserId(), "uuid",
-			_rootMessageUserUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getRootMessageUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setRootMessageUserUuid(String rootMessageUserUuid) {
-		_rootMessageUserUuid = rootMessageUserUuid;
 	}
 
 	@JSON
@@ -622,13 +635,18 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 
 	@Override
 	public String getLastPostByUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getLastPostByUserId(), "uuid",
-			_lastPostByUserUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getLastPostByUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setLastPostByUserUuid(String lastPostByUserUuid) {
-		_lastPostByUserUuid = lastPostByUserUuid;
 	}
 
 	@JSON
@@ -727,13 +745,18 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 
 	@Override
 	public String getStatusByUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getStatusByUserId(), "uuid",
-			_statusByUserUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getStatusByUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
-		_statusByUserUuid = statusByUserUuid;
 	}
 
 	@JSON
@@ -1409,7 +1432,6 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
 	private long _userId;
-	private String _userUuid;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
@@ -1420,11 +1442,9 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	private long _originalRootMessageId;
 	private boolean _setOriginalRootMessageId;
 	private long _rootMessageUserId;
-	private String _rootMessageUserUuid;
 	private int _messageCount;
 	private int _viewCount;
 	private long _lastPostByUserId;
-	private String _lastPostByUserUuid;
 	private Date _lastPostDate;
 	private Date _originalLastPostDate;
 	private double _priority;
@@ -1435,7 +1455,6 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	private int _originalStatus;
 	private boolean _setOriginalStatus;
 	private long _statusByUserId;
-	private String _statusByUserUuid;
 	private String _statusByUserName;
 	private Date _statusDate;
 	private long _columnBitmask;

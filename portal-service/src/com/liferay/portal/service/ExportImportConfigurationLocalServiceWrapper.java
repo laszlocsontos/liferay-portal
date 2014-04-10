@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -79,12 +79,14 @@ public class ExportImportConfigurationLocalServiceWrapper
 	*
 	* @param exportImportConfiguration the export import configuration
 	* @return the export import configuration that was removed
+	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.ExportImportConfiguration deleteExportImportConfiguration(
 		com.liferay.portal.model.ExportImportConfiguration exportImportConfiguration)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return _exportImportConfigurationLocalService.deleteExportImportConfiguration(exportImportConfiguration);
 	}
 
@@ -288,6 +290,19 @@ public class ExportImportConfigurationLocalServiceWrapper
 		long userId, long groupId, java.lang.String name,
 		java.lang.String description, int type,
 		java.util.Map<java.lang.String, java.io.Serializable> settingsMap,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _exportImportConfigurationLocalService.addExportImportConfiguration(userId,
+			groupId, name, description, type, settingsMap, status,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.portal.model.ExportImportConfiguration addExportImportConfiguration(
+		long userId, long groupId, java.lang.String name,
+		java.lang.String description, int type,
+		java.util.Map<java.lang.String, java.io.Serializable> settingsMap,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -297,7 +312,8 @@ public class ExportImportConfigurationLocalServiceWrapper
 
 	@Override
 	public void deleteExportImportConfigurations(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		_exportImportConfigurationLocalService.deleteExportImportConfigurations(groupId);
 	}
 
@@ -319,6 +335,12 @@ public class ExportImportConfigurationLocalServiceWrapper
 	}
 
 	@Override
+	public int getExportImportConfigurationsCount(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _exportImportConfigurationLocalService.getExportImportConfigurationsCount(groupId);
+	}
+
+	@Override
 	public int getExportImportConfigurationsCount(long groupId, int type)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _exportImportConfigurationLocalService.getExportImportConfigurationsCount(groupId,
@@ -326,15 +348,43 @@ public class ExportImportConfigurationLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.model.ExportImportConfiguration moveExportImportConfigurationToTrash(
+		long userId, long exportImportConfigurationId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _exportImportConfigurationLocalService.moveExportImportConfigurationToTrash(userId,
+			exportImportConfigurationId);
+	}
+
+	@Override
+	public com.liferay.portal.model.ExportImportConfiguration restoreExportImportConfigurationFromTrash(
+		long userId, long exportImportConfigurationId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _exportImportConfigurationLocalService.restoreExportImportConfigurationFromTrash(userId,
+			exportImportConfigurationId);
+	}
+
+	@Override
 	public com.liferay.portal.model.ExportImportConfiguration updateExportImportConfiguration(
-		long configurationId, java.lang.String name,
+		long userId, long exportImportConfigurationId, java.lang.String name,
 		java.lang.String description,
 		java.util.Map<java.lang.String, java.io.Serializable> settingsMap,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _exportImportConfigurationLocalService.updateExportImportConfiguration(configurationId,
-			name, description, settingsMap, serviceContext);
+		return _exportImportConfigurationLocalService.updateExportImportConfiguration(userId,
+			exportImportConfigurationId, name, description, settingsMap,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.portal.model.ExportImportConfiguration updateStatus(
+		long userId, long exportImportConfigurationId, int status)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _exportImportConfigurationLocalService.updateStatus(userId,
+			exportImportConfigurationId, status);
 	}
 
 	/**

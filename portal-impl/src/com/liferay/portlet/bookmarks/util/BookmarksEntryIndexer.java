@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,6 +46,8 @@ import com.liferay.portlet.bookmarks.service.persistence.BookmarksFolderActionab
 
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
@@ -60,6 +62,10 @@ public class BookmarksEntryIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.BOOKMARKS;
 
 	public BookmarksEntryIndexer() {
+		setDefaultSelectedFieldNames(
+			new String[] {
+				Field.COMPANY_ID, Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK,
+				Field.TITLE, Field.UID, Field.URL});
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -118,8 +124,8 @@ public class BookmarksEntryIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet,
-		PortletURL portletURL) {
+		Document document, Locale locale, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		String entryId = document.get(Field.ENTRY_CLASS_PK);
 

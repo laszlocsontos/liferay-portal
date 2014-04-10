@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portlet.documentlibrary.util;
+
+import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -42,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Eudaldo Alonso
  */
+@ProviderType
 public interface DL {
 
 	public static final String MANUAL_CHECK_IN_REQUIRED =
@@ -111,6 +114,10 @@ public interface DL {
 			PortletRequest portletRequest, long folderId)
 		throws PortalException, SystemException;
 
+	public Map<String, String> getEmailDefinitionTerms(
+		PortletRequest portletRequest, String emailFromAddress,
+		String emailFromName);
+
 	public Map<Locale, String> getEmailFileEntryAddedBodyMap(
 		PortletPreferences preferences);
 
@@ -132,6 +139,10 @@ public interface DL {
 	public String getEmailFromAddress(
 			PortletPreferences preferences, long companyId)
 		throws SystemException;
+
+	public Map<String, String> getEmailFromDefinitionTerms(
+		PortletRequest portletRequest, String emailFromAddress,
+		String emailFromName);
 
 	public String getEmailFromName(
 			PortletPreferences preferences, long companyId)

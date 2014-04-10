@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.mail.SMTPAccount;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -177,13 +178,11 @@ public class MailEngine {
 			List<FileAttachment> fileAttachments, SMTPAccount smtpAccount)
 		throws MailEngineException {
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
+
+		stopWatch.start();
 
 		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-
 			_log.debug("From: " + from);
 			_log.debug("To: " + Arrays.toString(to));
 			_log.debug("CC: " + Arrays.toString(cc));
@@ -216,23 +215,23 @@ public class MailEngine {
 		try {
 			InternetAddressUtil.validateAddress(from);
 
-			if (to != null) {
+			if (ArrayUtil.isNotEmpty(to)) {
 				InternetAddressUtil.validateAddresses(to);
 			}
 
-			if (cc != null) {
+			if (ArrayUtil.isNotEmpty(cc)) {
 				InternetAddressUtil.validateAddresses(cc);
 			}
 
-			if (bcc != null) {
+			if (ArrayUtil.isNotEmpty(bcc)) {
 				InternetAddressUtil.validateAddresses(bcc);
 			}
 
-			if (replyTo != null) {
+			if (ArrayUtil.isNotEmpty(replyTo)) {
 				InternetAddressUtil.validateAddresses(replyTo);
 			}
 
-			if (bulkAddresses != null) {
+			if (ArrayUtil.isNotEmpty(bulkAddresses)) {
 				InternetAddressUtil.validateAddresses(bulkAddresses);
 			}
 
@@ -252,15 +251,15 @@ public class MailEngine {
 
 			message.setFrom(from);
 
-			if (to != null) {
+			if (ArrayUtil.isNotEmpty(to)) {
 				message.setRecipients(Message.RecipientType.TO, to);
 			}
 
-			if (cc != null) {
+			if (ArrayUtil.isNotEmpty(cc)) {
 				message.setRecipients(Message.RecipientType.CC, cc);
 			}
 
-			if (bcc != null) {
+			if (ArrayUtil.isNotEmpty(bcc)) {
 				message.setRecipients(Message.RecipientType.BCC, bcc);
 			}
 
@@ -268,7 +267,7 @@ public class MailEngine {
 
 			message.setSubject(subject);
 
-			if ((fileAttachments != null) && (fileAttachments.size() > 0)) {
+			if (ListUtil.isNotEmpty(fileAttachments)) {
 				MimeMultipart rootMultipart = new MimeMultipart(
 					_MULTIPART_TYPE_MIXED);
 
@@ -337,7 +336,7 @@ public class MailEngine {
 
 			message.setSentDate(new Date());
 
-			if (replyTo != null) {
+			if (ArrayUtil.isNotEmpty(replyTo)) {
 				message.setReplyTo(replyTo);
 			}
 

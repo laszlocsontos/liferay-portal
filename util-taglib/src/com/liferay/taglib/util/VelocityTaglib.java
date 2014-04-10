@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.taglib.ui.IconTag;
 import com.liferay.taglib.ui.JournalArticleTag;
 import com.liferay.taglib.ui.MySitesTag;
 import com.liferay.taglib.ui.PngImageTag;
+import com.liferay.taglib.ui.QuickAccessTag;
 import com.liferay.taglib.ui.RatingsTag;
 
 import javax.portlet.PortletURL;
@@ -148,6 +149,8 @@ public interface VelocityTaglib {
 	public MySitesTag getMySitesTag() throws Exception;
 
 	public PngImageTag getPngImageTag() throws Exception;
+
+	public QuickAccessTag getQuickAccessTag() throws Exception;
 
 	public RatingsTag getRatingsTag() throws Exception;
 
@@ -343,6 +346,10 @@ public interface VelocityTaglib {
 
 	public void portletIconRefresh() throws Exception;
 
+	public void quickAccess() throws Exception;
+
+	public void quickAccess(String contentId) throws Exception;
+
 	public void ratings(
 			String className, long classPK, int numberOfStars, String type,
 			String url)
@@ -408,7 +415,12 @@ public interface VelocityTaglib {
 			String url)
 		throws Exception;
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #stagingMenu}
+	 */
 	public void staging() throws Exception;
+
+	public void stagingMenu() throws Exception;
 
 	public void toggle(
 			String id, String showImage, String hideImage, String showMessage,

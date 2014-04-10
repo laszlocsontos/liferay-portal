@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -128,18 +128,16 @@ public class ThemeDisplay
 
 		String host = getCDNHost();
 
-		String portalURL = getPortalURL();
+		if (Validator.isNull(host)) {
+			String portalURL = getPortalURL();
 
-		if (getServerName() != null) {
 			try {
 				portalURL = PortalUtil.getPortalURL(getLayout(), this);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
 			}
-		}
 
-		if (Validator.isNull(host)) {
 			host = portalURL;
 		}
 
@@ -1439,13 +1437,11 @@ public class ThemeDisplay
 		if (Validator.isNull(dynamicResourcesHost)) {
 			String portalURL = getPortalURL();
 
-			if (getServerName() != null) {
-				try {
-					portalURL = PortalUtil.getPortalURL(getLayout(), this);
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
+			try {
+				portalURL = PortalUtil.getPortalURL(getLayout(), this);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
 			}
 
 			dynamicResourcesHost = portalURL;

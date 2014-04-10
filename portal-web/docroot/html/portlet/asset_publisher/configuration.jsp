@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,13 +24,6 @@ String redirect = ParamUtil.getString(request, "redirect");
 String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectSite";
 
 List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<AssetRendererFactory>();
-
-String emailParam = "emailAssetEntryAdded";
-
-String currentLanguageId = LanguageUtil.getLanguageId(request);
-
-String emailSubjectParam = emailParam + "Subject_" + currentLanguageId;
-String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 %>
 
 <liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL" />
@@ -250,9 +243,6 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 	<%
 	request.setAttribute("configuration.jsp-classTypesAssetRendererFactories", classTypesAssetRendererFactories);
 	request.setAttribute("configuration.jsp-configurationRenderURL", configurationRenderURL);
-	request.setAttribute("configuration.jsp-emailBodyParam", emailBodyParam);
-	request.setAttribute("configuration.jsp-emailParam", emailParam);
-	request.setAttribute("configuration.jsp-emailSubjectParam", emailSubjectParam);
 	request.setAttribute("configuration.jsp-redirect", redirect);
 	request.setAttribute("configuration.jsp-rootPortletId", rootPortletId);
 	request.setAttribute("configuration.jsp-selectScope", selectScope);
@@ -281,8 +271,8 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 				{
 					dialog: {
 						constrain: true,
-						modal: true,
-						width: 600
+						destroyOnHide: true,
+						modal: true
 					},
 					eventName: '<%= eventName %>',
 					id: '<%= eventName %>' + currentTarget.attr('id'),
@@ -344,7 +334,6 @@ String emailBodyParam = emailParam + "Body_" + currentLanguageId;
 			%>
 
 			document.<portlet:namespace />fm.<portlet:namespace />metadataFields.value = Liferay.Util.listSelect(document.<portlet:namespace />fm.<portlet:namespace />currentMetadataFields);
-			document.<portlet:namespace />fm.<portlet:namespace /><%= emailBodyParam %>.value = window.<portlet:namespace />editor.getHTML();
 
 			submitForm(document.<portlet:namespace />fm);
 		},

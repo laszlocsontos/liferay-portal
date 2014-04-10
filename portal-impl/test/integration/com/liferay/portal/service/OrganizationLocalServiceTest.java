@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -95,7 +95,7 @@ public class OrganizationLocalServiceTest {
 			"Organization A", true);
 
 		Organization organizationB = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization B", false);
+			organizationA.getOrganizationId(), "Organization B", false);
 
 		Assert.assertEquals(
 			organizationA.getOrganizationId(),
@@ -116,7 +116,7 @@ public class OrganizationLocalServiceTest {
 			"Organization A", false);
 
 		Organization organizationB = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization B", true);
+			organizationA.getOrganizationId(), "Organization B", true);
 
 		Assert.assertEquals(
 			organizationA.getOrganizationId(),
@@ -137,7 +137,7 @@ public class OrganizationLocalServiceTest {
 			"Organization A", true);
 
 		Organization organizationB = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization B", true);
+			organizationA.getOrganizationId(), "Organization B", true);
 
 		Assert.assertEquals(
 			organizationA.getOrganizationId(),
@@ -190,7 +190,7 @@ public class OrganizationLocalServiceTest {
 			"Organization A", false);
 
 		Organization organizationAA = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization AA", true);
+			organizationA.getOrganizationId(), "Organization AA", true);
 
 		Organization organizationB = OrganizationTestUtil.addOrganization(
 			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
@@ -222,7 +222,7 @@ public class OrganizationLocalServiceTest {
 			"Organization A", true);
 
 		Organization organizationAA = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization AA", true);
+			organizationA.getOrganizationId(), "Organization AA", true);
 
 		Organization organizationB = OrganizationTestUtil.addOrganization(
 			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,

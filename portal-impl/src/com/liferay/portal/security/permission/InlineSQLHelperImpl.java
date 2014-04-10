@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -548,10 +548,7 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 
 		sb.append("(((InlineSQLResourcePermission.primKey = CAST_TEXT(");
 		sb.append(classPKField);
-		sb.append(")) AND (((");
-		sb.append("InlineSQLResourcePermission.scope = ");
-		sb.append(ResourceConstants.SCOPE_INDIVIDUAL);
-		sb.append(") AND ");
+		sb.append(")) AND ((");
 
 		boolean hasPreviousViewableGroup = false;
 
@@ -617,15 +614,17 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 		String roleIdsOrOwnerIdSQL = getRoleIdsOrOwnerIdSQL(
 			permissionChecker, groupIds, userIdField);
 
+		int scope = ResourceConstants.SCOPE_INDIVIDUAL;
+
 		permissionJoin = StringUtil.replace(
 			permissionJoin,
 			new String[] {
 				"[$CLASS_NAME$]", "[$COMPANY_ID$]", "[$PRIM_KEYS$]",
-				"[$ROLE_IDS_OR_OWNER_ID$]"
+				"[$RESOURCE_SCOPE_INDIVIDUAL$]", "[$ROLE_IDS_OR_OWNER_ID$]"
 			},
 			new String[] {
 				className, String.valueOf(permissionChecker.getCompanyId()),
-				sb.toString(), roleIdsOrOwnerIdSQL
+				sb.toString(), String.valueOf(scope), roleIdsOrOwnerIdSQL
 			});
 
 		int pos = sql.indexOf(_WHERE_CLAUSE);

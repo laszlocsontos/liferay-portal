@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,7 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portlet.PortletSettings;
+import com.liferay.portal.settings.Settings;
 
 import java.util.Locale;
 import java.util.Map;
@@ -119,6 +119,23 @@ public interface Localization {
 		String xml, String requestedLanguageId, boolean useDefault);
 
 	/**
+	 * Returns the localized string from the localizations XML in the language,
+	 * optionally using the default language if the no localization exists for
+	 * the requested language.
+	 *
+	 * @param  xml the localizations XML
+	 * @param  requestedLanguageId the ID of the language
+	 * @param  useDefault whether to use the default language if no localization
+	 *         exists for the requested language
+	 * @return the localized string. If <code>useDefault</code> is
+	 *         <code>false</code> and no localization exists for the requested
+	 *         language, an empty string will be returned.
+	 */
+	public String getLocalization(
+		String xml, String requestedLanguageId, boolean useDefault,
+		String defaultValue);
+
+	/**
 	 * Returns a map of locales and localized strings for the parameter in the
 	 * request.
 	 *
@@ -132,17 +149,22 @@ public interface Localization {
 		HttpServletRequest request, String parameter);
 
 	/**
-	 * Returns a map of locales and localized strings for the parameter in the
+	 * Returns a map of locales and localized strings for the preference in the
 	 * preferences container.
 	 *
 	 * @param  preferences the preferences container
-	 * @param  parameter the prefix of the parameters containing the localized
-	 *         strings. Each localization will be loaded from a parameter with
-	 *         this prefix, followed by an underscore, and the language ID.
+	 * @param  preferenceName the prefix of the preference containing the
+	 *         localized strings. Each localization will be loaded from a
+	 *         preference with this prefix, followed by an underscore, and the
+	 *         language ID.
 	 * @return the locales and localized strings
 	 */
 	public Map<Locale, String> getLocalizationMap(
-		PortletPreferences preferences, String parameter);
+		PortletPreferences preferences, String preferenceName);
+
+	public Map<Locale, String> getLocalizationMap(
+		PortletPreferences preferences, String preferenceName,
+		String propertyName);
 
 	/**
 	 * Returns a map of locales and localized strings for the parameter in the
@@ -201,74 +223,34 @@ public interface Localization {
 		String parameter);
 
 	/**
+	 * Returns the localizations XML for the parameter in the portlet request,
+	 * attempting to get data from the preferences container when it is not
+	 * available in the portlet request.
+	 *
+	 * @param  preferences the preferences container
+	 * @param  portletRequest the portlet request
+	 * @param  parameter the prefix of the parameters containing the localized
+	 *         strings. Each localization will be loaded from a parameter with
+	 *         this prefix, followed by an underscore, and the language ID.
+	 * @return the locales and localized strings
+	 */
+	public String getLocalizationXmlFromPreferences(
+		PortletPreferences preferences, PortletRequest portletRequest,
+		String parameter, String defaultValue);
+
+	public String getLocalizationXmlFromPreferences(
+		PortletPreferences preferences, PortletRequest portletRequest,
+		String parameter, String prefix, String defaultValue);
+
+	public String getLocalizedName(String name, String languageId);
+
+	/**
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             #getLocalizationMap(PortletRequest, String)}
 	 */
 	@Deprecated
 	public Map<Locale, String> getLocalizedParameter(
 		PortletRequest portletRequest, String parameter);
-
-	/**
-	 * Returns the localized portlet settings value for the key in the language.
-	 * The default language is used if no localization exists for the requested
-	 * language.
-	 *
-	 * @param  portletSettings the portlet settings
-	 * @param  key the portlet settings key
-	 * @param  languageId the ID of the language
-	 * @return the localized portlet settings value
-	 */
-	public String getPortletSettingsValue(
-		PortletSettings portletSettings, String key, String languageId);
-
-	/**
-	 * Returns the localized portlet settings value for the key in the language,
-	 * optionally using the default language if no localization exists for the
-	 * requested language.
-	 *
-	 * @param  settings the portlet settings
-	 * @param  key the portlet settings key
-	 * @param  languageId the ID of the language
-	 * @param  useDefault whether to use the default language if no localization
-	 *         exists for the requested language
-	 * @return the localized portlet settings value. If <code>useDefault</code>
-	 *         is <code>false</code> and no localization exists for the
-	 *         requested language, an empty string is returned.
-	 */
-	public String getPortletSettingsValue(
-		PortletSettings settings, String key, String languageId,
-		boolean useDefault);
-
-	/**
-	 * Returns the localized portlet settings values for the key in the
-	 * language. The default language is used if no localization exists for the
-	 * requested language.
-	 *
-	 * @param  portletSettings the portlet settings
-	 * @param  key the portlet settings key
-	 * @param  languageId the ID of the language
-	 * @return the localized portlet settings values
-	 */
-	public String[] getPortletSettingsValues(
-		PortletSettings portletSettings, String key, String languageId);
-
-	/**
-	 * Returns the localized portlet settings values for the key in the
-	 * language, optionally using the default language if no localization exists
-	 * for the requested language.
-	 *
-	 * @param  portletSettings the portlet settings
-	 * @param  key the portlet settings key
-	 * @param  languageId the ID of the language
-	 * @param  useDefault whether to use the default language if no localization
-	 *         exists for the requested language
-	 * @return the localized portlet settings values. If <code>useDefault</code>
-	 *         is <code>false</code> and no localization exists for the
-	 *         requested language, an empty array is returned.
-	 */
-	public String[] getPortletSettingsValues(
-		PortletSettings portletSettings, String key, String languageId,
-		boolean useDefault);
 
 	/**
 	 * Returns the localized preferences key in the language. Generally this is
@@ -341,6 +323,66 @@ public interface Localization {
 	public String[] getPreferencesValues(
 		PortletPreferences preferences, String key, String languageId,
 		boolean useDefault);
+
+	/**
+	 * Returns the localized settings value for the key in the language.
+	 * The default language is used if no localization exists for the requested
+	 * language.
+	 *
+	 * @param  settings the settings
+	 * @param  key the settings key
+	 * @param  languageId the ID of the language
+	 * @return the localized settings value
+	 */
+	public String getSettingsValue(
+		Settings settings, String key, String languageId);
+
+	/**
+	 * Returns the localized settings value for the key in the language,
+	 * optionally using the default language if no localization exists for the
+	 * requested language.
+	 *
+	 * @param  settings the settings
+	 * @param  key the settings key
+	 * @param  languageId the ID of the language
+	 * @param  useDefault whether to use the default language if no localization
+	 *         exists for the requested language
+	 * @return the localized settings value. If <code>useDefault</code>
+	 *         is <code>false</code> and no localization exists for the
+	 *         requested language, an empty string is returned.
+	 */
+	public String getSettingsValue(
+		Settings settings, String key, String languageId, boolean useDefault);
+
+	/**
+	 * Returns the localized settings values for the key in the
+	 * language. The default language is used if no localization exists for the
+	 * requested language.
+	 *
+	 * @param  settings the settings
+	 * @param  key the settings key
+	 * @param  languageId the ID of the language
+	 * @return the localized settings values
+	 */
+	public String[] getSettingsValues(
+		Settings settings, String key, String languageId);
+
+	/**
+	 * Returns the localized settings values for the key in the
+	 * language, optionally using the default language if no localization exists
+	 * for the requested language.
+	 *
+	 * @param  settings the settings
+	 * @param  key the settings key
+	 * @param  languageId the ID of the language
+	 * @param  useDefault whether to use the default language if no localization
+	 *         exists for the requested language
+	 * @return the localized settings values. If <code>useDefault</code>
+	 *         is <code>false</code> and no localization exists for the
+	 *         requested language, an empty array is returned.
+	 */
+	public String[] getSettingsValues(
+		Settings settings, String key, String languageId, boolean useDefault);
 
 	/**
 	 * Removes the localization for the language from the localizations XML.

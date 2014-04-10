@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.json.JSONSerializable;
 import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceAction;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionsManagerUtil;
-import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceClassVisitorFactoryUtil;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMappingResolver;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceNaming;
 import com.liferay.portal.kernel.servlet.HttpMethods;
@@ -68,14 +67,6 @@ public abstract class BaseJSONWebServiceTestCase extends PowerMockito {
 
 		jsonWebServiceActionsManagerUtil.setJSONWebServiceActionsManager(
 			new JSONWebServiceActionsManagerImpl());
-
-		JSONWebServiceClassVisitorFactoryUtil
-			jsonWebServiceClassVisitorFactoryUtil =
-				new JSONWebServiceClassVisitorFactoryUtil();
-
-		jsonWebServiceClassVisitorFactoryUtil.
-			setJSONWebServiceClassVisitorFactory(
-				new JSONWebServiceClassVisitorFactoryImpl());
 
 		MethodParametersResolverUtil methodParametersResolverUtil =
 			new MethodParametersResolverUtil();

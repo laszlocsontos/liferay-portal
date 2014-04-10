@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -34,12 +35,16 @@ import org.junit.runner.RunWith;
 /**
  * @author Manuel de la Peña
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
+@ExecutionTestListeners(
+	listeners = {
+		MainServletExecutionTestListener.class,
+		TransactionalExecutionTestListener.class
+	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Transactional
 public class VerifyJournalTest extends BaseVerifyTestCase {
 
 	@Test
-	@Transactional
 	public void testJournalArticleTreePathWithJournalArticleInTrash()
 		throws Exception {
 
@@ -62,7 +67,6 @@ public class VerifyJournalTest extends BaseVerifyTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testJournalArticleTreePathWithParentJournalFolderInTrash()
 		throws Exception {
 
@@ -88,7 +92,6 @@ public class VerifyJournalTest extends BaseVerifyTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testJournalFolderTreePathWithJournalFolderInTrash()
 		throws Exception {
 
@@ -111,7 +114,6 @@ public class VerifyJournalTest extends BaseVerifyTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testJournalFolderTreePathWithParentJournalFolderInTrash()
 		throws Exception {
 

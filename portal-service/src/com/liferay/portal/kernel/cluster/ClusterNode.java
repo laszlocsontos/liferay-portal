@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.cluster;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -25,6 +27,7 @@ import java.net.InetSocketAddress;
 /**
  * @author Tina Tian
  */
+@ProviderType
 public class ClusterNode implements Comparable<ClusterNode>, Serializable {
 
 	public ClusterNode(String clusterNodeId, InetAddress bindInetAddress) {

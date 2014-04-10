@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,6 +64,11 @@ public class RegionServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().addRegion(countryId, regionCode, name, active);
+	}
+
+	public static com.liferay.portal.model.Region fetchRegion(long regionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchRegion(regionId);
 	}
 
 	public static com.liferay.portal.model.Region fetchRegion(long countryId,

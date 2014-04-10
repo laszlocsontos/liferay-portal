@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -743,13 +743,16 @@ public class ServicePreAction extends Action {
 
 		themeDisplay.setRequest(request);
 
-		// Set the CDN host, portal URL, and Facebook application ID first
-		// because other methods (setLookAndFeel) depend on them being set
+		// Set attributes first that other methods (getCDNBaseURL and
+		// setLookAndFeel) depend on
 
 		themeDisplay.setCDNHost(cdnHost);
 		themeDisplay.setCDNDynamicResourcesHost(dynamicResourcesCDNHost);
-		themeDisplay.setPortalURL(portalURL);
 		themeDisplay.setFacebookCanvasPageURL(facebookCanvasPageURL);
+		themeDisplay.setPortalURL(portalURL);
+		themeDisplay.setSecure(request.isSecure());
+		themeDisplay.setServerName(request.getServerName());
+		themeDisplay.setServerPort(request.getServerPort());
 		themeDisplay.setWidget(widget);
 
 		themeDisplay.setCompany(company);
@@ -798,9 +801,6 @@ public class ServicePreAction extends Action {
 		themeDisplay.setRefererGroupId(refererGroupId);
 		themeDisplay.setRefererPlid(refererPlid);
 		themeDisplay.setScopeGroupId(scopeGroupId);
-		themeDisplay.setSecure(request.isSecure());
-		themeDisplay.setServerName(request.getServerName());
-		themeDisplay.setServerPort(request.getServerPort());
 		themeDisplay.setSignedIn(signedIn);
 		themeDisplay.setSiteDefaultLocale(
 			PortalUtil.getSiteDefaultLocale(siteGroupId));
@@ -1387,13 +1387,9 @@ public class ServicePreAction extends Action {
 	public void run(HttpServletRequest request, HttpServletResponse response)
 		throws ActionException {
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		try {
 			servicePre(request, response);
@@ -1417,13 +1413,28 @@ public class ServicePreAction extends Action {
 			PortletDataHandlerKeys.PERMISSIONS,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.THEME_REFERENCE,
@@ -1667,13 +1678,13 @@ public class ServicePreAction extends Action {
 				userGroup.getGroupId(), true,
 				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-			if (layouts.size() == 0) {
+			if (layouts.isEmpty()) {
 				layouts = LayoutLocalServiceUtil.getLayouts(
 					userGroup.getGroupId(), false,
 					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 			}
 
-			if (layouts.size() > 0) {
+			if (!layouts.isEmpty()) {
 				layout = layouts.get(0);
 			}
 
@@ -1694,13 +1705,13 @@ public class ServicePreAction extends Action {
 						group.getGroupId(), true,
 						LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-					if (layouts.size() == 0) {
+					if (layouts.isEmpty()) {
 						layouts = LayoutLocalServiceUtil.getLayouts(
 							group.getGroupId(), false,
 							LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 					}
 
-					if (layouts.size() > 0) {
+					if (!layouts.isEmpty()) {
 						layout = layouts.get(0);
 
 						break;
@@ -1770,7 +1781,7 @@ public class ServicePreAction extends Action {
 				guestGroup.getGroupId(), false,
 				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-			if (layouts.size() > 0) {
+			if (!layouts.isEmpty()) {
 				layout = layouts.get(0);
 			}
 		}

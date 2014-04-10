@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -173,13 +173,13 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		FileEntry file1 = DLAppTestUtil.addFileEntry(
 			TestPropsValues.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, true, "Test 1.txt");
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test 1.txt");
 
 		String file1Value = getDocLibraryFieldValue(file1);
 
 		FileEntry file2 = DLAppTestUtil.addFileEntry(
 			TestPropsValues.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, true, "Test 2.txt");
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test 2.txt");
 
 		String file2Value = getDocLibraryFieldValue(file2);
 

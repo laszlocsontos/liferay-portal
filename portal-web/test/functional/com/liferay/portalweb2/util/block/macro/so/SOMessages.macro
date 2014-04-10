@@ -2,11 +2,13 @@
 	<var name="password" value="test" />
 
 	<command name="sendMessage">
+		<var name="key_recipientName" value="${recipientName}" />
+
 		<execute action="SOMessages#assertClick" locator-key1="NEW_MESSAGE_BUTTON" value1="New Message" />
 
 		<execute action="SOMessagesAdd#selectFrame" locator-key1="NEW_MESSAGE_IFRAME" />
 		<execute action="SOMessagesAdd#type" locator-key1="TO_FIELD" value1="${recipientName}" />
-		<execute action="SOMessagesAdd#assertClick" locator-key1="TO_FIELD_DROPDOWN_LIST" value1="${key_recipientName}" />
+		<execute action="SOMessagesAdd#assertClick" locator-key1="TO_FIELD_DROPDOWN_LIST" value1="${recipientName}" />
 		<execute action="SOMessagesAdd#assertTextEquals" locator-key1="TO_FIELD" value1="${recipientName} &lt;${recipientScreenName}&gt;, " />
 		<execute action="SOMessagesAdd#type" locator-key1="SUBJECT_FIELD" value1="${messageSubject}" />
 		<execute action="SOMessagesAdd#type" locator-key1="BODY_FIELD" value1="${messageBody}" />
@@ -73,7 +75,7 @@
 		<execute action="SOMessages#click" locator-key1="MESSAGE_SUBJECT" />
 
 		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_SUBJECT" value1="${messageSubject}" />
-		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_USERS" value1="Between ${connectionName} And You" />
+		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_USERS" value1="Between ${connectionName} and You" />
 		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_SENDER" value1="${senderName}" />
 		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_BODY" value1="${messageBody}" />
 
@@ -95,7 +97,6 @@
 	</command>
 
 	<command name="viewMessageNotification">
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
 		<execute action="SOUserBar#assertElementPresent" locator-key1="NOTIFICATION" />
 		<execute action="SOUserBar#assertTextEquals" locator-key1="NOTIFICATION_MENU_COUNT" value1="1" />
 		<execute action="SOUserBar#click" locator-key1="NOTIFICATION" />
@@ -117,7 +118,7 @@
 		<var name="key_messageReplyBody" value="${messageReplyBody}" />
 
 		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_SUBJECT" value1="${messageSubject}" />
-		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_USERS" value1="Between ${connectionName} And You" />
+		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_USERS" value1="Between ${connectionName} and You" />
 		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_SENDER" value1="${senderName}" />
 		<execute action="SOMessagesMessage#assertTextEquals" locator-key1="PRIVATE_MESSAGE_BODY" value1="${messageBody}" />
 

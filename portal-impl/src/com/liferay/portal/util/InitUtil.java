@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,12 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.cache.CacheRegistryImpl;
 import com.liferay.portal.configuration.ConfigurationFactoryImpl;
 import com.liferay.portal.dao.db.DBFactoryImpl;
 import com.liferay.portal.dao.jdbc.DataSourceFactoryImpl;
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
@@ -32,6 +34,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.log.Log4jLogFactoryImpl;
+import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.security.lang.DoPrivilegedUtil;
 import com.liferay.portal.security.lang.SecurityManagerUtil;
 import com.liferay.portal.spring.util.SpringUtil;
@@ -53,13 +56,9 @@ public class InitUtil {
 			return;
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_PRINT_TIME) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		// Set the default locale used by Liferay. This locale is no longer set
 		// at the VM level. See LEP-2584.
@@ -199,6 +198,68 @@ public class InitUtil {
 		List<String> extraConfigLocations) {
 
 		initWithSpring(false, extraConfigLocations);
+	}
+
+	public synchronized static void initWithSpringAndModuleFramework() {
+		initWithSpringAndModuleFramework(false, null);
+	}
+
+	public synchronized static void initWithSpringAndModuleFramework(
+		boolean force, List<String> extraConfigLocations) {
+
+		if (force) {
+			_initialized = false;
+		}
+
+		if (_initialized) {
+			return;
+		}
+
+		if (!_neverInitialized) {
+			PropsUtil.reload();
+		}
+		else {
+			_neverInitialized = false;
+		}
+
+		try {
+			PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR = System.getProperty(
+				SystemProperties.TMP_DIR);
+
+			init();
+
+			ModuleFrameworkUtilAdapter.startFramework();
+
+			SpringUtil.loadContext(extraConfigLocations);
+
+			BeanLocatorImpl beanLocatorImpl =
+				(BeanLocatorImpl)PortalBeanLocatorUtil.getBeanLocator();
+
+			ModuleFrameworkUtilAdapter.registerContext(
+				beanLocatorImpl.getApplicationContext());
+
+			ModuleFrameworkUtilAdapter.startRuntime();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		_initialized = true;
+	}
+
+	public synchronized static void initWithSpringAndModuleFramework(
+		List<String> extraConfigLocations) {
+
+		initWithSpringAndModuleFramework(false, extraConfigLocations);
+	}
+
+	public synchronized static void stopModuleFramework() {
+		try {
+			ModuleFrameworkUtilAdapter.stopFramework();
+		}
+		catch (Exception e) {
+			new RuntimeException(e);
+		}
 	}
 
 	private static final boolean _PRINT_TIME = false;

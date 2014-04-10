@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -45,7 +47,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextUtil;
+import com.liferay.portal.settings.LocalizedValuesMap;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalUtil;
@@ -56,6 +58,7 @@ import com.liferay.portal.util.SubscriptionSender;
 import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
+import com.liferay.portlet.blogs.BlogsSettings;
 import com.liferay.portlet.blogs.EntryContentException;
 import com.liferay.portlet.blogs.EntryDisplayDateException;
 import com.liferay.portlet.blogs.EntrySmallImageNameException;
@@ -77,11 +80,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
@@ -103,6 +104,7 @@ import net.htmlparser.jericho.StartTag;
  */
 public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public BlogsEntry addEntry(
 			long userId, String title, String description, String content,
@@ -294,7 +296,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 			serviceContext.setScopeGroupId(entry.getGroupId());
 
-			updateStatus(
+			blogsEntryLocalService.updateStatus(
 				entry.getStatusByUserId(), entry.getEntryId(),
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
 		}
@@ -305,12 +307,13 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		for (BlogsEntry entry : blogsEntryPersistence.findByGroupId(groupId)) {
-			deleteEntry(entry);
+			blogsEntryLocalService.deleteEntry(entry);
 		}
 	}
 
+	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public void deleteEntry(BlogsEntry entry)
+	public BlogsEntry deleteEntry(BlogsEntry entry)
 		throws PortalException, SystemException {
 
 		// Entry
@@ -374,6 +377,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
 			entry.getCompanyId(), entry.getGroupId(),
 			BlogsEntry.class.getName(), entry.getEntryId());
+
+		return entry;
 	}
 
 	@Override
@@ -382,7 +387,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		BlogsEntry entry = blogsEntryPersistence.findByPrimaryKey(entryId);
 
-		deleteEntry(entry);
+		blogsEntryLocalService.deleteEntry(entry);
 	}
 
 	/**
@@ -854,7 +859,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		List<BlogsEntry> entries = blogsEntryPersistence.findByGroupId(groupId);
 
 		for (BlogsEntry entry : entries) {
-			moveEntryToTrash(userId, entry);
+			blogsEntryLocalService.moveEntryToTrash(userId, entry);
 		}
 	}
 
@@ -870,6 +875,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 	 *         be updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public BlogsEntry moveEntryToTrash(long userId, BlogsEntry entry)
 		throws PortalException, SystemException {
@@ -927,7 +933,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		BlogsEntry entry = blogsEntryPersistence.findByPrimaryKey(entryId);
 
-		return moveEntryToTrash(userId, entry);
+		return blogsEntryLocalService.moveEntryToTrash(userId, entry);
 	}
 
 	/**
@@ -941,8 +947,9 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 	 *         counter could not be updated
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public void restoreEntryFromTrash(long userId, long entryId)
+	public BlogsEntry restoreEntryFromTrash(long userId, long entryId)
 		throws PortalException, SystemException {
 
 		// Entry
@@ -963,6 +970,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			userId, trashEntry.getGroupId(), BlogsEntry.class.getName(),
 			entryId, SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
 			extraDataJSONObject.toString(), 0);
+
+		return entry;
 	}
 
 	@Override
@@ -1009,6 +1018,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			AssetLinkConstants.TYPE_RELATED);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public BlogsEntry updateEntry(
 			long userId, long entryId, String title, String description,
@@ -1133,6 +1143,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			guestPermissions);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public BlogsEntry updateStatus(
 			long userId, long entryId, int status,
@@ -1166,9 +1177,6 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		blogsStatsUserLocalService.updateStatsUser(
 			entry.getGroupId(), entry.getUserId(), entry.getDisplayDate());
-
-		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-			BlogsEntry.class);
 
 		AssetEntry assetEntry = assetEntryLocalService.fetchEntry(
 			BlogsEntry.class.getName(), entryId);
@@ -1216,10 +1224,6 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 				trashEntryLocalService.deleteEntry(
 					BlogsEntry.class.getName(), entryId);
 			}
-
-			// Indexer
-
-			indexer.reindex(entry);
 
 			if (oldStatus != WorkflowConstants.STATUS_IN_TRASH) {
 
@@ -1279,15 +1283,6 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			else if (oldStatus == WorkflowConstants.STATUS_IN_TRASH) {
 				trashEntryLocalService.deleteEntry(
 					BlogsEntry.class.getName(), entryId);
-			}
-
-			// Indexer
-
-			if (status == WorkflowConstants.STATUS_IN_TRASH) {
-				indexer.reindex(entry);
-			}
-			else {
-				indexer.delete(entry);
 			}
 		}
 
@@ -1398,26 +1393,14 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			return;
 		}
 
-		PortletPreferences preferences =
-			ServiceContextUtil.getPortletPreferences(serviceContext);
-
-		if (preferences == null) {
-			long ownerId = entry.getGroupId();
-			int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
-			long plid = PortletKeys.PREFS_PLID_SHARED;
-			String portletId = PortletKeys.BLOGS;
-			String defaultPreferences = null;
-
-			preferences = portletPreferencesLocalService.getPreferences(
-				entry.getCompanyId(), ownerId, ownerType, plid, portletId,
-				defaultPreferences);
-		}
+		BlogsSettings blogsSettings = BlogsUtil.getBlogsSettings(
+			entry.getGroupId());
 
 		if (serviceContext.isCommandAdd() &&
-			BlogsUtil.getEmailEntryAddedEnabled(preferences)) {
+			blogsSettings.getEmailEntryAddedEnabled()) {
 		}
 		else if (serviceContext.isCommandUpdate() &&
-				 BlogsUtil.getEmailEntryUpdatedEnabled(preferences)) {
+				 blogsSettings.getEmailEntryUpdatedEnabled()) {
 		}
 		else {
 			return;
@@ -1426,24 +1409,21 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		String entryTitle = entry.getTitle();
 		String entryURL = getEntryURL(entry, serviceContext);
 
-		String fromName = BlogsUtil.getEmailFromName(
-			preferences, entry.getCompanyId());
-		String fromAddress = BlogsUtil.getEmailFromAddress(
-			preferences, entry.getCompanyId());
+		String fromName = blogsSettings.getEmailFromName();
+		String fromAddress = blogsSettings.getEmailFromAddress();
 
-		Map<Locale, String> localizedSubjectMap = null;
-		Map<Locale, String> localizedBodyMap = null;
+		LocalizedValuesMap subjectLocalizedValuesMap = null;
+		LocalizedValuesMap bodyLocalizedValuesMap = null;
 
 		if (serviceContext.isCommandUpdate()) {
-			localizedSubjectMap = BlogsUtil.getEmailEntryUpdatedSubjectMap(
-				preferences);
-			localizedBodyMap = BlogsUtil.getEmailEntryUpdatedBodyMap(
-				preferences);
+			subjectLocalizedValuesMap =
+				blogsSettings.getEmailEntryUpdatedSubject();
+			bodyLocalizedValuesMap = blogsSettings.getEmailEntryUpdatedBody();
 		}
 		else {
-			localizedSubjectMap = BlogsUtil.getEmailEntryAddedSubjectMap(
-				preferences);
-			localizedBodyMap = BlogsUtil.getEmailEntryAddedBodyMap(preferences);
+			subjectLocalizedValuesMap =
+				blogsSettings.getEmailEntryAddedSubject();
+			bodyLocalizedValuesMap = blogsSettings.getEmailEntryAddedBody();
 		}
 
 		SubscriptionSender subscriptionSender = new SubscriptionSender();
@@ -1463,8 +1443,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		subscriptionSender.setEntryURL(entryURL);
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
-		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
-		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
+		subscriptionSender.setLocalizedBodyMap(bodyLocalizedValuesMap);
+		subscriptionSender.setLocalizedSubjectMap(subjectLocalizedValuesMap);
 		subscriptionSender.setMailId("blogs_entry", entry.getEntryId());
 
 		int notificationType =
@@ -1485,6 +1465,9 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		subscriptionSender.addPersistedSubscribers(
 			BlogsEntry.class.getName(), entry.getGroupId());
+
+		subscriptionSender.addPersistedSubscribers(
+			BlogsEntry.class.getName(), entry.getEntryId());
 
 		subscriptionSender.flushNotificationsAsync();
 	}

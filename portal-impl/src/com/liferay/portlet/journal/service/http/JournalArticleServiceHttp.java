@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1903,14 +1903,16 @@ public class JournalArticleServiceHttp {
 		}
 	}
 
-	public static void subscribe(HttpPrincipal httpPrincipal, long groupId)
+	public static void subscribeStructure(HttpPrincipal httpPrincipal,
+		long groupId, long userId, long ddmStructureId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(JournalArticleServiceUtil.class,
-					"subscribe", _subscribeParameterTypes49);
+					"subscribeStructure", _subscribeStructureParameterTypes49);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, groupId);
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
+					userId, ddmStructureId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
@@ -1934,14 +1936,17 @@ public class JournalArticleServiceHttp {
 		}
 	}
 
-	public static void unsubscribe(HttpPrincipal httpPrincipal, long groupId)
+	public static void unsubscribeStructure(HttpPrincipal httpPrincipal,
+		long groupId, long userId, long ddmStructureId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(JournalArticleServiceUtil.class,
-					"unsubscribe", _unsubscribeParameterTypes50);
+					"unsubscribeStructure",
+					_unsubscribeStructureParameterTypes50);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, groupId);
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
+					userId, ddmStructureId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
@@ -2482,11 +2487,11 @@ public class JournalArticleServiceHttp {
 			java.util.Date.class, java.util.Date.class, int.class,
 			java.util.Date.class, boolean.class
 		};
-	private static final Class<?>[] _subscribeParameterTypes49 = new Class[] {
-			long.class
+	private static final Class<?>[] _subscribeStructureParameterTypes49 = new Class[] {
+			long.class, long.class, long.class
 		};
-	private static final Class<?>[] _unsubscribeParameterTypes50 = new Class[] {
-			long.class
+	private static final Class<?>[] _unsubscribeStructureParameterTypes50 = new Class[] {
+			long.class, long.class, long.class
 		};
 	private static final Class<?>[] _updateArticleParameterTypes51 = new Class[] {
 			long.class, long.class, long.class, java.lang.String.class,

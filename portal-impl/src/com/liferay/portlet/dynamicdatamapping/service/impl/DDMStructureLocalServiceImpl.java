@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,6 +45,7 @@ import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.dynamicdatamapping.NoSuchStructureException;
 import com.liferay.portlet.dynamicdatamapping.RequiredStructureException;
@@ -154,7 +155,9 @@ public class DDMStructureLocalServiceImpl
 
 		Date now = new Date();
 
-		validate(groupId, classNameId, structureKey, nameMap, xsd);
+		validate(
+			groupId, parentStructureId, classNameId, structureKey, nameMap,
+			xsd);
 
 		long structureId = counterLocalService.increment();
 
@@ -755,19 +758,19 @@ public class DDMStructureLocalServiceImpl
 
 	/**
 	 * Returns the structure matching the class name ID, structure key, and
-	 * group, optionally in the global scope.
+	 * group, optionally in the parent site.
 	 *
 	 * <p>
 	 * This method first searches in the group. If the structure is still not
-	 * found and <code>includeGlobalStructures</code> is set to
-	 * <code>true</code>, this method searches the global group.
+	 * found and <code>includeAncestorStructures</code> is set to
+	 * <code>true</code>, this method searches the parent sites.
 	 * </p>
 	 *
 	 * @param  groupId the primary key of the structure's group
 	 * @param  classNameId the primary key of the class name for the structure's
 	 *         related model
 	 * @param  structureKey the unique string identifying the structure
-	 * @param  includeGlobalStructures whether to include the global scope in
+	 * @param  includeAncestorStructures whether to include the parent sites in
 	 *         the search
 	 * @return the matching structure
 	 * @throws PortalException if a matching structure could not be found
@@ -776,7 +779,7 @@ public class DDMStructureLocalServiceImpl
 	@Override
 	public DDMStructure getStructure(
 			long groupId, long classNameId, String structureKey,
-			boolean includeGlobalStructures)
+			boolean includeAncestorStructures)
 		throws PortalException, SystemException {
 
 		structureKey = getStructureKey(structureKey);
@@ -788,19 +791,24 @@ public class DDMStructureLocalServiceImpl
 			return structure;
 		}
 
-		if (!includeGlobalStructures) {
+		if (!includeAncestorStructures) {
 			throw new NoSuchStructureException(
 				"No DDMStructure exists with the structure key " +
 					structureKey);
 		}
 
-		Group group = groupPersistence.findByPrimaryKey(groupId);
+		for (long curGroupId : PortalUtil.getAncestorSiteGroupIds(groupId)) {
+			structure = ddmStructurePersistence.fetchByG_C_S(
+				curGroupId, classNameId, structureKey);
 
-		Group companyGroup = groupLocalService.getCompanyGroup(
-			group.getCompanyId());
+			if (structure != null) {
+				return structure;
+			}
+		}
 
-		return ddmStructurePersistence.findByG_C_S(
-			companyGroup.getGroupId(), classNameId, structureKey);
+		throw new NoSuchStructureException(
+			"No DDMStructure exists with the structure key " +
+				structureKey + " in the ancestor groups");
 	}
 
 	/**
@@ -1472,7 +1480,16 @@ public class DDMStructureLocalServiceImpl
 			throw new StructureXsdException();
 		}
 
-		validate(nameMap, xsd);
+		String parentXsd = StringPool.BLANK;
+
+		DDMStructure parentStructure =
+			ddmStructurePersistence.fetchByPrimaryKey(parentStructureId);
+
+		if (parentStructure != null) {
+			parentXsd = parentStructure.getCompleteXsd();
+		}
+
+		validate(nameMap, parentXsd, xsd);
 
 		structure.setModifiedDate(serviceContext.getModifiedDate(null));
 		structure.setParentStructureId(parentStructureId);
@@ -1498,18 +1515,18 @@ public class DDMStructureLocalServiceImpl
 	}
 
 	protected void getChildrenStructureIds(
-			List<Long> structureIds, long groupId, long structureId)
+			List<Long> structureIds, long groupId, long parentStructureId)
 		throws PortalException, SystemException {
 
 		List<DDMStructure> structures = ddmStructurePersistence.findByG_P(
-			groupId, structureId);
+			groupId, parentStructureId);
 
 		for (DDMStructure structure : structures) {
 			structureIds.add(structure.getStructureId());
 
 			getChildrenStructureIds(
 				structureIds, structure.getGroupId(),
-				structure.getParentStructureId());
+				structure.getStructureId());
 		}
 	}
 
@@ -1523,6 +1540,25 @@ public class DDMStructureLocalServiceImpl
 		structureIds.add(0, structureId);
 
 		return structureIds;
+	}
+
+	protected Set<String> getElementNames(Document document) {
+		Set<String> elementNames = new HashSet<String>();
+
+		XPath xPathSelector = SAXReaderUtil.createXPath("//dynamic-element");
+
+		List<Node> nodes = xPathSelector.selectNodes(document);
+
+		for (Node node : nodes) {
+			Element element = (Element)node;
+
+			String name = StringUtil.toLowerCase(
+				element.attributeValue("name"));
+
+			elementNames.add(name);
+		}
+
+		return elementNames;
 	}
 
 	protected String getStructureKey(String structureKey) {
@@ -1639,23 +1675,12 @@ public class DDMStructureLocalServiceImpl
 		for (Node node : nodes) {
 			Element element = (Element)node;
 
-			String name = element.attributeValue("name");
+			String name = StringUtil.toLowerCase(
+				element.attributeValue("name"));
 
 			if (name.startsWith(DDMStructureConstants.XSD_NAME_RESERVED)) {
 				throw new StructureXsdException();
 			}
-
-			Element parentElement = element.getParent();
-
-			while (!parentElement.isRootElement()) {
-				name =
-					parentElement.attributeValue("name") + StringPool.SLASH +
-						name;
-
-				parentElement = parentElement.getParent();
-			}
-
-			name = StringUtil.toLowerCase(name);
 
 			if (elementNames.contains(name)) {
 				throw new StructureDuplicateElementException();
@@ -1665,9 +1690,21 @@ public class DDMStructureLocalServiceImpl
 		}
 	}
 
+	protected void validate(Document parentDocument, Document childDocument)
+		throws PortalException {
+
+		Set<String> parentElementNames = getElementNames(parentDocument);
+
+		for (String childElementName : getElementNames(childDocument)) {
+			if (parentElementNames.contains(childElementName)) {
+				throw new StructureDuplicateElementException();
+			}
+		}
+	}
+
 	protected void validate(
-			long groupId, long classNameId, String structureKey,
-			Map<Locale, String> nameMap, String xsd)
+			long groupId, long parentStructureId, long classNameId,
+			String structureKey, Map<Locale, String> nameMap, String xsd)
 		throws PortalException, SystemException {
 
 		structureKey = getStructureKey(structureKey);
@@ -1684,7 +1721,16 @@ public class DDMStructureLocalServiceImpl
 			throw sdske;
 		}
 
-		validate(nameMap, xsd);
+		String parentXsd = StringPool.BLANK;
+
+		DDMStructure parentStructure =
+			ddmStructurePersistence.fetchByPrimaryKey(parentStructureId);
+
+		if (parentStructure != null) {
+			parentXsd = parentStructure.getCompleteXsd();
+		}
+
+		validate(nameMap, parentXsd, xsd);
 	}
 
 	protected void validate(
@@ -1714,11 +1760,12 @@ public class DDMStructureLocalServiceImpl
 		}
 	}
 
-	protected void validate(Map<Locale, String> nameMap, String xsd)
+	protected void validate(
+			Map<Locale, String> nameMap, String parentXsd, String childXsd)
 		throws PortalException {
 
 		try {
-			Document document = SAXReaderUtil.read(xsd);
+			Document document = SAXReaderUtil.read(childXsd);
 
 			Element rootElement = document.getRootElement();
 
@@ -1728,6 +1775,12 @@ public class DDMStructureLocalServiceImpl
 			validate(nameMap, contentDefaultLocale);
 
 			validate(document);
+
+			if (Validator.isNotNull(parentXsd)) {
+				Document parentDocument = SAXReaderUtil.read(parentXsd);
+
+				validate(parentDocument, document);
+			}
 		}
 		catch (LocaleException le) {
 			throw le;

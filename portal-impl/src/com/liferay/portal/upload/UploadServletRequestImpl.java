@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,10 +90,12 @@ public class UploadServletRequestImpl
 
 			_liferayServletRequest = new LiferayServletRequest(request);
 
-			List<LiferayFileItem> liferayFileItemsList =
+			List<org.apache.commons.fileupload.FileItem> fileItems =
 				servletFileUpload.parseRequest(_liferayServletRequest);
 
-			for (LiferayFileItem liferayFileItem : liferayFileItemsList) {
+			for (org.apache.commons.fileupload.FileItem fileItem : fileItems) {
+				LiferayFileItem liferayFileItem = (LiferayFileItem)fileItem;
+
 				if (liferayFileItem.isFormField()) {
 					liferayFileItem.setString(request.getCharacterEncoding());
 

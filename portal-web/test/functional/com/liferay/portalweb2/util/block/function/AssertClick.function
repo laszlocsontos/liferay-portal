@@ -48,6 +48,8 @@
 	<command name="assertTextClickAtAddApplication">
 		<execute selenium="waitForElementPresent" argument1="//script[contains(@src,'/html/js/liferay/dockbar_add_page.js')]" />
 
+		<execute selenium="pause" argument1="1000" />
+
 		<execute function="AssertClick#assertTextClickAt" />
 	</command>
 
@@ -67,6 +69,8 @@
 
 	<command name="assertTextClickAtCKEditor">
 		<execute selenium="waitForVisible" argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" />
+
+		<execute selenium="pause" argument1="1000" />
 
 		<execute function="AssertClick#assertTextClickAt" />
 	</command>
@@ -184,7 +188,7 @@
 	</command>
 
 	<command name="waitForDMHomeAssertTextEqualsClick">
-		<execute selenium="waitForElementPresent" argument1="//a[@class='browse-folder yui3-dd-drop']" />
+		<execute selenium="waitForElementPresent" argument1="//a[contains(@class,'browse-folder')]" />
 
 		<execute selenium="pause" argument1="1500" />
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -136,10 +136,17 @@ if (!inlineEdit) {
 		},
 
 		getCkData: function() {
-			var data = CKEDITOR.instances['<%= name %>'].getData();
+			var data;
 
-			if (CKEDITOR.env.gecko && (CKEDITOR.tools.trim(data) == '<br />')) {
-				data = '';
+			if (!window['<%= name %>'].instanceReady && window['<%= HtmlUtil.escapeJS(namespace + initMethod) %>']) {
+				data = window['<%= HtmlUtil.escapeJS(namespace + initMethod) %>']();
+			}
+			else {
+				data = CKEDITOR.instances['<%= name %>'].getData();
+
+				if (CKEDITOR.env.gecko && (CKEDITOR.tools.trim(data) == '<br />')) {
+					data = '';
+				}
 			}
 
 			return data;
@@ -152,6 +159,8 @@ if (!inlineEdit) {
 		getText: function() {
 			return window['<%= name %>'].getCkData();
 		},
+
+		instanceReady: false,
 
 		<c:if test="<%= Validator.isNotNull(onBlurMethod) %>">
 			onBlurCallback: function() {
@@ -180,6 +189,8 @@ if (!inlineEdit) {
 
 		setHTML: function(value) {
 			CKEDITOR.instances['<%= name %>'].setData(value);
+
+			window['<%= name %>']._setStyles();
 		}
 	};
 </aui:script>
@@ -207,8 +218,56 @@ if (inlineEdit && (inlineEditSaveURL != null)) {
 </script>
 
 <aui:script use="<%= modules %>">
-	(function() {
+	window['<%= name %>']._setStyles = function() {
+		var iframe = A.one('#cke_<%= name %> iframe');
+
+		if (iframe) {
+			var iframeWin = iframe.getDOM().contentWindow;
+
+			if (iframeWin) {
+				var iframeDoc = iframeWin.document.documentElement;
+
+				A.one(iframeDoc).addClass('aui');
+			}
+		}
+	};
+
+	<c:if test="<%= inlineEdit && (inlineEditSaveURL != null) %>">
+		var inlineEditor;
+
+		Liferay.on(
+			'toggleControls',
+			function(event) {
+				if (event.src === 'ui') {
+					var ckEditor = CKEDITOR.instances['<%= name %>'];
+
+					if (event.enabled && !ckEditor) {
+						createEditor();
+					}
+					else if (ckEditor) {
+						inlineEditor.destroy();
+						ckEditor.destroy();
+
+						ckEditor = null;
+
+						var editorNode = A.one('#<%= name %>');
+
+						editorNode.removeAttribute('contenteditable');
+						editorNode.removeClass('lfr-editable');
+					}
+				}
+			}
+		);
+	</c:if>
+
+	var createEditor = function() {
 		var Util = Liferay.Util;
+
+		var editorNode = A.one('#<%= name %>');
+
+		editorNode.setAttribute('contenteditable', true);
+
+		editorNode.addClass('lfr-editable');
 
 		function getToolbarSet(toolbarSet) {
 			if (Util.isPhone()) {
@@ -231,21 +290,13 @@ if (inlineEdit && (inlineEditSaveURL != null)) {
 				);
 			</c:if>
 
-			var iframe = A.one('#cke_<%= name %> iframe');
+			window['<%= name %>']._setStyles();
 
-			if (iframe) {
-				var iframeWin = iframe.getDOM().contentWindow;
-
-				if (iframeWin) {
-					var iframeDoc = iframeWin.document.documentElement;
-
-					A.one(iframeDoc).addClass('aui');
-				}
-			}
+			window['<%= name %>'].instanceReady = true;
 		}
 
 		<%
-		StringBundler sb = new StringBundler(10);
+		StringBundler sb = new StringBundler(8);
 
 		sb.append(mainPath);
 		sb.append("/portal/fckeditor?p_p_id=");
@@ -277,10 +328,14 @@ if (inlineEdit && (inlineEditSaveURL != null)) {
 			}
 		);
 
+		if (window['<%= name %>Config']) {
+			window['<%= name %>Config']();
+		}
+
 		var ckEditor = CKEDITOR.instances['<%= name %>'];
 
 		<c:if test="<%= inlineEdit && (inlineEditSaveURL != null) %>">
-			new Liferay.CKEditorInline(
+			inlineEditor = new Liferay.CKEditorInline(
 				{
 					editor: ckEditor,
 					editorName: '<%= name %>',
@@ -347,6 +402,8 @@ if (inlineEdit && (inlineEditSaveURL != null)) {
 
 			}
 		);
+
+		ckEditor.on('dataReady', window['<%= name %>']._setStyles);
 
 		<%
 		if (toolbarSet.equals("creole")) {
@@ -416,7 +473,15 @@ if (inlineEdit && (inlineEditSaveURL != null)) {
 		}
 		%>
 
-	})();
+	};
+
+	<%
+	String toogleControlsStatus = GetterUtil.getString(SessionClicks.get(request, "liferay_toggle_controls", ""));
+	%>
+
+	<c:if test='<%= (inlineEdit && toogleControlsStatus.equals("visible")) || !inlineEdit %>'>;
+		createEditor();
+	</c:if>
 
 </aui:script>
 

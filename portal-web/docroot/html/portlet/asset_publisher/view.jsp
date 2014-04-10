@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,9 +87,13 @@ boolean hasAddPortletURLs = false;
 		}
 	%>
 
-		<div class="lfr-meta-actions add-asset-selector">
-			<%@ include file="/html/portlet/asset_publisher/add_asset.jspf" %>
-		</div>
+		<c:if test="<%= !addPortletURLs.isEmpty() %>">
+			<aui:nav-bar>
+				<div class="lfr-meta-actions add-asset-selector">
+					<%@ include file="/html/portlet/asset_publisher/add_asset.jspf" %>
+				</div>
+			</aui:nav-bar>
+		</c:if>
 
 	<%
 	}

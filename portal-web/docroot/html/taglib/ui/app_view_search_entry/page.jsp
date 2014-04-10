@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,7 +58,7 @@ summary.setQueryTerms(queryTerms);
 
 		<div class="entry-metadata">
 			<span class="entry-title">
-				<%= summary.getHighlightedContent() %>
+				<%= summary.getHighlightedTitle() %>
 
 				<c:if test="<%= (status != WorkflowConstants.STATUS_ANY) && (status != WorkflowConstants.STATUS_APPROVED) %>">
 					<aui:workflow-status showIcon="<%= false %>" showLabel="<%= false %>" status="<%= status %>" />
@@ -125,6 +125,9 @@ summary.setQueryTerms(queryTerms);
 			if (Validator.isNull(summary.getContent())) {
 				summary.setContent(fileEntry.getTitle());
 			}
+
+			summary.setHighlight(highlightEnabled);
+			summary.setQueryTerms(queryTerms);
 		%>
 
 			<div class="entry-attachment">
@@ -159,7 +162,10 @@ summary.setQueryTerms(queryTerms);
 		for (MBMessage mbMessage : mbMessages) {
 			User userDisplay = UserLocalServiceUtil.getUser(mbMessage.getUserId());
 
-			summary = new Summary(null, mbMessage.getSubject(), null);
+			summary = new Summary(null, mbMessage.getBody(), null);
+
+			summary.setHighlight(highlightEnabled);
+			summary.setQueryTerms(queryTerms);
 		%>
 
 			<div class="entry-discussion">

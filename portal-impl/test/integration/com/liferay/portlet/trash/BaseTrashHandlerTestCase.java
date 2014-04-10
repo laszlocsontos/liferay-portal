@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -160,6 +160,14 @@ public abstract class BaseTrashHandlerTestCase {
 	@Transactional
 	public void testTrashDuplicate() throws Exception {
 		trashDuplicateBaseModel();
+	}
+
+	@Test
+	@Transactional
+	public void testTrashGrandparentBaseModelAndRestoreParentModel()
+		throws Exception {
+
+		trashGrandparentBaseModelAndRestoreParentModel();
 	}
 
 	@Test
@@ -388,6 +396,13 @@ public abstract class BaseTrashHandlerTestCase {
 		throws Exception;
 
 	protected BaseModel<?> getParentBaseModel(
+			Group group, long parentBaseModelId, ServiceContext serviceContext)
+		throws Exception {
+
+		return group;
+	}
+
+	protected BaseModel<?> getParentBaseModel(
 			Group group, ServiceContext serviceContext)
 		throws Exception {
 
@@ -427,6 +442,10 @@ public abstract class BaseTrashHandlerTestCase {
 	}
 
 	protected boolean isAssetableModel() {
+		return true;
+	}
+
+	protected boolean isAssetableParentModel() {
 		return true;
 	}
 
@@ -745,6 +764,82 @@ public abstract class BaseTrashHandlerTestCase {
 			getTrashEntriesCount(group.getGroupId()));
 
 		Assert.assertTrue(isBaseModelTrashName(duplicateBaseModel));
+	}
+
+	protected void trashGrandparentBaseModelAndRestoreParentModel()
+		throws Exception {
+
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
+			group.getGroupId());
+
+		BaseModel<?> grandparentBaseModel = getParentBaseModel(
+			group, serviceContext);
+
+		int initialBaseModelsCount = getNotInTrashBaseModelsCount(
+			grandparentBaseModel);
+		int initialTrashEntriesCount = getTrashEntriesCount(group.getGroupId());
+
+		BaseModel<?> parentBaseModel = getParentBaseModel(
+			group, (Long)grandparentBaseModel.getPrimaryKeyObj(),
+			serviceContext);
+
+		baseModel = addBaseModel(parentBaseModel, true, serviceContext);
+
+		if (getBaseModelClassName().equals(getParentBaseModelClassName())) {
+			Assert.assertEquals(
+				initialBaseModelsCount + 1,
+				getNotInTrashBaseModelsCount(grandparentBaseModel));
+		}
+		else {
+			Assert.assertEquals(
+				initialBaseModelsCount,
+				getNotInTrashBaseModelsCount(grandparentBaseModel));
+		}
+
+		Assert.assertEquals(
+			initialTrashEntriesCount, getTrashEntriesCount(group.getGroupId()));
+
+		moveParentBaseModelToTrash(
+			(Long)grandparentBaseModel.getPrimaryKeyObj());
+
+		Assert.assertTrue(isInTrashContainer(baseModel));
+		Assert.assertTrue(isInTrashContainer(parentBaseModel));
+		Assert.assertEquals(
+			initialBaseModelsCount,
+			getNotInTrashBaseModelsCount(grandparentBaseModel));
+		Assert.assertEquals(
+			initialTrashEntriesCount + 1,
+			getTrashEntriesCount(group.getGroupId()));
+
+		TrashHandler parentTrashHandler =
+			TrashHandlerRegistryUtil.getTrashHandler(
+				getParentBaseModelClassName());
+
+		if (isAssetableModel()) {
+			Assert.assertFalse(isAssetEntryVisible(baseModel));
+		}
+
+		if (isAssetableParentModel()) {
+			Assert.assertFalse(isAssetEntryVisible(parentBaseModel));
+		}
+
+		parentTrashHandler.restoreTrashEntry(
+			TestPropsValues.getUserId(),
+			(Long)grandparentBaseModel.getPrimaryKeyObj());
+
+		Assert.assertEquals(
+			initialTrashEntriesCount, getTrashEntriesCount(group.getGroupId()));
+
+		Assert.assertFalse(isInTrashContainer(baseModel));
+		Assert.assertFalse(isInTrashContainer(parentBaseModel));
+
+		if (isAssetableModel()) {
+			Assert.assertTrue(isAssetEntryVisible(baseModel));
+		}
+
+		if (isAssetableParentModel()) {
+			Assert.assertTrue(isAssetEntryVisible(parentBaseModel));
+		}
 	}
 
 	protected void trashIsRestorableBaseModel() throws Exception {
@@ -1261,7 +1356,6 @@ public abstract class BaseTrashHandlerTestCase {
 		Assert.assertEquals(
 			initialTrashEntriesCount + 1,
 			getTrashEntriesCount(group.getGroupId()));
-
 		Assert.assertTrue(isInTrashContainer(baseModel));
 
 		if (isAssetableModel()) {

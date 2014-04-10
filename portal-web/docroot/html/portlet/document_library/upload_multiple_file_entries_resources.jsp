@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,7 @@ if ((folder != null) && (folder.getModel() instanceof DLFolder)) {
 	inherited = !dlFolder.isOverrideFileEntryTypes();
 }
 
-List<DLFileEntryType> fileEntryTypes = DLFileEntryTypeServiceUtil.getFolderFileEntryTypes(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay), folderId, inherited);
+List<DLFileEntryType> fileEntryTypes = DLFileEntryTypeServiceUtil.getFolderFileEntryTypes(PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId), folderId, inherited);
 
 FileVersion fileVersion = null;
 
@@ -79,6 +79,8 @@ if (fileEntryTypeId > 0) {
 }
 
 long assetClassPK = 0;
+
+DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, fileEntry, fileVersion);
 %>
 
 <portlet:actionURL var="uploadMultipleFileEntriesURL">
@@ -256,7 +258,7 @@ long assetClassPK = 0;
 
 	<span id="<portlet:namespace />selectedFileNameContainer"></span>
 
-	<aui:button type="submit" />
+	<aui:button type="submit" value="<%= dlActionsDisplayContext.getPublishButtonLabel() %>" />
 </aui:form>
 
 <aui:script>

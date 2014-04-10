@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,20 +15,16 @@
 package com.liferay.portlet.wiki.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
+import com.liferay.portal.test.SynchronousMailExecutionTestListener;
 import com.liferay.portal.util.BaseSubscriptionTestCase;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
-import com.liferay.portlet.wiki.model.WikiPageConstants;
+import com.liferay.portlet.wiki.util.WikiTestUtil;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,66 +32,27 @@ import org.junit.runner.RunWith;
 
 /**
  * @author Sergio González
+ * @author Roberto Díaz
  */
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class
+		SynchronousMailExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class WikiSubscriptionTest extends BaseSubscriptionTestCase {
 
+	@Ignore
 	@Override
-	public long addBaseModel(long containerModelId) throws Exception {
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			group.getGroupId());
-
-		serviceContext.setCommand(Constants.ADD);
-		serviceContext.setLayoutFullURL("http://localhost");
-
-		WikiPage page = WikiPageLocalServiceUtil.addPage(
-			TestPropsValues.getUserId(), containerModelId,
-			ServiceTestUtil.randomString(), WikiPageConstants.VERSION_DEFAULT,
-			ServiceTestUtil.randomString(50), ServiceTestUtil.randomString(),
-			false, WikiPageConstants.DEFAULT_FORMAT, true, StringPool.BLANK,
-			StringPool.BLANK, serviceContext);
-
-		return page.getResourcePrimKey();
-	}
-
-	@Override
-	public long addContainerModel(long containerModelId) throws Exception {
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			group.getGroupId());
-
-		WikiNode node = WikiNodeLocalServiceUtil.addNode(
-			TestPropsValues.getUserId(), ServiceTestUtil.randomString(),
-			StringPool.BLANK, serviceContext);
-
-		return node.getNodeId();
-	}
-
-	@Override
-	public void addSubscriptionBaseModel(long baseModelId) throws Exception {
-		SubscriptionLocalServiceUtil.addSubscription(
-			TestPropsValues.getUserId(), group.getGroupId(),
-			WikiPage.class.getName(), baseModelId);
-	}
-
-	@Override
-	public void addSubscriptionContainerModel(long containerModelId)
-		throws Exception {
-
-		SubscriptionLocalServiceUtil.addSubscription(
-			TestPropsValues.getUserId(), group.getGroupId(),
-			WikiNode.class.getName(), containerModelId);
+	@Test
+	public void testSubscriptionBaseModelWhenInRootContainerModel() {
 	}
 
 	@Ignore
 	@Override
 	@Test
-	public void testSubscriptionBaseModelWhenInRootContainerModel() {
+	public void testSubscriptionClassType() {
 	}
 
 	@Ignore
@@ -108,6 +65,18 @@ public class WikiSubscriptionTest extends BaseSubscriptionTestCase {
 	@Override
 	@Test
 	public void testSubscriptionContainerModelWhenInSubcontainerModel() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testSubscriptionDefaultClassType() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testSubscriptionLocalizedContent() {
 	}
 
 	@Ignore
@@ -129,21 +98,50 @@ public class WikiSubscriptionTest extends BaseSubscriptionTestCase {
 	}
 
 	@Override
-	public long updateEntry(long baseModelId) throws Exception {
-		WikiPage page = WikiPageLocalServiceUtil.getPage(baseModelId, true);
+	protected long addBaseModel(long containerModelId) throws Exception {
+		WikiPage page = WikiTestUtil.addPage(
+			group.getGroupId(), containerModelId, true);
 
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			group.getGroupId());
+		return page.getResourcePrimKey();
+	}
 
-		serviceContext.setCommand(Constants.ADD);
-		serviceContext.setLayoutFullURL("http://localhost");
+	@Override
+	protected long addContainerModel(long containerModelId) throws Exception {
+		WikiNode node = WikiTestUtil.addNode(group.getGroupId());
 
-		page = WikiPageLocalServiceUtil.updatePage(
-			TestPropsValues.getUserId(), page.getNodeId(), page.getTitle(),
-			page.getVersion(), ServiceTestUtil.randomString(50),
-			ServiceTestUtil.randomString(), false,
-			WikiPageConstants.DEFAULT_FORMAT, StringPool.BLANK,
-			StringPool.BLANK, serviceContext);
+		return node.getNodeId();
+	}
+
+	@Override
+	protected void addSubscriptionBaseModel(long baseModelId) throws Exception {
+		WikiPage page = WikiPageLocalServiceUtil.getPage(baseModelId);
+
+		WikiPageLocalServiceUtil.subscribePage(
+			TestPropsValues.getUserId(), page.getNodeId(), page.getTitle());
+	}
+
+	@Override
+	protected void addSubscriptionContainerModel(long containerModelId)
+		throws Exception {
+
+		WikiNodeLocalServiceUtil.subscribeNode(
+			TestPropsValues.getUserId(), containerModelId);
+	}
+
+	@Override
+	protected String getPortletId() {
+		return PortletKeys.WIKI;
+	}
+
+	@Override
+	protected String getSubscriptionBodyPreferenceName() throws Exception {
+		return "emailPageAddedBody";
+	}
+
+	@Override
+	protected long updateEntry(long baseModelId) throws Exception {
+		WikiPage page = WikiTestUtil.updatePage(
+			WikiPageLocalServiceUtil.getPage(baseModelId, true));
 
 		return page.getResourcePrimKey();
 	}

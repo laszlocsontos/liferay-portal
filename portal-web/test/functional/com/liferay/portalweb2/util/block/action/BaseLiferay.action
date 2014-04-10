@@ -11,6 +11,14 @@
 		</default>
 	</command>
 
+	<command name="assertAlertNotPresent">
+		<default>
+			<description message="Fail if the alert is present." />
+
+			<execute function="AssertAlertNotPresent#assertAlertNotPresent" />
+		</default>
+	</command>
+
 	<command name="assertChecked">
 		<default>
 			<execute function="AssertChecked#assertChecked" />
@@ -26,6 +34,22 @@
 			<description message="Click on the ${locator1} with the value ${value1}." />
 
 			<execute function="AssertClick#assertTextClickAt" />
+		</default>
+	</command>
+
+	<command name="assertConsoleTextNotPresent">
+		<default>
+			<description message="Assert that the text ${value1} is NOT present within the console output." />
+
+			<execute function="AssertConsoleTextNotPresent#assertConsoleTextNotPresent" />
+		</default>
+	</command>
+
+	<command name="assertConsoleTextPresent">
+		<default>
+			<description message="Assert that the text ${value1} is present within the console output." />
+
+			<execute function="AssertConsoleTextPresent#assertConsoleTextPresent" />
 		</default>
 	</command>
 
@@ -103,6 +127,14 @@
 		</default>
 	</command>
 
+	<command name="assertVisible">
+		<default>
+			<description message="Assert that the ${locator1} is visible." />
+
+			<execute function="AssertVisible#assertVisible" />
+		</default>
+	</command>
+
 	<command name="check">
 		<default>
 			<execute function="Check#clickAt" />
@@ -155,7 +187,7 @@
 
 	<command name="dragAndDrop">
 		<default>
-			<execute function="DragAndDrop#dragAndDrop" />
+			<execute function="DragAndDrop#dragAndDropToObject" />
 		</default>
 	</command>
 
@@ -215,11 +247,29 @@
 		</default>
 	</command>
 
+	<command name="mouseDown">
+		<default>
+			<execute function="MouseDown#mouseDown" />
+		</default>
+	</command>
+
+	<command name="mouseMove">
+		<default>
+			<execute function="MouseMove#mouseMove" />
+		</default>
+	</command>
+
 	<command name="mouseOver">
 		<default>
 			<description message="Mouse over the ${locator1}." />
 
 			<execute function="MouseOver#mouseOver" />
+		</default>
+	</command>
+
+	<command name="mouseUp">
+		<default>
+			<execute function="MouseUp#mouseUp" />
 		</default>
 	</command>
 

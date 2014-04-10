@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,21 +14,54 @@
 
 package com.liferay.portlet.blogs.action;
 
-import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
-import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.portlet.SettingsConfigurationAction;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.settings.Settings;
+import com.liferay.portlet.blogs.BlogsSettings;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletRequest;
 
 /**
  * @author Jorge Ferrer
  * @author Thiago Moreira
  */
-public class ConfigurationActionImpl extends DefaultConfigurationAction {
+public class ConfigurationActionImpl extends SettingsConfigurationAction {
+
+	@Override
+	public void postProcess(
+		long companyId, PortletRequest portletRequest, Settings settings) {
+
+		BlogsSettings blogsSettings = new BlogsSettings(settings);
+
+		removeDefaultValue(
+			portletRequest, settings, "emailFromAddress",
+			blogsSettings.getEmailFromAddress());
+		removeDefaultValue(
+			portletRequest, settings, "emailFromName",
+			blogsSettings.getEmailFromName());
+
+		String languageId = LocaleUtil.toLanguageId(
+			LocaleUtil.getSiteDefault());
+
+		removeDefaultValue(
+			portletRequest, settings, "emailEntryAddedBody_" + languageId,
+			blogsSettings.getEmailEntryAddedBody());
+		removeDefaultValue(
+			portletRequest, settings, "emailEntryAddedSubject_" + languageId,
+			blogsSettings.getEmailEntryAddedSubject());
+		removeDefaultValue(
+			portletRequest, settings, "emailEntryUpdatedBody_" + languageId,
+			blogsSettings.getEmailEntryUpdatedBody());
+		removeDefaultValue(
+			portletRequest, settings, "emailEntryUpdatedSubject_" + languageId,
+			blogsSettings.getEmailEntryUpdatedSubject());
+	}
 
 	@Override
 	public void processAction(
@@ -38,70 +71,13 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
-		String tabs2 = ParamUtil.getString(actionRequest, "tabs2");
-
 		if (Validator.isNotNull(cmd)) {
-			if (tabs2.equals("email-from")) {
-				validateEmailFrom(actionRequest);
-			}
-			else if (tabs2.equals("entry-added-email")) {
-				validateEmailEntryAdded(actionRequest);
-			}
-			else if (tabs2.equals("entry-updated-email")) {
-				validateEmailEntryUpdated(actionRequest);
-			}
+			validateEmail(actionRequest, "emailEntryAdded");
+			validateEmail(actionRequest, "emailEntryUpdated");
+			validateEmailFrom(actionRequest);
 		}
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
-	}
-
-	protected void validateEmailEntryAdded(ActionRequest actionRequest)
-		throws Exception {
-
-		String emailEntryAddedSubject = getLocalizedParameter(
-			actionRequest, "emailEntryAddedSubject");
-		String emailEntryAddedBody = getLocalizedParameter(
-			actionRequest, "emailEntryAddedBody");
-
-		if (Validator.isNull(emailEntryAddedSubject)) {
-			SessionErrors.add(actionRequest, "emailEntryAddedSubject");
-		}
-		else if (Validator.isNull(emailEntryAddedBody)) {
-			SessionErrors.add(actionRequest, "emailEntryAddedBody");
-		}
-	}
-
-	protected void validateEmailEntryUpdated(ActionRequest actionRequest)
-		throws Exception {
-
-		String emailEntryUpdatedSubject = getLocalizedParameter(
-			actionRequest, "emailEntryUpdatedSubject");
-		String emailEntryUpdatedBody = getLocalizedParameter(
-			actionRequest, "emailEntryUpdatedBody");
-
-		if (Validator.isNull(emailEntryUpdatedSubject)) {
-			SessionErrors.add(actionRequest, "emailEntryUpdatedSubject");
-		}
-		else if (Validator.isNull(emailEntryUpdatedBody)) {
-			SessionErrors.add(actionRequest, "emailEntryUpdatedBody");
-		}
-	}
-
-	protected void validateEmailFrom(ActionRequest actionRequest)
-		throws Exception {
-
-		String emailFromName = getParameter(actionRequest, "emailFromName");
-		String emailFromAddress = getParameter(
-			actionRequest, "emailFromAddress");
-
-		if (Validator.isNull(emailFromName)) {
-			SessionErrors.add(actionRequest, "emailFromName");
-		}
-		else if (!Validator.isEmailAddress(emailFromAddress) &&
-				 !Validator.isVariableTerm(emailFromAddress)) {
-
-			SessionErrors.add(actionRequest, "emailFromAddress");
-		}
 	}
 
 }

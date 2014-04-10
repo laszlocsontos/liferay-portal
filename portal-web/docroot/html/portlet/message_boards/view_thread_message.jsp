@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 				</c:when>
 				<c:otherwise>
 					<liferay-ui:user-display
-						displayStyle="<%= 2 %>"
+						displayStyle="2"
 						userId="<%= message.getUserId() %>"
 						userName="<%= HtmlUtil.escape(message.getUserName()) %>"
 					>
@@ -49,7 +49,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 						MBStatsUser statsUser = MBStatsUserLocalServiceUtil.getStatsUser(scopeGroupId, message.getUserId());
 
 						int posts = statsUser.getMessageCount();
-						String[] ranks = MBUtil.getUserRank(groupPortletSettings, themeDisplay.getLanguageId(), statsUser);
+						String[] ranks = MBUtil.getUserRank(mbSettings, themeDisplay.getLanguageId(), statsUser);
 						%>
 
 						<c:if test="<%= Validator.isNotNull(ranks[1]) %>">
@@ -283,8 +283,7 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 				String msgBody = message.getBody();
 
 				if (message.isFormatBBCode()) {
-					msgBody = BBCodeTranslatorUtil.getHTML(msgBody);
-					msgBody = StringUtil.replace(msgBody, "@theme_images_path@/emoticons", themeDisplay.getPathThemeImages() + "/emoticons");
+					msgBody = MBUtil.getBBCodeHTML(msgBody, themeDisplay.getPathThemeImages());
 				}
 				%>
 

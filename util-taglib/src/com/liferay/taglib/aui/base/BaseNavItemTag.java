@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -99,6 +99,10 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 
 	public boolean getToggle() {
 		return _toggle;
+	}
+
+	public boolean getToggleTouch() {
+		return _toggleTouch;
 	}
 
 	public boolean getUseDialog() {
@@ -211,6 +215,12 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("toggle", toggle);
 	}
 
+	public void setToggleTouch(boolean toggleTouch) {
+		_toggleTouch = toggleTouch;
+
+		setScopedAttribute("toggleTouch", toggleTouch);
+	}
+
 	public void setUseDialog(boolean useDialog) {
 		_useDialog = useDialog;
 
@@ -242,6 +252,7 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		_state = null;
 		_title = null;
 		_toggle = false;
+		_toggleTouch = true;
 		_useDialog = false;
 		_wrapDropDownMenu = true;
 	}
@@ -275,6 +286,7 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "state", _state);
 		setNamespacedAttribute(request, "title", _title);
 		setNamespacedAttribute(request, "toggle", _toggle);
+		setNamespacedAttribute(request, "toggleTouch", _toggleTouch);
 		setNamespacedAttribute(request, "useDialog", _useDialog);
 		setNamespacedAttribute(request, "wrapDropDownMenu", _wrapDropDownMenu);
 	}
@@ -304,6 +316,7 @@ public class BaseNavItemTag extends com.liferay.taglib.util.IncludeTag {
 	private java.lang.String _state = null;
 	private java.lang.String _title = null;
 	private boolean _toggle = false;
+	private boolean _toggleTouch = true;
 	private boolean _useDialog = false;
 	private boolean _wrapDropDownMenu = true;
 

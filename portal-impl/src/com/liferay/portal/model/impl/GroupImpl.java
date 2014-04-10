@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
@@ -153,6 +154,18 @@ public class GroupImpl extends GroupBaseImpl {
 	@Override
 	public long getDefaultPublicPlid() {
 		return getDefaultPlid(false);
+	}
+
+	@Override
+	public List<Group> getDescendants(boolean site) throws SystemException {
+		List<Group> descendants = new UniqueList<Group>();
+
+		for (Group group : getChildren(site)) {
+			descendants.add(group);
+			descendants.addAll(group.getDescendants(site));
+		}
+
+		return descendants;
 	}
 
 	@Override
@@ -379,6 +392,15 @@ public class GroupImpl extends GroupBaseImpl {
 		}
 
 		return 0;
+	}
+
+	@Override
+	public long getRemoteLiveGroupId() {
+		if (!isStagedRemotely()) {
+			return GroupConstants.DEFAULT_LIVE_GROUP_ID;
+		}
+
+		return GetterUtil.getLong(getTypeSettingsProperty("remoteGroupId"));
 	}
 
 	@Override

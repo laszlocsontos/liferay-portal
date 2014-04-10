@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ import com.liferay.portlet.dynamicdatalists.RecordSetNameException;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatalists.service.base.DDLRecordSetLocalServiceBaseImpl;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructureLink;
 
 import java.util.Date;
 import java.util.List;
@@ -334,8 +335,12 @@ public class DDLRecordSetLocalServiceImpl
 			ServiceContext serviceContext, DDLRecordSet recordSet)
 		throws PortalException, SystemException {
 
+		// Record set
+
 		validateDDMStructureId(ddmStructureId);
 		validateName(nameMap);
+
+		long oldDDMStructureId = recordSet.getDDMStructureId();
 
 		recordSet.setModifiedDate(serviceContext.getModifiedDate(null));
 		recordSet.setDDMStructureId(ddmStructureId);
@@ -344,6 +349,26 @@ public class DDLRecordSetLocalServiceImpl
 		recordSet.setMinDisplayRows(minDisplayRows);
 
 		ddlRecordSetPersistence.update(recordSet);
+
+		if (oldDDMStructureId != ddmStructureId) {
+
+			// Records
+
+			ddlRecordLocalService.deleteRecords(recordSet.getRecordSetId());
+
+			// Dynamic data mapping structure link
+
+			DDMStructureLink ddmStructureLink =
+				ddmStructureLinkLocalService.getClassStructureLink(
+					recordSet.getRecordSetId());
+
+			long classNameId = classNameLocalService.getClassNameId(
+				DDLRecordSet.class);
+
+			ddmStructureLinkLocalService.updateStructureLink(
+				ddmStructureLink.getStructureLinkId(), classNameId,
+				recordSet.getRecordSetId(), ddmStructureId);
+		}
 
 		return recordSet;
 	}

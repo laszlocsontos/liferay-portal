@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -571,8 +571,7 @@ public class JournalArticleServiceTest {
 		}
 
 		return JournalTestUtil.updateArticle(
-			article, "Version 2", ServiceTestUtil.randomString(),
-			serviceContext);
+			article, "Version 2", article.getContent(), serviceContext);
 	}
 
 	private JournalArticle _article;

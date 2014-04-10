@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -254,13 +254,9 @@ public class PortletExporter {
 			_log.debug("Export permissions " + exportPermissions);
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isInfoEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		LayoutCache layoutCache = new LayoutCache();
 
@@ -382,15 +378,19 @@ public class PortletExporter {
 		portletDataContext.setMissingReferencesElement(
 			missingReferencesElement);
 
-		boolean[] exportPortletControls =
-			ExportImportHelperUtil.getExportPortletControls(
+		Map<String, Boolean> exportPortletControlsMap =
+			ExportImportHelperUtil.getExportPortletControlsMap(
 				layout.getCompanyId(), portletId, parameterMap);
 
 		exportPortlet(
 			portletDataContext, layoutCache, portletId, layout, rootElement,
-			exportPermissions, exportPortletControls[0],
-			exportPortletControls[1], exportPortletControls[2],
-			exportPortletControls[3]);
+			exportPermissions,
+			exportPortletControlsMap.get(
+				PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS),
+			exportPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_DATA),
+			exportPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_SETUP),
+			exportPortletControlsMap.get(
+				PortletDataHandlerKeys.PORTLET_USER_PREFERENCES));
 
 		exportAssetLinks(portletDataContext);
 		exportAssetTags(portletDataContext);

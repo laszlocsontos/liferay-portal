@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,7 +56,7 @@ public class LayoutCache {
 				List<UserGroup> userGroups = UserGroupLocalServiceUtil.search(
 					companyId, null, null, 0, 1, (OrderByComparator)null);
 
-				if (userGroups.size() > 0) {
+				if (!userGroups.isEmpty()) {
 					UserGroup userGroup = userGroups.get(0);
 
 					entityGroupId = userGroup.getGroupId();
@@ -69,7 +69,7 @@ public class LayoutCache {
 						OrganizationConstants.ANY_PARENT_ORGANIZATION_ID, name,
 						null, null, null, null, null, null, null, true, 0, 1);
 
-				if (organizations.size() > 0) {
+				if (!organizations.isEmpty()) {
 					Organization organization = organizations.get(0);
 
 					entityGroupId = organization.getGroupId();

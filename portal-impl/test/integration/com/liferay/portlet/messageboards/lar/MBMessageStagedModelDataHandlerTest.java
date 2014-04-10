@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,6 +92,8 @@ public class MBMessageStagedModelDataHandlerTest
 			group.getGroupId(), category.getCategoryId(), true,
 			objectValuePairs);
 
+		MBMessageLocalServiceUtil.updateAnswer(message, true, false);
+
 		List<FileEntry> attachmentsFileEntries =
 			message.getAttachmentsFileEntries();
 
@@ -182,6 +184,7 @@ public class MBMessageStagedModelDataHandlerTest
 
 		Assert.assertEquals(
 			1, importedMessage.getAttachmentsFileEntriesCount());
+		Assert.assertTrue(importedMessage.isAnswer());
 	}
 
 }

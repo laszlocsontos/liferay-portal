@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,7 @@ import com.liferay.portlet.journal.service.persistence.JournalFolderActionableDy
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
 
@@ -56,6 +57,10 @@ public class JournalFolderIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.JOURNAL;
 
 	public JournalFolderIndexer() {
+		setDefaultSelectedFieldNames(
+			new String[] {
+				Field.COMPANY_ID, Field.DESCRIPTION, Field.ENTRY_CLASS_NAME,
+				Field.ENTRY_CLASS_PK, Field.TITLE, Field.UID});
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -130,8 +135,8 @@ public class JournalFolderIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet,
-		PortletURL portletURL) {
+		Document document, Locale locale, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		LiferayPortletURL liferayPortletURL = (LiferayPortletURL)portletURL;
 

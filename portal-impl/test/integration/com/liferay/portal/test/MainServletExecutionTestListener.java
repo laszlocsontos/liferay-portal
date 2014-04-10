@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,6 +36,10 @@ public class MainServletExecutionTestListener
 	public void runBeforeClass(TestContext testContext) {
 		super.runBeforeClass(testContext);
 
+		if (mainServlet != null) {
+			return;
+		}
+
 		MockServletContext mockServletContext =
 			new AutoDeployMockServletContext(
 				getResourceBasePath(), new FileSystemResourceLoader());
@@ -60,7 +64,7 @@ public class MainServletExecutionTestListener
 		return "file:" + file.getAbsolutePath();
 	}
 
-	protected MainServlet mainServlet;
+	protected static MainServlet mainServlet;
 
 	protected class AutoDeployMockServletContext extends MockServletContext {
 

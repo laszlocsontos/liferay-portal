@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -195,7 +195,9 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 	protected void checkInefficientStringMethods(
 		String line, String fileName, int lineCount) {
 
-		if (mainReleaseVersion.equals(MAIN_RELEASE_VERSION_6_1_0)) {
+		if (mainReleaseVersion.equals(MAIN_RELEASE_VERSION_6_1_0) ||
+			isRunsOutsidePortal(fileName)) {
+
 			return;
 		}
 
@@ -410,20 +412,25 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 				"<%--\n" + copyright + "\n--%>");
 		}
 
-		int x = content.indexOf("* Copyright (c) 2000-20");
+		int x = content.indexOf("* Copyright (c) 2000-");
 
 		if (x == -1) {
 			return content;
 		}
 
-		int y = copyright.indexOf("* Copyright (c) 2000-20");
+		int y = content.indexOf("Liferay", x);
 
-		if (y == -1) {
+		String contentCopyrightYear = content.substring(x, y);
+
+		x = copyright.indexOf("* Copyright (c) 2000-");
+
+		if (x == -1) {
 			return content;
 		}
 
-		String contentCopyrightYear = content.substring(x, x + 25);
-		String copyrightYear = copyright.substring(y, y + 25);
+		y = copyright.indexOf("Liferay", x);
+
+		String copyrightYear = copyright.substring(x, y);
 
 		return StringUtil.replace(content, contentCopyrightYear, copyrightYear);
 	}
@@ -915,6 +922,15 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		}
 
 		return false;
+	}
+
+	protected boolean isRunsOutsidePortal(String fileName) {
+		if (fileName.contains("/sync-engine-shared/")) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	protected void processErrorMessage(String fileName, String message) {

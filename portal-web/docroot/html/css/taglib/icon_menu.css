@@ -1,6 +1,10 @@
 @import "compass";
 @import "mixins";
 
+.lfr-icon-menu .lfr-icon-menu-icon {
+	max-width: none;
+}
+
 .lfr-menu-list-overflow {
 	overflow: auto;
 	overflow-x: hidden;
@@ -22,8 +26,8 @@
 	}
 
 	&.dropdown-menu {
-		position: relative;
 		float: none;
+		position: relative;
 
 		@include respond-to(phone, tablet) {
 			> li > a {

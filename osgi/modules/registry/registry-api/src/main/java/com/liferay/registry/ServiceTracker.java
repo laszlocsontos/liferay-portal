@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@ public interface ServiceTracker<S, T> {
 	public void close();
 
 	@Override
-	public boolean equals(Object obj);
+	public boolean equals(Object object);
 
 	public T getService();
 
@@ -42,7 +42,7 @@ public interface ServiceTracker<S, T> {
 
 	public SortedMap<ServiceReference<S>, T> getTrackedServiceReferences();
 
-	public int getTrackingServiceReferencesCount();
+	public int getUpdateMarker();
 
 	@Override
 	public int hashCode();

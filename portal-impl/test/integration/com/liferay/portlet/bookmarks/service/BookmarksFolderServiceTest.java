@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -179,19 +179,15 @@ public class BookmarksFolderServiceTest {
 			Assert.assertEquals(
 				entry.getCompanyId(),
 				GetterUtil.getLong(doc.get(Field.COMPANY_ID)));
-			AssertUtils.assertEqualsIgnoreCase(
-				entry.getDescription(), doc.get(Field.DESCRIPTION));
+			Assert.assertEquals(
+				BookmarksEntry.class.getName(),
+				doc.get(Field.ENTRY_CLASS_NAME));
 			Assert.assertEquals(
 				entry.getEntryId(),
 				GetterUtil.getLong(doc.get(Field.ENTRY_CLASS_PK)));
-			Assert.assertEquals(
-				entry.getGroupId(),
-				GetterUtil.getLong(doc.get(Field.GROUP_ID)));
 			AssertUtils.assertEqualsIgnoreCase(
 				entry.getName(), doc.get(Field.TITLE));
 			Assert.assertEquals(entry.getUrl(), doc.get(Field.URL));
-			Assert.assertEquals(
-				entry.getFolderId(), GetterUtil.getLong(doc.get("folderId")));
 		}
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,6 +119,13 @@ public class AssetCategoryServiceWrapper implements AssetCategoryService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _assetCategoryService.getCategory(categoryId);
+	}
+
+	@Override
+	public java.lang.String getCategoryPath(long categoryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _assetCategoryService.getCategoryPath(categoryId);
 	}
 
 	@Override
@@ -318,6 +325,26 @@ public class AssetCategoryServiceWrapper implements AssetCategoryService,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _assetCategoryService.search(groupIds, name, vocabularyIds,
 			start, end);
+	}
+
+	@Override
+	public com.liferay.portlet.asset.model.AssetCategoryDisplay searchCategoriesDisplay(
+		long groupId, java.lang.String title, long vocabularyId, int start,
+		int end)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _assetCategoryService.searchCategoriesDisplay(groupId, title,
+			vocabularyId, start, end);
+	}
+
+	@Override
+	public com.liferay.portlet.asset.model.AssetCategoryDisplay searchCategoriesDisplay(
+		long[] groupIds, java.lang.String title, long[] vocabularyIds,
+		int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _assetCategoryService.searchCategoriesDisplay(groupIds, title,
+			vocabularyIds, start, end);
 	}
 
 	@Override

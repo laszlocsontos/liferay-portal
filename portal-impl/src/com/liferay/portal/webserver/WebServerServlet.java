@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1189,8 +1189,7 @@ public class WebServerServlet extends HttpServlet {
 			return;
 		}
 
-		String fileName = HttpUtil.decodeURL(
-			HtmlUtil.escape(pathArray[2]), true);
+		String fileName = HttpUtil.decodeURL(HtmlUtil.escape(pathArray[2]));
 
 		if (fileEntry.isInTrash()) {
 			fileName = TrashUtil.getOriginalTitle(fileName);

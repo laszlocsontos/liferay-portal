@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -234,7 +234,7 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			List<Layout> layouts = layoutPersistence.findByG_P_P(
 				groupId, privateLayout, parentLayoutId, 0, 1);
 
-			if (layouts.size() == 0) {
+			if (layouts.isEmpty()) {
 				firstLayout = true;
 			}
 			else {

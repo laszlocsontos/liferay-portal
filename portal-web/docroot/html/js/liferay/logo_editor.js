@@ -7,19 +7,21 @@ AUI.add(
 			{
 				ATTRS: {
 					maxFileSize: {
-						value: null
+						validator: Lang.isNumber
 					},
 
 					previewURL: {
+						validator: Lang.isString,
 						value: null
 					},
 
 					uploadURL: {
+						validator: Lang.isString,
 						value: null
 					}
 				},
 
-				AUGMENTS: [Liferay.PortletBase],
+				AUGMENTS: [Liferay.PortletBase, Liferay.StorageFormatter],
 
 				EXTENDS: A.Base,
 
@@ -87,38 +89,33 @@ AUI.add(
 
 						var responseText = obj.responseText;
 
-						var exception;
-
-						if (responseText.indexOf('FileSizeException') > -1) {
-							exception = 'FileSizeException';
+						try {
+							responseText = A.JSON.parse(responseText);
 						}
-						else if (responseText.indexOf('TypeException') > -1) {
-							exception = 'TypeException';
+						catch (err) {
 						}
-
-						if (exception) {
-							if (exception == 'FileSizeException') {
-								message = Lang.sub(
-									Liferay.Language.get('upload-images-no-larger-than-x-k'),
-									[instance.get('maxFileSize')]
-								);
-							}
-							else {
-								message = Liferay.Language.get('please-enter-a-file-with-a-valid-file-type');
-							}
-
-							var messageNode = instance._getMessageNode(message, 'aui-alert aui-alert-error');
-
-							instance._formNode.prepend(messageNode);
-						}
-
-						var previewURL = instance.get('previewURL');
-
-						previewURL = Liferay.Util.addParams('t=' + Lang.now(), previewURL);
 
 						var portraitPreviewImg = instance._portraitPreviewImg;
 
-						portraitPreviewImg.attr('src', previewURL);
+						if (Lang.isObject(responseText)) {
+							if (responseText.errorMessage) {
+								var messageNode = instance._getMessageNode(responseText.errorMessage, 'alert alert-error');
+
+								instance._formNode.prepend(messageNode);
+							}
+
+							if (responseText.tempImageFileName) {
+								var previewURL = instance.get('previewURL');
+
+								previewURL = Liferay.Util.addParams(instance.get('namespace') + 'tempImageFileName=' + responseText.tempImageFileName, previewURL);
+								previewURL = Liferay.Util.addParams('t=' + Lang.now(), previewURL);
+
+								portraitPreviewImg.attr('src', previewURL);
+
+								instance.one('#previewURL').val(previewURL);
+								instance.one('#tempImageFileName').val(responseText.tempImageFileName);
+							}
+						}
 
 						portraitPreviewImg.removeClass('loading');
 					},
@@ -177,32 +174,36 @@ AUI.add(
 					_onFileNameChange: function(event) {
 						var instance = this;
 
-						var uploadURL = instance.get('uploadURL');
+						var formValidator = Liferay.Form.get(instance._formNode.attr('id')).formValidator;
 
-						var imageCropper = instance._imageCropper;
-						var portraitPreviewImg = instance._portraitPreviewImg;
+						formValidator.validateField(instance._fileNameNode);
 
-						portraitPreviewImg.addClass('loading');
+						if (!formValidator.hasErrors()) {
+							var imageCropper = instance._imageCropper;
+							var portraitPreviewImg = instance._portraitPreviewImg;
 
-						portraitPreviewImg.attr('src', themeDisplay.getPathThemeImages() + '/spacer.png');
+							portraitPreviewImg.addClass('loading');
 
-						if (imageCropper) {
-							imageCropper.disable();
-						}
+							portraitPreviewImg.attr('src', themeDisplay.getPathThemeImages() + '/spacer.png');
 
-						A.io.request(
-							uploadURL,
-							{
-								form: {
-									id: instance.ns('fm'),
-									upload: true
-								},
-								on: {
-									complete: A.bind('fire', instance, 'uploadComplete'),
-									start: A.bind('fire', instance, 'uploadStart')
-								}
+							if (imageCropper) {
+								imageCropper.disable();
 							}
-						);
+
+							A.io.request(
+								instance.get('uploadURL'),
+								{
+									form: {
+										id: instance.ns('fm'),
+										upload: true
+									},
+									on: {
+										complete: A.bind('fire', instance, 'uploadComplete'),
+										start: A.bind('fire', instance, 'uploadStart')
+									}
+								}
+							);
+						}
 					},
 
 					_onImageLoad: function(event) {
@@ -288,6 +289,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-image-cropper', 'aui-io-request', 'liferay-portlet-base']
+		requires: ['aui-image-cropper', 'aui-io-request', 'liferay-portlet-base', 'liferay-storage-formatter']
 	}
 );

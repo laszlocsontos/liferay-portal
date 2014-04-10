@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -154,14 +154,15 @@ if (!ParamUtil.getBoolean(renderRequest, "advancedSearch")) {
 		</aui:nav>
 
 		<aui:nav-bar>
+
+			<%
+			request.setAttribute(WebKeys.SEARCH_CONTAINER, userSearchContainer);
+			%>
+
 			<liferay-util:include page="/html/portlet/users_admin/toolbar.jsp" />
 
 			<c:if test="<%= userOrganization == null %>">
-				<aui:nav-bar-search cssClass="pull-right">
-					<liferay-ui:search-form
-						page="/html/portlet/users_admin/user_search.jsp"
-					/>
-				</aui:nav-bar-search>
+				<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/users_admin/user_search.jsp" searchContainer="<%= userSearchContainer %>" />
 			</c:if>
 		</aui:nav-bar>
 	</c:if>

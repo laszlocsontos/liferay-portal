@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,20 +36,25 @@ import org.apache.tools.ant.DirectoryScanner;
  */
 public class SeleniumBuilderContext {
 
-	public SeleniumBuilderContext(String baseDir) throws Exception {
-		this(baseDir, "com/liferay/portalweb/portal/util/liferayselenium/");
-	}
-
-	public SeleniumBuilderContext(String baseDir, String liferaySeleniumDir)
+	public SeleniumBuilderContext(
+			SeleniumBuilderFileUtil seleniumBuilderFileUtil)
 		throws Exception {
 
-		_baseDir = baseDir;
+		this(
+			seleniumBuilderFileUtil,
+			"com/liferay/portalweb/portal/util/liferayselenium/");
+	}
 
-		_seleniumBuilderFileUtil = new SeleniumBuilderFileUtil(_baseDir);
+	public SeleniumBuilderContext(
+			SeleniumBuilderFileUtil seleniumBuilderFileUtil,
+			String liferaySeleniumDirName)
+		throws Exception {
+
+		_seleniumBuilderFileUtil = seleniumBuilderFileUtil;
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 
-		directoryScanner.setBasedir(_baseDir);
+		directoryScanner.setBasedir(seleniumBuilderFileUtil.getBaseDirName());
 		directoryScanner.setIncludes(
 			new String[] {
 				"**\\*.action", "**\\*.function", "**\\*.macro", "**\\*.path",
@@ -65,8 +70,8 @@ public class SeleniumBuilderContext {
 		}
 
 		String[] seleniumFileNames = {
-			liferaySeleniumDir + "LiferaySelenium.java",
-			liferaySeleniumDir + "SeleniumWrapper.java"
+			liferaySeleniumDirName + "LiferaySelenium.java",
+			liferaySeleniumDirName + "SeleniumWrapper.java"
 		};
 
 		for (String seleniumFileName : seleniumFileNames) {
@@ -270,10 +275,6 @@ public class SeleniumBuilderContext {
 
 	public String getActionSimpleClassName(String actionName) {
 		return _actionSimpleClassNames.get(actionName);
-	}
-
-	public String getBaseDir() {
-		return _baseDir;
 	}
 
 	public String getFunctionClassName(String functionName) {
@@ -1239,7 +1240,6 @@ public class SeleniumBuilderContext {
 		new HashMap<String, Element>();
 	private Map<String, String> _actionSimpleClassNames =
 		new HashMap<String, String>();
-	private String _baseDir;
 	private Map<String, String> _functionClassNames =
 		new HashMap<String, String>();
 	private Map<String, String> _functionFileNames =

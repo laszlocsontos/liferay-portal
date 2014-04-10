@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ import com.liferay.portal.security.permission.ResourceBlockIdsBag;
 import com.liferay.portal.service.PersistedModelLocalService;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil;
 import com.liferay.portal.service.base.ResourceBlockLocalServiceBaseImpl;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.sql.Connection;
@@ -870,7 +871,9 @@ public class ResourceBlockLocalServiceImpl
 
 					// On success, manually flush to enforce database row lock
 
-					resourceBlockPersistence.flush();
+					if (PropsValues.SPRING_HIBERNATE_SESSION_DELEGATED) {
+						resourceBlockPersistence.flush();
+					}
 				}
 				catch (SystemException se) {
 					if (_log.isWarnEnabled()) {

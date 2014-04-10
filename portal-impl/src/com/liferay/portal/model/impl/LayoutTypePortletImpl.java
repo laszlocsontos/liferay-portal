@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -314,7 +314,7 @@ public class LayoutTypePortletImpl
 			Portlet portlet = PortletLocalServiceUtil.getPortletById(
 				getCompanyId(), portletId);
 
-			if (portlet != null) {
+			if ((portlet != null) && !portlet.isUndeployedPortlet()) {
 				portlets.add(portlet);
 			}
 		}
@@ -1258,7 +1258,7 @@ public class LayoutTypePortletImpl
 
 			List<String> columns = layoutTemplate.getColumns();
 
-			if (columns.size() > 0) {
+			if (!columns.isEmpty()) {
 				columnId = columns.get(0);
 			}
 		}

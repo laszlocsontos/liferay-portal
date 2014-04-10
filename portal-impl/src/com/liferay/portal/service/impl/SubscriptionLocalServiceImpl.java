@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -112,12 +112,12 @@ public class SubscriptionLocalServiceImpl
 		long classNameId = classNameLocalService.getClassNameId(className);
 		Date now = new Date();
 
-		long subscriptionId = counterLocalService.increment();
-
 		Subscription subscription = subscriptionPersistence.fetchByC_U_C_C(
 			user.getCompanyId(), userId, classNameId, classPK);
 
 		if (subscription == null) {
+			long subscriptionId = counterLocalService.increment();
+
 			subscription = subscriptionPersistence.create(subscriptionId);
 
 			subscription.setCompanyId(user.getCompanyId());

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -144,6 +144,55 @@ public class WriterOutputStreamTest {
 	}
 
 	@Test
+	public void testFlush() throws IOException {
+		final AtomicBoolean flushed = new AtomicBoolean();
+
+		CharArrayWriter charArrayWriter = new CharArrayWriter() {
+
+			@Override
+			public void flush() {
+				flushed.set(true);
+			}
+
+		};
+
+		WriterOutputStream writerOutputStream = new WriterOutputStream(
+			charArrayWriter, StringPool.UTF8, 2);
+
+		Assert.assertFalse(flushed.get());
+
+		writerOutputStream.write('a');
+
+		Assert.assertFalse(flushed.get());
+
+		Assert.assertEquals(0, charArrayWriter.size());
+
+		writerOutputStream.write('b');
+
+		Assert.assertFalse(flushed.get());
+
+		Assert.assertEquals(0, charArrayWriter.size());
+
+		writerOutputStream.write('c');
+
+		Assert.assertFalse(flushed.get());
+
+		Assert.assertEquals("ab", charArrayWriter.toString());
+
+		writerOutputStream.write('d');
+
+		Assert.assertFalse(flushed.get());
+
+		Assert.assertEquals("ab", charArrayWriter.toString());
+
+		writerOutputStream.flush();
+
+		Assert.assertTrue(flushed.get());
+
+		Assert.assertEquals("abcd", charArrayWriter.toString());
+	}
+
+	@Test
 	public void testWrite() throws IOException {
 		CharArrayWriter charArrayWriter = new CharArrayWriter();
 
@@ -275,7 +324,16 @@ public class WriterOutputStreamTest {
 	}
 
 	private void _testWriteBlock(boolean autoFlush) throws IOException {
-		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+		final AtomicBoolean flushed = new AtomicBoolean();
+
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter() {
+
+			@Override
+			public void flush() {
+				flushed.set(true);
+			}
+
+		};
 
 		WriterOutputStream writerOutputStream = new WriterOutputStream(
 			unsyncStringWriter, "US-ASCII", 2, autoFlush);
@@ -286,13 +344,19 @@ public class WriterOutputStreamTest {
 				(byte)'f', (byte)'g'},
 			1, 5);
 
+		Assert.assertFalse(flushed.get());
+
 		if (!autoFlush) {
 			writerOutputStream.flush();
+
+			Assert.assertTrue(flushed.get());
+
+			flushed.set(false);
 		}
 
 		Assert.assertEquals("bcdef", unsyncStringWriter.toString());
 
-		unsyncStringWriter = new UnsyncStringWriter();
+		unsyncStringWriter.reset();
 
 		writerOutputStream = new WriterOutputStream(
 			unsyncStringWriter, "US-ASCII", 4, autoFlush);
@@ -303,21 +367,33 @@ public class WriterOutputStreamTest {
 				(byte)'f', (byte)'g'},
 			1, 5);
 
+		Assert.assertFalse(flushed.get());
+
 		if (!autoFlush) {
 			writerOutputStream.flush();
+
+			Assert.assertTrue(flushed.get());
+
+			flushed.set(false);
 		}
 
 		Assert.assertEquals("bcdef", unsyncStringWriter.toString());
 
-		unsyncStringWriter = new UnsyncStringWriter();
+		unsyncStringWriter.reset();
 
 		writerOutputStream = new WriterOutputStream(
 			unsyncStringWriter, "US-ASCII", autoFlush);
 
 		writerOutputStream.write(new byte[]{(byte)'a', (byte)'b', (byte)'c'});
 
+		Assert.assertFalse(flushed.get());
+
 		if (!autoFlush) {
 			writerOutputStream.flush();
+
+			Assert.assertTrue(flushed.get());
+
+			flushed.set(false);
 		}
 
 		Assert.assertEquals("abc", unsyncStringWriter.toString());

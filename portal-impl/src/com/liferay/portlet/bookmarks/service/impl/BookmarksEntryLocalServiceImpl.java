@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,9 +28,9 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -62,12 +62,10 @@ import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.model.TrashVersion;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.portlet.PortletPreferences;
 
@@ -517,6 +515,11 @@ public class BookmarksEntryLocalServiceImpl
 		searchContext.setStart(start);
 		searchContext.setUserId(userId);
 
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
+
 		return indexer.search(searchContext);
 	}
 
@@ -684,21 +687,6 @@ public class BookmarksEntryLocalServiceImpl
 		return folderId;
 	}
 
-	protected void notify(final SubscriptionSender subscriptionSender) {
-		TransactionCommitCallbackRegistryUtil.registerCallback(
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					subscriptionSender.flushNotificationsAsync();
-
-					return null;
-				}
-
-			}
-		);
-	}
-
 	protected void notifySubscribers(
 			BookmarksEntry entry, ServiceContext serviceContext)
 		throws PortalException, SystemException {
@@ -805,17 +793,14 @@ public class BookmarksEntryLocalServiceImpl
 
 		BookmarksFolder folder = entry.getFolder();
 
-		List<Long> folderIds = new ArrayList<Long>();
-
 		if (folder != null) {
-			folderIds.add(folder.getFolderId());
-
-			folderIds.addAll(folder.getAncestorFolderIds());
-		}
-
-		for (long curFolderId : folderIds) {
 			subscriptionSender.addPersistedSubscribers(
-				BookmarksFolder.class.getName(), curFolderId);
+				BookmarksFolder.class.getName(), folder.getFolderId());
+
+			for (Long ancestorFolderId : folder.getAncestorFolderIds()) {
+				subscriptionSender.addPersistedSubscribers(
+					BookmarksFolder.class.getName(), ancestorFolderId);
+			}
 		}
 
 		subscriptionSender.addPersistedSubscribers(
@@ -824,7 +809,7 @@ public class BookmarksEntryLocalServiceImpl
 		subscriptionSender.addPersistedSubscribers(
 			BookmarksEntry.class.getName(), entry.getEntryId());
 
-		notify(subscriptionSender);
+		subscriptionSender.flushNotificationsAsync();
 	}
 
 	protected void validate(String url) throws PortalException {

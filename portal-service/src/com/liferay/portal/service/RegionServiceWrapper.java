@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,6 +56,12 @@ public class RegionServiceWrapper implements RegionService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _regionService.addRegion(countryId, regionCode, name, active);
+	}
+
+	@Override
+	public com.liferay.portal.model.Region fetchRegion(long regionId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _regionService.fetchRegion(regionId);
 	}
 
 	@Override

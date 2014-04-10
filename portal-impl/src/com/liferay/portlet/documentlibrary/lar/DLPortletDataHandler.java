@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -187,7 +187,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "folders")) {
 			Element foldersElement =
-				portletDataContext.getImportDataGroupElement(Folder.class);
+				portletDataContext.getImportDataGroupElement(DLFolder.class);
 
 			List<Element> folderElements = foldersElement.elements();
 
@@ -199,7 +199,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "documents")) {
 			Element fileEntriesElement =
-				portletDataContext.getImportDataGroupElement(FileEntry.class);
+				portletDataContext.getImportDataGroupElement(DLFileEntry.class);
 
 			List<Element> fileEntryElements = fileEntriesElement.elements();
 
@@ -316,7 +316,7 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 
 		if (rootFolderId > 0) {
 			Element foldersElement =
-				portletDataContext.getImportDataGroupElement(Folder.class);
+				portletDataContext.getImportDataGroupElement(DLFolder.class);
 
 			List<Element> folderElements = foldersElement.elements();
 

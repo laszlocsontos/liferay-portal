@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -480,7 +480,7 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 		List<Long> folderIds = dlFolderService.getFolderIds(
 			groupId, rootFolderId);
 
-		if (folderIds.size() == 0) {
+		if (folderIds.isEmpty()) {
 			return Collections.emptyList();
 		}
 		else if (userId <= 0) {
@@ -496,28 +496,47 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 
 	@Override
 	public List<DLFileEntry> getGroupFileEntries(
-			long groupId, long userId, long rootFolderId, String[] mimeTypes,
-			int status, int start, int end, OrderByComparator obc)
+			long groupId, long userId, long repositoryId, long rootFolderId,
+			String[] mimeTypes, int status, int start, int end,
+			OrderByComparator obc)
 		throws PortalException, SystemException {
+
+		List<Long> repositoryIds = new ArrayList<Long>();
+
+		if (repositoryId != 0) {
+			repositoryIds.add(repositoryId);
+		}
 
 		QueryDefinition queryDefinition = new QueryDefinition(
 			status, start, end, obc);
 
 		if (rootFolderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			return dlFileEntryFinder.filterFindByG_U_F_M(
-				groupId, userId, new ArrayList<Long>(), mimeTypes,
-				queryDefinition);
+			return dlFileEntryFinder.filterFindByG_U_R_F_M(
+				groupId, userId, repositoryIds, new ArrayList<Long>(),
+				mimeTypes, queryDefinition);
 		}
 
 		List<Long> folderIds = dlFolderService.getFolderIds(
 			groupId, rootFolderId);
 
-		if (folderIds.size() == 0) {
+		if (folderIds.isEmpty()) {
 			return Collections.emptyList();
 		}
 
-		return dlFileEntryFinder.filterFindByG_U_F_M(
-			groupId, userId, folderIds, mimeTypes, queryDefinition);
+		return dlFileEntryFinder.filterFindByG_U_R_F_M(
+			groupId, userId, repositoryIds, folderIds, mimeTypes,
+			queryDefinition);
+	}
+
+	@Override
+	public List<DLFileEntry> getGroupFileEntries(
+			long groupId, long userId, long rootFolderId, String[] mimeTypes,
+			int status, int start, int end, OrderByComparator obc)
+		throws PortalException, SystemException {
+
+		return getGroupFileEntries(
+			groupId, userId, 0, rootFolderId, mimeTypes, status, start, end,
+			obc);
 	}
 
 	@Override
@@ -528,7 +547,7 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 		List<Long> folderIds = dlFolderService.getFolderIds(
 			groupId, rootFolderId);
 
-		if (folderIds.size() == 0) {
+		if (folderIds.isEmpty()) {
 			return 0;
 		}
 		else if (userId <= 0) {
@@ -543,25 +562,42 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 
 	@Override
 	public int getGroupFileEntriesCount(
-			long groupId, long userId, long rootFolderId, String[] mimeTypes,
-			int status)
+			long groupId, long userId, long repositoryId, long rootFolderId,
+			String[] mimeTypes, int status)
 		throws PortalException, SystemException {
 
+		List<Long> repositoryIds = new ArrayList<Long>();
+
+		if (repositoryId != 0) {
+			repositoryIds.add(repositoryId);
+		}
+
 		if (rootFolderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			return dlFileEntryFinder.filterCountByG_U_F_M(
-				groupId, userId, new ArrayList<Long>(), mimeTypes,
-				new QueryDefinition(status));
+			return dlFileEntryFinder.filterCountByG_U_R_F_M(
+				groupId, userId, repositoryIds, new ArrayList<Long>(),
+				mimeTypes, new QueryDefinition(status));
 		}
 
 		List<Long> folderIds = dlFolderService.getFolderIds(
 			groupId, rootFolderId);
 
-		if (folderIds.size() == 0) {
+		if (folderIds.isEmpty()) {
 			return 0;
 		}
 
-		return dlFileEntryFinder.filterCountByG_U_F_M(
-			groupId, userId, folderIds, mimeTypes, new QueryDefinition(status));
+		return dlFileEntryFinder.filterCountByG_U_R_F_M(
+			groupId, userId, repositoryIds, folderIds, mimeTypes,
+			new QueryDefinition(status));
+	}
+
+	@Override
+	public int getGroupFileEntriesCount(
+			long groupId, long userId, long rootFolderId, String[] mimeTypes,
+			int status)
+		throws PortalException, SystemException {
+
+		return getGroupFileEntriesCount(
+			groupId, userId, 0, rootFolderId, mimeTypes, status);
 	}
 
 	@Override

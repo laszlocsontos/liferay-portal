@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,11 +17,13 @@
 <%@ include file="/html/portlet/dynamic_data_lists/init.jsp" %>
 
 <%
+SearchContainer searchContainer = (SearchContainer)request.getAttribute(WebKeys.SEARCH_CONTAINER);
+
 String toolbarItem = ParamUtil.getString(request, "toolbarItem");
 %>
 
 <aui:nav-bar>
-	<aui:nav>
+	<aui:nav searchContainer="<%= searchContainer %>">
 		<portlet:renderURL var="viewRecordsURL">
 			<portlet:param name="struts_action" value="/dynamic_data_lists/view" />
 		</portlet:renderURL>
@@ -38,7 +40,7 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem");
 		</c:if>
 	</aui:nav>
 
-	<aui:nav-bar-search cssClass="pull-right" file="/html/portlet/dynamic_data_lists/record_set_search.jsp" />
+	<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/dynamic_data_lists/record_set_search.jsp" searchContainer="<%= searchContainer %>" />
 </aui:nav-bar>
 
 <c:if test="<%= DDLPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_RECORD_SET) %>">

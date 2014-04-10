@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TreeModelFinder;
@@ -64,7 +65,6 @@ import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
-import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.model.Account;
 import com.liferay.portal.model.BackgroundTask;
 import com.liferay.portal.model.Company;
@@ -114,8 +114,8 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -412,6 +412,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				group.getCompanyId(), 0, 0, Group.class.getName(),
 				group.getGroupId(), false, false, false);
 		}
+
+		addPortletDefaultData(group);
 
 		return group;
 	}
@@ -1043,6 +1045,21 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Returns the company's group.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @return the company's group, or <code>null</code> if a matching group
+	 *         could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Group fetchCompanyGroup(long companyId) throws SystemException {
+		long classNameId = classNameLocalService.getClassNameId(Company.class);
+
+		return groupPersistence.fetchByC_C_C(companyId, classNameId, companyId);
+	}
+
+	/**
 	 * Returns the group with the matching friendly URL.
 	 *
 	 * @param  companyId the primary key of the company
@@ -1087,6 +1104,28 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		}
 
 		return groupLocalService.loadFetchGroup(companyId, name);
+	}
+
+	/**
+	 * Returns the default user's personal site group.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @return the default user's personal site group, or <code>null</code> if a
+	 *         matching group could not be found
+	 * @throws PortalException if a default user for the company could not be
+	 *         found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public Group fetchUserPersonalSiteGroup(long companyId)
+		throws PortalException, SystemException {
+
+		long classNameId = classNameLocalService.getClassNameId(
+			UserPersonalSite.class);
+		long defaultUserId = userLocalService.getDefaultUserId(companyId);
+
+		return groupPersistence.fetchByC_C_C(
+			companyId, classNameId, defaultUserId);
 	}
 
 	/**
@@ -1160,7 +1199,15 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		if (Validator.isNull(friendlyURL)) {
-			throw new NoSuchGroupException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("{companyId=");
+			sb.append(companyId);
+			sb.append(", friendlyURL=");
+			sb.append(friendlyURL);
+			sb.append("}");
+
+			throw new NoSuchGroupException(sb.toString());
 		}
 
 		friendlyURL = getFriendlyURL(friendlyURL);
@@ -1915,6 +1962,15 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		return userOrgsGroups;
 	}
 
+	/**
+	 * Returns the default user's personal site group.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @return the default user's personal site group
+	 * @throws PortalException if a matching group or default user for the
+	 *         company could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
 	@Override
 	public Group getUserPersonalSiteGroup(long companyId)
 		throws PortalException, SystemException {
@@ -2438,7 +2494,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				keywordsArray, params, andOperator, start, end, obc);
 		}
 
-		List<Group> groups = doSearch(
+		Collection<Group> groups = doSearch(
 			companyId, classNameIds, parentGroupId, keywordsArray,
 			keywordsArray, params, andOperator);
 
@@ -2553,7 +2609,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				params, andOperator, start, end, obc);
 		}
 
-		List<Group> groups = doSearch(
+		Collection<Group> groups = doSearch(
 			companyId, classNameIds, parentGroupId, names, descriptions, params,
 			andOperator);
 
@@ -3036,7 +3092,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				keywordsArray, params, andOperator);
 		}
 
-		List<Group> groups = doSearch(
+		Collection<Group> groups = doSearch(
 			companyId, classNameIds, parentGroupId, keywordsArray,
 			keywordsArray, params, andOperator);
 
@@ -3084,7 +3140,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				params, andOperator);
 		}
 
-		List<Group> groups = doSearch(
+		Collection<Group> groups = doSearch(
 			companyId, classNameIds, parentGroupId, names, descriptions, params,
 			andOperator);
 
@@ -3666,9 +3722,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		Map<String, String[]> parameterMap = new HashMap<String, String[]>();
 
 		parameterMap.put(
-			PortletDataHandlerKeys.CATEGORIES,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
 			PortletDataHandlerKeys.PERMISSIONS,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
@@ -3678,6 +3731,10 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			PortletDataHandlerKeys.PORTLET_DATA,
 			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE +
+				PortletKeys.ASSET_CATEGORIES_ADMIN,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
 			PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
 			new String[] {Boolean.TRUE.toString()});
 
@@ -3685,52 +3742,65 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			defaultUserId, group.getGroupId(), false, parameterMap, larFile);
 	}
 
-	protected void deletePortletData(Group group)
+	protected void addPortletDefaultData(Group group)
 		throws PortalException, SystemException {
 
-		List<Portlet> portlets = portletLocalService.getPortlets(
-			group.getCompanyId());
+		PortletDataContext portletDataContext =
+			PortletDataContextFactoryUtil.createPreparePortletDataContext(
+				group.getCompanyId(), group.getGroupId(), null, null);
 
-		for (Portlet portlet : portlets) {
-			if (!portlet.isActive()) {
-				continue;
+		List<PortletDataHandler> portletDataHandlers = getPortletDataHandlers(
+			group);
+
+		for (PortletDataHandler portletDataHandler : portletDataHandlers) {
+			try {
+				portletDataHandler.addDefaultData(
+					portletDataContext, portletDataHandler.getPortletId(),
+					null);
 			}
-
-			PortletDataHandler portletDataHandler =
-				portlet.getPortletDataHandlerInstance();
-
-			if ((portletDataHandler == null) ||
-				portletDataHandler.isDataPortalLevel()) {
-
-				continue;
-			}
-
-			PortletDataContext portletDataContext =
-				PortletDataContextFactoryUtil.createExportPortletDataContext(
-					group.getCompanyId(), group.getGroupId(),
-					(Map<String, String[]>)null, (Date)null, (Date)null,
-					(ZipWriter)null);
-
-			// For now, we are going to throw an exception if one portlet data
-			// handler has an exception to ensure that the transaction is rolled
-			// back for data integrity. We may decide that this is not the best
-			// behavior in the future because a bad plugin could disallow
-			// deletion of groups.
-
-			//try {
-				portletDataHandler.deleteData(
-					portletDataContext, portlet.getPortletId(), null);
-			/*}
 			catch (Exception e) {
 				_log.error(
-					"Unable to delete data for portlet " +
-						portlet.getPortletId() + " in group " +
+					"Unable to add default data for portlet " +
+						portletDataHandler.getPortletId() + " in group " +
 							group.getGroupId());
-			}*/
+
+				if (portletDataHandler.isRollbackOnException()) {
+					throw new SystemException(e);
+				}
+			}
 		}
 	}
 
-	protected List<Group> doSearch(
+	protected void deletePortletData(Group group)
+		throws PortalException, SystemException {
+
+		PortletDataContext portletDataContext =
+			PortletDataContextFactoryUtil.createPreparePortletDataContext(
+				group.getCompanyId(), group.getGroupId(), null, null);
+
+		List<PortletDataHandler> portletDataHandlers = getPortletDataHandlers(
+			group);
+
+		for (PortletDataHandler portletDataHandler : portletDataHandlers) {
+			try {
+				portletDataHandler.deleteData(
+					portletDataContext, portletDataHandler.getPortletId(),
+					null);
+			}
+			catch (Exception e) {
+				_log.error(
+					"Unable to delete data for portlet " +
+						portletDataHandler.getPortletId() + " in group " +
+							group.getGroupId());
+
+				if (portletDataHandler.isRollbackOnException()) {
+					throw new SystemException(e);
+				}
+			}
+		}
+	}
+
+	protected Collection<Group> doSearch(
 			long companyId, long[] classNameIds, long parentGroupId,
 			String[] names, String[] descriptions,
 			LinkedHashMap<String, Object> params, boolean andOperator)
@@ -3754,7 +3824,16 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		Boolean site = (Boolean)params.remove("site");
 		List<Integer> types = (List<Integer>)params.remove("types");
 
-		List<Group> groups = new ArrayList<Group>();
+		Collection<Group> groups = null;
+
+		Long userId = (Long)params.remove("usersGroups");
+
+		if (userId == null) {
+			groups = new ArrayList<Group>();
+		}
+		else {
+			groups = new HashSet<Group>();
+		}
 
 		for (long classNameId : classNameIds) {
 			groups.addAll(groupPersistence.findByC_C(companyId, classNameId));
@@ -3963,25 +4042,14 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			}
 		}
 
-		// Join by Groups_Roles
-
-		Long userId = (Long)params.remove("usersGroups");
-
 		if (userId == null) {
 			return groups;
 		}
 
-		Set<Group> resultGroups = new HashSet<Group>(groups);
-
-		Long roleId = (Long)params.remove("groupsRoles");
-
-		if (roleId != null) {
-			resultGroups.retainAll(rolePersistence.getGroups(roleId));
-		}
-
 		// Join by Users_Groups
 
-		resultGroups.retainAll(userPersistence.getGroups(userId));
+		Set<Group> joinedGroups = new HashSet<Group>(
+			userPersistence.getGroups(userId));
 
 		boolean inherit = GetterUtil.getBoolean(params.remove("inherit"), true);
 
@@ -3997,7 +4065,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 				for (Group group : groups) {
 					if (organizationId == group.getClassPK()) {
-						resultGroups.add(group);
+						joinedGroups.add(group);
 					}
 				}
 			}
@@ -4005,15 +4073,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			// Join by Groups_Orgs and Users_Orgs
 
 			for (Organization organization : organizations) {
-				List<Group> tempGroups = new ArrayList<Group>(groups);
-
-				tempGroups.retainAll(
+				joinedGroups.addAll(
 					organizationPersistence.getGroups(
 						organization.getOrganizationId()));
-
-				if (!tempGroups.isEmpty()) {
-					resultGroups.addAll(tempGroups);
-				}
 			}
 
 			// Join by Groups_UserGroups and Users_UserGroups
@@ -4021,14 +4083,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			List<UserGroup> userGroups = userPersistence.getUserGroups(userId);
 
 			for (UserGroup userGroup : userGroups) {
-				List<Group> tempGroups = new ArrayList<Group>(groups);
-
-				tempGroups.retainAll(
+				joinedGroups.addAll(
 					userGroupPersistence.getGroups(userGroup.getUserGroupId()));
-
-				if (!tempGroups.isEmpty()) {
-					resultGroups.addAll(tempGroups);
-				}
 			}
 		}
 
@@ -4036,7 +4092,24 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			_log.debug("Unprocessed parameters " + MapUtil.toString(params));
 		}
 
-		return new ArrayList<Group>(resultGroups);
+		// Join by Groups_Roles
+
+		Long roleId = (Long)params.remove("groupsRoles");
+
+		if (roleId != null) {
+			joinedGroups.retainAll(rolePersistence.getGroups(roleId));
+		}
+
+		if (joinedGroups.size() > groups.size()) {
+			groups.retainAll(joinedGroups);
+
+			return groups;
+		}
+		else {
+			joinedGroups.retainAll(groups);
+
+			return joinedGroups;
+		}
 	}
 
 	protected long[] getClassNameIds() {
@@ -4095,6 +4168,33 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 	protected String getOrgGroupName(String name) {
 		return name + ORGANIZATION_NAME_SUFFIX;
+	}
+
+	protected List<PortletDataHandler> getPortletDataHandlers(Group group)
+		throws SystemException {
+
+		List<Portlet> portlets = portletLocalService.getPortlets(
+			group.getCompanyId());
+
+		List<PortletDataHandler> portletDataHandlers =
+			new ArrayList<PortletDataHandler>(portlets.size());
+
+		for (Portlet portlet : portlets) {
+			if (!portlet.isActive()) {
+				continue;
+			}
+
+			PortletDataHandler portletDataHandler =
+				portlet.getPortletDataHandlerInstance();
+
+			if ((portletDataHandler != null) &&
+				!portletDataHandler.isDataPortalLevel()) {
+
+				portletDataHandlers.add(portletDataHandler);
+			}
+		}
+
+		return portletDataHandlers;
 	}
 
 	protected String[] getSearchNames(long companyId, String name)
@@ -4352,16 +4452,25 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	protected List<Group> sort(
-		List<Group> groups, int start, int end, OrderByComparator obc) {
+		Collection<Group> groups, int start, int end, OrderByComparator obc) {
 
 		if (obc == null) {
 			obc = new GroupNameComparator(true);
 		}
 
-		Collections.sort(groups, obc);
+		List<Group> groupList = null;
+
+		if (groups instanceof List) {
+			groupList = (List<Group>)groups;
+		}
+		else {
+			groupList = new ArrayList<Group>(groups);
+		}
+
+		Collections.sort(groupList, obc);
 
 		return Collections.unmodifiableList(
-			ListUtil.subList(groups, start, end));
+			ListUtil.subList(groupList, start, end));
 	}
 
 	protected void unscheduleStaging(Group group) {
@@ -4548,7 +4657,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			Group group = groupFinder.findByC_N(companyId, name);
 
 			if ((groupId <= 0) || (group.getGroupId() != groupId)) {
-				throw new DuplicateGroupException();
+				throw new DuplicateGroupException("{groupId=" + groupId + "}");
 			}
 		}
 		catch (NoSuchGroupException nsge) {

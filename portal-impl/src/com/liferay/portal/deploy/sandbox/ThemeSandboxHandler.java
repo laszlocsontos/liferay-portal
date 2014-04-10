@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,10 @@
 
 package com.liferay.portal.deploy.sandbox;
 
+import com.liferay.portal.ant.CopyTask;
 import com.liferay.portal.kernel.deploy.Deployer;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
 

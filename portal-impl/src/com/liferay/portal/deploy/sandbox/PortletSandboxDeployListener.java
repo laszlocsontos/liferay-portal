@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,7 @@ public class PortletSandboxDeployListener
 		portletExtTaglibDTD =
 			portalWebDir + "/WEB-INF/tld/liferay-portlet-ext.tld";
 		securityTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-security.tld";
+		stagingTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-staging.tld";
 		themeTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-theme.tld";
 		uiTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-ui.tld";
 		utilTaglibDTD = portalWebDir + "/WEB-INF/tld/liferay-util.tld";

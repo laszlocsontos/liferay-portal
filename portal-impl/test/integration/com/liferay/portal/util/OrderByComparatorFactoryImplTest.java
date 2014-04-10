@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,12 +14,15 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.model.EmailAddress;
 import com.liferay.portal.model.impl.EmailAddressImpl;
 import com.liferay.portal.model.impl.EmailAddressModelImpl;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.TransactionalExecutionTestListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,7 +39,9 @@ import org.junit.runner.RunWith;
  * @author Wesley Gong
  * @see    ServiceBeanMethodInvocationFactoryImplTest
  */
+@ExecutionTestListeners(listeners = {TransactionalExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Transactional
 public class OrderByComparatorFactoryImplTest {
 
 	@Test

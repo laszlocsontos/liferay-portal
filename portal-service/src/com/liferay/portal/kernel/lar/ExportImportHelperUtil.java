@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -94,6 +94,11 @@ public class ExportImportHelperUtil {
 		return _exportImportHelper;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getExportPortletControlsMap(long, String, Map)}
+	 */
+	@Deprecated
 	public static boolean[] getExportPortletControls(
 			long companyId, String portletId,
 			Map<String, String[]> parameterMap)
@@ -103,6 +108,11 @@ public class ExportImportHelperUtil {
 			companyId, portletId, parameterMap);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getExportPortletControlsMap(long, String, Map, String)}
+	 */
+	@Deprecated
 	public static boolean[] getExportPortletControls(
 			long companyId, String portletId,
 			Map<String, String[]> parameterMap, String type)
@@ -112,6 +122,30 @@ public class ExportImportHelperUtil {
 			companyId, portletId, parameterMap, type);
 	}
 
+	public static Map<String, Boolean> getExportPortletControlsMap(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap)
+		throws Exception {
+
+		return getExportImportHelper().getExportPortletControlsMap(
+			companyId, portletId, parameterMap);
+	}
+
+	public static Map<String, Boolean> getExportPortletControlsMap(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, String type)
+		throws Exception {
+
+		return getExportImportHelper().getExportPortletControlsMap(
+			companyId, portletId, parameterMap, type);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getImportPortletControlsMap(long, String, Map, Element,
+	 *             ManifestSummary)}
+	 */
+	@Deprecated
 	public static boolean[] getImportPortletControls(
 			long companyId, String portletId,
 			Map<String, String[]> parameterMap, Element portletDataElement)
@@ -121,6 +155,12 @@ public class ExportImportHelperUtil {
 			companyId, portletId, parameterMap, portletDataElement);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getImportPortletControlsMap(long, String, Map, Element,
+	 *             ManifestSummary)}
+	 */
+	@Deprecated
 	public static boolean[] getImportPortletControls(
 			long companyId, String portletId,
 			Map<String, String[]> parameterMap, Element portletDataElement,
@@ -132,9 +172,20 @@ public class ExportImportHelperUtil {
 			manifestSummary);
 	}
 
+	public static Map<String, Boolean> getImportPortletControlsMap(
+			long companyId, String portletId,
+			Map<String, String[]> parameterMap, Element portletDataElement,
+			ManifestSummary manifestSummary)
+		throws Exception {
+
+		return getExportImportHelper().getImportPortletControlsMap(
+			companyId, portletId, parameterMap, portletDataElement,
+			manifestSummary);
+	}
+
 	public static Map<Long, Boolean> getLayoutIdMap(
 			PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		return getExportImportHelper().getLayoutIdMap(portletRequest);
 	}
@@ -154,6 +205,20 @@ public class ExportImportHelperUtil {
 		throws PortalException, SystemException {
 
 		return getExportImportHelper().getLayoutIds(layoutIdMap, targetGroupId);
+	}
+
+	public static long[] getLayoutIds(PortletRequest portletRequest)
+		throws PortalException, SystemException {
+
+		return getExportImportHelper().getLayoutIds(portletRequest);
+	}
+
+	public static long[] getLayoutIds(
+			PortletRequest portletRequest, long targetGroupId)
+		throws PortalException, SystemException {
+
+		return getExportImportHelper().getLayoutIds(
+			portletRequest, targetGroupId);
 	}
 
 	public static ManifestSummary getManifestSummary(
@@ -197,6 +262,13 @@ public class ExportImportHelperUtil {
 
 		return getExportImportHelper().getTempFileEntry(
 			groupId, userId, folderName);
+	}
+
+	public static boolean isReferenceWithinExportScope(
+		PortletDataContext portletDataContext, StagedModel stagedModel) {
+
+		return getExportImportHelper().isReferenceWithinExportScope(
+			portletDataContext, stagedModel);
 	}
 
 	public static String replaceExportContentReferences(
@@ -313,6 +385,21 @@ public class ExportImportHelperUtil {
 			portletDataContext, content, importReferencedContent);
 	}
 
+	public static void updateExportPortletPreferencesClassPKs(
+			PortletDataContext portletDataContext, Portlet portlet,
+			PortletPreferences portletPreferences, String key, String className)
+		throws Exception {
+
+		getExportImportHelper().updateExportPortletPreferencesClassPKs(
+			portletDataContext, portlet, portletPreferences, key, className);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #updateExportPortletPreferencesClassPKs(PortletDataContext,
+	 *             Portlet, PortletPreferences, String, String)}
+	 */
+	@Deprecated
 	public static void updateExportPortletPreferencesClassPKs(
 			PortletDataContext portletDataContext, Portlet portlet,
 			PortletPreferences portletPreferences, String key, String className,

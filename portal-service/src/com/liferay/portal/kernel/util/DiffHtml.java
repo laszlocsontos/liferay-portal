@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,13 +14,11 @@
 
 package com.liferay.portal.kernel.util;
 
-import java.io.Reader;
-
 /**
- * @author Julio Camarero
+ * @author     Julio Camarero
+ * @deprecated As of 7.0.0, moved to {@link
+ *             com.liferay.portal.kernel.diff.DiffHtml}
  */
-public interface DiffHtml {
-
-	public String diff(Reader source, Reader target) throws Exception;
-
+@Deprecated
+public interface DiffHtml extends com.liferay.portal.kernel.diff.DiffHtml {
 }

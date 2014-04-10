@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
@@ -26,8 +27,9 @@ import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MembershipRequest;
 import com.liferay.portal.model.MembershipRequestModel;
 import com.liferay.portal.model.MembershipRequestSoap;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
@@ -351,12 +353,18 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 
 	@Override
 	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	public long getOriginalUserId() {
@@ -432,13 +440,18 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 
 	@Override
 	public String getReplierUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getReplierUserId(), "uuid",
-			_replierUserUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getReplierUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setReplierUserUuid(String replierUserUuid) {
-		_replierUserUuid = replierUserUuid;
 	}
 
 	@JSON
@@ -739,7 +752,6 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 	private boolean _setOriginalGroupId;
 	private long _companyId;
 	private long _userId;
-	private String _userUuid;
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
 	private Date _createDate;
@@ -747,7 +759,6 @@ public class MembershipRequestModelImpl extends BaseModelImpl<MembershipRequest>
 	private String _replyComments;
 	private Date _replyDate;
 	private long _replierUserId;
-	private String _replierUserUuid;
 	private int _statusId;
 	private int _originalStatusId;
 	private boolean _setOriginalStatusId;

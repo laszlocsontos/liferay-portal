@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -160,7 +160,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 	</liferay-portlet:renderURL>
 
 	<div class="journal-container" id="<portlet:namespace />entriesContainer">
-		<aui:form action="<%= searchURL %>" method="get" name="fm">
+		<aui:form action="<%= searchURL %>" method="get" name="fm2">
 			<liferay-portlet:renderURLParams varImpl="searchURL" />
 			<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 			<aui:input name="breadcrumbsFolderId" type="hidden" value="<%= breadcrumbsFolderId %>" />
@@ -242,7 +242,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 
 						PortletURL hitURL = liferayPortletResponse.createRenderURL();
 
-						List<SearchResult> searchResultsList = SearchResultUtil.getSearchResults(hits, locale, hitURL);
+						List<SearchResult> searchResultsList = SearchResultUtil.getSearchResults(hits, locale, hitURL, liferayPortletRequest, liferayPortletResponse);
 
 						emptySearchResults = searchResultsList.isEmpty();
 

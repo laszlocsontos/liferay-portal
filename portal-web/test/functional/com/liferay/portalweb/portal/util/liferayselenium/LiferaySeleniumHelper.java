@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,9 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OSDetector;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -40,10 +42,12 @@ import java.io.File;
 import java.io.InputStreamReader;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
-import org.sikuli.script.Key;
+import org.sikuli.api.robot.Key;
 import org.sikuli.script.Match;
 import org.sikuli.script.Screen;
 
@@ -61,16 +65,16 @@ public class LiferaySeleniumHelper {
 		String command = null;
 
 		if (!OSDetector.isWindows()) {
-			String projectDir = liferaySelenium.getProjectDir();
+			String projectDirName = liferaySelenium.getProjectDirName();
 
-			projectDir = StringUtil.replace(projectDir, "\\", "//");
+			projectDirName = StringUtil.replace(projectDirName, "\\", "//");
 
-			runtime.exec("/bin/bash cd " + projectDir);
+			runtime.exec("/bin/bash cd " + projectDirName);
 
 			command = "/bin/bash ant -f " + fileName + " " + target;
 		}
 		else {
-			runtime.exec("cmd /c cd " + liferaySelenium.getProjectDir());
+			runtime.exec("cmd /c cd " + liferaySelenium.getProjectDirName());
 
 			command = "cmd /c ant -f " + fileName + " " + target;
 		}
@@ -102,6 +106,14 @@ public class LiferaySeleniumHelper {
 		BaseTestCase.assertEquals(pattern, liferaySelenium.getAlert());
 	}
 
+	public static void assertAlertNotPresent(LiferaySelenium liferaySelenium)
+		throws Exception {
+
+		if (liferaySelenium.isAlertPresent()) {
+			throw new Exception("Alert is present");
+		}
+	}
+
 	public static void assertChecked(
 			LiferaySelenium liferaySelenium, String locator)
 		throws Exception {
@@ -124,6 +136,20 @@ public class LiferaySeleniumHelper {
 			throw new Exception(
 				"Pattern \"" + pattern + "\" does not match \"" + confirmation +
 					"\"");
+		}
+	}
+
+	public static void assertConsoleTextNotPresent(String text)
+		throws Exception {
+
+		if (isConsoleTextPresent(text)) {
+			throw new Exception("\"" + text + "\" is present in console");
+		}
+	}
+
+	public static void assertConsoleTextPresent(String text) throws Exception {
+		if (!isConsoleTextPresent(text)) {
+			throw new Exception("\"" + text + "\" is not present in console");
 		}
 	}
 
@@ -165,14 +191,14 @@ public class LiferaySeleniumHelper {
 		String currentDate = DateUtil.getCurrentDate(
 			"yyyy-MM-dd", LocaleUtil.getDefault());
 
-		String log4jXMLFile =
+		String fileName =
 			PropsValues.LIFERAY_HOME + "/logs/liferay." + currentDate + ".xml";
 
-		if (!FileUtil.exists(log4jXMLFile)) {
+		if (!FileUtil.exists(fileName)) {
 			return;
 		}
 
-		String content = FileUtil.read(log4jXMLFile);
+		String content = FileUtil.read(fileName);
 
 		if (content.equals("")) {
 			return;
@@ -199,7 +225,7 @@ public class LiferaySeleniumHelper {
 					continue;
 				}
 
-				FileUtil.write(log4jXMLFile, "");
+				FileUtil.write(fileName, "");
 
 				Element throwableElement = eventElement.element("throwable");
 
@@ -405,27 +431,6 @@ public class LiferaySeleniumHelper {
 		}
 	}
 
-	public static void clickImageElement(
-			LiferaySelenium liferaySelenium, String image)
-		throws Exception {
-
-		Screen screen = new Screen();
-
-		Match match = screen.exists(
-			liferaySelenium.getProjectDir() +
-			liferaySelenium.getSikuliImagesDir() + image);
-
-		liferaySelenium.pause("1000");
-
-		if (match == null) {
-			return;
-		}
-
-		screen.click(
-			liferaySelenium.getProjectDir() +
-			liferaySelenium.getSikuliImagesDir() + image);
-	}
-
 	public static void connectToEmailAccount(
 			String emailAddress, String emailPassword)
 		throws Exception {
@@ -469,10 +474,45 @@ public class LiferaySeleniumHelper {
 		return pattern.equals(confirmation);
 	}
 
+	public static boolean isConsoleTextPresent(String text) throws Exception {
+		String currentDate = DateUtil.getCurrentDate(
+			"yyyy-MM-dd", LocaleUtil.getDefault());
+
+		String fileName =
+			PropsValues.LIFERAY_HOME + "/logs/liferay." + currentDate + ".log";
+
+		String content = FileUtil.read(fileName);
+
+		Pattern pattern = Pattern.compile(text);
+
+		Matcher matcher = pattern.matcher(content);
+
+		return matcher.find();
+	}
+
 	public static boolean isElementNotPresent(
 		LiferaySelenium liferaySelenium, String locator) {
 
 		return !liferaySelenium.isElementPresent(locator);
+	}
+
+	public static boolean isElementPresentAfterWait(
+			LiferaySelenium liferaySelenium, String locator)
+		throws Exception {
+
+		for (int second = 0;; second++) {
+			if (second >= TestPropsValues.TIMEOUT_EXPLICIT_WAIT) {
+				return liferaySelenium.isElementPresent(locator);
+			}
+
+			if (liferaySelenium.isElementPresent(locator)) {
+				break;
+			}
+
+			Thread.sleep(1000);
+		}
+
+		return liferaySelenium.isElementPresent(locator);
 	}
 
 	public static boolean isIgnorableErrorLine(String line) {
@@ -530,6 +570,10 @@ public class LiferaySeleniumHelper {
 		// LPS-17639
 
 		if (line.contains("Table 'lportal.lock_' doesn't exist")) {
+			return true;
+		}
+
+		if (line.contains("Table 'lportal.Lock_' doesn't exist")) {
 			return true;
 		}
 
@@ -614,6 +658,37 @@ public class LiferaySeleniumHelper {
 			return true;
 		}
 
+		if (Validator.equals(
+				TestPropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.1") ||
+			Validator.equals(
+				TestPropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.2") ||
+			Validator.equals(
+				TestPropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.3") ||
+			Validator.equals(
+				TestPropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.4") ||
+			Validator.equals(
+				TestPropsValues.LIFERAY_PORTAL_BRANCH, "ee-6.2.10")) {
+
+			if (line.contains(
+					"com.liferay.portal.kernel.search.SearchException: " +
+						"java.nio.channels.ClosedByInterruptException")) {
+
+				return true;
+			}
+
+			if (line.contains(
+					"org.apache.lucene.store.AlreadyClosedException")) {
+
+				return true;
+			}
+		}
+
+		if (Validator.isNotNull(TestPropsValues.IGNORE_ERROR) &&
+			line.contains(TestPropsValues.IGNORE_ERROR)) {
+
+			return true;
+		}
+
 		return false;
 	}
 
@@ -666,14 +741,13 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.pause("3000");
 	}
 
-	public static void saveScreenshot(
-			LiferaySelenium liferaySelenium, String fileName)
+	public static void saveScreenshot(LiferaySelenium liferaySelenium)
 		throws Exception {
 
 		_screenshotCount++;
 
 		File file = new File(
-			liferaySelenium.getProjectDir() + "portal-web/test-results/" +
+			liferaySelenium.getProjectDirName() + "portal-web/test-results/" +
 				"functional/screenshots/" + _screenshotCount + ".jpg");
 
 		file.mkdirs();
@@ -699,30 +773,13 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.pause("3000");
 	}
 
-	public static void typeFrame(
-		LiferaySelenium liferaySelenium, String locator, String value) {
-
-		liferaySelenium.selectFrame(locator);
-
-		value = value.replace("\\", "\\\\");
-
-		value = HtmlUtil.escapeJS(value);
-
-		liferaySelenium.runScript(
-			"document.body.innerHTML = \"" + value + "\"");
-
-		liferaySelenium.selectFrame("relative=parent");
-	}
-
-	public static void typeImageElement(
-			LiferaySelenium liferaySelenium, String image, String value)
+	public static void sikuliClick(
+			LiferaySelenium liferaySelenium, String image)
 		throws Exception {
 
-		Screen screen = new Screen();
-
-		Match match = screen.exists(
-			liferaySelenium.getProjectDir() +
-			liferaySelenium.getSikuliImagesDir() + image);
+		Match match = _screen.exists(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
 
 		liferaySelenium.pause("1000");
 
@@ -730,13 +787,106 @@ public class LiferaySeleniumHelper {
 			return;
 		}
 
-		screen.click(
-			liferaySelenium.getProjectDir() +
-			liferaySelenium.getSikuliImagesDir() + image);
+		_screen.click(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+	}
 
-		screen.type(liferaySelenium.getOutputDir() + value);
+	public static void sikuliType(
+			LiferaySelenium liferaySelenium, String image, String value)
+		throws Exception {
 
-		screen.type(Key.ENTER);
+		Match match = _screen.exists(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+
+		liferaySelenium.pause("1000");
+
+		if (match == null) {
+			return;
+		}
+
+		_screen.click(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+
+		_screen.type(value);
+	}
+
+	public static void sikuliUploadCommonFile(
+			LiferaySelenium liferaySelenium, String image, String value)
+		throws Exception {
+
+		sikuliType(
+			liferaySelenium, image,
+			liferaySelenium.getProjectDirName() +
+				liferaySelenium.getDependenciesDirName() + value);
+
+		_screen.type(Key.ENTER);
+	}
+
+	public static void sikuliUploadTempFile(
+			LiferaySelenium liferaySelenium, String image, String value)
+		throws Exception {
+
+		String slash = "/";
+
+		if (OSDetector.isWindows()) {
+			slash = "\\";
+		}
+
+		sikuliType(
+			liferaySelenium, image,
+			liferaySelenium.getOutputDirName() + slash + value);
+
+		_screen.type(Key.ENTER);
+	}
+
+	public static void typeAceEditor(
+		LiferaySelenium liferaySelenium, String locator, String value) {
+
+		int x = 0;
+		int y = value.indexOf("${line.separator}");
+
+		String line = value.substring(x, y);
+
+		liferaySelenium.typeKeys(locator, line.trim(), true);
+
+		liferaySelenium.keyPress(locator, "\\13");
+
+		while (y != -1) {
+			x = value.indexOf("}", x) + 1;
+			y = value.indexOf("${line.separator}", x);
+
+			if (y != -1) {
+				line = value.substring(x, y);
+			}
+			else {
+				line = value.substring(x, value.length());
+			}
+
+			liferaySelenium.typeKeys(locator, line.trim(), true);
+
+			liferaySelenium.keyPress(locator, "\\13");
+		}
+	}
+
+	public static void typeFrame(
+		LiferaySelenium liferaySelenium, String locator, String value) {
+
+		StringBundler sb = new StringBundler();
+
+		String titleAttibute = liferaySelenium.getAttribute(locator + "@title");
+
+		int x = titleAttibute.indexOf(",");
+
+		sb.append(titleAttibute.substring(x + 1));
+
+		sb.append(".setHTML(\"");
+		sb.append(HtmlUtil.escapeJS(value.replace("\\", "\\\\")));
+		sb.append("\");");
+
+		liferaySelenium.runScript(sb.toString());
 	}
 
 	public static void waitForElementNotPresent(
@@ -1053,6 +1203,7 @@ public class LiferaySeleniumHelper {
 		}
 	}
 
+	private static Screen _screen = new Screen();
 	private static int _screenshotCount = 0;
 
 }

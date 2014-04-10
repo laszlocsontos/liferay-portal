@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -94,8 +94,8 @@ public class FileChecker extends BaseChecker {
 			"${com.sun.aas.instanceRoot}",
 			"${com.sun.aas.installRoot}",
 			"${file.separator}",
-			"${java.io.tmpdir}",
 			"${java.home}",
+			"${java.io.tmpdir}",
 			"${jboss.home.dir}",
 			"${jetty.home}",
 			"${jonas.base}",
@@ -133,7 +133,8 @@ public class FileChecker extends BaseChecker {
 			System.getProperty("com.sun.aas.instanceRoot"),
 			System.getProperty("com.sun.aas.installRoot"),
 			System.getProperty("file.separator"),
-			System.getProperty("java.io.tmpdir"), System.getenv("JAVA_HOME"),
+			System.getProperty("java.home"),
+			System.getProperty("java.io.tmpdir"),
 			System.getProperty("jboss.home.dir"),
 			System.getProperty("jetty.home"), System.getProperty("jonas.base"),
 			_portalDir, PropsValues.LIFERAY_HOME,

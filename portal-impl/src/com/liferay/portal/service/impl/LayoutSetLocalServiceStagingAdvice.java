@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -81,7 +81,7 @@ public class LayoutSetLocalServiceStagingAdvice
 				(String)arguments[3]);
 		}
 		else if (methodName.equals("updateLogo") && (arguments.length == 4)) {
-			updateLogo(
+			returnValue = updateLogo(
 				(LayoutSetLocalService)thisObject, (Long)arguments[0],
 				(Boolean)arguments[1], (Boolean)arguments[2],
 				(byte[])arguments[3]);
@@ -192,6 +192,8 @@ public class LayoutSetLocalServiceStagingAdvice
 
 		PortalUtil.updateImageId(
 			layoutSetBranch, logo, logoBytes, "logoId", 0, 0, 0);
+
+		layoutSetBranchPersistence.update(layoutSetBranch);
 
 		return layoutSet;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,6 +48,8 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.impl.RegistryImpl;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -368,8 +370,11 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 	@Override
 	public void startFramework() throws Exception {
+		List<ServiceLoaderCondition> serviceLoaderConditions =
+			ServiceLoader.load(ServiceLoaderCondition.class);
+
 		ServiceLoaderCondition serviceLoaderCondition =
-			new ModuleFrameworkServiceLoaderCondition();
+			serviceLoaderConditions.get(0);
 
 		List<FrameworkFactory> frameworkFactories = ServiceLoader.load(
 			FrameworkFactory.class, serviceLoaderCondition);
@@ -388,6 +393,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		_framework.init();
 
 		_framework.start();
+
+		RegistryUtil.setRegistry(
+			new RegistryImpl(_framework.getBundleContext()));
 
 		_setupInitialBundles();
 	}
@@ -443,6 +451,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		if (_log.isInfoEnabled()) {
 			_log.info(frameworkEvent);
 		}
+
+		RegistryUtil.setRegistry(null);
 	}
 
 	@Override
@@ -1136,19 +1146,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	private Map<String, List<URL>> _extraPackageMap;
 	private List<URL> _extraPackageURLs;
 	private Framework _framework;
-
-	private class ModuleFrameworkServiceLoaderCondition
-		implements ServiceLoaderCondition {
-
-		@Override
-		public boolean isLoad(URL url) {
-			String path = url.getPath();
-
-			return path.contains(
-				PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR);
-		}
-
-	}
 
 	private class StartupFrameworkListener implements FrameworkListener {
 

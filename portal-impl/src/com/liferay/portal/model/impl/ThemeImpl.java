@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -371,7 +371,7 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 
 	@Override
 	public boolean hasColorSchemes() {
-		if (_colorSchemesMap.size() > 0) {
+		if (!_colorSchemesMap.isEmpty()) {
 			return true;
 		}
 		else {
@@ -589,7 +589,7 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 			List<ThemeCompanyId> includes = limit.getIncludes();
 			List<ThemeCompanyId> excludes = limit.getExcludes();
 
-			if ((includes.size() != 0) && (excludes.size() != 0)) {
+			if (!includes.isEmpty() && !excludes.isEmpty()) {
 
 				// Since includes and excludes are specified, check to make sure
 				// the current company id is included and also not excluded
@@ -604,7 +604,7 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 					available = !limit.isExcluded(id);
 				}
 			}
-			else if ((includes.size() == 0) && (excludes.size() != 0)) {
+			else if (includes.isEmpty() && !excludes.isEmpty()) {
 
 				// Since no includes are specified, check to make sure the
 				// current company id is not excluded
@@ -615,7 +615,7 @@ public class ThemeImpl extends PluginBaseImpl implements Theme {
 
 				available = !limit.isExcluded(id);
 			}
-			else if ((includes.size() != 0) && (excludes.size() == 0)) {
+			else if (!includes.isEmpty() && excludes.isEmpty()) {
 
 				// Since no excludes are specified, check to make sure the
 				// current company id is included

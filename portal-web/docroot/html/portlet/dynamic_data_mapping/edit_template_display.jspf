@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -116,8 +116,8 @@ if (Validator.isNotNull(scriptContent)) {
 
 	var editorContainer = panelScriptContainer.one('#<portlet:namespace />editorContainer');
 
-	if (Liferay.Util.getTop() !== A.config.win) {
-		var dialog = Liferay.Util.getWindow();
+	if (Util.getTop() !== A.config.win) {
+		var dialog = Util.getWindow();
 
 		if (dialog && A.Lang.isFunction(dialog._detachUIHandlesAutohide)) {
 			dialog._detachUIHandlesAutohide();
@@ -291,13 +291,17 @@ if (Validator.isNotNull(scriptContent)) {
 		return selectLanguageNode.val();
 	}
 
+	var paletteSearchContainer = panelScriptContainer.one('#<portlet:namespace />paletteSearchContainer');
+
 	function resizeEditor(event) {
 		var info = event.info;
 
 		richEditor.set(STR_HEIGHT, info.offsetHeight);
 		richEditor.set('width', info.offsetWidth);
 
-		paletteDataContainer.setStyle(STR_HEIGHT, info.offsetHeight);
+		if (!Util.isPhone()) {
+			paletteDataContainer.setStyle(STR_HEIGHT, info.offsetHeight - paletteSearchContainer.height());
+		}
 	}
 
 	function setEditorContent(content) {

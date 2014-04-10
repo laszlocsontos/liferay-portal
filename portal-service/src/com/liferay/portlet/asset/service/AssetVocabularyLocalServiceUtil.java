@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -424,15 +424,13 @@ public class AssetVocabularyLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupsVocabularies(
 		long[] groupIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getGroupsVocabularies(groupIds);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupsVocabularies(
 		long[] groupIds, java.lang.String className)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getGroupsVocabularies(groupIds, className);
 	}
 
@@ -457,6 +455,17 @@ public class AssetVocabularyLocalServiceUtil {
 		return getService().getGroupVocabularies(groupId, name, start, end, obc);
 	}
 
+	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupVocabularies(
+		long[] groupIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getGroupVocabularies(groupIds);
+	}
+
+	public static int getGroupVocabulariesCount(long[] groupIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getGroupVocabulariesCount(groupIds);
+	}
+
 	public static com.liferay.portlet.asset.model.AssetVocabulary getGroupVocabulary(
 		long groupId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -476,6 +485,14 @@ public class AssetVocabularyLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().getVocabulary(vocabularyId);
+	}
+
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portlet.asset.model.AssetVocabulary> searchVocabularies(
+		long companyId, long groupId, java.lang.String title, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchVocabularies(companyId, groupId, title, start, end);
 	}
 
 	/**

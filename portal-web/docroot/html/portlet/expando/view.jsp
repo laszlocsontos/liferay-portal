@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,9 +61,9 @@ Collections.sort(customAttributesDisplays, new CustomAttributesDisplayComparator
 		>
 
 			<%
-			buffer.append("<img align=\"left\" border=\"0\" src=\"");
+			buffer.append("<img class=\"custom-attribute-icon\" src=\"");
 			buffer.append(customAttributesDisplay.getIconPath(themeDisplay));
-			buffer.append("\" style=\"margin-right: 5px;\">");
+			buffer.append("\">");
 			buffer.append(ResourceActionsUtil.getModelResource(locale, customAttributesDisplay.getClassName()));
 			%>
 

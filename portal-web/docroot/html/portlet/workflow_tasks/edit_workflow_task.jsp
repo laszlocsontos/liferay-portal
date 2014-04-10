@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,10 +54,11 @@ if ((workflowTask.getAssigneeUserId() == user.getUserId()) && !workflowTask.isCo
 }
 
 PortletURL editPortletURL = workflowHandler.getURLEdit(classPK, liferayPortletRequest, liferayPortletResponse);
+PortletURL viewDiffsPortletURL = workflowHandler.getURLViewDiffs(classPK, liferayPortletRequest, liferayPortletResponse);
 
 String viewFullContentURLString = null;
 
-if (assetRenderer.isPreviewInContext()) {
+if ((assetRenderer != null) && assetRenderer.isPreviewInContext()) {
 	viewFullContentURLString = assetRenderer.getURLViewInContext((LiferayPortletRequest)renderRequest, (LiferayPortletResponse)renderResponse, null);
 }
 else {
@@ -194,6 +195,20 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 						<liferay-ui:icon-list>
 							<c:if test="<%= assetRenderer.hasViewPermission(permissionChecker) %>">
 								<liferay-ui:icon image="view" message="view[action]" method="get" target='<%= assetRenderer.isPreviewInContext() ? "_blank" : StringPool.BLANK %>' url="<%= viewFullContentURLString %>" />
+
+								<c:if test="<%= viewDiffsPortletURL != null %>">
+
+									<%
+									viewDiffsPortletURL.setParameter("redirect", currentURL);
+									viewDiffsPortletURL.setParameter("hideControls", Boolean.TRUE.toString());
+									viewDiffsPortletURL.setWindowState(LiferayWindowState.POP_UP);
+									viewDiffsPortletURL.setPortletMode(PortletMode.VIEW);
+
+									String taglibViewDiffsURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "viewDiffs', title: '" + HtmlUtil.escapeJS(LanguageUtil.get(pageContext, "diffs")) + "', uri:'" + HtmlUtil.escapeJS(viewDiffsPortletURL.toString()) + "'});";
+									%>
+
+									<liferay-ui:icon image="pages" message="diffs" url="<%= taglibViewDiffsURL %>" />
+								</c:if>
 							</c:if>
 
 							<c:if test="<%= editPortletURL != null %>">
@@ -238,7 +253,7 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 
 					<c:choose>
 						<c:when test="<%= path == null %>">
-							<%= HtmlUtil.escape(workflowHandler.getSummary(classPK, locale)) %>
+							<%= HtmlUtil.escape(workflowHandler.getSummary(classPK, renderRequest, renderResponse)) %>
 						</c:when>
 						<c:otherwise>
 							<liferay-util:include page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>" />
@@ -246,6 +261,8 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 					</c:choose>
 
 					<%
+					boolean filterByMetadata = false;
+
 					String[] metadataFields = new String[] {"author", "categories", "tags"};
 					%>
 

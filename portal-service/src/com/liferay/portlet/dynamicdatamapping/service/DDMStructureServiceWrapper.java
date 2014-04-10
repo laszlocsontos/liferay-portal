@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -353,6 +353,32 @@ public class DDMStructureServiceWrapper implements DDMStructureService,
 		long[] groupIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _ddmStructureService.getStructures(groupIds);
+	}
+
+	/**
+	* Returns all the structures matching the groups and class name ID that the
+	* user has permission to view.
+	*
+	* @param groupIds the primary keys of the groups
+	* @param classNameId the primary key of the class name for the structure's
+	related model
+	* @return the structures matching the groups and class name ID that the
+	user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	@Override
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getStructures(
+		long[] groupIds, long classNameId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureService.getStructures(groupIds, classNameId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> getStructures(
+		long[] groupIds, long classNameId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _ddmStructureService.getStructures(groupIds, classNameId, start,
+			end);
 	}
 
 	/**

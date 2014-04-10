@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.CompanyMxException;
 import com.liferay.portal.CompanyVirtualHostException;
 import com.liferay.portal.RequiredCompanyException;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -30,6 +31,7 @@ import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.User;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
@@ -62,9 +64,11 @@ import org.springframework.mock.web.MockServletContext;
  */
 @ExecutionTestListeners(
 	listeners = {
-		MainServletExecutionTestListener.class
+		MainServletExecutionTestListener.class,
+		TransactionalExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Transactional
 public class CompanyLocalServiceTest {
 
 	@Before
@@ -233,6 +237,23 @@ public class CompanyLocalServiceTest {
 	}
 
 	@Test
+	public void testUpdateDisplay() throws Exception {
+		Company company = addCompany();
+
+		User user = UserLocalServiceUtil.getDefaultUser(company.getCompanyId());
+
+		UserLocalServiceUtil.updateUser(user);
+
+		CompanyLocalServiceUtil.updateDisplay(
+			company.getCompanyId(), "hu", "CET");
+
+		user = UserLocalServiceUtil.getDefaultUser(company.getCompanyId());
+
+		Assert.assertEquals("hu", user.getLanguageId());
+		Assert.assertEquals("CET", user.getTimeZoneId());
+	}
+
+	@Test
 	public void testUpdateInvalidAccountNames() throws Exception {
 		Company company = addCompany();
 
@@ -301,8 +322,8 @@ public class CompanyLocalServiceTest {
 
 		LayoutSetPrototype layoutSetPrototype =
 			LayoutSetPrototypeLocalServiceUtil.addLayoutSetPrototype(
-				userId, companyId, nameMap, StringPool.BLANK, true, true,
-				getServiceContext(companyId));
+				userId, companyId, nameMap, new HashMap<Locale, String>(), true,
+				true, getServiceContext(companyId));
 
 		return layoutSetPrototype;
 	}

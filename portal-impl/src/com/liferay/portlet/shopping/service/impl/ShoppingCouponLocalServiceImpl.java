@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -266,7 +266,7 @@ public class ShoppingCouponLocalServiceImpl
 			}
 
 			if (shoppingCouponPersistence.fetchByCode(code) != null) {
-				throw new DuplicateCouponCodeException();
+				throw new DuplicateCouponCodeException("{code=" + code + "}");
 			}
 		}
 
@@ -303,7 +303,7 @@ public class ShoppingCouponLocalServiceImpl
 			}
 		}
 
-		if (invalidCategoryIds.size() > 0) {
+		if (!invalidCategoryIds.isEmpty()) {
 			CouponLimitCategoriesException clce =
 				new CouponLimitCategoriesException();
 
@@ -334,7 +334,7 @@ public class ShoppingCouponLocalServiceImpl
 			}
 		}
 
-		if (invalidSkus.size() > 0) {
+		if (!invalidSkus.isEmpty()) {
 			CouponLimitSKUsException clskue = new CouponLimitSKUsException();
 
 			clskue.setSkus(invalidSkus);

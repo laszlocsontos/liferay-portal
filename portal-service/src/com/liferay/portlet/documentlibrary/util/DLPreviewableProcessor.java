@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -356,15 +356,13 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 	protected void deletePreviews(
 		long companyId, long groupId, long fileEntryId, long fileVersionId) {
 
-		for (String type : getPreviewTypes()) {
-			String path = getPreviewFilePath(
-				groupId, fileEntryId, fileVersionId, type);
+		String path = getPreviewFilePath(
+			groupId, fileEntryId, fileVersionId, null);
 
-			try {
-				DLStoreUtil.deleteFile(companyId, REPOSITORY_ID, path);
-			}
-			catch (Exception e) {
-			}
+		try {
+			DLStoreUtil.deleteFile(companyId, REPOSITORY_ID, path);
+		}
+		catch (Exception e) {
 		}
 	}
 

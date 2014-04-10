@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,6 +58,7 @@ import com.liferay.portal.model.LayoutStagingHandler;
 import com.liferay.portal.model.LayoutTemplate;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.LayoutTypePortletConstants;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -150,7 +151,7 @@ public class LayoutStagedModelDataHandler
 
 		populateElementLayoutMetadata(layoutElement, layout);
 
-		layoutElement.addAttribute("action", Constants.ADD);
+		layoutElement.addAttribute(Constants.ACTION, Constants.ADD);
 
 		portletDataContext.setPlid(layout.getPlid());
 
@@ -220,10 +221,6 @@ public class LayoutStagedModelDataHandler
 
 		boolean privateLayout = portletDataContext.isPrivateLayout();
 
-		Map<Long, Layout> newLayoutsMap =
-			(Map<Long, Layout>)portletDataContext.getNewPrimaryKeysMap(
-				Layout.class + ".layout");
-
 		String action = layoutElement.attributeValue("action");
 
 		if (action.equals(Constants.DELETE)) {
@@ -231,18 +228,16 @@ public class LayoutStagedModelDataHandler
 				LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
 					layoutUuid, groupId, privateLayout);
 
-			if (layout != null) {
-				newLayoutsMap.put(oldLayoutId, layout);
-
-				ServiceContext serviceContext =
-					ServiceContextThreadLocal.getServiceContext();
-
-				LayoutLocalServiceUtil.deleteLayout(
-					deletingLayout, false, serviceContext);
-			}
+			LayoutLocalServiceUtil.deleteLayout(
+				deletingLayout, false,
+				ServiceContextThreadLocal.getServiceContext());
 
 			return;
 		}
+
+		Map<Long, Layout> layouts =
+			(Map<Long, Layout>)portletDataContext.getNewPrimaryKeysMap(
+				Layout.class + ".layout");
 
 		Layout existingLayout = null;
 		Layout importedLayout = null;
@@ -295,7 +290,7 @@ public class LayoutStagedModelDataHandler
 				layout.getUuid(), groupId, privateLayout);
 
 			if (SitesUtil.isLayoutModifiedSinceLastMerge(existingLayout)) {
-				newLayoutsMap.put(oldLayoutId, existingLayout);
+				layouts.put(oldLayoutId, existingLayout);
 
 				return;
 			}
@@ -374,12 +369,19 @@ public class LayoutStagedModelDataHandler
 			else {
 				importedLayout.setCreateDate(layout.getCreateDate());
 				importedLayout.setModifiedDate(layout.getModifiedDate());
-				importedLayout.setLayoutPrototypeUuid(
-					layout.getLayoutPrototypeUuid());
-				importedLayout.setLayoutPrototypeLinkEnabled(
-					layout.isLayoutPrototypeLinkEnabled());
-				importedLayout.setSourcePrototypeLayoutUuid(
-					layout.getSourcePrototypeLayoutUuid());
+
+				Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+				if (!group.isLayoutPrototype() &&
+					!group.isLayoutSetPrototype()) {
+
+					importedLayout.setLayoutPrototypeUuid(
+						layout.getLayoutPrototypeUuid());
+					importedLayout.setLayoutPrototypeLinkEnabled(
+						layout.isLayoutPrototypeLinkEnabled());
+					importedLayout.setSourcePrototypeLayoutUuid(
+						layout.getSourcePrototypeLayoutUuid());
+				}
 			}
 
 			importedLayout.setUuid(layout.getUuid());
@@ -404,8 +406,6 @@ public class LayoutStagedModelDataHandler
 		portletDataContext.setPlid(importedLayout.getPlid());
 		portletDataContext.setOldPlid(layout.getPlid());
 
-		newLayoutsMap.put(oldLayoutId, importedLayout);
-
 		long parentLayoutId = layout.getParentLayoutId();
 
 		String parentLayoutUuid = GetterUtil.getString(
@@ -418,17 +418,10 @@ public class LayoutStagedModelDataHandler
 		if ((parentLayoutId != LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) &&
 			(parentLayoutElement != null)) {
 
-			String parentLayoutPath = parentLayoutElement.attributeValue(
-				"path");
-
-			Layout parentLayout =
-				(Layout)portletDataContext.getZipEntryAsObject(
-					parentLayoutPath);
-
 			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, parentLayout);
+				portletDataContext, parentLayoutElement);
 
-			Layout importedParentLayout = newLayoutsMap.get(parentLayoutId);
+			Layout importedParentLayout = layouts.get(parentLayoutId);
 
 			parentLayoutId = importedParentLayout.getLayoutId();
 		}
@@ -474,7 +467,7 @@ public class LayoutStagedModelDataHandler
 		else if (layout.isTypeLinkToLayout()) {
 			importLinkedLayout(
 				portletDataContext, layout, importedLayout, layoutElement,
-				newLayoutsMap);
+				layouts);
 		}
 		else {
 			updateTypeSettings(portletDataContext, importedLayout, layout);
@@ -509,15 +502,15 @@ public class LayoutStagedModelDataHandler
 
 		LayoutSetLocalServiceUtil.updatePageCount(groupId, privateLayout);
 
-		List<Layout> newLayouts = portletDataContext.getNewLayouts();
-
-		newLayouts.add(importedLayout);
-
 		Map<Long, Long> layoutPlids =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Layout.class);
 
 		layoutPlids.put(layout.getPlid(), importedLayout.getPlid());
+
+		layouts.put(oldLayoutId, importedLayout);
+
+		importAssets(portletDataContext, layout, importedLayout);
 
 		importLayoutFriendlyURLs(portletDataContext, layout);
 
@@ -639,7 +632,7 @@ public class LayoutStagedModelDataHandler
 			!portletDataContext.isPerformDirectBinaryImport() &&
 			!layout.isInheritLookAndFeel()) {
 
-			StagedTheme stagedTheme = new StagedTheme(layout.getTheme());
+			StagedTheme stagedTheme = new StagedThemeImpl(layout.getTheme());
 
 			Element layoutElement = portletDataContext.getExportDataElement(
 				layout);
@@ -769,6 +762,22 @@ public class LayoutStagedModelDataHandler
 		return friendlyURL;
 	}
 
+	protected void importAssets(
+			PortletDataContext portletDataContext, Layout layout,
+			Layout importedLayout)
+		throws Exception {
+
+		long userId = portletDataContext.getUserId(layout.getUserUuid());
+
+		long[] assetCategoryIds = portletDataContext.getAssetCategoryIds(
+			Layout.class, layout.getPlid());
+		String[] assetTagNames = portletDataContext.getAssetTagNames(
+			Layout.class, layout.getPlid());
+
+		LayoutLocalServiceUtil.updateAsset(
+			userId, importedLayout, assetCategoryIds, assetTagNames);
+	}
+
 	protected void importJournalArticle(
 			PortletDataContext portletDataContext, Layout layout)
 		throws Exception {
@@ -851,7 +860,7 @@ public class LayoutStagedModelDataHandler
 	protected void importLinkedLayout(
 			PortletDataContext portletDataContext, Layout layout,
 			Layout importedLayout, Element layoutElement,
-			Map<Long, Layout> newLayoutsMap)
+			Map<Long, Layout> layouts)
 		throws Exception {
 
 		UnicodeProperties typeSettingsProperties =
@@ -885,7 +894,7 @@ public class LayoutStagedModelDataHandler
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, linkedToLayout);
 
-			Layout importedLinkedLayout = newLayoutsMap.get(linkToLayoutId);
+			Layout importedLinkedLayout = layouts.get(linkToLayoutId);
 
 			typeSettingsProperties.setProperty(
 				"privateLayout",
@@ -1154,21 +1163,22 @@ public class LayoutStagedModelDataHandler
 			List<String> sourcePortletIds = layoutTypePortlet.getPortletIds();
 
 			for (String portletId : sourcePortletIds) {
-				boolean importPortletSetup = false;
+				boolean importPortletConfiguration = false;
 
 				try {
-					boolean[] importPortletControls =
-						ExportImportHelperUtil.getImportPortletControls(
+					Map<String, Boolean> importPortletControlsMap =
+						ExportImportHelperUtil.getImportPortletControlsMap(
 							portletDataContext.getCompanyId(), portletId,
 							portletDataContext.getParameterMap(), null,
 							portletDataContext.getManifestSummary());
 
-					importPortletSetup = importPortletControls[2];
+					importPortletConfiguration = importPortletControlsMap.get(
+						PortletDataHandlerKeys.PORTLET_CONFIGURATION);
 				}
 				catch (Exception e) {
 				}
 
-				if (!importPortletSetup &&
+				if (!importPortletConfiguration &&
 					!importedPortletIds.contains(portletId)) {
 
 					removePortletFromLayoutTypePortlet(

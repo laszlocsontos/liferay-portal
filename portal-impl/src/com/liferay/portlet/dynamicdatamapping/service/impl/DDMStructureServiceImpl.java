@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -385,6 +385,33 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		throws SystemException {
 
 		return ddmStructurePersistence.filterFindByGroupId(groupIds);
+	}
+
+	/**
+	 * Returns all the structures matching the groups and class name ID that the
+	 * user has permission to view.
+	 *
+	 * @param  groupIds the primary keys of the groups
+	 * @param  classNameId the primary key of the class name for the structure's
+	 *         related model
+	 * @return the structures matching the groups and class name ID that the
+	 *         user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public List<DDMStructure> getStructures(long[] groupIds, long classNameId)
+		throws SystemException {
+
+		return ddmStructurePersistence.filterFindByG_C(groupIds, classNameId);
+	}
+
+	@Override
+	public List<DDMStructure> getStructures(
+			long[] groupIds, long classNameId, int start, int end)
+		throws SystemException {
+
+		return ddmStructurePersistence.filterFindByG_C(
+			groupIds, classNameId, start, end);
 	}
 
 	/**

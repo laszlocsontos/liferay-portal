@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Serializable;
 
@@ -29,6 +30,10 @@ import java.util.Map;
  */
 public class Field implements Serializable {
 
+	public static final String ANY = StringPool.STAR;
+
+	public static final String ASSET_CATEGORY_ID = "assetCategoryId";
+
 	public static final String ASSET_CATEGORY_IDS = "assetCategoryIds";
 
 	/**
@@ -42,6 +47,10 @@ public class Field implements Serializable {
 	public static final String ASSET_TAG_IDS = "assetTagIds";
 
 	public static final String ASSET_TAG_NAMES = "assetTagNames";
+
+	public static final String ASSET_VOCABULARY_ID = "assetVocabularyId";
+
+	public static final String ASSET_VOCABULARY_IDS = "assetVocabularyIds";
 
 	public static final String CATEGORY_ID = "categoryId";
 
@@ -74,6 +83,8 @@ public class Field implements Serializable {
 	public static final String GROUP_ROLE_ID = "groupRoleId";
 
 	public static final String HIDDEN = "hidden";
+
+	public static final String JOURNAL_ARTICLE_ID = "journalArticleId";
 
 	public static final String KEYWORD_SEARCH = "keywordSearch";
 

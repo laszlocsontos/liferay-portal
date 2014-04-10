@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -296,7 +296,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 							<aui:row fluid="<%= true %>">
 								<aui:col cssClass="lfr-discussion-details" width="25">
 									<liferay-ui:user-display
-										displayStyle="<%= 2 %>"
+										displayStyle="2"
 										userId="<%= message.getUserId() %>"
 										userName="<%= HtmlUtil.escape(message.getUserName()) %>"
 									/>
@@ -314,9 +314,11 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 									<div class="lfr-discussion-message">
 
 										<%
-										String msgBody = BBCodeTranslatorUtil.getHTML(message.getBody());
+										String msgBody = message.getBody();
 
-										msgBody = StringUtil.replace(msgBody, "@theme_images_path@/emoticons", themeDisplay.getPathThemeImages() + "/emoticons");
+										if (message.isFormatBBCode()) {
+											msgBody = MBUtil.getBBCodeHTML(msgBody, themeDisplay.getPathThemeImages());
+										}
 										%>
 
 										<%= msgBody %>

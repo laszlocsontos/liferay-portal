@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,11 +21,11 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -51,7 +51,7 @@ public class TokensTransformerListener extends BaseTransformerListener {
 
 	@Override
 	public String onScript(
-		String script, String xml, String languageId,
+		String script, Document document, String languageId,
 		Map<String, String> tokens) {
 
 		if (_log.isDebugEnabled()) {
@@ -67,44 +67,59 @@ public class TokensTransformerListener extends BaseTransformerListener {
 	 * @return the processed string
 	 */
 	protected String replace(String s, Map<String, String> tokens) {
-		Set<Map.Entry<String, String>> tokensSet = tokens.entrySet();
-
-		if (tokensSet.size() == 0) {
+		if (tokens.isEmpty()) {
 			return s;
 		}
 
-		List<String> escapedKeysList = new ArrayList<String>();
-		List<String> escapedValuesList = new ArrayList<String>();
+		List<String> escapedKeysList = null;
+		List<String> escapedValuesList = null;
 
-		List<String> keysList = new ArrayList<String>();
-		List<String> valuesList = new ArrayList<String>();
+		List<String> keysList = null;
+		List<String> valuesList = null;
 
-		List<String> tempEscapedKeysList = new ArrayList<String>();
-		List<String> tempEscapedValuesList = new ArrayList<String>();
+		List<String> tempEscapedKeysList = null;
+		List<String> tempEscapedValuesList = null;
 
-		for (Map.Entry<String, String> entry : tokensSet) {
+		boolean hasKey = false;
+
+		for (Map.Entry<String, String> entry : tokens.entrySet()) {
 			String key = entry.getKey();
-			String value = GetterUtil.getString(entry.getValue());
 
-			if (Validator.isNotNull(key)) {
-				String escapedKey =
-					StringPool.AT + StringPool.AT + key + StringPool.AT +
-						StringPool.AT;
+			if (Validator.isNotNull(key) && s.contains(key)) {
+				if (!hasKey) {
+					escapedKeysList = new ArrayList<String>();
+					escapedValuesList = new ArrayList<String>();
+					keysList = new ArrayList<String>();
+					valuesList = new ArrayList<String>();
+					tempEscapedKeysList = new ArrayList<String>();
+					tempEscapedValuesList = new ArrayList<String>();
 
-				String actualKey = StringPool.AT + key + StringPool.AT;
+					hasKey = true;
+				}
+
+				String actualKey = StringPool.AT.concat(
+					key).concat(StringPool.AT);
+
+				String escapedKey = StringPool.AT.concat(
+					actualKey).concat(StringPool.AT);
 
 				String tempEscapedKey =
-					TEMP_ESCAPED_AT_OPEN + key + TEMP_ESCAPED_AT_CLOSE;
+					TEMP_ESCAPED_AT_OPEN.concat(key).concat(
+						TEMP_ESCAPED_AT_CLOSE);
 
 				escapedKeysList.add(escapedKey);
 				escapedValuesList.add(tempEscapedKey);
 
 				keysList.add(actualKey);
-				valuesList.add(value);
+				valuesList.add(GetterUtil.getString(entry.getValue()));
 
 				tempEscapedKeysList.add(tempEscapedKey);
 				tempEscapedValuesList.add(actualKey);
 			}
+		}
+
+		if (!hasKey) {
+			return s;
 		}
 
 		s = StringUtil.replace(

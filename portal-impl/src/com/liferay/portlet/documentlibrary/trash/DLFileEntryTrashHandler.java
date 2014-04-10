@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.RepositoryServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil;
@@ -41,7 +42,7 @@ import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
-import com.liferay.portlet.trash.DuplicateEntryException;
+import com.liferay.portlet.trash.RestoreEntryException;
 import com.liferay.portlet.trash.TrashEntryConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
 
@@ -57,22 +58,22 @@ import javax.portlet.PortletRequest;
 public class DLFileEntryTrashHandler extends DLBaseTrashHandler {
 
 	@Override
-	public void checkDuplicateEntry(
+	public void checkRestorableEntry(
 			long classPK, long containerModelId, String newName)
 		throws PortalException, SystemException {
 
 		DLFileEntry dlFileEntry = getDLFileEntry(classPK);
 
-		checkDuplicateEntry(
+		checkRestorableEntry(
 			classPK, 0, containerModelId, dlFileEntry.getTitle(), newName);
 	}
 
 	@Override
-	public void checkDuplicateTrashEntry(
+	public void checkRestorableEntry(
 			TrashEntry trashEntry, long containerModelId, String newName)
 		throws PortalException, SystemException {
 
-		checkDuplicateEntry(
+		checkRestorableEntry(
 			trashEntry.getClassPK(), trashEntry.getEntryId(), containerModelId,
 			trashEntry.getTypeSettingsProperty("title"), newName);
 	}
@@ -148,7 +149,7 @@ public class DLFileEntryTrashHandler extends DLBaseTrashHandler {
 
 	@Override
 	public String getSystemEventClassName() {
-		return FileEntry.class.getName();
+		return DLFileEntryConstants.getClassName();
 	}
 
 	@Override
@@ -281,7 +282,7 @@ public class DLFileEntryTrashHandler extends DLBaseTrashHandler {
 		DLFileVersionLocalServiceUtil.updateDLFileVersion(dlFileVersion);
 	}
 
-	protected void checkDuplicateEntry(
+	protected void checkRestorableEntry(
 			long classPK, long entryId, long containerModelId,
 			String originalTitle, String newName)
 		throws PortalException, SystemException {
@@ -301,13 +302,14 @@ public class DLFileEntryTrashHandler extends DLBaseTrashHandler {
 				dlFileEntry.getGroupId(), containerModelId, originalTitle);
 
 		if (duplicateDLFileEntry != null) {
-			DuplicateEntryException dee = new DuplicateEntryException();
+			RestoreEntryException ree = new RestoreEntryException(
+				RestoreEntryException.DUPLICATE);
 
-			dee.setDuplicateEntryId(duplicateDLFileEntry.getFileEntryId());
-			dee.setOldName(duplicateDLFileEntry.getTitle());
-			dee.setTrashEntryId(entryId);
+			ree.setDuplicateEntryId(duplicateDLFileEntry.getFileEntryId());
+			ree.setOldName(duplicateDLFileEntry.getTitle());
+			ree.setTrashEntryId(entryId);
 
-			throw dee;
+			throw ree;
 		}
 	}
 

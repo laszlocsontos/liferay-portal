@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -114,7 +114,7 @@ request.setAttribute("control_panel.jsp-ppid", ppid);
 									if (categoryPortlets.size() == 1) {
 										Portlet firstPortlet = categoryPortlets.get(0);
 
-										PortletURL redirectURL = PortalUtil.getSiteAdministrationURL(request, themeDisplay, firstPortlet.getPortletName());
+										PortletURL redirectURL = PortalUtil.getSiteAdministrationURL(request, themeDisplay, firstPortlet.getPortletId());
 
 										response.sendRedirect(redirectURL.toString());
 									}

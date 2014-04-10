@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,6 +56,7 @@ import com.liferay.portal.model.AttachedModel;
 import com.liferay.portal.model.AuditedModel;
 import com.liferay.portal.model.ClassedModel;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.Portlet;
@@ -546,23 +547,23 @@ public class PortletDataContextImpl implements PortletDataContext {
 				return referenceElement;
 			}
 
-			_missingReferences.add(referenceKey);
+			if (!_missingReferences.contains(referenceKey)) {
+				_missingReferences.add(referenceKey);
 
-			doAddReferenceElement(
-				referrerClassedModel, null, classedModel, className, binPath,
-				referenceType, true);
+				referenceElement.addAttribute(
+					"missing", Boolean.TRUE.toString());
+
+				doAddReferenceElement(
+					referrerClassedModel, null, classedModel, className,
+					binPath, referenceType, true);
+			}
 		}
 		else {
 			_references.add(referenceKey);
 
-			if (_missingReferences.contains(referenceKey)) {
-				_missingReferences.remove(referenceKey);
+			referenceElement.addAttribute("missing", Boolean.FALSE.toString());
 
-				Element missingReferenceElement = getMissingReferenceElement(
-					classedModel);
-
-				_missingReferencesElement.remove(missingReferenceElement);
-			}
+			cleanUpMissingReferences(classedModel);
 		}
 
 		return referenceElement;
@@ -649,6 +650,20 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 		catch (IOException ioe) {
 			throw new SystemException(ioe);
+		}
+	}
+
+	@Override
+	public void cleanUpMissingReferences(ClassedModel classedModel) {
+		String referenceKey = getReferenceKey(classedModel);
+
+		if (_missingReferences.contains(referenceKey)) {
+			_missingReferences.remove(referenceKey);
+
+			Element missingReferenceElement = getMissingReferenceElement(
+				classedModel);
+
+			_missingReferencesElement.remove(missingReferenceElement);
 		}
 	}
 
@@ -973,9 +988,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 			"path", path);
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             ExportImportPathUtil#getLayoutPath(PortletDataContext, long)}
+	 */
+	@Deprecated
 	@Override
 	public String getLayoutPath(long plid) {
-		return ExportImportPathUtil.getLayoutPath(this, plid);
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -993,6 +1013,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _missingReferencesElement;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getNewPrimaryKeysMap(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<Layout> getNewLayouts() {
 		return _newLayouts;
@@ -1017,7 +1042,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1040,6 +1065,12 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _plid;
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             ExportImportPathUtil#getPortletPath(PortletDataContext,
+	 *             String)}
+	 */
+	@Deprecated
 	@Override
 	public String getPortletPath(String portletId) {
 		return ExportImportPathUtil.getPortletPath(this, portletId);
@@ -1115,7 +1146,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1188,13 +1219,18 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return getReferenceElements(parentStagedModel, clazz, 0, null);
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             ExportImportPathUtil#getRootPath(PortletDataContext)}
+	 */
+	@Deprecated
 	@Override
 	public String getRootPath() {
 		return ExportImportPathUtil.getRootPath(this);
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1232,16 +1268,33 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _sourceGroupId;
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             ExportImportPathUtil#getSourceLayoutPath(PortletDataContext,
+	 *             long)}
+	 */
+	@Deprecated
 	@Override
 	public String getSourceLayoutPath(long layoutId) {
-		return ExportImportPathUtil.getSourceLayoutPath(this, layoutId);
+		return StringPool.BLANK;
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             ExportImportPathUtil#getSourcePortletPath(PortletDataContext,
+	 *             String)}
+	 */
+	@Deprecated
 	@Override
 	public String getSourcePortletPath(String portletId) {
-		return ExportImportPathUtil.getSourcePortletPath(this, portletId);
+		return StringPool.BLANK;
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             ExportImportPathUtil#getSourceRootPath(PortletDataContext)}
+	 */
+	@Deprecated
 	@Override
 	public String getSourceRootPath() {
 		return ExportImportPathUtil.getSourceRootPath(this);
@@ -1273,7 +1326,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1340,7 +1393,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1421,6 +1474,25 @@ public class PortletDataContextImpl implements PortletDataContext {
 			(Map<Long, Long>)getNewPrimaryKeysMap(clazz);
 
 		newPrimaryKeysMap.put(classPK, newClassPK);
+
+		if (classedModel instanceof StagedGroupedModel &&
+			newClassedModel instanceof StagedGroupedModel) {
+
+			Map<Long, Long> groupIds = (Map<Long, Long>)getNewPrimaryKeysMap(
+				Group.class);
+
+			StagedGroupedModel stagedGroupedModel =
+				(StagedGroupedModel)classedModel;
+
+			if (!groupIds.containsKey(stagedGroupedModel.getGroupId())) {
+				StagedGroupedModel newStagedGroupedModel =
+					(StagedGroupedModel)newClassedModel;
+
+				groupIds.put(
+					stagedGroupedModel.getGroupId(),
+					newStagedGroupedModel.getGroupId());
+			}
+		}
 
 		importLocks(clazz, String.valueOf(classPK), String.valueOf(newClassPK));
 		importPermissions(clazz, classPK, newClassPK);
@@ -1657,7 +1729,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -2026,6 +2098,31 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 			referenceElement.addAttribute(
 				"group-id", String.valueOf(stagedGroupedModel.getGroupId()));
+
+			try {
+				Group group = GroupLocalServiceUtil.getGroup(
+					stagedGroupedModel.getGroupId());
+
+				long liveGroupId = group.getLiveGroupId();
+
+				if (group.isStagedRemotely()) {
+					liveGroupId = group.getRemoteLiveGroupId();
+				}
+
+				if (liveGroupId == GroupConstants.DEFAULT_LIVE_GROUP_ID) {
+					liveGroupId = group.getGroupId();
+				}
+
+				referenceElement.addAttribute(
+					"live-group-id", String.valueOf(liveGroupId));
+			}
+			catch (Exception e) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to find group " +
+							stagedGroupedModel.getGroupId());
+				}
+			}
 		}
 
 		if (Validator.isNotNull(binPath)) {

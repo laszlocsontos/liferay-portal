@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetBranch;
 import com.liferay.portlet.layoutsadmin.lar.StagedTheme;
+import com.liferay.portlet.layoutsadmin.lar.StagedThemeImpl;
 
 /**
  * @author Mate Thurzo
@@ -45,7 +46,7 @@ public class ThemeExporter {
 			return;
 		}
 
-		StagedTheme stagedTheme = new StagedTheme(layoutSet.getTheme());
+		StagedTheme stagedTheme = new StagedThemeImpl(layoutSet.getTheme());
 
 		if (!portletDataContext.isPerformDirectBinaryImport()) {
 			Element layoutSetElement = portletDataContext.getExportDataElement(
@@ -78,7 +79,8 @@ public class ThemeExporter {
 			return;
 		}
 
-		StagedTheme stagedTheme = new StagedTheme(layoutSetBranch.getTheme());
+		StagedTheme stagedTheme = new StagedThemeImpl(
+			layoutSetBranch.getTheme());
 
 		if (!portletDataContext.isPerformDirectBinaryImport()) {
 			Element layoutSetBranchElement =

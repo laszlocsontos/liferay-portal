@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -102,9 +102,16 @@ public class IntrabandRPCUtil {
 				datagram.getDataByteBuffer());
 
 			try {
-				V v = deserializer.readObject();
+				RPCResponse rpcResponse = deserializer.readObject();
 
-				_futureResult.set(v);
+				Exception exception = rpcResponse.getException();
+
+				if (exception != null) {
+					_futureResult.setException(exception);
+				}
+				else {
+					_futureResult.set((V)rpcResponse.getResult());
+				}
 			}
 			catch (ClassNotFoundException cnfe) {
 				_futureResult.setException(cnfe);

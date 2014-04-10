@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -70,7 +70,7 @@ public class DLDirectoryNameAndFileNameTest {
 
 		DLAppTestUtil.addFileEntry(
 			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			true, name);
+			name);
 	}
 
 	@Test(expected = FolderNameException.class)
@@ -168,7 +168,7 @@ public class DLDirectoryNameAndFileNameTest {
 	public void testUpdateFileEntry() throws Exception {
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
 			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			true, StringUtil.randomString(20));
+			StringUtil.randomString(20));
 
 		String name =
 			StringUtil.randomString(20) + PropsValues.DL_CHAR_BLACKLIST[0];
@@ -180,8 +180,7 @@ public class DLDirectoryNameAndFileNameTest {
 	@Test(expected = FolderNameException.class)
 	public void testUpdateFolder() throws Exception {
 		Folder folder = DLAppTestUtil.addFolder(
-			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			StringUtil.randomString(20));
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 		String name =
 			StringUtil.randomString(20) + PropsValues.DL_CHAR_BLACKLIST[0];

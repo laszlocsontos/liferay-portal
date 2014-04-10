@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -78,6 +78,8 @@ public interface JournalArticle extends JournalArticleModel, PersistedModel,
 	@java.lang.Deprecated()
 	public java.lang.String getDefaultLocale();
 
+	public com.liferay.portal.kernel.xml.Document getDocument();
+
 	public com.liferay.portlet.journal.model.JournalFolder getFolder()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -89,7 +91,15 @@ public interface JournalArticle extends JournalArticleModel, PersistedModel,
 	public boolean hasApprovedVersion()
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated As of 7.0.0, with no direct replacement
+	*/
+	@java.lang.Deprecated()
 	public boolean isTemplateDriven();
+
+	public void setDefaultLanguageId(java.lang.String defaultLanguageId);
+
+	public void setDocument(com.liferay.portal.kernel.xml.Document document);
 
 	public void setSmallImageType(java.lang.String smallImageType);
 }

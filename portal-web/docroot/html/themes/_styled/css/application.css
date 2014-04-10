@@ -303,6 +303,13 @@
 	vertical-align: middle;
 }
 
+.aui .lfr-url-error {
+	display: inline-block;
+	white-space: normal;
+
+	@include word-break(break-all);
+}
+
 /* ---------- Menus ---------- */
 
 .lfr-page-templates li {
@@ -458,6 +465,23 @@
 
 .tree-node-selected .tree-label {
 	background-color: transparent;
+}
+
+/* ---------- Input mirror ---------- */
+
+.lfr-autocomplete-input-list .yui3-aclist-list {
+	margin: 0;
+}
+
+.liferay-autocomplete-input-mirror {
+	left: -9999px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	position: absolute;
+	top: -9999px;
+	visibility: hidden;
+	white-space: pre-wrap;
+	word-wrap: break-word;
 }
 
 /* ---------- Page customization ---------- */
@@ -668,7 +692,7 @@
 
 .ios.mobile {
 	.modal-content .dialog-iframe-bd {
-		overflow: auto;
 		-webkit-overflow-scrolling: touch;
+		overflow: auto;
 	}
 }

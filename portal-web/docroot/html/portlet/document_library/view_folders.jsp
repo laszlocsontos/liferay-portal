@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,8 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
+String browseBy = ParamUtil.getString(request, "browseBy");
+
 Folder folder = (Folder)request.getAttribute("view.jsp-folder");
 
 long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
@@ -59,7 +61,6 @@ if (folder != null) {
 	}
 }
 
-String browseBy = ParamUtil.getString(request, "browseBy");
 long fileEntryTypeId = ParamUtil.getLong(request, "fileEntryTypeId", -1);
 
 int entryStart = ParamUtil.getInteger(request, "entryStart");
@@ -70,8 +71,10 @@ int folderEnd = ParamUtil.getInteger(request, "folderEnd", SearchContainer.DEFAU
 
 int total = 0;
 
+long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId);
+
 if (browseBy.equals("file-entry-type")) {
-	total = DLFileEntryTypeServiceUtil.getFileEntryTypesCount(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay));
+	total = DLFileEntryTypeServiceUtil.getFileEntryTypesCount(groupIds);
 }
 else if ((folderId != rootFolderId) || expandFolder) {
 	total = DLAppServiceUtil.getFoldersCount(repositoryId, parentFolderId, false);
@@ -92,9 +95,9 @@ if (browseBy.equals("file-entry-type")) {
 }
 else {
 	if ((folderId != rootFolderId) && (parentFolderId > 0) && (folder != null) && (!folder.isMountPoint() || expandFolder)) {
-		Folder grandParentFolder = DLAppServiceUtil.getFolder(parentFolderId);
+		Folder grandparentFolder = DLAppServiceUtil.getFolder(parentFolderId);
 
-		parentTitle = grandParentFolder.getName();
+		parentTitle = grandparentFolder.getName();
 	}
 	else if (((folderId != rootFolderId) && (parentFolderId == 0)) || ((folderId == rootFolderId) && (parentFolderId == 0) && expandFolder)) {
 		parentTitle = LanguageUtil.get(pageContext, "home");
@@ -197,11 +200,11 @@ else {
 							/>
 						</c:if>
 
-						<c:if test="<%= DLFileEntryTypeServiceUtil.getFileEntryTypesCount(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay)) > 0 %>">
+						<c:if test="<%= DLFileEntryTypeServiceUtil.getFileEntryTypesCount(groupIds) > 0 %>">
 							<liferay-portlet:renderURL varImpl="viewBasicFileEntryTypeURL">
 								<portlet:param name="struts_action" value="/document_library/view" />
-								<portlet:param name="folderId" value="<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
 								<portlet:param name="browseBy" value="file-entry-type" />
+								<portlet:param name="folderId" value="<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
 								<portlet:param name="entryStart" value="0" />
 								<portlet:param name="entryEnd" value="<%= String.valueOf(entryEnd - entryStart) %>" />
 								<portlet:param name="folderStart" value="0" />
@@ -333,8 +336,8 @@ else {
 						<c:if test="<%= searchContainer.getStart() == 0 %>">
 							<liferay-portlet:renderURL varImpl="viewBasicFileEntryTypeURL">
 								<portlet:param name="struts_action" value="/document_library/view" />
-								<portlet:param name="folderId" value="<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
 								<portlet:param name="browseBy" value="file-entry-type" />
+								<portlet:param name="folderId" value="<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
 								<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(0) %>" />
 								<portlet:param name="entryStart" value="0" />
 								<portlet:param name="entryEnd" value="<%= String.valueOf(entryEnd - entryStart) %>" />
@@ -360,7 +363,7 @@ else {
 						</c:if>
 
 						<%
-						List<DLFileEntryType> fileEntryTypes = DLFileEntryTypeServiceUtil.getFileEntryTypes(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay), searchContainer.getStart(), searchContainer.getEnd());
+						List<DLFileEntryType> fileEntryTypes = DLFileEntryTypeServiceUtil.getFileEntryTypes(groupIds, searchContainer.getStart(), searchContainer.getEnd());
 
 						for (DLFileEntryType fileEntryType : fileEntryTypes) {
 							request.setAttribute("view_folders.jsp-fileEntryType", fileEntryType);
@@ -368,8 +371,8 @@ else {
 
 							<liferay-portlet:renderURL varImpl="viewFileEntryTypeURL">
 								<portlet:param name="struts_action" value="/document_library/view" />
-								<portlet:param name="folderId" value="<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
 								<portlet:param name="browseBy" value="file-entry-type" />
+								<portlet:param name="folderId" value="<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
 								<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(fileEntryType.getFileEntryTypeId()) %>" />
 								<portlet:param name="entryStart" value="0" />
 								<portlet:param name="entryEnd" value="<%= String.valueOf(entryEnd - entryStart) %>" />

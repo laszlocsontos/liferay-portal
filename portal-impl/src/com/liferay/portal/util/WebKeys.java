@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,6 +42,8 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String ASSET_VOCABULARIES = "ASSET_VOCABULARIES";
 
 	public static final String ASSET_VOCABULARY = "ASSET_VOCABULARY";
+
+	public static final String AVAILABLE_LOCALES = "AVAILABLE_LOCALES";
 
 	public static final String BASIC_AUTH_ENABLED = "BASIC_AUTH_ENABLED";
 
@@ -118,6 +120,8 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String ENCRYPT = "shuo";
 
 	public static final String EXPANDO_COLUMN = "EXPANDO_COLUMN";
+
+	public static final String EXPORT_IMPORT_CONFIGURATION_ID = "EXPORT_IMPORT_CONFIGURATION_ID";
 
 	public static final String FACEBOOK_ACCESS_TOKEN = "FACEBOOK_ACCESS_TOKEN";
 
@@ -208,6 +212,8 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String JOURNAL_TEMPLATE = "JOURNAL_TEMPLATE";
 
 	public static final String JOURNAL_TEMPLATE_ID = "JOURNAL_TEMPLATE_ID";
+
+	public static final String LANGUAGE_ID = "LANGUAGE_ID";
 
 	@Distributed
 	public static final String LAYOUT_ASSET_ENTRY = "LIFERAY_SHARED_LAYOUT_ASSET_ENTRY";

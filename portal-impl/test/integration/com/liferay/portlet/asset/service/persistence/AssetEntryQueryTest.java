@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.asset.model.AssetCategory;
@@ -59,7 +60,8 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class
+		EnvironmentExecutionTestListener.class,
+		TransactionalExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Transactional
@@ -67,6 +69,8 @@ public class AssetEntryQueryTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_group = GroupTestUtil.addGroup();
+
 		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
 
 		AssetVocabulary vocabulary =
@@ -454,16 +458,14 @@ public class AssetEntryQueryTest {
 
 		threadLocalCache.removeAll();
 
-		Group group = GroupTestUtil.addGroup();
-
 		AssetEntryQuery assetEntryQuery = buildAssetEntryQuery(
-			group.getGroupId(), assetCategoryIds, assetTagNames, any, not);
+			_group.getGroupId(), assetCategoryIds, assetTagNames, any, not);
 
 		int initialEntries = AssetEntryServiceUtil.getEntriesCount(
 			assetEntryQuery);
 
 		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			group.getGroupId());
+			_group.getGroupId());
 
 		if (assetCategoryIds1 != null) {
 			serviceContext.setAssetCategoryIds(assetCategoryIds1);
@@ -496,7 +498,7 @@ public class AssetEntryQueryTest {
 		threadLocalCache.removeAll();
 
 		assetEntryQuery = buildAssetEntryQuery(
-			group.getGroupId(), assetCategoryIds, assetTagNames, any, not);
+			_group.getGroupId(), assetCategoryIds, assetTagNames, any, not);
 
 		int allTagsEntries = AssetEntryServiceUtil.getEntriesCount(
 			assetEntryQuery);
@@ -529,11 +531,8 @@ public class AssetEntryQueryTest {
 
 		threadLocalCache.removeAll();
 
-		Group group = GroupTestUtil.addGroup();
-
 		for (int i = 0; i < scores.length; i++) {
-			BlogsEntry entry = BlogsTestUtil.addEntry(
-				TestPropsValues.getUserId(), group, true);
+			BlogsEntry entry = BlogsTestUtil.addEntry(_group, true);
 
 			RatingsEntryServiceUtil.updateEntry(
 				BlogsEntry.class.getName(), entry.getEntryId(), scores[i]);
@@ -544,7 +543,7 @@ public class AssetEntryQueryTest {
 		threadLocalCache.removeAll();
 
 		AssetEntryQuery assetEntryQuery = buildAssetEntryQuery(
-			group.getGroupId(), null, null, false, false);
+			_group.getGroupId(), null, null, false, false);
 
 		assetEntryQuery.setOrderByCol1("ratings");
 		assetEntryQuery.setOrderByType1(orderByType);
@@ -576,11 +575,8 @@ public class AssetEntryQueryTest {
 
 		threadLocalCache.removeAll();
 
-		Group group = GroupTestUtil.addGroup();
-
 		for (int i = 0; i < viewCounts.length; i++) {
-			BlogsEntry entry = BlogsTestUtil.addEntry(
-				TestPropsValues.getUserId(), group, true);
+			BlogsEntry entry = BlogsTestUtil.addEntry(_group, true);
 
 			AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
 				BlogsEntry.class.getName(), entry.getEntryId());
@@ -595,7 +591,7 @@ public class AssetEntryQueryTest {
 		threadLocalCache.removeAll();
 
 		AssetEntryQuery assetEntryQuery = buildAssetEntryQuery(
-			group.getGroupId(), null, null, false, false);
+			_group.getGroupId(), null, null, false, false);
 
 		assetEntryQuery.setOrderByCol1("viewCount");
 		assetEntryQuery.setOrderByType1(orderByType);
@@ -615,6 +611,7 @@ public class AssetEntryQueryTest {
 	private long[] _assetCategoryIds2;
 	private long _fashionCategoryId;
 	private long _foodCategoryId;
+	private Group _group;
 	private long _healthCategoryId;
 	private long _sportCategoryId;
 	private long _travelCategoryId;

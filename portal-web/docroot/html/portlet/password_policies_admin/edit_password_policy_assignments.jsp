@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -114,7 +114,7 @@ portletURL.setParameter("tabs3", tabs3);
 						name="name"
 					>
 
-						<%= HtmlUtil.escape(user2.getFullName()) %>
+						<%= user2.getFullName() %>
 
 						<%
 						PasswordPolicyRel passwordPolicyRel = PasswordPolicyRelLocalServiceUtil.fetchPasswordPolicyRel(User.class.getName(), user.getUserId());
@@ -141,7 +141,7 @@ portletURL.setParameter("tabs3", tabs3);
 
 					<liferay-ui:search-container-column-text
 						name="screen-name"
-						value="<%= HtmlUtil.escape(user2.getScreenName()) %>"
+						value="<%= user2.getScreenName() %>"
 					/>
 				</liferay-ui:search-container-row>
 

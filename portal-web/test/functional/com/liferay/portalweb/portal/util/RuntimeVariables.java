@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,17 +72,13 @@ public class RuntimeVariables {
 
 		String varValue = value;
 
-		Pattern pattern = Pattern.compile("\\$\\{([^}]*?)\\}");
-
-		Matcher matcher = pattern.matcher(varValue);
-
-		Pattern statementPattern = Pattern.compile(
-			"(.*)\\?(.*)\\(([^\\)]*?)\\)");
+		Matcher matcher = _variablePattern.matcher(varValue);
 
 		while (matcher.find()) {
 			String statement = matcher.group(1);
 
-			Matcher statementMatcher = statementPattern.matcher(statement);
+			Matcher statementMatcher = _variableStatementPattern.matcher(
+				statement);
 
 			if (statementMatcher.find()) {
 				String operand = statementMatcher.group(1);
@@ -183,6 +179,8 @@ public class RuntimeVariables {
 
 		String varValue = context.get(varName);
 
+		varValue = StringUtil.replace(varValue, "${line.separator}", "");
+
 		if (varValue.contains("${") && varValue.contains("}")) {
 			return false;
 		}
@@ -192,6 +190,20 @@ public class RuntimeVariables {
 
 	public static String replace(String text) {
 		return _instance._replace(text);
+	}
+
+	public static String replaceRegularExpression(
+		String content, String regex, int group) {
+
+		Pattern pattern = Pattern.compile(regex);
+
+		Matcher matcher = pattern.matcher(content);
+
+		if (matcher.find()) {
+			return matcher.group(group);
+		}
+
+		return StringPool.BLANK;
 	}
 
 	public static void setValue(String key, String value) {
@@ -286,6 +298,11 @@ public class RuntimeVariables {
 	}
 
 	private static RuntimeVariables _instance = new RuntimeVariables();
+
+	private static Pattern _variablePattern = Pattern.compile(
+		"\\$\\{([^}]*?)\\}");
+	private static Pattern _variableStatementPattern = Pattern.compile(
+		"(.*)\\?(.*)\\(([^\\)]*?)\\)");
 
 	private ContextReplace _contextReplace;
 	private Map<String, String> _runtimeVariables =

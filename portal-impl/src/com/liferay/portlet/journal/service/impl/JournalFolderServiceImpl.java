@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -325,6 +325,26 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			getPermissionChecker(), folder, ActionKeys.UPDATE);
 
 		journalFolderLocalService.restoreFolderFromTrash(getUserId(), folderId);
+	}
+
+	@Override
+	public void subscribe(long groupId, long folderId)
+		throws PortalException, SystemException {
+
+		JournalFolderPermission.check(
+			getPermissionChecker(), groupId, folderId, ActionKeys.SUBSCRIBE);
+
+		journalFolderLocalService.subscribe(getUserId(), groupId, folderId);
+	}
+
+	@Override
+	public void unsubscribe(long groupId, long folderId)
+		throws PortalException, SystemException {
+
+		JournalFolderPermission.check(
+			getPermissionChecker(), groupId, folderId, ActionKeys.SUBSCRIBE);
+
+		journalFolderLocalService.unsubscribe(getUserId(), groupId, folderId);
 	}
 
 	@Override

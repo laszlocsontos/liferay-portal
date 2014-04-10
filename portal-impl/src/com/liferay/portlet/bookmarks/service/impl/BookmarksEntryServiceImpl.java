@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -164,7 +164,7 @@ public class BookmarksEntryServiceImpl extends BookmarksEntryServiceBaseImpl {
 		List<Long> folderIds = bookmarksFolderService.getFolderIds(
 			groupId, rootFolderId);
 
-		if (folderIds.size() == 0) {
+		if (folderIds.isEmpty()) {
 			return Collections.emptyList();
 		}
 		else if (userId <= 0) {
@@ -215,7 +215,7 @@ public class BookmarksEntryServiceImpl extends BookmarksEntryServiceBaseImpl {
 		List<Long> folderIds = bookmarksFolderService.getFolderIds(
 			groupId, rootFolderId);
 
-		if (folderIds.size() == 0) {
+		if (folderIds.isEmpty()) {
 			return 0;
 		}
 		else if (userId <= 0) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1019,7 +1019,7 @@ public class Validator {
 	/**
 	 * Returns <code>true</code> if the string is not <code>null</code>, meaning
 	 * it is not a <code>null</code> reference, nothing but spaces, or the
-	 * string "<code>null</code>".
+	 * string "<code>null</code>", with zero or more leading or trailing spaces.
 	 *
 	 * @param  s the string to check
 	 * @return <code>true</code> if the string is not <code>null</code>;
@@ -1081,7 +1081,7 @@ public class Validator {
 	/**
 	 * Returns <code>true</code> if the string is <code>null</code>, meaning it
 	 * is a <code>null</code> reference, nothing but spaces, or the string
-	 * "<code>null</code>".
+	 * "<code>null</code>", with zero or more leading or trailing spaces.
 	 *
 	 * @param  s the string to check
 	 * @return <code>true</code> if the string is <code>null</code>;
@@ -1303,7 +1303,10 @@ public class Validator {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean isXml(String s) {
-		if (s.startsWith(_XML_BEGIN) || s.startsWith(_XML_EMPTY)) {
+		if (isNull(s)) {
+			return false;
+		}
+		else if (s.startsWith(_XML_BEGIN) || s.startsWith(_XML_EMPTY)) {
 			return true;
 		}
 		else {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -231,9 +231,7 @@ public class ConvertDocumentLibraryTest {
 	}
 
 	protected WikiPage addWikiPage() throws Exception {
-		WikiNode wikiNode = WikiTestUtil.addNode(
-			TestPropsValues.getUserId(), _group.getGroupId(),
-			ServiceTestUtil.randomString(), ServiceTestUtil.randomString(50));
+		WikiNode wikiNode = WikiTestUtil.addNode(_group.getGroupId());
 
 		return WikiTestUtil.addPage(
 			wikiNode.getUserId(), _group.getGroupId(), wikiNode.getNodeId(),

@@ -1,4 +1,6 @@
 <definition component-name="portal-collaboration">
+	<property name="testray.main.component.name" value="Collaboration" />
+
 	<var name="pageName" value="Blogs Page" />
 	<var name="portletName" value="Blogs" />
 
@@ -21,7 +23,7 @@
 	<tear-down>
 		<execute macro="BlogsEntry#tearDownCP" />
 
-		<execute macro="BlogsPortlet#tearDownConfigurationDisplaySettingsPG" />
+		<execute macro="BlogsPortlet#tearDownConfigurationDisplaySettingsCP" />
 
 		<execute macro="BlogsPortlet#tearDownConfigurationScopePG" />
 

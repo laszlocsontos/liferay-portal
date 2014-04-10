@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.xml.Document;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class PropertiesTransformerListener extends BaseTransformerListener {
 
 	@Override
 	public String onScript(
-		String script, String xml, String languageId,
+		String script, Document document, String languageId,
 		Map<String, String> tokens) {
 
 		if (_log.isDebugEnabled()) {

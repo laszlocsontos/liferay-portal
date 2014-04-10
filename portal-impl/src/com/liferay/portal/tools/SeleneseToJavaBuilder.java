@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeFormatter;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
-import com.liferay.portal.util.InitUtil;
 
 import jargs.gnu.CmdLineParser;
 
@@ -48,7 +47,7 @@ import org.apache.tools.ant.DirectoryScanner;
 public class SeleneseToJavaBuilder {
 
 	public static void main(String[] args) throws Exception {
-		InitUtil.initWithSpring();
+		ToolDependencies.wireBasic();
 
 		new SeleneseToJavaBuilder(args);
 	}
@@ -182,9 +181,7 @@ public class SeleneseToJavaBuilder {
 
 		char[] array = param.toCharArray();
 
-		for (int i = 0; i < array.length; ++i) {
-			char c = array[i];
-
+		for (char c : array) {
 			if (c == CharPool.BACK_SLASH) {
 				sb.append("\\\\");
 			}
@@ -566,7 +563,7 @@ public class SeleneseToJavaBuilder {
 			}
 		}
 
-		if (labels.size() > 0) {
+		if (!labels.isEmpty()) {
 			sb.append("int label = 1;");
 
 			sb.append("while (label >= 1) {");
@@ -1291,7 +1288,7 @@ public class SeleneseToJavaBuilder {
 			}
 		}
 
-		if (labels.size() > 0) {
+		if (!labels.isEmpty()) {
 			sb.append("case 100:");
 			sb.append("label = -1;");
 			sb.append("}");

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,12 +29,7 @@ public class URLCodecTest {
 	public void testDecodeURL() throws Exception {
 		for (int i = 0; i < _RAW_URLS.length; i++) {
 			String result = URLCodec.decodeURL(
-				_ENCODED_URLS[i], StringPool.UTF8, false);
-
-			Assert.assertEquals(_RAW_URLS[i], result);
-
-			result = URLCodec.decodeURL(
-				_ESCAPE_SPACES_ENCODED_URLS[i], StringPool.UTF8, true);
+				_ENCODED_URLS[i], StringPool.UTF8);
 
 			Assert.assertEquals(_RAW_URLS[i], result);
 		}

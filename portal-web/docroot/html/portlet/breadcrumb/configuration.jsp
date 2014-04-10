@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,22 @@
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 			<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
+			<aui:fieldset>
+				<aui:select name="preferences--displayStyle--">
+
+					<%
+					for (String displayStyleOption : PropsValues.BREADCRUMB_DISPLAY_STYLE_OPTIONS) {
+					%>
+
+						<aui:option label="<%= displayStyleOption %>" selected="<%= displayStyle.equals(displayStyleOption) %>" />
+
+					<%
+					}
+					%>
+
+				</aui:select>
+			</aui:fieldset>
+
 			<aui:fieldset cssClass="checkBoxes">
 				<aui:col width="<%= 50 %>">
 					<aui:input data-key='<%= "_" + HtmlUtil.escapeJS(portletResource) + "_showCurrentGroup" %>' label="show-current-site" name="preferences--showCurrentGroup--" type="checkbox" value="<%= showCurrentGroup %>" />
@@ -46,6 +62,13 @@
 		</aui:form>
 	</aui:col>
 	<aui:col width="<%= 50 %>">
+
+		<%
+		List<BreadcrumbEntry> breadcrumbEntries = PortalUtil.getPortletBreadcrumbs(request);
+
+		breadcrumbEntries.clear();
+		%>
+
 		<liferay-portlet:preview
 			portletName="<%= portletResource %>"
 			queryString="struts_action=/breadcrumb/view"

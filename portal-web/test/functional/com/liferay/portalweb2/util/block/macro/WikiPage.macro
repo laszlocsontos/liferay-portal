@@ -39,6 +39,37 @@
 		<execute action="PGWikidisplay#assertTextEquals" locator-key1="WIKI_PAGE_BODY" value1="${wikiChildPageContent}" />
 	</command>
 
+	<command name="addCommentPG">
+		<var name="key_commentBody" value="${commentBody}" />
+
+		<if>
+			<and>
+				<condition action="PGWiki#isNotVisible" locator-key1="COMMENTS_BE_THE_FIRST_LINK" />
+				<condition action="PGWiki#isNotVisible" locator-key1="COMMENTS_ADD_COMMENT_LINK" />
+			</and>
+			<then>
+				<execute action="PGWiki#assertClick" locator-key1="COMMENTS_DROP_DOWN" value1="Comments" />
+			</then>
+		</if>
+
+		<if>
+			<condition action="PGWiki#isVisible" locator-key1="COMMENTS_BE_THE_FIRST_LINK" />
+			<then>
+				<execute action="PGWiki#assertClick" locator-key1="COMMENTS_BE_THE_FIRST_LINK" value1="Be the first." />
+			</then>
+			<elseif>
+				<condition action="PGWiki#isVisible" locator-key1="COMMENTS_ADD_COMMENT_LINK" />
+				<then>
+					<execute action="PGWiki#assertClick" locator-key1="COMMENTS_ADD_COMMENT_LINK" value1="Add Comment" />
+				</then>
+			</elseif>
+		</if>
+
+		<execute action="PGWiki#type" locator-key1="COMMENTS_COMMENT_FIELD" value1="${commentBody}" />
+		<execute action="PGWiki#assertClick" locator-key1="COMMENTS_REPLY_BUTTON" value1="Reply" />
+		<execute action="PGWiki#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request processed successfully." />
+	</command>
+
 	<command name="addCP">
 		<var name="key_wikiNodeName" value="${wikiNodeName}" />
 
@@ -431,6 +462,19 @@
 		<execute action="PGWikiWikipageHistory#assertTextEquals" locator-key1="COMPARE_VERSIONS_DIFF" value1="${wikiPageVersionDiff}" />
 	</command>
 
+	<command name="deleteCP">
+		<var name="key_wikiNodeName" value="${wikiNodeName}" />
+
+		<execute action="CPWiki#assertClick" locator-key1="WIKI_NODE_TABLE_WIKI" value1="${wikiNodeName}" />
+
+		<var name="key_wikiPageTitle" value="${wikiPageTitle}" />
+
+		<execute action="CPWikiAllpages#assertTextEquals" locator-key1="WIKI_PAGE_TABLE_PAGE" value1="${wikiPageTitle}" />
+		<execute action="CPWikiAllpages#assertClick" locator-key1="WIKI_PAGE_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPWikiAllpages#assertClick" locator-key1="WIKI_PAGE_MENULIST_RECYCLE_BIN" value1="Move to the Recycle Bin" />
+		<execute action="CPWikiAllpages#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="The ${assetType} ${wikiPageTitle} was moved to the Recycle Bin. Undo" />
+	</command>
+
 	<command name="deleteFrontPagePGViaWD">
 		<execute action="PGWikidisplay#assertClick" locator-key1="NAVIGATION_ALL_PAGES" value1="All Pages" />
 
@@ -439,7 +483,7 @@
 		<execute action="PGWikidisplayAllpages#assertClick" locator-key1="WIKI_PAGE_TABLE_ACTIONS" value1="Actions" />
 		<execute action="PGWikidisplayAllpages#assertClick" locator-key1="WIKI_PAGE_MENULIST_RECYCLE_BIN" value1="Move to the Recycle Bin" />
 		<execute action="PGWikidisplayAllpages#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="The ${assetType} ${wikiPageTitle} was moved to the Recycle Bin. Undo" />
-		<execute action="PGWikidisplayAllpages#assertElementNotPresent" locator-key1="WIKI_PAGE_TABLE_PAGE" />
+		<execute action="PGWikidisplayAllpages#assertTextEquals" locator-key1="WIKI_PAGE_TABLE_REVISION" value1="1.0" />
 
 		<execute macro="RecycleBin#emptyCP" />
 	</command>
@@ -452,7 +496,17 @@
 		<execute action="PGWikiAllpages#assertClick" locator-key1="WIKI_PAGE_TABLE_ACTIONS" value1="Actions" />
 		<execute action="PGWikiAllpages#assertClick" locator-key1="WIKI_PAGE_MENULIST_RECYCLE_BIN" value1="Move to the Recycle Bin" />
 		<execute action="PGWikiAllpages#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="The ${assetType} ${wikiPageTitle} was moved to the Recycle Bin. Undo" />
-		<execute action="PGWikiAllpages#assertElementNotPresent" locator-key1="WIKI_PAGE_TABLE_PAGE" />
+
+		<if>
+			<equals arg1="${wikiPageTitle}" arg2="FrontPage" />
+			<then>
+				<execute action="PGWikiAllpages#assertTextEquals" locator-key1="WIKI_PAGE_TABLE_PAGE" value1="FrontPage" />
+				<execute action="PGWikiAllpages#assertTextEquals" locator-key1="WIKI_PAGE_TABLE_REVISION" value1="1.0 (Minor Edit)" />
+			</then>
+			<else>
+				<execute action="PGWikiAllpages#assertElementNotPresent" locator-key1="WIKI_PAGE_TABLE_PAGE_2" />
+			</else>
+		</if>
 
 		<execute macro="RecycleBin#emptyCP" />
 	</command>
@@ -541,6 +595,27 @@
 		<execute action="PGWikiEditpage#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
 
 		<execute action="PGWikiWikipage#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
+	<command name="removeViewPermissionPG">
+		<var name="key_roleName" value="${key_roleName?lowercase()}" />
+
+		<execute action="PGWiki#assertClick" locator-key1="NAVIGATION_ALL_PAGES" value1="All Pages" />
+
+		<var name="key_wikiPageTitle" value="${wikiPageTitle}" />
+
+		<execute action="PGWikiAllpages#assertClick" locator-key1="WIKI_PAGE_TABLE_PAGE" value1="${wikiPageTitle}" />
+
+		<execute action="PGWiki#assertClick" locator-key1="DETAILS_BUTTON" value1="Details" />
+
+		<execute action="PGWikiWikipageDetails#assertClick" locator-key1="PERMISSIONS_LINK" value1="Permissions" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+		<execute action="Permissions#assertTextEquals" locator-key1="HEADER_TITLE" value1="${wikiPageTitle}" />
+		<execute action="Permissions#uncheck" locator-key1="CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX" />
+		<execute action="Permissions#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="Permissions#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute action="Permissions#selectFrame" value1="relative=top" />
 	</command>
 
 	<command name="renameWikiPagePG">
@@ -653,10 +728,21 @@
 
 		<execute action="CPWiki#assertClick" locator-key1="WIKI_NODE_TABLE_WIKI" value1="Main" />
 
+		<var name="key_wikiPageTitle" value="FrontPage" />
+
 		<while>
-			<condition action="CPWikiAllpages#isElementPresent" locator1="//a[@title='Actions']" />
+			<condition action="CPWikiAllpages#isTextNotEqual" locator-key1="WIKI_PAGE_TABLE_REVISION" value1="1.0 (Minor Edit)" />
 			<then>
-				<execute action="CPWikiAllpages#assertClick" locator1="//a[@title='Actions']" value1="Actions" />
+				<execute action="CPWikiAllpages#assertClick" locator-key1="WIKI_PAGE_TABLE_ACTIONS_GENERIC" value1="Actions" />
+				<execute action="CPWikiAllpages#assertClick" locator-key1="WIKI_PAGE_MENULIST_RECYCLE_BIN" value1="Move to the Recycle Bin" />
+				<execute action="CPWikiAllpages#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="moved to the Recycle Bin. Undo" />
+			</then>
+		</while>
+
+		<while>
+			<condition action="CPWikiAllpages#isElementPresent" locator-key1="WIKI_PAGE_TABLE_ACTIONS_GENERIC_2" />
+			<then>
+				<execute action="CPWikiAllpages#assertClick" locator-key1="WIKI_PAGE_TABLE_ACTIONS_GENERIC_2" value1="Actions" />
 				<execute action="CPWikiAllpages#assertClick" locator-key1="WIKI_PAGE_MENULIST_RECYCLE_BIN" value1="Move to the Recycle Bin" />
 				<execute action="CPWikiAllpages#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="moved to the Recycle Bin. Undo" />
 			</then>
@@ -677,6 +763,15 @@
 		<var name="key_wikiChildPageTitle" value="${wikiChildPageTitle}" />
 
 		<execute action="PGWikidisplay#assertTextEquals" locator-key1="WIKI_PAGE_CHILD_PAGE_TITLE" value1="${wikiChildPageTitle}" />
+	</command>
+
+	<command name="viewCP">
+		<var name="key_wikiPageTitle" value="${wikiPageTitle}" />
+
+		<execute action="CPWikiAllpages#assertTextEquals" locator-key1="WIKI_PAGE_TABLE_PAGE" value1="${wikiPageTitle}" />
+		<execute action="CPWikiAllpages#assertClick" locator-key1="WIKI_PAGE_TABLE_PAGE" value1="${wikiPageTitle}" />
+		<execute action="CPWikiWikipage#assertTextEquals" locator-key1="WIKI_PAGE_TITLE_HEADER" value1="${wikiPageTitle}" />
+		<execute action="CPWikiWikipage#assertTextEquals" locator-key1="WIKI_PAGE_BODY" value1="${wikiPageContent}" />
 	</command>
 
 	<command name="viewCustomADTSocialPG" >
@@ -712,10 +807,9 @@
 	</command>
 
 	<command name="viewDefaultPGViaWD">
-		<execute action="PGWikidisplay#assertTextEquals" locator-key1="PORTLET_CONFIGURATION_MESSAGE" value1="Please configure this portlet to make it visible to all users." />
-		<execute action="PGWikidisplay#assertTextNotPresent" value1="${wikiPageTitle}" />
+		<execute action="PGWikidisplay#assertTextEquals" locator-key1="INFO_MESSAGE" value1="This page is empty. Edit it to add some text." />
+		<execute action="PGWikidisplay#assertTextEquals" locator-key1="WIKI_PAGE_TITLE" value1="FrontPage" />
 		<execute action="PGWikidisplay#assertTextNotPresent" value1="${wikiPageContent}" />
-		<execute action="PGWikidisplay#assertElementNotPresent" locator-key1="WIKI_PAGE_TITLE" />
 		<execute action="PGWikidisplay#assertElementNotPresent" locator-key1="WIKI_PAGE_BODY" />
 	</command>
 

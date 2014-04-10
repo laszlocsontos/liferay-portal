@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1062,6 +1062,20 @@ public class GroupLocalServiceUtil {
 	}
 
 	/**
+	* Returns the company's group.
+	*
+	* @param companyId the primary key of the company
+	* @return the company's group, or <code>null</code> if a matching group
+	could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Group fetchCompanyGroup(
+		long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchCompanyGroup(companyId);
+	}
+
+	/**
 	* Returns the group with the matching friendly URL.
 	*
 	* @param companyId the primary key of the company
@@ -1090,6 +1104,23 @@ public class GroupLocalServiceUtil {
 		java.lang.String name)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().fetchGroup(companyId, name);
+	}
+
+	/**
+	* Returns the default user's personal site group.
+	*
+	* @param companyId the primary key of the company
+	* @return the default user's personal site group, or <code>null</code> if a
+	matching group could not be found
+	* @throws PortalException if a default user for the company could not be
+	found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.Group fetchUserPersonalSiteGroup(
+		long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchUserPersonalSiteGroup(companyId);
 	}
 
 	/**
@@ -1661,6 +1692,15 @@ public class GroupLocalServiceUtil {
 		return getService().getUserOrganizationsGroups(userId, start, end);
 	}
 
+	/**
+	* Returns the default user's personal site group.
+	*
+	* @param companyId the primary key of the company
+	* @return the default user's personal site group
+	* @throws PortalException if a matching group or default user for the
+	company could not be found
+	* @throws SystemException if a system exception occurred
+	*/
 	public static com.liferay.portal.model.Group getUserPersonalSiteGroup(
 		long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,

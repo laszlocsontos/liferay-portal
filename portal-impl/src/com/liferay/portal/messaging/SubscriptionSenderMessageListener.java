@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,13 +33,11 @@ public class SubscriptionSenderMessageListener extends BaseMessageListener {
 		SubscriptionSender subscriptionSender =
 			(SubscriptionSender)message.getPayload();
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
+
+		stopWatch.start();
 
 		if (_log.isInfoEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-
 			_log.info(
 				"Sending notifications for {mailId=" +
 					subscriptionSender.getMailId() + "}");

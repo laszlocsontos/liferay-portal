@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,6 +41,11 @@ import com.liferay.portal.UserPasswordException;
 import com.liferay.portal.UserReminderQueryException;
 import com.liferay.portal.UserScreenNameException;
 import com.liferay.portal.UserSmsException;
+import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil;
+import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil.Synchronizer;
+import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.shard.ShardCallable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -69,6 +74,7 @@ import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -100,6 +106,8 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.model.impl.LayoutImpl;
+import com.liferay.portal.model.impl.UserCacheModel;
+import com.liferay.portal.model.impl.UserImpl;
 import com.liferay.portal.security.auth.AuthPipeline;
 import com.liferay.portal.security.auth.Authenticator;
 import com.liferay.portal.security.auth.EmailAddressGenerator;
@@ -129,7 +137,6 @@ import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SubscriptionSender;
 import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.usersadmin.util.UsersAdmin;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.Encryptor;
 import com.liferay.util.EncryptorException;
@@ -150,6 +157,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.portlet.PortletPreferences;
 
 /**
  * Provides the local service for accessing, adding, authenticating, deleting,
@@ -991,6 +1000,36 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		return user;
 	}
 
+	@Override
+	public void afterPropertiesSet() {
+		super.afterPropertiesSet();
+
+		PortalCache<Serializable, Serializable> portalCache =
+			EntityCacheUtil.getPortalCache(UserImpl.class);
+
+		PortalCacheMapSynchronizeUtil.synchronize(
+			portalCache, _defaultUsers,
+			new Synchronizer<Serializable, Serializable>() {
+
+				@Override
+				public void onSynchronize(
+					Map<? extends Serializable, ? extends Serializable> map,
+					Serializable key, Serializable value) {
+
+					if (!(value instanceof UserCacheModel)) {
+						return;
+					}
+
+					UserCacheModel userCacheModel = (UserCacheModel)value;
+
+					if (userCacheModel.defaultUser) {
+						_defaultUsers.remove(userCacheModel.companyId);
+					}
+				}
+
+			});
+	}
+
 	/**
 	 * Attempts to authenticate the user by their email address and password,
 	 * while using the AuthPipeline.
@@ -1664,13 +1703,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		boolean sendEmail = ParamUtil.getBoolean(serviceContext, "sendEmail");
 
 		if (sendEmail) {
-			sendEmail(user, password, serviceContext);
+			notifyUser(user, password, serviceContext);
 		}
 
 		Company company = companyPersistence.findByPrimaryKey(
 			user.getCompanyId());
 
-		if (company.isStrangersVerify() && (serviceContext.getPlid() > 0)) {
+		if (company.isStrangersVerify()) {
 			sendEmailAddressVerification(
 				user, user.getEmailAddress(), serviceContext);
 		}
@@ -2756,7 +2795,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		List<User> users = userPersistence.findByUuid(uuid);
 
 		if (users.isEmpty()) {
-			throw new NoSuchUserException();
+			throw new NoSuchUserException("{uuid=" + uuid + "}");
 		}
 		else {
 			return users.get(0);
@@ -2779,7 +2818,15 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		List<User> users = userPersistence.findByUuid_C(uuid, companyId);
 
 		if (users.isEmpty()) {
-			throw new NoSuchUserException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("{uuid=");
+			sb.append(uuid);
+			sb.append(", companyId=");
+			sb.append(companyId);
+			sb.append("}");
+
+			throw new NoSuchUserException(sb.toString());
 		}
 		else {
 			return users.get(0);
@@ -3260,7 +3307,64 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			LinkedHashMap<String, Object> params)
 		throws SystemException {
 
-		return userFinder.countByKeywords(companyId, keywords, status, params);
+		if (!PropsValues.USERS_INDEXER_ENABLED ||
+			!PropsValues.USERS_SEARCH_WITH_INDEX) {
+
+			return userFinder.countByKeywords(
+				companyId, keywords, status, params);
+		}
+
+		try {
+			String firstName = null;
+			String middleName = null;
+			String lastName = null;
+			String fullName = null;
+			String screenName = null;
+			String emailAddress = null;
+			String street = null;
+			String city = null;
+			String zip = null;
+			String region = null;
+			String country = null;
+			boolean andOperator = false;
+
+			if (Validator.isNotNull(keywords)) {
+				firstName = keywords;
+				middleName = keywords;
+				lastName = keywords;
+				fullName = keywords;
+				screenName = keywords;
+				emailAddress = keywords;
+				street = keywords;
+				city = keywords;
+				zip = keywords;
+				region = keywords;
+				country = keywords;
+			}
+			else {
+				andOperator = true;
+			}
+
+			if (params != null) {
+				params.put("keywords", keywords);
+			}
+
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				User.class);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, firstName, middleName, lastName, fullName,
+				screenName, emailAddress, street, city, zip, region, country,
+				status, params, andOperator, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+			Hits hits = indexer.search(searchContext);
+
+			return hits.getLength();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
 	}
 
 	/**
@@ -3292,9 +3396,36 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			LinkedHashMap<String, Object> params, boolean andSearch)
 		throws SystemException {
 
-		return userFinder.countByC_FN_MN_LN_SN_EA_S(
-			companyId, firstName, middleName, lastName, screenName,
-			emailAddress, status, params, andSearch);
+		if (!PropsValues.USERS_INDEXER_ENABLED ||
+			!PropsValues.USERS_SEARCH_WITH_INDEX) {
+
+			return userFinder.countByC_FN_MN_LN_SN_EA_S(
+				companyId, firstName, middleName, lastName, screenName,
+				emailAddress, status, params, andSearch);
+		}
+
+		try {
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				User.class);
+
+			FullNameGenerator fullNameGenerator =
+				FullNameGeneratorFactory.getInstance();
+
+			String fullName = fullNameGenerator.getFullName(
+				firstName, middleName, lastName);
+
+			SearchContext searchContext = buildSearchContext(
+				companyId, firstName, middleName, lastName, fullName,
+				screenName, emailAddress, null, null, null, null, null, status,
+				params, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+			Hits hits = indexer.search(searchContext);
+
+			return hits.getLength();
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
 	}
 
 	@Override
@@ -3392,12 +3523,19 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			serviceContext.getPortalURL() + serviceContext.getPathMain() +
 				"/portal/verify_email_address?ticketKey=" + ticket.getKey();
 
-		Layout layout = layoutLocalService.getLayout(serviceContext.getPlid());
+		long plid = serviceContext.getPlid();
 
-		Group group = layout.getGroup();
+		if (plid > 0) {
+			Layout layout = layoutLocalService.fetchLayout(plid);
 
-		if (!layout.isPrivateLayout() && !group.isUser()) {
-			verifyEmailAddressURL += "&p_l_id=" + serviceContext.getPlid();
+			if (layout != null) {
+				Group group = layout.getGroup();
+
+				if (!layout.isPrivateLayout() && !group.isUser()) {
+					verifyEmailAddressURL +=
+						"&p_l_id=" + serviceContext.getPlid();
+				}
+			}
 		}
 
 		String fromName = PrefsPropsUtil.getString(
@@ -3408,15 +3546,20 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		String toName = user.getFullName();
 		String toAddress = emailAddress;
 
-		String subject = PrefsPropsUtil.getContent(
-			user.getCompanyId(), PropsKeys.ADMIN_EMAIL_VERIFICATION_SUBJECT);
+		PortletPreferences companyPortletPreferences =
+			PrefsPropsUtil.getPreferences(user.getCompanyId(), true);
 
-		String body = PrefsPropsUtil.getContent(
-			user.getCompanyId(), PropsKeys.ADMIN_EMAIL_VERIFICATION_BODY);
+		Map<Locale, String> localizedSubjectMap =
+			LocalizationUtil.getLocalizationMap(
+				companyPortletPreferences, "adminEmailVerificationSubject",
+				PropsKeys.ADMIN_EMAIL_VERIFICATION_SUBJECT);
+		Map<Locale, String> localizedBodyMap =
+			LocalizationUtil.getLocalizationMap(
+				companyPortletPreferences, "adminEmailVerificationBody",
+				PropsKeys.ADMIN_EMAIL_VERIFICATION_BODY);
 
 		SubscriptionSender subscriptionSender = new SubscriptionSender();
 
-		subscriptionSender.setBody(body);
 		subscriptionSender.setCompanyId(user.getCompanyId());
 		subscriptionSender.setContextAttributes(
 			"[$EMAIL_VERIFICATION_CODE$]", ticket.getKey(),
@@ -3426,11 +3569,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			user.getUserId(), "[$USER_SCREENNAME$]", user.getScreenName());
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
+		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
+		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
 		subscriptionSender.setMailId(
 			"user", user.getUserId(), System.currentTimeMillis(),
 			PwdGenerator.getPassword());
 		subscriptionSender.setServiceContext(serviceContext);
-		subscriptionSender.setSubject(subject);
 		subscriptionSender.setUserId(user.getUserId());
 
 		subscriptionSender.addRuntimeSubscribers(toAddress, toName);
@@ -3569,31 +3713,40 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		String toName = user.getFullName();
 		String toAddress = user.getEmailAddress();
 
+		PortletPreferences companyPortletPreferences =
+			PrefsPropsUtil.getPreferences(company.getCompanyId(), true);
+
+		Map<Locale, String> localizedSubjectMap = null;
+		Map<Locale, String> localizedBodyMap = null;
+
 		if (Validator.isNull(subject)) {
 			if (company.isSendPasswordResetLink()) {
-				subject = PrefsPropsUtil.getContent(
-					companyId, PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_SUBJECT);
+				localizedSubjectMap = LocalizationUtil.getLocalizationMap(
+					companyPortletPreferences, "adminEmailPasswordResetSubject",
+					PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_SUBJECT);
 			}
 			else {
-				subject = PrefsPropsUtil.getContent(
-					companyId, PropsKeys.ADMIN_EMAIL_PASSWORD_SENT_SUBJECT);
+				localizedSubjectMap = LocalizationUtil.getLocalizationMap(
+					companyPortletPreferences, "adminEmailPasswordSentSubject",
+					PropsKeys.ADMIN_EMAIL_PASSWORD_SENT_SUBJECT);
 			}
 		}
 
 		if (Validator.isNull(body)) {
 			if (company.isSendPasswordResetLink()) {
-				body = PrefsPropsUtil.getContent(
-					companyId, PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_BODY);
+				localizedBodyMap = LocalizationUtil.getLocalizationMap(
+					companyPortletPreferences, "adminEmailPasswordResetBody",
+					PropsKeys.ADMIN_EMAIL_PASSWORD_RESET_BODY);
 			}
 			else {
-				body = PrefsPropsUtil.getContent(
-					companyId, PropsKeys.ADMIN_EMAIL_PASSWORD_SENT_BODY);
+				localizedBodyMap = LocalizationUtil.getLocalizationMap(
+					companyPortletPreferences, "adminEmailPasswordSentBody",
+					PropsKeys.ADMIN_EMAIL_PASSWORD_SENT_BODY);
 			}
 		}
 
 		SubscriptionSender subscriptionSender = new SubscriptionSender();
 
-		subscriptionSender.setBody(body);
 		subscriptionSender.setCompanyId(companyId);
 		subscriptionSender.setContextAttributes(
 			"[$PASSWORD_RESET_URL$]", passwordResetURL, "[$REMOTE_ADDRESS$]",
@@ -3603,11 +3756,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			user.getScreenName());
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
+		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
+		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
 		subscriptionSender.setMailId(
 			"user", user.getUserId(), System.currentTimeMillis(),
 			PwdGenerator.getPassword());
 		subscriptionSender.setServiceContext(serviceContext);
-		subscriptionSender.setSubject(subject);
 		subscriptionSender.setUserId(user.getUserId());
 
 		subscriptionSender.addRuntimeSubscribers(toAddress, toName);
@@ -5320,7 +5474,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		if (ticket.isExpired() ||
 			(ticket.getType() != TicketConstants.TYPE_EMAIL_ADDRESS)) {
 
-			throw new NoSuchTicketException();
+			throw new NoSuchTicketException("{ticketKey=" + ticketKey + "}");
 		}
 
 		User user = userPersistence.findByPrimaryKey(ticket.getClassPK());
@@ -5333,7 +5487,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			if (userPersistence.fetchByC_EA(
 					user.getCompanyId(), emailAddress) != null) {
 
-				throw new DuplicateUserEmailAddressException();
+				throw new DuplicateUserEmailAddressException(
+					"{userId=" + user.getUserId() + "}");
 			}
 
 			setEmailAddress(
@@ -5759,18 +5914,16 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			}
 		}
 
-		QueryConfig queryConfig = new QueryConfig();
-
-		queryConfig.setHighlightEnabled(false);
-		queryConfig.setScoreEnabled(false);
-
-		searchContext.setQueryConfig(queryConfig);
-
 		if (sort != null) {
 			searchContext.setSorts(sort);
 		}
 
 		searchContext.setStart(start);
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
 
 		return searchContext;
 	}
@@ -5808,6 +5961,67 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		return userIds;
 	}
 
+	protected void notifyUser(
+			User user, String password, ServiceContext serviceContext)
+		throws SystemException {
+
+		if (!PrefsPropsUtil.getBoolean(
+				user.getCompanyId(),
+				PropsKeys.ADMIN_EMAIL_USER_ADDED_ENABLED)) {
+
+			return;
+		}
+
+		String fromName = PrefsPropsUtil.getString(
+			user.getCompanyId(), PropsKeys.ADMIN_EMAIL_FROM_NAME);
+		String fromAddress = PrefsPropsUtil.getString(
+			user.getCompanyId(), PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
+
+		String toName = user.getFullName();
+		String toAddress = user.getEmailAddress();
+
+		PortletPreferences companyPortletPreferences =
+			PrefsPropsUtil.getPreferences(user.getCompanyId(), true);
+
+		Map<Locale, String> localizedSubjectMap =
+			LocalizationUtil.getLocalizationMap(
+				companyPortletPreferences, "adminEmailUserAddedSubject",
+				PropsKeys.ADMIN_EMAIL_USER_ADDED_SUBJECT);
+
+		Map<Locale, String> localizedBodyMap = null;
+
+		if (Validator.isNotNull(password)) {
+			localizedBodyMap = LocalizationUtil.getLocalizationMap(
+				companyPortletPreferences, "adminEmailUserAddedBody",
+				PropsKeys.ADMIN_EMAIL_USER_ADDED_BODY);
+		}
+		else {
+			localizedBodyMap = LocalizationUtil.getLocalizationMap(
+				companyPortletPreferences, "adminEmailUserAddedNoPasswordBody",
+				PropsKeys.ADMIN_EMAIL_USER_ADDED_NO_PASSWORD_BODY);
+		}
+
+		SubscriptionSender subscriptionSender = new SubscriptionSender();
+
+		subscriptionSender.setCompanyId(user.getCompanyId());
+		subscriptionSender.setContextAttributes(
+			"[$USER_ID$]", user.getUserId(), "[$USER_PASSWORD$]", password,
+			"[$USER_SCREENNAME$]", user.getScreenName());
+		subscriptionSender.setFrom(fromAddress, fromName);
+		subscriptionSender.setHtmlFormat(true);
+		subscriptionSender.setLocalizedBodyMap(localizedBodyMap);
+		subscriptionSender.setLocalizedSubjectMap(localizedSubjectMap);
+		subscriptionSender.setMailId(
+			"user", user.getUserId(), System.currentTimeMillis(),
+			PwdGenerator.getPassword());
+		subscriptionSender.setServiceContext(serviceContext);
+		subscriptionSender.setUserId(user.getUserId());
+
+		subscriptionSender.addRuntimeSubscribers(toAddress, toName);
+
+		subscriptionSender.flushNotificationsAsync();
+	}
+
 	protected void reindex(final User user) {
 		final Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 			User.class);
@@ -5834,8 +6048,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(User.class);
 
 		for (int i = 0; i < 10; i++) {
-			Hits hits = indexer.search(
-				searchContext, UsersAdmin.USER_SELECTED_FIELD_NAMES);
+			Hits hits = indexer.search(searchContext);
 
 			List<User> users = UsersAdminUtil.getUsers(hits);
 
@@ -5846,61 +6059,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		throw new SearchException(
 			"Unable to fix the search index after 10 attempts");
-	}
-
-	protected void sendEmail(
-			User user, String password, ServiceContext serviceContext)
-		throws SystemException {
-
-		if (!PrefsPropsUtil.getBoolean(
-				user.getCompanyId(),
-				PropsKeys.ADMIN_EMAIL_USER_ADDED_ENABLED)) {
-
-			return;
-		}
-
-		String fromName = PrefsPropsUtil.getString(
-			user.getCompanyId(), PropsKeys.ADMIN_EMAIL_FROM_NAME);
-		String fromAddress = PrefsPropsUtil.getString(
-			user.getCompanyId(), PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
-
-		String toName = user.getFullName();
-		String toAddress = user.getEmailAddress();
-
-		String subject = PrefsPropsUtil.getContent(
-			user.getCompanyId(), PropsKeys.ADMIN_EMAIL_USER_ADDED_SUBJECT);
-
-		String body = null;
-
-		if (Validator.isNotNull(password)) {
-			body = PrefsPropsUtil.getContent(
-				user.getCompanyId(), PropsKeys.ADMIN_EMAIL_USER_ADDED_BODY);
-		}
-		else {
-			body = PrefsPropsUtil.getContent(
-				user.getCompanyId(),
-				PropsKeys.ADMIN_EMAIL_USER_ADDED_NO_PASSWORD_BODY);
-		}
-
-		SubscriptionSender subscriptionSender = new SubscriptionSender();
-
-		subscriptionSender.setBody(body);
-		subscriptionSender.setCompanyId(user.getCompanyId());
-		subscriptionSender.setContextAttributes(
-			"[$USER_ID$]", user.getUserId(), "[$USER_PASSWORD$]", password,
-			"[$USER_SCREENNAME$]", user.getScreenName());
-		subscriptionSender.setFrom(fromAddress, fromName);
-		subscriptionSender.setHtmlFormat(true);
-		subscriptionSender.setMailId(
-			"user", user.getUserId(), System.currentTimeMillis(),
-			PwdGenerator.getPassword());
-		subscriptionSender.setServiceContext(serviceContext);
-		subscriptionSender.setSubject(subject);
-		subscriptionSender.setUserId(user.getUserId());
-
-		subscriptionSender.addRuntimeSubscribers(toAddress, toName);
-
-		subscriptionSender.flushNotificationsAsync();
 	}
 
 	protected void setEmailAddress(
@@ -6104,7 +6262,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			User user = userPersistence.fetchByC_EA(companyId, emailAddress);
 
 			if ((user != null) && (user.getUserId() != userId)) {
-				throw new DuplicateUserEmailAddressException();
+				throw new DuplicateUserEmailAddressException(
+					"{userId=" + userId + "}");
 			}
 		}
 
@@ -6118,7 +6277,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					organizationPersistence.fetchByPrimaryKey(organizationId);
 
 				if (organization == null) {
-					throw new NoSuchOrganizationException();
+					throw new NoSuchOrganizationException(
+						"{organizationId=" + organizationId + "}");
 				}
 			}
 		}
@@ -6147,7 +6307,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				if (userPersistence.fetchByC_EA(
 						user.getCompanyId(), emailAddress) != null) {
 
-					throw new DuplicateUserEmailAddressException();
+					throw new DuplicateUserEmailAddressException(
+						"{userId=" + userId + "}");
 				}
 			}
 
@@ -6231,7 +6392,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			if (userPersistence.fetchByC_EA(
 					user.getCompanyId(), emailAddress1) != null) {
 
-				throw new DuplicateUserEmailAddressException();
+				throw new DuplicateUserEmailAddressException(
+					"{userId=" + user.getUserId() + "}");
 			}
 		}
 	}
@@ -6272,7 +6434,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		User user = userPersistence.fetchByC_O(companyId, openId);
 
 		if ((user != null) && (user.getUserId() != userId)) {
-			throw new DuplicateOpenIdException();
+			throw new DuplicateOpenIdException("{userId=" + userId + "}");
 		}
 	}
 
@@ -6363,7 +6525,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		User user = userPersistence.fetchByC_SN(companyId, screenName);
 
 		if ((user != null) && (user.getUserId() != userId)) {
-			throw new DuplicateUserScreenNameException();
+			throw new DuplicateUserScreenNameException(
+				"{userId=" + userId + "}");
 		}
 
 		String friendlyURL = StringPool.SLASH + screenName;

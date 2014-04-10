@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -188,7 +189,15 @@ public class JournalTemplateLocalServiceImpl
 			JournalTemplate newTemplate = fetchTemplate(groupId, newTemplateId);
 
 			if (newTemplate != null) {
-				throw new DuplicateTemplateIdException();
+				StringBundler sb = new StringBundler(5);
+
+				sb.append("{groupId=");
+				sb.append(groupId);
+				sb.append(", templateId=");
+				sb.append(newTemplateId);
+				sb.append("}");
+
+				throw new DuplicateTemplateIdException(sb.toString());
 			}
 		}
 
@@ -278,13 +287,13 @@ public class JournalTemplateLocalServiceImpl
 
 	@Override
 	public List<JournalTemplate> getStructureTemplates(
-			long groupId, String structureId, boolean includeGlobalTemplates)
+			long groupId, String structureId, boolean includeAncestorTemplates)
 		throws PortalException, SystemException {
 
 		long[] groupIds = new long[] {groupId};
 
-		if (includeGlobalTemplates) {
-			groupIds = PortalUtil.getSiteAndCompanyGroupIds(groupId);
+		if (includeAncestorTemplates) {
+			groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId);
 		}
 
 		JournalStructure structure = journalStructureLocalService.getStructure(

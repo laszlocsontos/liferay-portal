@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -112,6 +112,30 @@ public class DDMStructureServiceTest extends BaseDDMServiceTestCase {
 		try {
 			addStructure(
 				_classNameId, null, "Test Structure",
+				readText("ddm-structure-duplicate-element-name.xsd"),
+				storageType, DDMStructureConstants.TYPE_DEFAULT);
+
+			Assert.fail();
+		}
+		catch (StructureDuplicateElementException sdee) {
+		}
+	}
+
+	@Test
+	public void testAddStructureWithXsdContainingDuplicateElementNameInParent()
+		throws Exception {
+
+		String storageType = StorageType.XML.getValue();
+
+		try {
+			DDMStructure parentStructure = addStructure(
+				_classNameId, null, "Test Parent Structure",
+				readText("ddm-structure-duplicate-element-name.xsd"),
+				storageType, DDMStructureConstants.TYPE_DEFAULT);
+
+			addStructure(
+				parentStructure.getStructureId(), _classNameId, null,
+				"Test Structure",
 				readText("ddm-structure-duplicate-element-name.xsd"),
 				storageType, DDMStructureConstants.TYPE_DEFAULT);
 

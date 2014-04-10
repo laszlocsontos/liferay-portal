@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -589,8 +589,8 @@ public class LiferayRepository
 
 		List<DLFileEntry> dlFileEntries =
 			dlFileEntryService.getGroupFileEntries(
-				getGroupId(), userId, toFolderId(rootFolderId), mimeTypes,
-				status, start, end, obc);
+				getGroupId(), userId, getRepositoryId(),
+				toFolderId(rootFolderId), mimeTypes, status, start, end, obc);
 
 		return toFileEntries(dlFileEntries);
 	}
@@ -609,7 +609,8 @@ public class LiferayRepository
 		throws PortalException, SystemException {
 
 		return dlFileEntryService.getGroupFileEntriesCount(
-			getGroupId(), userId, toFolderId(rootFolderId), mimeTypes, status);
+			getGroupId(), userId, getRepositoryId(), toFolderId(rootFolderId),
+			mimeTypes, status);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -93,6 +93,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
@@ -102,10 +104,6 @@ import javax.portlet.PortletURL;
  * @author Raymond Augé
  */
 public abstract class BaseIndexer implements Indexer {
-
-	public BaseIndexer() {
-		_document = new DocumentImpl();
-	}
 
 	@Override
 	public void addRelatedEntryFields(Document document, Object obj)
@@ -319,15 +317,31 @@ public abstract class BaseIndexer implements Indexer {
 		return getSortField(orderByCol);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(Document, Locale,
+	 *             String, PortletURL, PortletRequest, PortletResponse)}
+	 */
+	@Deprecated
 	@Override
 	public Summary getSummary(
 			Document document, Locale locale, String snippet,
 			PortletURL portletURL)
 		throws SearchException {
 
+		return getSummary(document, locale, snippet, portletURL, null, null);
+	}
+
+	@Override
+	public Summary getSummary(
+			Document document, Locale locale, String snippet,
+			PortletURL portletURL, PortletRequest portletRequest,
+			PortletResponse portletResponse)
+		throws SearchException {
+
 		try {
 			Summary summary = doGetSummary(
-				document, locale, snippet, portletURL);
+				document, locale, snippet, portletURL, portletRequest,
+				portletResponse);
 
 			for (IndexerPostProcessor indexerPostProcessor :
 					_indexerPostProcessors) {
@@ -499,6 +513,17 @@ public abstract class BaseIndexer implements Indexer {
 		try {
 			Hits hits = null;
 
+			QueryConfig queryConfig = searchContext.getQueryConfig();
+
+			if (ArrayUtil.isEmpty(queryConfig.getSelectedFieldNames()) &&
+				!ArrayUtil.isEmpty(getDefaultSelectedFieldNames())) {
+
+				queryConfig.setSelectedFieldNames(
+					getDefaultSelectedFieldNames());
+			}
+
+			addFacetSelectedFieldNames(searchContext, queryConfig);
+
 			PermissionChecker permissionChecker =
 				PermissionThreadLocal.getPermissionChecker();
 
@@ -607,6 +632,32 @@ public abstract class BaseIndexer implements Indexer {
 
 		document.addLocalizedKeyword(
 			"localized_title", assetEntry.getTitleMap(), true);
+		document.addKeyword("visible", assetEntry.isVisible());
+	}
+
+	protected void addFacetSelectedFieldNames(
+		SearchContext searchContext, QueryConfig queryConfig) {
+
+		String[] selectedFieldNames = queryConfig.getSelectedFieldNames();
+
+		if (ArrayUtil.isEmpty(selectedFieldNames) ||
+			(selectedFieldNames.length == 1) &&
+			selectedFieldNames[0].equals(Field.ANY)) {
+
+			return;
+		}
+
+		Set<String> selectedFieldNameSet = SetUtil.fromArray(
+			selectedFieldNames);
+
+		Map<String, Facet> facets = searchContext.getFacets();
+
+		selectedFieldNameSet.addAll(facets.keySet());
+
+		selectedFieldNames = selectedFieldNameSet.toArray(
+			new String[selectedFieldNameSet.size()]);
+
+		queryConfig.setSelectedFieldNames(selectedFieldNames);
 	}
 
 	/**
@@ -1322,7 +1373,8 @@ public abstract class BaseIndexer implements Indexer {
 
 	protected abstract Summary doGetSummary(
 			Document document, Locale locale, String snippet,
-			PortletURL portletURL)
+			PortletURL portletURL, PortletRequest portletRequest,
+			PortletResponse portletResponse)
 		throws Exception;
 
 	protected abstract void doReindex(Object obj) throws Exception;
@@ -1478,6 +1530,10 @@ public abstract class BaseIndexer implements Indexer {
 		String[] classNames = getClassNames();
 
 		return classNames[0];
+	}
+
+	protected String[] getDefaultSelectedFieldNames() {
+		return _defaultSelectedFieldNames;
 	}
 
 	protected Set<String> getLocalizedCountryNames(Country country) {
@@ -1637,6 +1693,12 @@ public abstract class BaseIndexer implements Indexer {
 		}
 	}
 
+	protected void setDefaultSelectedFieldNames(
+		String[] getDefaultSelectedFieldNames) {
+
+		_defaultSelectedFieldNames = getDefaultSelectedFieldNames;
+	}
+
 	protected void setFilterSearch(boolean filterSearch) {
 		_filterSearch = filterSearch;
 	}
@@ -1659,7 +1721,8 @@ public abstract class BaseIndexer implements Indexer {
 
 	private static Log _log = LogFactoryUtil.getLog(BaseIndexer.class);
 
-	private Document _document;
+	private String[] _defaultSelectedFieldNames;
+	private Document _document = new DocumentImpl();
 	private boolean _filterSearch;
 	private boolean _indexerEnabled = true;
 	private IndexerPostProcessor[] _indexerPostProcessors =

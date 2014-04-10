@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -311,7 +311,7 @@ Group parentGroup = themeDisplay.getSiteGroup();
 				var result = <%= parentGroup.getPublicLayoutsPageCount() > 0 %>;
 
 				if (tabView.size() >= 2) {
-					var index = tabView.getTabIndex(tabView.get('activeTab'));
+					var index = tabView.indexOf(tabView.get('selection'));
 
 					result = (index == 0);
 				}

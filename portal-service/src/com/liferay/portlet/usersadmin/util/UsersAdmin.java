@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.Address;
@@ -51,15 +50,6 @@ import javax.servlet.http.HttpServletRequest;
 public interface UsersAdmin {
 
 	public static final String CUSTOM_QUESTION = "write-my-own-question";
-
-	public static final String[] ORGANIZATION_SELECTED_FIELD_NAMES =
-		{Field.COMPANY_ID, Field.ORGANIZATION_ID, Field.UID};
-
-	public static final String[] USER_GROUP_SELECTED_FIELD_NAMES =
-		{Field.COMPANY_ID, Field.UID, Field.USER_GROUP_ID};
-
-	public static final String[] USER_SELECTED_FIELD_NAMES =
-		{Field.COMPANY_ID, Field.UID, Field.USER_ID};
 
 	public void addPortletBreadcrumbEntries(
 			Organization organization, HttpServletRequest request,

@@ -95,9 +95,6 @@
 		<listener-class>com.liferay.portal.kernel.servlet.PortletSessionListenerManager</listener-class>
 	</listener>
 	<listener>
-		<listener-class>com.liferay.portal.kernel.servlet.SerializableSessionAttributeListener</listener-class>
-	</listener>
-	<listener>
 		<listener-class>com.liferay.portal.servlet.SharedSessionAttributeListener</listener-class>
 	</listener>
 	<servlet>
@@ -877,6 +874,10 @@
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/security</taglib-uri>
 			<taglib-location>/WEB-INF/tld/liferay-security.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>http://liferay.com/tld/staging</taglib-uri>
+			<taglib-location>/WEB-INF/tld/liferay-staging.tld</taglib-location>
 		</taglib>
 		<taglib>
 			<taglib-uri>http://liferay.com/tld/theme</taglib-uri>

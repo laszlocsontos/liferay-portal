@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,6 +44,10 @@ public interface Document extends Cloneable, Serializable {
 		throws IOException;
 
 	public void addFile(String name, InputStream is, String fileExt)
+		throws IOException;
+
+	public void addFile(
+			String name, InputStream is, String fileExt, int maxStringLength)
 		throws IOException;
 
 	public void addKeyword(String name, boolean value);

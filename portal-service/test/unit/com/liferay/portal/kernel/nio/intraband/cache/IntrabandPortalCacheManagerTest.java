@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.nio.intraband.cache;
 
 import com.liferay.portal.kernel.cache.PortalCache;
-import com.liferay.portal.kernel.cache.PortalCacheManager;
 import com.liferay.portal.kernel.io.Deserializer;
 import com.liferay.portal.kernel.nio.intraband.Datagram;
 import com.liferay.portal.kernel.nio.intraband.MockIntraband;
@@ -28,6 +27,7 @@ import java.lang.reflect.Field;
 
 import java.net.URL;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +50,24 @@ public class IntrabandPortalCacheManagerTest {
 			}
 
 		};
+
+	@Test
+	public void testCacheManagerListeners() {
+		IntrabandPortalCacheManager<String, String>
+			intrabandPortalCacheManager =
+				new IntrabandPortalCacheManager<String, String>(
+					_mockRegistrationReference);
+
+		Assert.assertSame(
+			Collections.emptySet(),
+			intrabandPortalCacheManager.getCacheManagerListeners());
+		Assert.assertFalse(
+			intrabandPortalCacheManager.registerCacheManagerListener(null));
+		Assert.assertFalse(
+			intrabandPortalCacheManager.unregisterCacheManagerListener(null));
+
+		intrabandPortalCacheManager.unregisterCacheManagerListeners();
+	}
 
 	@Test
 	public void testConstructor() throws Exception {
@@ -86,18 +104,6 @@ public class IntrabandPortalCacheManagerTest {
 		intrabandPortalCacheManager.destroy();
 
 		Assert.assertTrue(portalCaches.isEmpty());
-
-		Datagram datagram = _mockIntraband.getDatagram();
-
-		Assert.assertNotNull(datagram);
-		Assert.assertEquals(
-			SystemDataType.PORTAL_CACHE.getValue(), datagram.getType());
-
-		Deserializer deserializer = new Deserializer(
-			datagram.getDataByteBuffer());
-
-		Assert.assertEquals(
-			PortalCacheActionType.DESTROY.ordinal(), deserializer.readInt());
 	}
 
 	@Test
@@ -134,20 +140,6 @@ public class IntrabandPortalCacheManagerTest {
 		Assert.assertEquals(portalCacheName, portalCache2.getName());
 		Assert.assertEquals(1, portalCaches.size());
 		Assert.assertSame(portalCache, portalCache2);
-	}
-
-	@Test
-	public void testPortalCacheManagerGetterAndSetter() {
-		Assert.assertNull(IntrabandPortalCacheManager.getPortalCacheManager());
-
-		PortalCacheManager<String, String> portalCacheManager =
-			new MockPortalCacheManager();
-
-		IntrabandPortalCacheManager.setPortalCacheManager(portalCacheManager);
-
-		Assert.assertSame(
-			portalCacheManager,
-			IntrabandPortalCacheManager.getPortalCacheManager());
 	}
 
 	@Test
@@ -214,6 +206,11 @@ public class IntrabandPortalCacheManagerTest {
 		Assert.assertEquals(1, portalCaches.size());
 		Assert.assertSame(portalCache2, portalCaches.get(portalCacheName2));
 
+		intrabandPortalCacheManager.clearAll();
+
+		Assert.assertEquals(1, portalCaches.size());
+		Assert.assertSame(portalCache2, portalCaches.get(portalCacheName2));
+
 		Datagram datagram = _mockIntraband.getDatagram();
 
 		Assert.assertNotNull(datagram);
@@ -222,24 +219,6 @@ public class IntrabandPortalCacheManagerTest {
 
 		Deserializer deserializer = new Deserializer(
 			datagram.getDataByteBuffer());
-
-		Assert.assertEquals(
-			PortalCacheActionType.REMOVE_CACHE.ordinal(),
-			deserializer.readInt());
-		Assert.assertEquals(portalCacheName1, deserializer.readString());
-
-		intrabandPortalCacheManager.clearAll();
-
-		Assert.assertEquals(1, portalCaches.size());
-		Assert.assertSame(portalCache2, portalCaches.get(portalCacheName2));
-
-		datagram = _mockIntraband.getDatagram();
-
-		Assert.assertNotNull(datagram);
-		Assert.assertEquals(
-			SystemDataType.PORTAL_CACHE.getValue(), datagram.getType());
-
-		deserializer = new Deserializer(datagram.getDataByteBuffer());
 
 		Assert.assertEquals(
 			PortalCacheActionType.CLEAR_ALL.ordinal(), deserializer.readInt());
@@ -280,38 +259,5 @@ public class IntrabandPortalCacheManagerTest {
 	private MockIntraband _mockIntraband = new MockIntraband();
 	private MockRegistrationReference _mockRegistrationReference =
 		new MockRegistrationReference(_mockIntraband);
-
-	private static class MockPortalCacheManager
-		implements PortalCacheManager<String, String> {
-
-		@Override
-		public void clearAll() {
-		}
-
-		@Override
-		public void destroy() {
-		}
-
-		@Override
-		public PortalCache<String, String> getCache(String name) {
-			return null;
-		}
-
-		@Override
-		public PortalCache<String, String> getCache(
-			String name, boolean blocking) {
-
-			return null;
-		}
-
-		@Override
-		public void reconfigureCaches(URL configurationURL) {
-		}
-
-		@Override
-		public void removeCache(String name) {
-		}
-
-	}
 
 }

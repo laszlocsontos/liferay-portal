@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -107,7 +107,7 @@ public class SeleniumUtil extends TestPropsValues {
 			else if (BROWSER_TYPE.equals("*googlechrome")) {
 				System.setProperty(
 					"webdriver.chrome.driver",
-					TestPropsValues.SELENIUM_EXECUTABLE_DIR +
+					TestPropsValues.SELENIUM_EXECUTABLE_DIR_NAME +
 						"\\chromedriver.exe");
 
 				if (SELENIUM_LOGGER_ENABLED) {
@@ -123,7 +123,7 @@ public class SeleniumUtil extends TestPropsValues {
 
 				System.setProperty(
 					"webdriver.ie.driver",
-					TestPropsValues.SELENIUM_EXECUTABLE_DIR +
+					TestPropsValues.SELENIUM_EXECUTABLE_DIR_NAME +
 						"\\IEDriverServer.exe");
 
 				if (SELENIUM_LOGGER_ENABLED) {

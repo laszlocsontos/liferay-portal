@@ -5,7 +5,8 @@
 
 	<property name="war.file" value="${ant.project.name}" />
 
-	<property name="alloy-font-awesome.file" value="alloy-font-awesome-1.0.0.zip" />
+	<property name="alloy.version" value="2.0.0" />
+	<property name="alloy-font-awesome.version" value="1.0.0" />
 	<property name="ckeditor.file" value="ckeditor_4.0.3_liferay.zip" />
 	<property name="fckeditor.file" value="FCKeditor_2.6.3.zip" />
 	<property name="scayt.file" value="scayt_4.0.3.zip" />
@@ -24,6 +25,7 @@
 		<pathelement location="${project.dir}/util-taglib/util-taglib.jar" />
 		<pathelement location="${project.dir}/lib/development/activation.jar" />
 		<pathelement location="${project.dir}/lib/development/mail.jar" />
+		<pathelement location="${project.dir}/lib/global/portal-settings-shared.jar" />
 		<pathelement location="${project.dir}/lib/global/portlet.jar" />
 		<pathelement location="${project.dir}/lib/portal/alloy-taglib.jar" />
 		<pathelement location="${project.dir}/lib/portal/ant.jar" />
@@ -51,8 +53,6 @@
 
 	<target name="build-alloy">
 		<antcall target="build-alloy-bootstrap" />
-
-		<property name="alloy.version" value="2.0.0" />
 
 		<path id="alloy.zip.path">
 			<fileset dir="third-party">
@@ -230,6 +230,16 @@
 	</target>
 
 	<target name="build-alloy-font-awesome">
+		<path id="alloy-font-awesome.zip.path">
+			<fileset dir="third-party">
+				<include name="alloy-font-awesome-${alloy-font-awesome.version}*.zip" />
+			</fileset>
+		</path>
+
+		<property name="alloy-font-awesome.zip.path" refid="alloy-font-awesome.zip.path" />
+
+		<basename file="${alloy-font-awesome.zip.path}" property="alloy-font-awesome.file" />
+
 		<if>
 			<not>
 				<uptodate
@@ -420,6 +430,10 @@
 	</target>
 
 	<target name="build-css">
+		<property name="sass.tmp.dir" value="${basedir}/sass_tmp_dir" />
+
+		<mkdir dir="${sass.tmp.dir}" />
+
 		<java
 			classname="com.liferay.portal.tools.SassToCssBuilder"
 			classpathref="project.classpath"
@@ -428,6 +442,7 @@
 			newenvironment="true"
 		>
 			<jvmarg value="-Xmx1024m" />
+			<jvmarg value="-Djava.io.tmpdir=${sass.tmp.dir}" />
 			<jvmarg value="-Dliferay.lib.portal.dir=${basedir}/../lib/portal" />
 			<arg value="sass.dir.0=/html/css" />
 			<arg value="sass.dir.1=/html/portlet" />
@@ -435,6 +450,8 @@
 			<arg value="sass.docroot.dir=${basedir}/docroot" />
 			<arg value="sass.portal.common.dir=${basedir}/docroot/html/css/common" />
 		</java>
+
+		<delete dir="${sass.tmp.dir}" />
 	</target>
 
 	<target name="build-dtd">
@@ -738,9 +755,15 @@
 								alert( 'An internal server error occured.' );
 								break ;
 							case 210:
-								alert( 'You cannot upload a video file if video preview generation is disabled.' );
+								alert( 'A category is required for this file. Please use the Documents and Media application to upload the file.' );
 								break ;
 							case 211:
+								alert( 'File may contain a virus.' );
+								break ;
+							case 220:
+								alert( 'You cannot upload a video file if video preview generation is disabled.' );
+								break ;
+							case 221:
 								alert( 'You cannot upload an audio file if audio preview generation is disabled.' );
 								break ;
 							default :
@@ -869,14 +892,21 @@
 	</target>
 
 	<target name="build-selenium-new">
-		<delete dir="${basedir.unix}/test/functional-generated" />
+		<if>
+			<not>
+				<equals arg1="${delete.function.generated}" arg2="false" />
+			</not>
+			<then>
+				<delete dir="${basedir.unix}/test/functional-generated" />
+			</then>
+		</if>
 
 		<if>
 			<not>
 				<isset property="selenium.types" />
 			</not>
 			<then>
-				<property name="selenium.types" value="action,function,macro,path,testcase,testsuite" />
+				<property name="selenium.types" value="action,function,macro,path,testcase" />
 			</then>
 		</if>
 
@@ -889,44 +919,60 @@
 			newenvironment="true"
 		>
 			<jvmarg value="-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties" />
+			<arg value="project.dir=${project.dir}" />
 			<arg value="selenium.base.dir=test/functional" />
 			<arg value="selenium.types=${selenium.types}" />
+			<arg value="test.class=${test.class}" />
 		</java>
 	</target>
 
 	<target name="build-selenium-new-action">
 		<antcall target="build-selenium-new">
+			<param name="delete.function.generated" value="false" />
 			<param name="selenium.types" value="action" />
+		</antcall>
+	</target>
+
+	<target name="build-selenium-new-block">
+		<antcall target="build-selenium-new">
+			<param name="selenium.types" value="action,function,macro,path" />
 		</antcall>
 	</target>
 
 	<target name="build-selenium-new-function">
 		<antcall target="build-selenium-new">
+			<param name="delete.function.generated" value="false" />
 			<param name="selenium.types" value="function" />
 		</antcall>
 	</target>
 
 	<target name="build-selenium-new-macro">
 		<antcall target="build-selenium-new">
+			<param name="delete.function.generated" value="false" />
 			<param name="selenium.types" value="macro" />
 		</antcall>
 	</target>
 
 	<target name="build-selenium-new-path">
 		<antcall target="build-selenium-new">
+			<param name="delete.function.generated" value="false" />
 			<param name="selenium.types" value="path" />
 		</antcall>
 	</target>
 
 	<target name="build-selenium-new-test-case">
-		<antcall target="build-selenium-new">
-			<param name="selenium.types" value="testcase" />
-		</antcall>
-	</target>
+		<if>
+			<not>
+				<isset property="test.class" />
+			</not>
+			<then>
+				<fail>Please set "test.class".</fail>
+			</then>
+		</if>
 
-	<target name="build-selenium-new-test-suite">
 		<antcall target="build-selenium-new">
-			<param name="selenium.types" value="testsuite" />
+			<param name="delete.function.generated" value="false" />
+			<param name="selenium.types" value="testcase" />
 		</antcall>
 	</target>
 
@@ -1152,14 +1198,18 @@
 		<delete dir="test-classes" />
 		<delete dir="test-results" />
 
+		<antcall target="clean-css" />
+
+		<antcall target="clean-themes" />
+	</target>
+
+	<target name="clean-css">
 		<delete includeemptydirs="true">
 			<fileset dir="docroot/html/css" includes="**/.sass-cache/**,**/.sass_cache_*.css,**/_sass_cache_*.css" />
 			<fileset dir="docroot/html/portlet" includes="**/.sass-cache/**,**/.sass_cache_*.css,**/_sass_cache_*.css" />
 			<fileset dir="docroot/html/themes" includes="**/.sass-cache/**,**/.sass_cache_*.css,**/_sass_cache_*.css" />
 			<fileset dir="docroot/WEB-INF/tld" includes="liferay*.tld" />
 		</delete>
-
-		<antcall target="clean-themes" />
 	</target>
 
 	<target name="clean-themes">
@@ -1518,6 +1568,24 @@ Please set the property "jdk.6.home" in build.properties.
 
 	<target name="deploy-properties">
 		<ant dir=".." target="deploy-properties" inheritAll="false" />
+	</target>
+
+	<target name="format-js">
+		<taskdef classname="com.philmander.jshint.JsHintAntTask" classpath="${project.dir}/tools/ant-jshint-2.0.5.jar" name="jshint" />
+
+		<jshint
+			dir="${project.dir}"
+			globals="alert: true, AUI: true, confirm: true, Liferay: true, prompt: true, submitForm: true, themeDisplay: true, YUI: true"
+			options="browser=true,curly=true,devel=false,eqeqeq=false,eqnull=true,evil=true,forin=false,funcscope=true,nonew=false,nonstandard=true,scripturl=true,strict=false,trailing=true,yui=true"
+		>
+			<exclude name="**/aui/**" />
+			<exclude name="**/dynamiccss/dependencies/r2*.js" />
+			<exclude name="**/editor/**" />
+			<exclude name="**/misc/**" />
+			<exclude name="**/selenium/**" />
+			<exclude name="**/VAADIN/**" />
+			<include name="**/*.js" />
+		</jshint>
 	</target>
 
 	<target name="war" depends="compile">

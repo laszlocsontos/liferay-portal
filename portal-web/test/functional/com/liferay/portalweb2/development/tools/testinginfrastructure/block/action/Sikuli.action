@@ -1,13 +1,25 @@
 <definition>
 	<command name="click">
 		<default>
-			<execute function="Click#clickImageElement" />
+			<execute function="Click#sikuliClick" />
 		</default>
 	</command>
 
 	<command name="type">
 		<default>
-			<execute function="Type#typeImageElement" />
+			<execute function="Type#sikuliType" />
+		</default>
+	</command>
+
+	<command name="uploadCommonFile">
+		<default>
+			<execute function="UploadCommonFile#sikuliUploadCommonFile" />
+		</default>
+	</command>
+
+	<command name="uploadTempFile">
+		<default>
+			<execute function="UploadTempFile#sikuliUploadTempFile" />
 		</default>
 	</command>
 </definition>

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -88,13 +88,14 @@ if (filterManageableOrganizations) {
 				</aui:nav>
 
 				<aui:nav-bar>
+
+					<%
+					request.setAttribute(WebKeys.SEARCH_CONTAINER, organizationSearchContainer);
+					%>
+
 					<liferay-util:include page="/html/portlet/users_admin/toolbar.jsp" />
 
-					<aui:nav-bar-search cssClass="pull-right">
-						<liferay-ui:search-form
-							page="/html/portlet/users_admin/organization_search.jsp"
-						/>
-					</aui:nav-bar-search>
+					<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/users_admin/organization_search.jsp" searchContainer="<%= organizationSearchContainer %>" />
 				</aui:nav-bar>
 
 				<div id="breadcrumb">

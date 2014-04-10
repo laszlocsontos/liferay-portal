@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -112,7 +112,7 @@ if ((checkedOut || pending) && !PropsValues.DL_FILE_ENTRY_DRAFTS_ENABLED) {
 	saveAsDraft = true;
 }
 
-FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(request, fileEntry, fileVersion);
+DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, fileEntry, fileVersion);
 %>
 
 <c:if test="<%= Validator.isNull(referringPortletResource) %>">
@@ -183,6 +183,15 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntryId %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= String.valueOf(WorkflowConstants.ACTION_PUBLISH) %>" />
 
+	<liferay-ui:error exception="<%= AntivirusScannerException.class %>">
+
+		<%
+		AntivirusScannerException ase = (AntivirusScannerException)errorException;
+		%>
+
+		<liferay-ui:message key="<%= ase.getMessageKey() %>" />
+	</liferay-ui:error>
+
 	<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="please-enter-a-unique-document-name" />
 	<liferay-ui:error exception="<%= DuplicateFolderNameException.class %>" message="please-enter-a-unique-document-name" />
 
@@ -207,12 +216,10 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 	if (fileMaxSize == 0) {
 		fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
 	}
-
-	fileMaxSize /= 1024;
 	%>
 
 	<liferay-ui:error exception="<%= FileSizeException.class %>">
-		<liferay-ui:message arguments="<%= fileMaxSize %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
+		<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(fileMaxSize, locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
 	</liferay-ui:error>
 
 	<liferay-ui:asset-categories-error />
@@ -229,7 +236,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 		<aui:field-wrapper>
 			<c:if test="<%= fileMaxSize != 0 %>">
 				<div class="alert alert-info">
-					<%= LanguageUtil.format(pageContext, "upload-documents-no-larger-than-x-k", String.valueOf(fileMaxSize), false) %>
+					<%= LanguageUtil.format(pageContext, "upload-documents-no-larger-than-x", TextFormatter.formatStorageSize(fileMaxSize, locale), false) %>
 				</div>
 			</c:if>
 		</aui:field-wrapper>
@@ -328,7 +335,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 					inherited = !dlFolder.isOverrideFileEntryTypes();
 				}
 
-				List<DLFileEntryType> dlFileEntryTypes = DLFileEntryTypeLocalServiceUtil.getFolderFileEntryTypes(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay), folderId, inherited);
+				List<DLFileEntryType> dlFileEntryTypes = DLFileEntryTypeLocalServiceUtil.getFolderFileEntryTypes(PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId), folderId, inherited);
 				%>
 
 				<c:choose>
@@ -442,24 +449,24 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 		</c:if>
 
 		<aui:button-row>
-			<c:if test="<%= fileEntryDisplayContext.isSaveButtonVisible() %>">
-				<aui:button disabled="<%= fileEntryDisplayContext.isSaveButtonDisabled() %>" name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveFileEntry(true);" %>' value="<%= fileEntryDisplayContext.getSaveButtonLabel() %>" />
+			<c:if test="<%= dlActionsDisplayContext.isSaveButtonVisible() %>">
+				<aui:button disabled="<%= dlActionsDisplayContext.isSaveButtonDisabled() %>" name="saveButton" onClick='<%= renderResponse.getNamespace() + "saveFileEntry(true);" %>' value="<%= dlActionsDisplayContext.getSaveButtonLabel() %>" />
 			</c:if>
 
-			<c:if test="<%= fileEntryDisplayContext.isPublishButtonVisible() %>">
-				<aui:button disabled="<%= fileEntryDisplayContext.isPublishButtonDisabled() %>" name="publishButton" type="submit" value="<%= fileEntryDisplayContext.getPublishButtonLabel() %>" />
+			<c:if test="<%= dlActionsDisplayContext.isPublishButtonVisible() %>">
+				<aui:button disabled="<%= dlActionsDisplayContext.isPublishButtonDisabled() %>" name="publishButton" type="submit" value="<%= dlActionsDisplayContext.getPublishButtonLabel() %>" />
 			</c:if>
 
-			<c:if test="<%= fileEntryDisplayContext.isCheckoutDocumentButtonVisible() %>">
-				<aui:button disabled="<%= fileEntryDisplayContext.isCheckoutDocumentDisabled() %>" onClick='<%= renderResponse.getNamespace() + "checkOut();" %>' value="checkout[document]" />
+			<c:if test="<%= dlActionsDisplayContext.isCheckoutDocumentButtonVisible() %>">
+				<aui:button disabled="<%= dlActionsDisplayContext.isCheckoutDocumentDisabled() %>" onClick='<%= renderResponse.getNamespace() + "checkOut();" %>' value="checkout[document]" />
 			</c:if>
 
-			<c:if test="<%= fileEntryDisplayContext.isCheckinButtonVisible() %>">
-				<aui:button disabled="<%= fileEntryDisplayContext.isCheckinButtonDisabled() %>" onClick='<%= renderResponse.getNamespace() + "checkIn();" %>' value="save-and-checkin" />
+			<c:if test="<%= dlActionsDisplayContext.isCheckinButtonVisible() %>">
+				<aui:button disabled="<%= dlActionsDisplayContext.isCheckinButtonDisabled() %>" onClick='<%= renderResponse.getNamespace() + "checkIn();" %>' value="save-and-checkin" />
 			</c:if>
 
-			<c:if test="<%= fileEntryDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
-				<aui:button disabled="<%= fileEntryDisplayContext.isCancelCheckoutDocumentButtonDisabled() %>" onClick='<%= renderResponse.getNamespace() + "cancelCheckOut();" %>' value="cancel-checkout[document]" />
+			<c:if test="<%= dlActionsDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
+				<aui:button disabled="<%= dlActionsDisplayContext.isCancelCheckoutDocumentButtonDisabled() %>" onClick='<%= renderResponse.getNamespace() + "cancelCheckOut();" %>' value="cancel-checkout[document]" />
 			</c:if>
 
 			<aui:button href="<%= redirect %>" type="cancel" />

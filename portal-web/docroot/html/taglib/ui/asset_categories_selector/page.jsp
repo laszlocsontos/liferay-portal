@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,40 +26,19 @@ String curCategoryIds = GetterUtil.getString((String)request.getAttribute("lifer
 String curCategoryNames = StringPool.BLANK;
 int maxEntries = GetterUtil.getInteger(PropsUtil.get(PropsKeys.ASSET_CATEGORIES_SELECTOR_MAX_ENTRIES));
 
-List<AssetVocabulary> vocabularies = new ArrayList<AssetVocabulary>();
+long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId);
 
-Group siteGroup = themeDisplay.getSiteGroup();
-
-StringBundler vocabularyGroupIds = new StringBundler(3);
-
-vocabularies.addAll(AssetVocabularyServiceUtil.getGroupVocabularies(siteGroup.getGroupId(), false));
-
-vocabularyGroupIds.append(siteGroup.getGroupId());
-
-if (scopeGroupId != themeDisplay.getCompanyGroupId()) {
-	vocabularies.addAll(AssetVocabularyServiceUtil.getGroupVocabularies(themeDisplay.getCompanyGroupId(), false));
-
-	vocabularyGroupIds.append(StringPool.COMMA);
-	vocabularyGroupIds.append(themeDisplay.getCompanyGroupId());
-}
+List<AssetVocabulary> vocabularies = AssetVocabularyServiceUtil.getGroupVocabularies(groupIds);
 
 if (Validator.isNotNull(className)) {
+	vocabularies = AssetUtil.filterVocabularies(vocabularies, className);
+
 	long classNameId = PortalUtil.getClassNameId(className);
 
 	for (AssetVocabulary vocabulary : vocabularies) {
 		vocabulary = vocabulary.toEscapedModel();
 
-		int vocabularyCategoriesCount = AssetCategoryServiceUtil.getVocabularyCategoriesCount(vocabulary.getGroupId(), vocabulary.getVocabularyId());
-
-		if (vocabularyCategoriesCount == 0) {
-			continue;
-		}
-
-		UnicodeProperties settingsProperties = vocabulary.getSettingsProperties();
-
-		long[] selectedClassNameIds = StringUtil.split(settingsProperties.getProperty("selectedClassNameIds"), 0L);
-
-		if ((selectedClassNameIds.length > 0) && (selectedClassNameIds[0] != AssetCategoryConstants.ALL_CLASS_NAME_IDS) && !ArrayUtil.contains(selectedClassNameIds, classNameId)) {
+		if (AssetCategoryServiceUtil.getVocabularyCategoriesCount(vocabulary.getGroupId(), vocabulary.getVocabularyId()) == 0) {
 			continue;
 		}
 
@@ -84,8 +63,13 @@ if (Validator.isNotNull(className)) {
 			<label id="<%= namespace %>assetCategoriesLabel_<%= vocabulary.getVocabularyId() %>">
 				<%= vocabulary.getTitle(locale) %>
 
-				<c:if test="<%= vocabulary.getGroupId() == themeDisplay.getCompanyGroupId() %>">
-					(<liferay-ui:message key="global" />)
+				<c:if test="<%= vocabulary.getGroupId() != themeDisplay.getSiteGroupId() %>">
+
+					<%
+					Group vocabularyGroup = GroupLocalServiceUtil.getGroup(vocabulary.getGroupId());
+					%>
+
+					(<%= vocabularyGroup.getDescriptiveName() %>)
 				</c:if>
 
 				<c:if test="<%= vocabulary.isRequired(classNameId) %>">
@@ -113,7 +97,7 @@ if (Validator.isNotNull(className)) {
 					portalModelResource: <%= Validator.isNotNull(className) && (ResourceActionsUtil.isPortalModelResource(className) || className.equals(Group.class.getName())) %>,
 					singleSelect: <%= !vocabulary.isMultiValued() %>,
 					title: '<%= UnicodeLanguageUtil.format(pageContext, "select-x", vocabulary.getTitle(locale), false) %>',
-					vocabularyGroupIds: '<%= vocabulary.getGroupId() %>',
+					vocabularyGroupIds: '<%= StringUtil.merge(groupIds) %>',
 					vocabularyIds: '<%= String.valueOf(vocabulary.getVocabularyId()) %>'
 				}
 			).render();
@@ -148,7 +132,7 @@ else {
 				maxEntries: <%= maxEntries %>,
 				moreResultsLabel: '<%= UnicodeLanguageUtil.get(pageContext, "load-more-results") %>',
 				portalModelResource: <%= Validator.isNotNull(className) && (ResourceActionsUtil.isPortalModelResource(className) || className.equals(Group.class.getName())) %>,
-				vocabularyGroupIds: '<%= vocabularyGroupIds.toString() %>',
+				vocabularyGroupIds: '<%= StringUtil.merge(groupIds) %>',
 				vocabularyIds: '<%= ListUtil.toString(vocabularies, "vocabularyId") %>'
 			}
 		).render();

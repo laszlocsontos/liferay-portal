@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -148,15 +148,14 @@ public class DLPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 
 		DLAppTestUtil.addFileEntry(
 			stagingGroup.getGroupId(), repository.getRepositoryId(),
-			folder.getFolderId(), ServiceTestUtil.randomString());
+			folder.getFolderId());
 	}
 
 	@Override
 	protected void addStagedModels() throws Exception {
 		Folder folder = DLAppTestUtil.addFolder(
 			stagingGroup.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			ServiceTestUtil.randomString());
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
 			stagingGroup.getGroupId(), DLFileEntryType.class.getName());

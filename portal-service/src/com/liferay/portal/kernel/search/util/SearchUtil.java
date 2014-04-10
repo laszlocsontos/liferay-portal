@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,12 +28,11 @@ import java.util.regex.Pattern;
  */
 public class SearchUtil {
 
-	public static final String HIGHLIGHT_1 = "<span class=\"highlight\">";
-
-	public static final String HIGHLIGHT_2 = "</span>";
+	public static final String[] HIGHLIGHTS =
+		{"<span class=\"highlight\">", "</span>"};
 
 	public static String highlight(String s, String[] queryTerms) {
-		return highlight(s, queryTerms, HIGHLIGHT_1, HIGHLIGHT_2);
+		return highlight(s, queryTerms, HIGHLIGHTS[0], HIGHLIGHTS[1]);
 	}
 
 	public static String highlight(

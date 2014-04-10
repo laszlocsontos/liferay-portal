@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.language;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
@@ -22,8 +24,8 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
-import javax.portlet.PortletConfig;
 import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,7 @@ import javax.servlet.jsp.PageContext;
 /**
  * @author Brian Wing Shun Chan
  */
+@ProviderType
 public class LanguageUtil {
 
 	public static String format(
@@ -126,33 +129,31 @@ public class LanguageUtil {
 	}
 
 	public static String format(
-		PortletConfig portletConfig, Locale locale, String pattern,
-		Object argument) {
+		ResourceBundle resourceBundle, String pattern, Object argument) {
 
-		return getLanguage().format(portletConfig, locale, pattern, argument);
+		return getLanguage().format(resourceBundle, pattern, argument);
 	}
 
 	public static String format(
-		PortletConfig portletConfig, Locale locale, String pattern,
-		Object argument, boolean translateArguments) {
+		ResourceBundle resourceBundle, String pattern, Object argument,
+		boolean translateArguments) {
 
 		return getLanguage().format(
-			portletConfig, locale, pattern, argument, translateArguments);
+			resourceBundle, pattern, argument, translateArguments);
 	}
 
 	public static String format(
-		PortletConfig portletConfig, Locale locale, String pattern,
-		Object[] arguments) {
+		ResourceBundle resourceBundle, String pattern, Object[] arguments) {
 
-		return getLanguage().format(portletConfig, locale, pattern, arguments);
+		return getLanguage().format(resourceBundle, pattern, arguments);
 	}
 
 	public static String format(
-		PortletConfig portletConfig, Locale locale, String pattern,
-		Object[] arguments, boolean translateArguments) {
+		ResourceBundle resourceBundle, String pattern, Object[] arguments,
+		boolean translateArguments) {
 
 		return getLanguage().format(
-			portletConfig, locale, pattern, arguments, translateArguments);
+			resourceBundle, pattern, arguments, translateArguments);
 	}
 
 	public static String get(Locale locale, String key) {
@@ -173,17 +174,14 @@ public class LanguageUtil {
 		return getLanguage().get(pageContext, key, defaultValue);
 	}
 
-	public static String get(
-		PortletConfig portletConfig, Locale locale, String key) {
-
-		return getLanguage().get(portletConfig, locale, key);
+	public static String get(ResourceBundle resourceBundle, String key) {
+		return getLanguage().get(resourceBundle, key);
 	}
 
 	public static String get(
-		PortletConfig portletConfig, Locale locale, String key,
-		String defaultValue) {
+		ResourceBundle resourceBundle, String key, String defaultValue) {
 
-		return getLanguage().get(portletConfig, locale, key, defaultValue);
+		return getLanguage().get(resourceBundle, key, defaultValue);
 	}
 
 	public static Locale[] getAvailableLocales() {

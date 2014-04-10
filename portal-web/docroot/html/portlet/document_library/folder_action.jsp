@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -152,9 +152,9 @@ String iconMenuId = null;
 
 					<c:if test="<%= hasUpdatePermission && !folder.isMountPoint() %>">
 						<portlet:renderURL var="moveURL">
-							<portlet:param name="struts_action" value="/document_library/move_folder" />
+							<portlet:param name="struts_action" value="/document_library/move_entry" />
 							<portlet:param name="redirect" value="<%= redirect %>" />
-							<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+							<portlet:param name="folderIds" value="<%= String.valueOf(folderId) %>" />
 							<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
 						</portlet:renderURL>
 
@@ -324,7 +324,7 @@ String iconMenuId = null;
 					</c:if>
 
 					<%
-					int fileEntryTypesCount = DLFileEntryTypeServiceUtil.getFileEntryTypesCount(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay));
+					int fileEntryTypesCount = DLFileEntryTypeServiceUtil.getFileEntryTypesCount(PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId));
 					%>
 
 					<liferay-portlet:renderURL var="editFileEntryURL" windowState="<%= (((folder == null) || folder.isSupportsMetadata()) && (fileEntryTypesCount > 0)) ? LiferayWindowState.POP_UP.toString() : WindowState.NORMAL.toString() %>">
@@ -367,29 +367,6 @@ String iconMenuId = null;
 						image="add_instance"
 						message="add-shortcut"
 						url="<%= editFileShortcutURL %>"
-					/>
-				</c:if>
-			</c:when>
-			<c:when test="<%= portletName.equals(PortletKeys.TRASH) %>">
-
-				<%
-				boolean hasUpdatePermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.UPDATE);
-				%>
-
-				<c:if test="<%= hasUpdatePermission && ((folder == null) || !folder.isMountPoint()) %>">
-					<liferay-portlet:renderURL portletName="<%= PortletKeys.DOCUMENT_LIBRARY %>" var="moveURL">
-						<portlet:param name="struts_action" value="/document_library/move_folder" />
-						<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.MOVE_FROM_TRASH %>" />
-						<portlet:param name="redirect" value="<%= redirect %>" />
-						<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
-						<portlet:param name="parentFolderId" value="<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-						<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
-					</liferay-portlet:renderURL>
-
-					<liferay-ui:icon
-						image="submit"
-						message="move"
-						url="<%= moveURL %>"
 					/>
 				</c:if>
 			</c:when>
@@ -444,14 +421,9 @@ String iconMenuId = null;
 
 		<br /><br />
 
-		<div class="file-entry-field">
-			<label><liferay-ui:message key="webdav-url" /></label>
-
-			<liferay-ui:input-resource
-				cssClass="webdav-url-resource"
-				url="<%= DLUtil.getWebDavURL(themeDisplay, folder, null) %>"
-			/>
-		</div>
+		<aui:field-wrapper cssClass="file-entry-field" label="webdav-url">
+			<liferay-ui:input-resource cssClass="webdav-url-resource" id="webdavUrl" url="<%= DLUtil.getWebDavURL(themeDisplay, folder, null) %>" />
+		</aui:field-wrapper>
 	</div>
 </div>
 

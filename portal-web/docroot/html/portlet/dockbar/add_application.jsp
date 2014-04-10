@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,7 +41,7 @@ refererURL.setParameter("updateLayout", "true");
 		List<Portlet> portlets = new ArrayList<Portlet>();
 
 		for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
-			Portlet portlet = PortletLocalServiceUtil.getPortletById(portletId);
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(user.getCompanyId(), portletId);
 
 			if ((portlet != null) && portlet.isInclude() && portlet.isActive() && PortletPermissionUtil.contains(permissionChecker, layout, portlet, ActionKeys.ADD_TO_PAGE)) {
 				portlets.add(portlet);
@@ -64,10 +64,6 @@ refererURL.setParameter("updateLayout", "true");
 
 							<%
 							for (Portlet portlet : portlets) {
-								if (!PortletPermissionUtil.contains(permissionChecker, layout, portlet.getPortletId(), ActionKeys.ADD_TO_PAGE)) {
-									continue;
-								}
-
 								boolean portletInstanceable = portlet.isInstanceable();
 
 								boolean portletUsed = layoutTypePortlet.hasPortletId(portlet.getPortletId());

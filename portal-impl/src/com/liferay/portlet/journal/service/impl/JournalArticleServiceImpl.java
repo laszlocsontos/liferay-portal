@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1821,45 +1821,28 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			andOperator, new QueryDefinition(status));
 	}
 
-	/**
-	 * Subscribes the user to notifications for the web content article matching
-	 * the group, notifying him the instant versions of the article are created,
-	 * deleted, or modified.
-	 *
-	 * @param  groupId the primary key of the group
-	 * @throws PortalException if the user did not have permission to subscribe
-	 *         to the web content article or if a matching user or group could
-	 *         not be found
-	 * @throws SystemException if a system exception occurred
-	 */
 	@Override
-	public void subscribe(long groupId)
+	public void subscribeStructure(
+			long groupId, long userId, long ddmStructureId)
 		throws PortalException, SystemException {
 
 		JournalPermission.check(
 			getPermissionChecker(), groupId, ActionKeys.SUBSCRIBE);
 
-		journalArticleLocalService.subscribe(getUserId(), groupId);
+		journalArticleLocalService.subscribeStructure(
+			groupId, userId, ddmStructureId);
 	}
 
-	/**
-	 * Unsubscribes the user from notifications for the web content article
-	 * matching the group.
-	 *
-	 * @param  groupId the primary key of the group
-	 * @throws PortalException if the user did not have permission to subscribe
-	 *         to the web content article or if a matching user or subscription
-	 *         could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
 	@Override
-	public void unsubscribe(long groupId)
+	public void unsubscribeStructure(
+			long groupId, long userId, long ddmStructureId)
 		throws PortalException, SystemException {
 
 		JournalPermission.check(
 			getPermissionChecker(), groupId, ActionKeys.SUBSCRIBE);
 
-		journalArticleLocalService.unsubscribe(getUserId(), groupId);
+		journalArticleLocalService.unsubscribeStructure(
+			groupId, userId, ddmStructureId);
 	}
 
 	/**

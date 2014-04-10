@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,7 +59,7 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 					long[] availableClassNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds(company.getCompanyId());
 
 					for (long classNameId : availableClassNameIds) {
-						AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(PortalUtil.getClassName(classNameId));
+						AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(classNameId);
 
 						if (!assetRendererFactory.isSelectable()) {
 							availableClassNameIds = ArrayUtil.remove(availableClassNameIds, classNameId);
@@ -113,16 +113,22 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 
 						String title = HtmlUtil.escape(StringUtil.shorten(assetRenderer.getTitle(themeDisplay.getLocale()), 60));
 
+						boolean hasAddToPagePermission = PortletPermissionUtil.contains(permissionChecker, layout, assetRenderer.getAddToPagePortletId(), ActionKeys.ADD_TO_PAGE);
+
 						Map<String, Object> data = new HashMap<String, Object>();
 
 						data.put("class-name", assetEntry.getClassName());
 						data.put("class-pk", assetEntry.getClassPK());
-						data.put("draggable", true);
+
+						if (hasAddToPagePermission) {
+							data.put("draggable", true);
+						}
+
 						data.put("instanceable", true);
 						data.put("portlet-id", assetRenderer.getAddToPagePortletId());
 						data.put("title", title);
 
-						String navItemCssClass="content-shortcut lfr-content-item ";
+						String navItemCssClass="content-shortcut drag-content-item lfr-content-item ";
 
 						if (!displayStyle.equals("icon")) {
 							navItemCssClass += "has-preview";
@@ -147,15 +153,15 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 										</div>
 
 										<div class="add-content-description">
-											<%= HtmlUtil.escape(StringUtil.shorten(assetRenderer.getSummary(locale), 120)) %>
+											<%= HtmlUtil.escape(StringUtil.shorten(assetRenderer.getSummary(liferayPortletRequest, liferayPortletResponse), 120)) %>
 										</div>
 									</div>
 								</c:when>
-								<c:otherwise >
+								<c:when test="<%= hasAddToPagePermission %>">
 									<div <%= AUIUtil.buildData(data) %> class="add-content-item">
 										<liferay-ui:message key="add" />
 									</div>
-								</c:otherwise>
+								</c:when>
 							</c:choose>
 						</aui:nav-item>
 

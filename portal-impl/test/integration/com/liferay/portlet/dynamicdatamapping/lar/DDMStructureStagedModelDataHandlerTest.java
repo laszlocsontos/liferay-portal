@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
+import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
@@ -54,7 +55,9 @@ public class DDMStructureStagedModelDataHandlerTest
 			new HashMap<String, List<StagedModel>>();
 
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
-			group.getGroupId(), DDLRecordSet.class.getName());
+			group.getGroupId(), DDLRecordSet.class.getName(),
+			DDMStructureTestUtil.getSampleStructureXSD(
+				ServiceTestUtil.randomString()));
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DDMStructure.class, ddmStructure);

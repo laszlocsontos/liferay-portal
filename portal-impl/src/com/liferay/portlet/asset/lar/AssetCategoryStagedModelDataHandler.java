@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -140,6 +140,23 @@ public class AssetCategoryStagedModelDataHandler
 			AssetCategory.class, category.getCategoryId());
 
 		portletDataContext.addZipEntry(categoryPath, category);
+	}
+
+	@Override
+	protected void doImportMissingReference(
+			PortletDataContext portletDataContext, String uuid, long groupId,
+			long categoryId)
+		throws Exception {
+
+		AssetCategory existingCategory =
+			AssetCategoryLocalServiceUtil.fetchAssetCategoryByUuidAndGroupId(
+				uuid, groupId);
+
+		Map<Long, Long> categoryIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				AssetCategory.class);
+
+		categoryIds.put(categoryId, existingCategory.getCategoryId());
 	}
 
 	@Override

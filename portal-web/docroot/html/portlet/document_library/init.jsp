@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,7 +29,6 @@ page import="com.liferay.portlet.documentlibrary.DuplicateFileEntryTypeException
 page import="com.liferay.portlet.documentlibrary.DuplicateFileException" %><%@
 page import="com.liferay.portlet.documentlibrary.DuplicateFolderNameException" %><%@
 page import="com.liferay.portlet.documentlibrary.DuplicateRepositoryNameException" %><%@
-page import="com.liferay.portlet.documentlibrary.FileExtensionException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileMimeTypeException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileNameException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileShortcutPermissionException" %><%@
@@ -40,8 +39,10 @@ page import="com.liferay.portlet.documentlibrary.NoSuchFileEntryException" %><%@
 page import="com.liferay.portlet.documentlibrary.NoSuchFolderException" %><%@
 page import="com.liferay.portlet.documentlibrary.NoSuchMetadataSetException" %><%@
 page import="com.liferay.portlet.documentlibrary.RepositoryNameException" %><%@
+page import="com.liferay.portlet.documentlibrary.RequiredFileEntryTypeException" %><%@
 page import="com.liferay.portlet.documentlibrary.SourceFileNameException" %><%@
 page import="com.liferay.portlet.documentlibrary.action.EditFileEntryAction" %><%@
+page import="com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerException" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryType" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants" %><%@
@@ -61,8 +62,8 @@ page import="com.liferay.portlet.documentlibrary.service.permission.DLFileShortc
 page import="com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission" %><%@
 page import="com.liferay.portlet.documentlibrary.service.permission.DLPermission" %><%@
 page import="com.liferay.portlet.documentlibrary.util.AudioProcessorUtil" %><%@
+page import="com.liferay.portlet.documentlibrary.util.DLActionsDisplayContext" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil" %><%@
-page import="com.liferay.portlet.documentlibrary.util.FileEntryDisplayContext" %><%@
 page import="com.liferay.portlet.documentlibrary.util.ImageProcessorUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.PDFProcessorUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.RawMetadataProcessor" %><%@

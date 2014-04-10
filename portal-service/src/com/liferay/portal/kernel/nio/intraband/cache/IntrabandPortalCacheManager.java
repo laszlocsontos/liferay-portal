@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.nio.intraband.cache;
 
+import com.liferay.portal.kernel.cache.CacheManagerListener;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheManager;
 import com.liferay.portal.kernel.io.Serializer;
@@ -26,7 +27,9 @@ import java.io.Serializable;
 
 import java.net.URL;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,19 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IntrabandPortalCacheManager
 		<K extends Serializable, V extends Serializable>
 	implements PortalCacheManager<K, V> {
-
-	public static <K extends Serializable, V extends Serializable>
-		PortalCacheManager<K, V> getPortalCacheManager() {
-
-		return (PortalCacheManager<K, V>)_portalCacheManager;
-	}
-
-	public static void setPortalCacheManager(
-		PortalCacheManager<? extends Serializable, ? extends Serializable>
-		portalCacheManager) {
-
-		_portalCacheManager = portalCacheManager;
-	}
 
 	public IntrabandPortalCacheManager(
 		RegistrationReference registrationReference) {
@@ -73,17 +63,6 @@ public class IntrabandPortalCacheManager
 	@Override
 	public void destroy() {
 		_portalCaches.clear();
-
-		Serializer serializer = new Serializer();
-
-		serializer.writeInt(PortalCacheActionType.DESTROY.ordinal());
-
-		SystemDataType systemDataType = SystemDataType.PORTAL_CACHE;
-
-		_intraband.sendDatagram(
-			_registrationReference,
-			Datagram.createRequestDatagram(
-				systemDataType.getValue(), serializer.toByteBuffer()));
 	}
 
 	@Override
@@ -106,6 +85,11 @@ public class IntrabandPortalCacheManager
 	}
 
 	@Override
+	public Set<CacheManagerListener> getCacheManagerListeners() {
+		return Collections.emptySet();
+	}
+
+	@Override
 	public void reconfigureCaches(URL configurationURL) {
 		Serializer serializer = new Serializer();
 
@@ -121,24 +105,27 @@ public class IntrabandPortalCacheManager
 	}
 
 	@Override
-	public void removeCache(String name) {
-		_portalCaches.remove(name);
+	public boolean registerCacheManagerListener(
+		CacheManagerListener cacheManagerListener) {
 
-		Serializer serializer = new Serializer();
-
-		serializer.writeInt(PortalCacheActionType.REMOVE_CACHE.ordinal());
-		serializer.writeString(name);
-
-		SystemDataType systemDataType = SystemDataType.PORTAL_CACHE;
-
-		_intraband.sendDatagram(
-			_registrationReference,
-			Datagram.createRequestDatagram(
-				systemDataType.getValue(), serializer.toByteBuffer()));
+		return false;
 	}
 
-	private static PortalCacheManager
-		<? extends Serializable, ? extends Serializable> _portalCacheManager;
+	@Override
+	public void removeCache(String name) {
+		_portalCaches.remove(name);
+	}
+
+	@Override
+	public boolean unregisterCacheManagerListener(
+		CacheManagerListener cacheManagerListener) {
+
+		return false;
+	}
+
+	@Override
+	public void unregisterCacheManagerListeners() {
+	}
 
 	private final Intraband _intraband;
 	private final Map<String, PortalCache<K, V>> _portalCaches =

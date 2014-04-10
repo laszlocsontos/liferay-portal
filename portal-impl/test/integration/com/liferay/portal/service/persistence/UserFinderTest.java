@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -109,7 +109,7 @@ public class UserFinderTest {
 			TestPropsValues.getCompanyId(), null,
 			WorkflowConstants.STATUS_APPROVED, params);
 
-		Assert.assertEquals(4, count);
+		Assert.assertEquals(5, count);
 	}
 
 	@Test
@@ -223,7 +223,7 @@ public class UserFinderTest {
 		Assert.assertTrue(users.contains(_organizationUser));
 		Assert.assertTrue(users.contains(_userGroupUser));
 		Assert.assertTrue(users.contains(TestPropsValues.getUser()));
-		Assert.assertEquals(4, users.size());
+		Assert.assertEquals(5, users.size());
 	}
 
 	@Test

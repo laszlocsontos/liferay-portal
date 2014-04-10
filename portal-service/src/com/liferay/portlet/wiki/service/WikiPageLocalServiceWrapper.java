@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -849,6 +849,14 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	public int getPagesCount(java.lang.String format)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _wikiPageLocalService.getPagesCount(format);
+	}
+
+	@Override
+	public com.liferay.portlet.wiki.model.WikiPage getPreviousVersionPage(
+		com.liferay.portlet.wiki.model.WikiPage page)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _wikiPageLocalService.getPreviousVersionPage(page);
 	}
 
 	/**

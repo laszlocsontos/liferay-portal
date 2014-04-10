@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,10 @@ Layout exportableLayout = ExportImportHelperUtil.getExportableLayout(themeDispla
 
 String errorMessageKey = StringPool.BLANK;
 
-Group stagingGroup = themeDisplay.getScopeGroup();
+Group group = themeDisplay.getScopeGroup();
+
+Group stagingGroup = group;
+
 Group liveGroup = stagingGroup.getLiveGroup();
 
 Layout targetLayout = null;
@@ -102,7 +105,7 @@ portletURL.setParameter("tabs3", "current-and-previous");
 				</portlet:actionURL>
 
 				<aui:form action="<%= publishPortletURL %>" cssClass="lfr-export-dialog" method="post" name="fm1" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "publishToLive();" %>'>
-					<aui:input name="<%= Constants.CMD %>" type="hidden" value="publish_to_live" />
+					<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.PUBLISH_TO_LIVE %>" />
 					<aui:input name="tabs1" type="hidden" value="export_import" />
 					<aui:input name="tabs2" type="hidden" value="<%= tabs2 %>" />
 					<aui:input name="redirect" type="hidden" value="<%= portletURL %>" />
@@ -458,17 +461,7 @@ portletURL.setParameter("tabs3", "current-and-previous");
 							</c:if>
 
 							<aui:fieldset cssClass="options-group" label="permissions">
-								<ul class="lfr-tree unstyled">
-									<li class="tree-item">
-										<aui:input helpMessage="export-import-portlet-permissions-help" label="permissions" name="<%= PortletDataHandlerKeys.PERMISSIONS %>" type="checkbox" />
-
-										<ul id="<portlet:namespace />permissionsUl">
-											<li class="tree-item">
-												<aui:input label="permissions-assigned-to-roles" name="permissionsAssignedToRoles" type="checkbox" value="<%= true %>" />
-											</li>
-										</ul>
-									</li>
-								</ul>
+								<%@ include file="/html/portlet/layouts_admin/export_configuration/permissions.jspf" %>
 							</aui:fieldset>
 						</c:if>
 
@@ -531,8 +524,6 @@ portletURL.setParameter("tabs3", "current-and-previous");
 					submitForm(document.<portlet:namespace />fm1);
 				}
 			}
-
-			Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.PERMISSIONS %>Checkbox', '<portlet:namespace />permissionsUl');
 
 			Liferay.Util.toggleRadio('<portlet:namespace />portletMetaDataFilter', '<portlet:namespace />portletMetaDataList');
 			Liferay.Util.toggleRadio('<portlet:namespace />portletMetaDataAll', '', ['<portlet:namespace />portletMetaDataList']);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -334,13 +334,9 @@ public class PortletImporter {
 		String userIdStrategyString = MapUtil.getString(
 			parameterMap, PortletDataHandlerKeys.USER_ID_STRATEGY);
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isInfoEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		User user = UserUtil.findByPrimaryKey(userId);
 
@@ -463,8 +459,8 @@ public class PortletImporter {
 
 		Element portletDataElement = portletElement.element("portlet-data");
 
-		boolean[] importPortletControls =
-			ExportImportHelperUtil.getImportPortletControls(
+		Map<String, Boolean> importPortletControlsMap =
+			ExportImportHelperUtil.getImportPortletControlsMap(
 				layout.getCompanyId(), portletId, parameterMap,
 				portletDataElement, manifestSummary);
 
@@ -474,13 +470,21 @@ public class PortletImporter {
 
 			importPortletPreferences(
 				portletDataContext, layout.getCompanyId(), groupId, layout,
-				portletId, portletElement, true, importPortletControls[0],
-				importPortletControls[1], importPortletControls[2],
-				importPortletControls[3]);
+				portletId, portletElement, true,
+				importPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS),
+				importPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_DATA),
+				importPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_SETUP),
+				importPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES));
 
 			// Portlet data
 
-			if (importPortletControls[1]) {
+			if (importPortletControlsMap.get(
+					PortletDataHandlerKeys.PORTLET_DATA)) {
+
 				if (_log.isDebugEnabled()) {
 					_log.debug("Importing portlet data");
 				}

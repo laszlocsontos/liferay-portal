@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,20 +14,24 @@
 
 package com.liferay.portal.search.lucene;
 
-import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
-
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.AlreadyClosedException;
+import org.apache.lucene.store.Directory;
 
 /**
  * @author Tina Tian
  * @author Shuyang Zhou
  */
 public class IndexSearcherManager {
+
+	public IndexSearcherManager(Directory directory) throws IOException {
+		_indexSearcher = _createIndexSearcher(
+			IndexReader.open(directory, true));
+	}
 
 	public IndexSearcherManager(IndexWriter writer) throws IOException {
 		_indexSearcher = _createIndexSearcher(IndexReader.open(writer, true));
@@ -82,9 +86,6 @@ public class IndexSearcherManager {
 		_indexSearcher = null;
 
 		release(indexSearcher);
-
-		PortalExecutorManagerUtil.shutdown(
-			IndexSearcherManager.class.getName());
 	}
 
 	public synchronized void invalidate() {
@@ -102,10 +103,7 @@ public class IndexSearcherManager {
 	}
 
 	private IndexSearcher _createIndexSearcher(IndexReader indexReader) {
-		IndexSearcher indexSearcher = new IndexSearcher(
-			indexReader,
-			PortalExecutorManagerUtil.getPortalExecutor(
-				IndexSearcherManager.class.getName()));
+		IndexSearcher indexSearcher = new IndexSearcher(indexReader);
 
 		indexSearcher.setDefaultFieldSortScoring(true, false);
 		indexSearcher.setSimilarity(new FieldWeightSimilarity());

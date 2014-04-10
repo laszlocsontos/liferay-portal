@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -118,7 +118,7 @@ if (layout != null) {
 											<liferay-util:include page="/html/portlet/staging_bar/view_layout_revision_details.jsp" />
 										</div>
 
-										<liferay-ui:staging cssClass="branching-enabled span4" extended="<%= false %>" layoutSetBranchId="<%= layoutRevision.getLayoutSetBranchId() %>" onlyActions="<%= true %>" />
+										<liferay-staging:menu cssClass="branching-enabled span4" extended="<%= false %>" layoutSetBranchId="<%= layoutRevision.getLayoutSetBranchId() %>" onlyActions="<%= true %>" />
 									</c:when>
 
 									<c:otherwise>
@@ -141,7 +141,7 @@ if (layout != null) {
 										</div>
 
 										<c:if test="<%= group.isStagingGroup() || group.isStagedRemotely() %>">
-											<liferay-ui:staging cssClass="publish-link" extended="<%= false %>" onlyActions="<%= true %>" />
+											<liferay-staging:menu cssClass="publish-link" extended="<%= false %>" onlyActions="<%= true %>" />
 										</c:if>
 									</c:otherwise>
 								</c:choose>

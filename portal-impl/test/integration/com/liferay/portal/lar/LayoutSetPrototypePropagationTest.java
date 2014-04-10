@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,10 +25,18 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.servlet.filters.cache.CacheUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
@@ -38,12 +46,14 @@ import com.liferay.portal.util.LayoutTestUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMStructureTestUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.util.JournalTestUtil;
 import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,6 +118,37 @@ public class LayoutSetPrototypePropagationTest
 	}
 
 	@Test
+	public void testLayoutPermissionPropagationWithLinkEnabled()
+		throws Exception {
+
+		setLinkEnabled(true);
+
+		Role role = RoleLocalServiceUtil.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.POWER_USER);
+
+		ResourcePermissionServiceUtil.setIndividualResourcePermissions(
+			prototypeLayout.getGroupId(), prototypeLayout.getCompanyId(),
+			Layout.class.getName(),
+			String.valueOf(prototypeLayout.getPrimaryKey()), role.getRoleId(),
+			new String[] {ActionKeys.CUSTOMIZE});
+
+		prototypeLayout.setModifiedDate(new Date());
+
+		LayoutLocalServiceUtil.updateLayout(prototypeLayout);
+
+		CacheUtil.clearCache(prototypeLayout.getCompanyId());
+
+		propagateChanges(group);
+
+		Assert.assertTrue(
+			ResourcePermissionLocalServiceUtil.hasResourcePermission(
+				layout.getCompanyId(), Layout.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				String.valueOf(layout.getPrimaryKey()), role.getRoleId(),
+				ActionKeys.CUSTOMIZE));
+	}
+
+	@Test
 	public void testLayoutPropagationWithLayoutPrototypeLinkDisabled()
 		throws Exception {
 
@@ -156,7 +197,8 @@ public class LayoutSetPrototypePropagationTest
 	}
 
 	@Test
-	public void testPortletPreferencesPropagationWithPreferencesUniquePerLayoutEnabled()
+	public void
+			testPortletPreferencesPropagationWithPreferencesUniquePerLayoutEnabled()
 		throws Exception {
 
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
@@ -288,7 +330,7 @@ public class LayoutSetPrototypePropagationTest
 			ServiceTestUtil.randomString(), true);
 
 		LayoutTestUtil.updateLayoutTemplateId(
-				_prototypeLayout, initialLayoutTemplateId);
+			_prototypeLayout, initialLayoutTemplateId);
 
 		_initialPrototypeLayoutCount =
 			LayoutLocalServiceUtil.getLayoutsCount(
@@ -427,9 +469,11 @@ public class LayoutSetPrototypePropagationTest
 
 		Assert.assertEquals(content, journalArticle.getContent());
 
-		JournalTestUtil.updateArticle(
-			_layoutSetPrototypeJournalArticle, "New Test Title",
+		String newContent = DDMStructureTestUtil.getSampleStructuredContent(
 			"New Test Content");
+
+		JournalTestUtil.updateArticle(
+			_layoutSetPrototypeJournalArticle, "New Test Title", newContent);
 
 		propagateChanges(group);
 
@@ -466,7 +510,7 @@ public class LayoutSetPrototypePropagationTest
 			LayoutSetPrototypeLocalServiceUtil.updateLayoutSetPrototype(
 				_layoutSetPrototype.getLayoutSetPrototypeId(),
 				_layoutSetPrototype.getNameMap(),
-				_layoutSetPrototype.getDescription(),
+				_layoutSetPrototype.getDescriptionMap(),
 				_layoutSetPrototype.getActive(), layoutsUpdateable,
 				ServiceTestUtil.getServiceContext());
 	}

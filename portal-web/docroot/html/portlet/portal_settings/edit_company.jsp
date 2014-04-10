@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,6 +61,7 @@ request.setAttribute("websites.classPK", company.getAccountId());
 		categorySections="<%= categorySections %>"
 		htmlTop="<%= htmlTop %>"
 		jspPath="/html/portlet/portal_settings/"
+		showButtons="<%= RoleLocalServiceUtil.hasUserRole(user.getUserId(), company.getCompanyId(), RoleConstants.ADMINISTRATOR, true) %>"
 	/>
 </aui:form>
 
@@ -69,7 +70,6 @@ request.setAttribute("websites.classPK", company.getAccountId());
 		document.<portlet:namespace />fm.method = "post";
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.UPDATE %>";
 
-		<portlet:namespace />saveEmails();
 		<portlet:namespace />saveLdap();
 		<portlet:namespace />saveLocales();
 

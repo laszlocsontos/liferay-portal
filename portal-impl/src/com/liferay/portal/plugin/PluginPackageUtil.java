@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -949,7 +949,7 @@ public class PluginPackageUtil {
 			liferayVersions.add(liferayVersion.trim());
 		}
 
-		if (liferayVersions.size() == 0) {
+		if (liferayVersions.isEmpty()) {
 			liferayVersions.add(ReleaseInfo.getVersion() + "+");
 		}
 
@@ -1168,9 +1168,8 @@ public class PluginPackageUtil {
 					"recommended-deployment-context")));
 		pluginPackage.setRequiredDeploymentContexts(
 			_readList(
-				pluginPackageElement.element(
-					"required-deployment-contexts"),
-					"required-deployment-context"));
+				pluginPackageElement.element("required-deployment-contexts"),
+				"required-deployment-context"));
 		pluginPackage.setModifiedDate(
 			_readDate(pluginPackageElement.elementText("modified-date")));
 		pluginPackage.setAuthor(
@@ -1402,14 +1401,12 @@ public class PluginPackageUtil {
 		}
 
 		protected void setUpdateAvailable() throws Exception {
-			StopWatch stopWatch = null;
+			StopWatch stopWatch = new StopWatch();
+
+			stopWatch.start();
 
 			if (_log.isInfoEnabled()) {
 				_log.info("Checking for available updates");
-
-				stopWatch = new StopWatch();
-
-				stopWatch.start();
 			}
 
 			for (PluginPackage pluginPackage :

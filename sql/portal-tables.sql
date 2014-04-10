@@ -140,8 +140,8 @@ create table AssetEntry (
 	expirationDate DATE null,
 	mimeType VARCHAR(75) null,
 	title STRING null,
-	description STRING null,
-	summary STRING null,
+	description TEXT null,
+	summary TEXT null,
 	url STRING null,
 	layoutUuid VARCHAR(75) null,
 	height INTEGER,
@@ -791,7 +791,11 @@ create table ExportImportConfiguration (
 	name VARCHAR(75) null,
 	description STRING null,
 	type_ INTEGER,
-	settings_ TEXT null
+	settings_ TEXT null,
+	status INTEGER,
+	statusByUserId LONG,
+	statusByUserName VARCHAR(75) null,
+	statusDate DATE null
 );
 
 create table Group_ (
@@ -863,7 +867,7 @@ create table JournalArticle (
 	version DOUBLE,
 	title STRING null,
 	urlTitle VARCHAR(150) null,
-	description STRING null,
+	description TEXT null,
 	content TEXT null,
 	type_ VARCHAR(75) null,
 	structureId VARCHAR(75) null,

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -117,6 +117,12 @@ public class AssetCategoryServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().getCategory(categoryId);
+	}
+
+	public static java.lang.String getCategoryPath(long categoryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getCategoryPath(categoryId);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetCategory> getChildCategories(
@@ -302,6 +308,26 @@ public class AssetCategoryServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().search(groupIds, name, vocabularyIds, start, end);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetCategoryDisplay searchCategoriesDisplay(
+		long groupId, java.lang.String title, long vocabularyId, int start,
+		int end)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchCategoriesDisplay(groupId, title, vocabularyId,
+			start, end);
+	}
+
+	public static com.liferay.portlet.asset.model.AssetCategoryDisplay searchCategoriesDisplay(
+		long[] groupIds, java.lang.String title, long[] vocabularyIds,
+		int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchCategoriesDisplay(groupIds, title, vocabularyIds,
+			start, end);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetCategory updateCategory(

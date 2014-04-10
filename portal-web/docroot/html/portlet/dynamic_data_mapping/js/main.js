@@ -37,9 +37,12 @@ AUI.add(
 
 		var TPL_ELEMENT = '<{nodeName}{attributeList}></{nodeName}>';
 
+		var UNLOCALIZABLE_FIELD_ATTRS = ['indexType', 'name', 'required', 'repeatable', 'showLabel'];
+
 		var XML_ATTRIBUTES_FIELD_ATTRS = {
 			dataType: 1,
 			indexType: 1,
+			localizable: 1,
 			multiple: 1,
 			name: 1,
 			options: 1,
@@ -133,6 +136,7 @@ AUI.add(
 							editMessage: Liferay.Language.get('edit'),
 							label: Liferay.Language.get('field-label'),
 							large: Liferay.Language.get('large'),
+							localizable: Liferay.Language.get('localizable'),
 							medium: Liferay.Language.get('medium'),
 							multiple: Liferay.Language.get('multiple'),
 							name: Liferay.Language.get('name'),
@@ -261,11 +265,7 @@ AUI.add(
 					_afterEditingLocaleChange: function(event) {
 						var instance = this;
 
-						var editingField = instance.editingField;
-
-						if (editingField) {
-							editingField.set('readOnlyAttributes', instance._getReadOnlyFieldAttributes(editingField));
-						}
+						instance._syncFieldsReadOnlyAttributes();
 
 						instance._updateFieldsLocalizationMap(event.prevVal);
 
@@ -364,6 +364,7 @@ AUI.add(
 								dataType: field.get('dataType'),
 								fieldNamespace: field.get('fieldNamespace'),
 								indexType: field.get('indexType'),
+								localizable: field.get('localizable'),
 								multiple: field.get('multiple'),
 								name: field.get('name'),
 								readOnly: field.get('readOnly'),
@@ -470,18 +471,24 @@ AUI.add(
 
 						var translationManager = instance.translationManager;
 
+						var defaultLocale = translationManager.get('defaultLocale');
 						var editingLocale = translationManager.get('editingLocale');
 
 						var readOnlyAttributes = field.get('readOnlyAttributes');
 
-						if (editingLocale === translationManager.get('defaultLocale')) {
-							AArray.removeItem(readOnlyAttributes, 'name');
-						}
-						else if (AArray.indexOf(readOnlyAttributes, 'name') === -1) {
-							readOnlyAttributes.push('name');
-						}
+						AArray.each(
+							UNLOCALIZABLE_FIELD_ATTRS,
+							function(item, index, collection) {
+								if (defaultLocale === editingLocale) {
+									AArray.removeItem(readOnlyAttributes, item);
+								}
+								else {
+									readOnlyAttributes.push(item);
+								}
+							}
+						);
 
-						return readOnlyAttributes;
+						return AArray.dedupe(readOnlyAttributes);
 					},
 
 					_onPropertyModelChange: function(event) {
@@ -613,6 +620,20 @@ AUI.add(
 						);
 					},
 
+					_syncFieldsReadOnlyAttributes: function(fields) {
+						var instance = this;
+
+						fields = fields || instance.get('fields');
+
+						fields.each(
+							function(field) {
+								field.set('readOnlyAttributes', instance._getReadOnlyFieldAttributes(field));
+
+								instance._syncFieldsReadOnlyAttributes(field.get('fields'));
+							}
+						);
+					},
+
 					_toggleInputDirection: function(locale) {
 						var rtl = (Liferay.Language.direction[locale] === 'rtl');
 
@@ -678,7 +699,7 @@ AUI.add(
 					A.each(
 						str,
 						function(item, index, collection) {
-							if (!A.Text.Unicode.test(item, 'L') && !A.Text.Unicode.test(item, 'N') && !A.Text.Unicode.test(item,'Pd')) {
+							if (!A.Text.Unicode.test(item, 'L') && !A.Text.Unicode.test(item, 'N') && !A.Text.Unicode.test(item, 'Pd')) {
 								str = str.replace(item, STR_SPACE);
 							}
 						}
@@ -770,6 +791,12 @@ AUI.add(
 				},
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
+					iconClass: 'icon-globe',
+					label: Liferay.Language.get('geolocation'),
+					type: 'ddm-geolocation'
+				},
+				{
+					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
 					iconClass: 'icon-fb-integer',
 					label: Liferay.Language.get('integer'),
 					type: 'ddm-integer'
@@ -838,7 +865,7 @@ AUI.add(
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
 					iconClass: 'icon-picture',
 					label: Liferay.Language.get('image'),
-					type: 'wcm-image'
+					type: 'ddm-image'
 				},
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.separator,

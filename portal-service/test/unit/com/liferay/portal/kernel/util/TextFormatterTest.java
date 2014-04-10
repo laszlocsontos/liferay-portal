@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -187,6 +187,36 @@ public class TextFormatterTest {
 		String actual = TextFormatter.format(original, TextFormatter.P);
 
 		Assert.assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testformatStorageSizeOneGB() throws Exception {
+		long bytes = 1024 * 1024 * 1024;
+
+		Assert.assertEquals(
+			"1GB", TextFormatter.formatStorageSize(bytes, LocaleUtil.SPAIN));
+		Assert.assertEquals(
+			"1GB", TextFormatter.formatStorageSize(bytes, LocaleUtil.US));
+	}
+
+	@Test
+	public void testformatStorageSizeOneKB() throws Exception {
+		long bytes = 1024;
+
+		Assert.assertEquals(
+			"1k", TextFormatter.formatStorageSize(bytes, LocaleUtil.SPAIN));
+		Assert.assertEquals(
+			"1k", TextFormatter.formatStorageSize(bytes, LocaleUtil.US));
+	}
+
+	@Test
+	public void testformatStorageSizeOneMB() throws Exception {
+		long bytes = 1024 * 1024;
+
+		Assert.assertEquals(
+			"1MB", TextFormatter.formatStorageSize(bytes, LocaleUtil.SPAIN));
+		Assert.assertEquals(
+			"1MB", TextFormatter.formatStorageSize(bytes, LocaleUtil.US));
 	}
 
 }

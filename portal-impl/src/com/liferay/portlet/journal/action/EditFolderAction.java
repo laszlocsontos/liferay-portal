@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,8 @@ import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.journal.DuplicateFolderNameException;
 import com.liferay.portlet.journal.FolderNameException;
@@ -69,8 +71,11 @@ public class EditFolderAction extends PortletAction {
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteFolders(actionRequest, true);
 			}
-			else if (cmd.equals(Constants.MOVE)) {
-				moveFolder(actionRequest);
+			else if (cmd.equals(Constants.SUBSCRIBE)) {
+				subscribeFolder(actionRequest);
+			}
+			else if (cmd.equals(Constants.UNSUBSCRIBE)) {
+				unsubscribeFolder(actionRequest);
 			}
 
 			sendRedirect(actionRequest, actionResponse);
@@ -161,17 +166,28 @@ public class EditFolderAction extends PortletAction {
 		}
 	}
 
-	protected void moveFolder(ActionRequest actionRequest) throws Exception {
+	protected void subscribeFolder(ActionRequest actionRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		long folderId = ParamUtil.getLong(actionRequest, "folderId");
 
-		long parentFolderId = ParamUtil.getLong(
-			actionRequest, "parentFolderId");
+		JournalFolderServiceUtil.subscribe(
+			themeDisplay.getScopeGroupId(), folderId);
+	}
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			JournalFolder.class.getName(), actionRequest);
+	protected void unsubscribeFolder(ActionRequest actionRequest)
+		throws Exception {
 
-		JournalFolderServiceUtil.moveFolder(
-			folderId, parentFolderId, serviceContext);
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long folderId = ParamUtil.getLong(actionRequest, "folderId");
+
+		JournalFolderServiceUtil.unsubscribe(
+			themeDisplay.getScopeGroupId(), folderId);
 	}
 
 	protected void updateFolder(ActionRequest actionRequest) throws Exception {

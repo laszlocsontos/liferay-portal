@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -115,7 +115,7 @@ if (Validator.isNotNull(script)) {
 
 	<aui:fieldset>
 		<aui:field-wrapper>
-			<c:if test="<%= (DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(classPK) > 0) || (JournalArticleLocalServiceUtil.getStructureArticlesCount(groupId, structureKey) > 0) %>">
+			<c:if test="<%= (structure != null) && ((DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(classPK) > 0) || (JournalArticleLocalServiceUtil.getStructureArticlesCount(groupId, structureKey) > 0)) %>">
 				<div class="alert alert-warning">
 					<liferay-ui:message key="there-are-content-references-to-this-structure.-you-may-lose-data-if-a-field-name-is-renamed-or-removed" />
 				</div>

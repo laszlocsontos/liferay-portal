@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -69,12 +69,22 @@ public interface AssetRenderer {
 	public String getNewName(String oldName, String token);
 
 	public String getPreviewPath(
-			PortletRequest portletRequest, PortletResponse PortletResponse)
+			PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception;
 
 	public String getSearchSummary(Locale locale);
 
+	public String getSummary();
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(PortletRequest,
+	 *             PortletResponse)}
+	 */
+	@Deprecated
 	public String getSummary(Locale locale);
+
+	public String getSummary(
+		PortletRequest portletRequest, PortletResponse portletResponse);
 
 	public String getThumbnailPath(PortletRequest portletRequest)
 		throws Exception;
@@ -107,6 +117,11 @@ public interface AssetRenderer {
 	public PortletURL getURLView(
 			LiferayPortletResponse liferayPortletResponse,
 			WindowState windowState)
+		throws Exception;
+
+	public PortletURL getURLViewDiffs(
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse)
 		throws Exception;
 
 	public String getURLViewInContext(

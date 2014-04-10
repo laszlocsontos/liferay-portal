@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -381,6 +381,7 @@ public class PluginsEnvironmentBuilder {
 			}
 		}
 		else {
+			globalJars.add("portal-settings-shared.jar");
 			globalJars.add("portlet.jar");
 
 			portalJars.addAll(dependencyJars);
@@ -451,7 +452,9 @@ public class PluginsEnvironmentBuilder {
 			addClasspathEntry(
 				sb, "/portal/lib/development/powermock-mockito.jar");
 			addClasspathEntry(sb, "/portal/lib/development/spring-test.jar");
-			addClasspathEntry(sb, "/portal/lib/portal/commons-io.jar");
+
+			portalJars.add("commons-io.jar");
+			portalJars.add("commons-lang.jar");
 		}
 
 		addClasspathEntry(sb, "/portal/lib/development/activation.jar");

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portlet.documentlibrary.util;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -31,7 +32,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Subscription;
 import com.liferay.portal.service.GroupLocalServiceUtil;
@@ -75,7 +76,6 @@ import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelSizeCo
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
-import com.liferay.util.ContentUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,6 +83,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -456,26 +457,89 @@ public class DLImpl implements DL {
 	}
 
 	@Override
+	public Map<String, String> getEmailDefinitionTerms(
+		PortletRequest portletRequest, String emailFromAddress,
+		String emailFromName) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Map<String, String> definitionTerms =
+			new LinkedHashMap<String, String>();
+
+		definitionTerms.put(
+			"[$COMPANY_ID$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-id-associated-with-the-document"));
+		definitionTerms.put(
+			"[$COMPANY_MX$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-mx-associated-with-the-document"));
+		definitionTerms.put(
+			"[$COMPANY_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-name-associated-with-the-document"));
+		definitionTerms.put(
+			"[$DOCUMENT_TITLE$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-document-title"));
+		definitionTerms.put(
+			"[$DOCUMENT_TYPE$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-document-type"));
+		definitionTerms.put(
+			"[$DOCUMENT_URL$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-document-url"));
+		definitionTerms.put(
+			"[$DOCUMENT_USER_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-email-address-of-the-user-who-added-the-document"));
+		definitionTerms.put(
+			"[$DOCUMENT_USER_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-user-who-added-the-document"));
+		definitionTerms.put(
+			"[$FOLDER_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-folder-in-which-the-document-has-been-added"));
+		definitionTerms.put(
+			"[$FROM_ADDRESS$]", HtmlUtil.escape(emailFromAddress));
+		definitionTerms.put("[$FROM_NAME$]", HtmlUtil.escape(emailFromName));
+
+		Company company = themeDisplay.getCompany();
+
+		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
+
+		definitionTerms.put(
+			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+		definitionTerms.put(
+			"[$SITE_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-site-name-associated-with-the-document"));
+		definitionTerms.put(
+			"[$TO_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-address-of-the-email-recipient"));
+		definitionTerms.put(
+			"[$TO_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-name-of-the-email-recipient"));
+
+		return definitionTerms;
+	}
+
+	@Override
 	public Map<Locale, String> getEmailFileEntryAddedBodyMap(
 		PortletPreferences preferences) {
 
-		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
-			preferences, "emailFileEntryAddedBody");
-
-		Locale defaultLocale = LocaleUtil.getSiteDefault();
-
-		String defaultValue = map.get(defaultLocale);
-
-		if (Validator.isNotNull(defaultValue)) {
-			return map;
-		}
-
-		map.put(
-			defaultLocale,
-			ContentUtil.get(
-				PropsUtil.get(PropsKeys.DL_EMAIL_FILE_ENTRY_ADDED_BODY)));
-
-		return map;
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailFileEntryAddedBody",
+			PropsKeys.DL_EMAIL_FILE_ENTRY_ADDED_BODY);
 	}
 
 	@Override
@@ -497,46 +561,18 @@ public class DLImpl implements DL {
 	public Map<Locale, String> getEmailFileEntryAddedSubjectMap(
 		PortletPreferences preferences) {
 
-		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
-			preferences, "emailFileEntryAddedSubject");
-
-		Locale defaultLocale = LocaleUtil.getSiteDefault();
-
-		String defaultValue = map.get(defaultLocale);
-
-		if (Validator.isNotNull(defaultValue)) {
-			return map;
-		}
-
-		map.put(
-			defaultLocale,
-			ContentUtil.get(
-				PropsUtil.get(PropsKeys.DL_EMAIL_FILE_ENTRY_ADDED_SUBJECT)));
-
-		return map;
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailFileEntryAddedSubject",
+			PropsKeys.DL_EMAIL_FILE_ENTRY_ADDED_SUBJECT);
 	}
 
 	@Override
 	public Map<Locale, String> getEmailFileEntryUpdatedBodyMap(
 		PortletPreferences preferences) {
 
-		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
-			preferences, "emailFileEntryUpdatedBody");
-
-		Locale defaultLocale = LocaleUtil.getSiteDefault();
-
-		String defaultValue = map.get(defaultLocale);
-
-		if (Validator.isNotNull(defaultValue)) {
-			return map;
-		}
-
-		map.put(
-			defaultLocale,
-			ContentUtil.get(
-				PropsUtil.get(PropsKeys.DL_EMAIL_FILE_ENTRY_UPDATED_BODY)));
-
-		return map;
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailFileEntryUpdatedBody",
+			PropsKeys.DL_EMAIL_FILE_ENTRY_UPDATED_BODY);
 	}
 
 	@Override
@@ -558,23 +594,9 @@ public class DLImpl implements DL {
 	public Map<Locale, String> getEmailFileEntryUpdatedSubjectMap(
 		PortletPreferences preferences) {
 
-		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
-			preferences, "emailFileEntryUpdatedSubject");
-
-		Locale defaultLocale = LocaleUtil.getSiteDefault();
-
-		String defaultValue = map.get(defaultLocale);
-
-		if (Validator.isNotNull(defaultValue)) {
-			return map;
-		}
-
-		map.put(
-			defaultLocale,
-			ContentUtil.get(
-				PropsUtil.get(PropsKeys.DL_EMAIL_FILE_ENTRY_UPDATED_SUBJECT)));
-
-		return map;
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailFileEntryUpdatedSubject",
+			PropsKeys.DL_EMAIL_FILE_ENTRY_UPDATED_SUBJECT);
 	}
 
 	@Override
@@ -584,6 +606,56 @@ public class DLImpl implements DL {
 
 		return PortalUtil.getEmailFromAddress(
 			preferences, companyId, PropsValues.DL_EMAIL_FROM_ADDRESS);
+	}
+
+	@Override
+	public Map<String, String> getEmailFromDefinitionTerms(
+		PortletRequest portletRequest, String emailFromAddress,
+		String emailFromName) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Map<String, String> definitionTerms =
+			new LinkedHashMap<String, String>();
+
+		definitionTerms.put(
+			"[$COMPANY_ID$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-id-associated-with-the-document"));
+		definitionTerms.put(
+			"[$COMPANY_MX$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-mx-associated-with-the-document"));
+		definitionTerms.put(
+			"[$COMPANY_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-name-associated-with-the-document"));
+		definitionTerms.put(
+			"[$DOCUMENT_STATUS_BY_USER_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-user-who-updated-the-document"));
+		definitionTerms.put(
+			"[$DOCUMENT_USER_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-email-address-of-the-user-who-added-the-document"));
+		definitionTerms.put(
+			"[$DOCUMENT_USER_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-user-who-added-the-document"));
+		definitionTerms.put(
+			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+		definitionTerms.put(
+			"[$SITE_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-site-name-associated-with-the-document"));
+
+		return definitionTerms;
 	}
 
 	@Override
@@ -1168,13 +1240,13 @@ public class DLImpl implements DL {
 		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			Folder folder = DLAppLocalServiceUtil.getFolder(folderId);
 
+			ancestorFolderIds.add(folderId);
+
 			if (recursive) {
-				ancestorFolderIds = folder.getAncestorFolderIds();
+				ancestorFolderIds.addAll(folder.getAncestorFolderIds());
 
 				ancestorFolderIds.add(groupId);
 			}
-
-			ancestorFolderIds.add(0, folderId);
 		}
 		else {
 			ancestorFolderIds.add(groupId);

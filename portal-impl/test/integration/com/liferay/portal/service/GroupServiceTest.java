@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,10 +22,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
@@ -45,6 +42,7 @@ import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.CompanyTestUtil;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.LayoutTestUtil;
 import com.liferay.portal.util.OrganizationTestUtil;
@@ -82,8 +80,10 @@ import org.junit.runner.RunWith;
 public class GroupServiceTest {
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		FinderCacheUtil.clearCache();
+
+		_group = GroupTestUtil.addGroup();
 	}
 
 	@Test
@@ -373,7 +373,7 @@ public class GroupServiceTest {
 
 		themeDisplay.setPlid(group.getClassPK());
 
-		themeDisplay.setScopeGroupId(TestPropsValues.getGroupId());
+		themeDisplay.setScopeGroupId(_group.getGroupId());
 
 		String scopeDescriptiveName = group.getScopeDescriptiveName(
 			themeDisplay);
@@ -401,7 +401,7 @@ public class GroupServiceTest {
 
 		Group group = addGroup(false, false, true);
 
-		themeDisplay.setScopeGroupId(TestPropsValues.getGroupId());
+		themeDisplay.setScopeGroupId(_group.getGroupId());
 
 		String scopeDescriptiveName = group.getScopeDescriptiveName(
 			themeDisplay);
@@ -476,7 +476,7 @@ public class GroupServiceTest {
 
 		themeDisplay.setPlid(group.getClassPK());
 
-		themeDisplay.setScopeGroupId(TestPropsValues.getGroupId());
+		themeDisplay.setScopeGroupId(_group.getGroupId());
 
 		String scopeLabel = group.getScopeLabel(themeDisplay);
 
@@ -505,7 +505,7 @@ public class GroupServiceTest {
 
 		Group group = GroupTestUtil.addGroup();
 
-		themeDisplay.setScopeGroupId(TestPropsValues.getGroupId());
+		themeDisplay.setScopeGroupId(_group.getGroupId());
 
 		String scopeLabel = group.getScopeLabel(themeDisplay);
 
@@ -1033,14 +1033,10 @@ public class GroupServiceTest {
 			Locale groupDefaultLocale, boolean expectFailure)
 		throws Exception {
 
-		UnicodeProperties properties = new UnicodeProperties();
+		Locale[] availableLocales = LanguageUtil.getAvailableLocales();
 
-		properties.put(
-			PropsKeys.LOCALES,
-			StringUtil.merge(LocaleUtil.toLanguageIds(portalAvailableLocales)));
-
-		CompanyLocalServiceUtil.updatePreferences(
-			TestPropsValues.getCompanyId(), properties);
+		CompanyTestUtil.resetCompanyLocales(
+			TestPropsValues.getCompanyId(), portalAvailableLocales);
 
 		Group group = GroupTestUtil.addGroup(
 			GroupConstants.DEFAULT_PARENT_GROUP_ID,
@@ -1060,8 +1056,11 @@ public class GroupServiceTest {
 			}
 		}
 		finally {
-			LanguageUtil.resetAvailableLocales(TestPropsValues.getCompanyId());
+			CompanyTestUtil.resetCompanyLocales(
+				TestPropsValues.getCompanyId(), availableLocales);
 		}
 	}
+
+	private Group _group;
 
 }

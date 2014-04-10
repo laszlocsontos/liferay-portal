@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -124,13 +124,11 @@ public class MessageListenerImpl implements MessageListener {
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs = null;
 
 		try {
-			StopWatch stopWatch = null;
+			StopWatch stopWatch = new StopWatch();
+
+			stopWatch.start();
 
 			if (_log.isDebugEnabled()) {
-				stopWatch = new StopWatch();
-
-				stopWatch.start();
-
 				_log.debug("Deliver message from " + from + " to " + recipient);
 			}
 
@@ -200,7 +198,7 @@ public class MessageListenerImpl implements MessageListener {
 				_log.debug("Parent message " + parentMessage);
 			}
 
-			String subject = MBUtil.getSubjectWithoutMessageId(message);
+			String subject = MBUtil.getSubjectForEmail(message);
 
 			MBMailMessage mbMailMessage = new MBMailMessage();
 
@@ -212,8 +210,7 @@ public class MessageListenerImpl implements MessageListener {
 
 			ServiceContext serviceContext = new ServiceContext();
 
-			serviceContext.setAddGroupPermissions(true);
-			serviceContext.setAddGuestPermissions(true);
+			serviceContext.setAttribute("propagatePermissions", Boolean.TRUE);
 			serviceContext.setLayoutFullURL(
 				PortalUtil.getLayoutFullURL(
 					groupId, PortletKeys.MESSAGE_BOARDS));

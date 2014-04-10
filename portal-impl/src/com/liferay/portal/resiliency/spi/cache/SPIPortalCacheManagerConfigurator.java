@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,16 +33,14 @@ public class SPIPortalCacheManagerConfigurator {
 			PortalCacheManager<K, V> portalCacheManager)
 		throws RemoteException {
 
-		if (SPIUtil.isSPI()) {
-			SPI spi = SPIUtil.getSPI();
-
-			portalCacheManager = new IntrabandPortalCacheManager<K, V>(
-				spi.getRegistrationReference());
+		if (!SPIUtil.isSPI()) {
+			return portalCacheManager;
 		}
 
-		IntrabandPortalCacheManager.setPortalCacheManager(portalCacheManager);
+		SPI spi = SPIUtil.getSPI();
 
-		return portalCacheManager;
+		return new IntrabandPortalCacheManager<K, V>(
+			spi.getRegistrationReference());
 	}
 
 }

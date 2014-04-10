@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,16 +67,42 @@ public abstract class BaseTrashHandler implements TrashHandler {
 			extraDataJSONObject.toString());
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #checkRestorableEntry(long, long, String)}
+	 */
+	@Deprecated
+	@Override
+	public void checkDuplicateEntry(
+			long classPK, long containerModelId, String newName)
+		throws PortalException, SystemException {
+
+		checkRestorableEntry(classPK, containerModelId, newName);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #checkRestorableEntry(TrashEntry, long, String)}
+	 */
+	@Deprecated
+	@Override
+	public void checkDuplicateTrashEntry(
+			TrashEntry trashEntry, long containerModelId, String newName)
+		throws PortalException, SystemException {
+
+		checkRestorableEntry(trashEntry, containerModelId, newName);
+	}
+
 	@Override
 	@SuppressWarnings("unused")
-	public void checkDuplicateEntry(
+	public void checkRestorableEntry(
 			long classPK, long containerModelId, String newName)
 		throws PortalException, SystemException {
 	}
 
 	@Override
 	@SuppressWarnings("unused")
-	public void checkDuplicateTrashEntry(
+	public void checkRestorableEntry(
 			TrashEntry trashEntry, long containerModelId, String newName)
 		throws PortalException, SystemException {
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -843,7 +843,7 @@ public class DLAppHelperLocalServiceImpl
 		}
 
 		if (!event.equals(DLSyncConstants.EVENT_DELETE) &&
-			!event.equals(DLSyncConstants.EVENT_MOVE_TO_TRASH)) {
+			!event.equals(DLSyncConstants.EVENT_TRASH)) {
 
 			FileVersion fileVersion = fileEntry.getFileVersion();
 
@@ -1008,7 +1008,7 @@ public class DLAppHelperLocalServiceImpl
 				// Folders, file entries, and file shortcuts
 
 				QueryDefinition queryDefinition = new QueryDefinition(
-					WorkflowConstants.STATUS_ANY);
+					WorkflowConstants.STATUS_IN_TRASH);
 
 				List<Object> foldersAndFileEntriesAndFileShortcuts =
 					dlFolderLocalService.
@@ -1077,7 +1077,7 @@ public class DLAppHelperLocalServiceImpl
 			// Sync
 
 			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_RESTORE_FROM_TRASH, fileEntry);
+				DLSyncConstants.EVENT_RESTORE, fileEntry);
 		}
 
 		// Trash
@@ -1183,8 +1183,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_RESTORE_FROM_TRASH, folder);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, folder);
 
 		// Trash
 
@@ -1662,8 +1661,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_RESTORE_FROM_TRASH, fileEntry);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, fileEntry);
 
 		// Social
 
@@ -1714,8 +1712,7 @@ public class DLAppHelperLocalServiceImpl
 
 			// Sync
 
-			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_MOVE_TO_TRASH, fileEntry);
+			registerDLSyncEventCallback(DLSyncConstants.EVENT_TRASH, fileEntry);
 		}
 
 		// Trash
@@ -1844,8 +1841,7 @@ public class DLAppHelperLocalServiceImpl
 
 			// Sync
 
-			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_RESTORE_FROM_TRASH, folder);
+			registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, folder);
 
 			// Social
 
@@ -1907,8 +1903,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_MOVE_TO_TRASH, folder);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_TRASH, folder);
 
 		// Social
 
@@ -2004,21 +1999,6 @@ public class DLAppHelperLocalServiceImpl
 		catch (Exception e) {
 			return false;
 		}
-	}
-
-	protected void notify(final SubscriptionSender subscriptionSender) {
-		TransactionCommitCallbackRegistryUtil.registerCallback(
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					subscriptionSender.flushNotificationsAsync();
-
-					return null;
-				}
-
-			}
-		);
 	}
 
 	protected void notifySubscribers(
@@ -2143,17 +2123,14 @@ public class DLAppHelperLocalServiceImpl
 		subscriptionSender.addPersistedSubscribers(
 			Folder.class.getName(), fileVersion.getGroupId());
 
-		List<Long> folderIds = new ArrayList<Long>();
-
 		if (folder != null) {
-			folderIds.add(folder.getFolderId());
-
-			folderIds.addAll(folder.getAncestorFolderIds());
-		}
-
-		for (long curFolderId : folderIds) {
 			subscriptionSender.addPersistedSubscribers(
-				Folder.class.getName(), curFolderId);
+				Folder.class.getName(), folder.getFolderId());
+
+			for (Long ancestorFolderId : folder.getAncestorFolderIds()) {
+				subscriptionSender.addPersistedSubscribers(
+					Folder.class.getName(), ancestorFolderId);
+			}
 		}
 
 		if (dlFileEntryType.getFileEntryTypeId() ==
@@ -2171,7 +2148,7 @@ public class DLAppHelperLocalServiceImpl
 		subscriptionSender.addPersistedSubscribers(
 			DLFileEntry.class.getName(), fileEntry.getFileEntryId());
 
-		notify(subscriptionSender);
+		subscriptionSender.flushNotificationsAsync();
 	}
 
 	protected void registerDLProcessorCallback(

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -97,7 +97,7 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.fetchEntry(DLFileEntryC
 
 request.setAttribute(WebKeys.LAYOUT_ASSET_ENTRY, layoutAssetEntry);
 
-FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(request, fileEntry, fileVersion);
+DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(request, fileEntry, fileVersion);
 %>
 
 <portlet:actionURL var="editFileEntry">
@@ -191,7 +191,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 							}
 							%>
 
-							<img alt="" border="no" class="thumbnail" src="<%= thumbnailSrc %>" style="max-height: <%= PropsValues.DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT %>px; max-width: <%= PropsValues.DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH %>px;" />
+							<img alt="" border="no" class="thumbnail" src="<%= thumbnailSrc %>" style="<%= DLUtil.getThumbnailStyle(true, 0) %>" />
 						</span>
 
 						<span class="user-date">
@@ -703,7 +703,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 
 		var fileEntryButtonGroup = [];
 
-		<c:if test="<%= fileEntryDisplayContext.isDownloadButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isDownloadButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 					icon: 'icon-download',
@@ -717,7 +717,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isOpenInMsOfficeButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isOpenInMsOfficeButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 					label: '<%= UnicodeLanguageUtil.get(pageContext, "open-in-ms-office") %>',
@@ -730,7 +730,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isEditButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isEditButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 
@@ -751,12 +751,12 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isMoveButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isMoveButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 
 					<portlet:renderURL var="moveURL">
-						<portlet:param name="struts_action" value="/document_library/move_file_entry" />
+						<portlet:param name="struts_action" value="/document_library/move_entry" />
 						<portlet:param name="redirect" value="<%= redirect %>" />
 						<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
 					</portlet:renderURL>
@@ -772,7 +772,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isCheckoutDocumentButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isCheckoutDocumentButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 
@@ -788,7 +788,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 
@@ -804,7 +804,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isCheckinButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isCheckinButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 
@@ -820,7 +820,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isPermissionsButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isPermissionsButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 					<liferay-security:permissionsURL
@@ -847,7 +847,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isMoveToTheRecycleBinButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isMoveToTheRecycleBinButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 					<portlet:renderURL var="viewFolderURL">
@@ -868,7 +868,7 @@ FileEntryDisplayContext fileEntryDisplayContext = new FileEntryDisplayContext(re
 			);
 		</c:if>
 
-		<c:if test="<%= fileEntryDisplayContext.isDeleteButtonVisible() %>">
+		<c:if test="<%= dlActionsDisplayContext.isDeleteButtonVisible() %>">
 			fileEntryButtonGroup.push(
 				{
 					<portlet:renderURL var="viewFolderURL">

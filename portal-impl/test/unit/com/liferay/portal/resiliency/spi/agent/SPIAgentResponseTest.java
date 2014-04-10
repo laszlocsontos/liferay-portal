@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -205,8 +205,9 @@ public class SPIAgentResponseTest {
 
 		// Portal resiliency action, byte model output, native buffer
 
-		byte[] byteArray = new byte[] {(
-			byte)0, (byte)1, (byte)2, (byte)3, (byte)4, (byte)5};
+		byte[] byteArray = new byte[] {
+			(byte)0, (byte)1, (byte)2, (byte)3, (byte)4, (byte)5
+		};
 
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(byteArray.length);
 

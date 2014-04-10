@@ -392,6 +392,20 @@
 			return columnId;
 		},
 
+		getGeolocation: function(callback) {
+			if (callback && navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(
+					function(position) {
+						callback.call(
+							this,
+							position.coords.latitude,
+							position.coords.longitude
+						);
+					}
+				);
+			}
+		},
+
 		getOpener: function() {
 			var openingWindow = Window._opener;
 
@@ -781,7 +795,7 @@
 			Liferay.Util.openWindow(
 				{
 					cache: false,
-					title: Liferay.Util.escapeHTML(event.title),
+					title: event.title,
 					uri: event.uri
 				}
 			);
@@ -1365,7 +1379,7 @@
 				);
 			}
 
-			if (selectedOption && selectedOption.text() != '' && sort == true) {
+			if (selectedOption && selectedOption.text() !== '' && sort === true) {
 				Util.sortBox(toBox);
 			}
 		},
@@ -1582,11 +1596,14 @@
 
 				var length = selectedItems.size();
 
+				var item;
+				var itemIndex;
+
 				if (down) {
 					while (length--) {
-						var item = selectedItems.item(length);
+						item = selectedItems.item(length);
 
-						var itemIndex = item.get('index');
+						itemIndex = item.get('index');
 
 						var referenceNode = box.get('firstChild');
 
@@ -1603,11 +1620,11 @@
 				}
 				else {
 					for (var i = 0; i < length; i++) {
-						var item = selectedItems.item(i);
+						item = selectedItems.item(i);
 
-						var itemIndex = item.get('index');
+						itemIndex = item.get('index');
 
-						if (itemIndex == 0) {
+						if (itemIndex === 0) {
 							box.append(item);
 						}
 						else {
@@ -1961,6 +1978,13 @@
 
 				docBody.addClass(currentClass);
 
+				Liferay.fire(
+					'toggleControls',
+					{
+						enabled: (Liferay._editControlsState === 'visible')
+					}
+				);
+
 				trigger.on(
 					'gesturemovestart',
 					function(event) {
@@ -1978,6 +2002,14 @@
 								Liferay._editControlsState = (docBody.hasClass(visibleClass) ? 'visible' : 'hidden');
 
 								Liferay.Store('liferay_toggle_controls', Liferay._editControlsState);
+
+								Liferay.fire(
+									'toggleControls',
+									{
+										enabled: (Liferay._editControlsState === 'visible'),
+										src: 'ui'
+									}
+								);
 							}
 						);
 					}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,12 +16,12 @@ package com.liferay.portal.security.auth;
 
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * @author Shuyang Zhou
@@ -65,7 +65,9 @@ public class TransientTokenUtil {
 
 		String token = PortalUUIDUtil.generate();
 
-		_tokens.put(expireTime, token);
+		while (_tokens.putIfAbsent(expireTime, token) != null) {
+			expireTime++;
+		}
 
 		return token;
 	}
@@ -76,7 +78,7 @@ public class TransientTokenUtil {
 		headMap.clear();
 	}
 
-	private static final SortedMap<Long, String> _tokens =
-		Collections.synchronizedSortedMap(new TreeMap<Long, String>());
+	private static final ConcurrentNavigableMap<Long, String> _tokens =
+		new ConcurrentSkipListMap<Long, String>();
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,10 +19,12 @@ import com.liferay.portal.kernel.dao.search.SearchPaginationUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Time;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Tina Tian
@@ -32,6 +34,21 @@ public abstract class BaseSearchResultPermissionFilter
 
 	@Override
 	public Hits search(SearchContext searchContext) throws SearchException {
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		if (!queryConfig.isAllFieldsSelected()) {
+			Set<String> selectedFieldNameSet = SetUtil.fromArray(
+				queryConfig.getSelectedFieldNames());
+
+			for (String selectedFieldName : _PERMISSION_SELECTED_FIELD_NAMES) {
+				selectedFieldNameSet.add(selectedFieldName);
+			}
+
+			queryConfig.setSelectedFieldNames(
+				selectedFieldNameSet.toArray(
+					new String[selectedFieldNameSet.size()]));
+		}
+
 		int end = searchContext.getEnd();
 		int start = searchContext.getStart();
 
@@ -139,9 +156,14 @@ public abstract class BaseSearchResultPermissionFilter
 			(float)(System.currentTimeMillis() - startTime) / Time.SECOND);
 	}
 
-	private static double _INDEX_PERMISSION_FILTER_SEARCH_AMPLIFICATION_FACTOR =
-		GetterUtil.getDouble(
-			PropsUtil.get(
-				PropsKeys.INDEX_PERMISSION_FILTER_SEARCH_AMPLIFICATION_FACTOR));
+	private static final double
+		_INDEX_PERMISSION_FILTER_SEARCH_AMPLIFICATION_FACTOR =
+			GetterUtil.getDouble(
+				PropsUtil.get(
+					PropsKeys.
+						INDEX_PERMISSION_FILTER_SEARCH_AMPLIFICATION_FACTOR));
+
+	private static final String[] _PERMISSION_SELECTED_FIELD_NAMES =
+		{Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK};
 
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,19 +45,11 @@ portletURL.setParameter("struts_action", "/blogs/view");
 	List results = null;
 
 	if ((assetCategoryId != 0) || Validator.isNotNull(assetTagName)) {
-		AssetEntryQuery assetEntryQuery = new AssetEntryQuery(BlogsEntry.class.getName(), searchContainer);
+		SearchContainerResults<AssetEntry> searchContainerResults = BlogsUtil.getSearchContainerResults(searchContainer);
 
-		assetEntryQuery.setExcludeZeroViewCount(false);
-		assetEntryQuery.setVisible(Boolean.TRUE);
+		searchContainer.setTotal(searchContainerResults.getTotal());
 
-		total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
-
-		searchContainer.setTotal(total);
-
-		assetEntryQuery.setEnd(searchContainer.getEnd());
-		assetEntryQuery.setStart(searchContainer.getStart());
-
-		results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
+		results = searchContainerResults.getResults();
 	}
 	else {
 		int status = WorkflowConstants.STATUS_APPROVED;

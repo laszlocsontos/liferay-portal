@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,18 +15,19 @@
 package com.liferay.portlet.blogs.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.service.SubscriptionLocalServiceUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.settings.Settings;
+import com.liferay.portal.settings.SettingsFactoryUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
+import com.liferay.portal.test.SynchronousMailExecutionTestListener;
 import com.liferay.portal.util.BaseSubscriptionTestCase;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.blogs.model.BlogsEntry;
+import com.liferay.portlet.blogs.util.BlogsConstants;
+import com.liferay.portlet.blogs.util.BlogsTestUtil;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,50 +35,16 @@ import org.junit.runner.RunWith;
 
 /**
  * @author Sergio González
+ * @author Roberto Díaz
  */
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class
+		SynchronousMailExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class BlogsSubscriptionTest extends BaseSubscriptionTestCase {
-
-	@Override
-	public long addBaseModel(long containerModelId) throws Exception {
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			group.getGroupId());
-
-		serviceContext.setCommand(Constants.ADD);
-		serviceContext.setLayoutFullURL("http://localhost");
-
-		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
-			TestPropsValues.getUserId(), ServiceTestUtil.randomString(),
-			StringPool.BLANK, ServiceTestUtil.randomString(), 1, 1, 2012, 12, 0,
-			false, false, new String[0], false, StringPool.BLANK,
-			StringPool.BLANK, null, serviceContext);
-
-		return entry.getEntryId();
-	}
-
-	@Override
-	public long addContainerModel(long containerModelId) throws Exception {
-		return 0;
-	}
-
-	@Override
-	public void addSubscriptionBaseModel(long baseModelId) {
-	}
-
-	@Override
-	public void addSubscriptionContainerModel(long containerModelId)
-		throws Exception {
-
-		SubscriptionLocalServiceUtil.addSubscription(
-			TestPropsValues.getUserId(), group.getGroupId(),
-			BlogsEntry.class.getName(), group.getGroupId());
-	}
 
 	@Ignore
 	@Override
@@ -89,6 +56,12 @@ public class BlogsSubscriptionTest extends BaseSubscriptionTestCase {
 	@Override
 	@Test
 	public void testSubscriptionBaseModelWhenInRootContainerModel() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testSubscriptionClassType() {
 	}
 
 	@Ignore
@@ -112,6 +85,12 @@ public class BlogsSubscriptionTest extends BaseSubscriptionTestCase {
 	@Ignore
 	@Override
 	@Test
+	public void testSubscriptionDefaultClassType() {
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testSubscriptionRootContainerModelWhenInContainerModel() {
 	}
 
@@ -122,8 +101,47 @@ public class BlogsSubscriptionTest extends BaseSubscriptionTestCase {
 	}
 
 	@Override
-	public long updateEntry(long baseModelId) {
-		return 0;
+	protected long addBaseModel(long containerModelId) throws Exception {
+		BlogsEntry entry = BlogsTestUtil.addEntry(group, true);
+
+		return entry.getEntryId();
+	}
+
+	@Override
+	protected void addSubscriptionContainerModel(long containerModelId)
+		throws Exception {
+
+		BlogsEntryLocalServiceUtil.subscribe(
+			TestPropsValues.getUserId(), group.getGroupId());
+	}
+
+	@Override
+	protected String getSubscriptionBodyPreferenceName() throws Exception {
+		return "emailEntryAddedBody";
+	}
+
+	@Override
+	protected void setAddBaseModelSubscriptionBodyPreferences()
+		throws Exception {
+
+		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
+			group.getGroupId(), BlogsConstants.SERVICE_NAME);
+
+		String germanSubscriptionBodyPreferenceKey =
+			LocalizationUtil.getPreferencesKey(
+				getSubscriptionBodyPreferenceName(),
+				LocaleUtil.toLanguageId(LocaleUtil.GERMANY));
+
+		settings.setValue(germanSubscriptionBodyPreferenceKey, GERMAN_BODY);
+
+		String spanishSubscriptionBodyPreferenceKey =
+			LocalizationUtil.getPreferencesKey(
+				getSubscriptionBodyPreferenceName(),
+				LocaleUtil.toLanguageId(LocaleUtil.SPAIN));
+
+		settings.setValue(spanishSubscriptionBodyPreferenceKey, SPANISH_BODY);
+
+		settings.store();
 	}
 
 }

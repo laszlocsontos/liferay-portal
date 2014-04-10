@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,7 +87,7 @@
 
 					PortletURL summaryURL = PortletURLUtil.clone(portletURL, renderResponse);
 
-					Summary summary = indexer.getSummary(doc, locale, StringPool.BLANK, summaryURL);
+					Summary summary = indexer.getSummary(doc, locale, StringPool.BLANK, summaryURL, renderRequest, renderResponse);
 
 					summary.setHighlight(PropsValues.INDEX_SEARCH_HIGHLIGHT_ENABLED);
 					summary.setQueryTerms(queryTerms);

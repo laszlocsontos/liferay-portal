@@ -6,9 +6,19 @@
 
 		<execute selenium="type" argument2="" />
 
+		<execute selenium="pause" argument1="1000" />
+
 		<execute selenium="clickAt" />
 
+		<execute selenium="pause" argument1="1000" />
+
 		<execute selenium="sendKeys" />
+
+		<execute selenium="pause" argument1="1000" />
+
+		<execute selenium="clickAt" />
+
+		<execute selenium="pause" argument1="1000" />
 	</command>
 
 	<command name="sendKeys">
@@ -31,12 +41,26 @@
 		<execute selenium="sendKeys" />
 	</command>
 
+	<command name="sikuliType">
+		<execute selenium="sikuliType" />
+
+		<execute selenium="pause" argument1="2000" />
+	</command>
+
 	<command name="type">
 		<execute selenium="waitForVisible" />
 
 		<execute selenium="mouseOver" />
 
 		<execute selenium="type" />
+	</command>
+
+	<command name="typeAceEditor">
+		<execute selenium="waitForElementPresent" />
+
+		<execute selenium="mouseOver" />
+
+		<execute selenium="typeAceEditor" />
 	</command>
 
 	<command name="typeFrame">
@@ -50,19 +74,17 @@
 	<command name="typeFrameWaitForCKEditor">
 		<execute selenium="waitForVisible" argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" />
 
+		<execute selenium="pause" argument1="1000" />
+
 		<execute function="Type#typeFrame" />
 
 		<execute selenium="pause" argument1="1000" />
 	</command>
 
-	<command name="typeImageElement">
-		<execute selenium="typeImageElement" />
-
-		<execute selenium="pause" argument1="2000" />
-	</command>
-
 	<command name="typeWaitForCKEditor">
 		<execute selenium="waitForVisible" argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" />
+
+		<execute selenium="pause" argument1="1000" />
 
 		<execute function="Type#type" />
 	</command>

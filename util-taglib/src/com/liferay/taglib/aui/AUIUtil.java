@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Shuyang Zhou
@@ -145,7 +147,7 @@ public class AUIUtil {
 
 		if (showForLabel) {
 			sb.append("for=\"");
-			sb.append(forLabel);
+			sb.append(HtmlUtil.escapeAttribute(forLabel));
 			sb.append("\"");
 		}
 
@@ -162,6 +164,27 @@ public class AUIUtil {
 		boolean choiceField) {
 
 		return buildLabel(StringPool.BLANK, false, showForLabel, forLabel);
+	}
+
+	public static Object getAttribute(
+		HttpServletRequest request, String namespace, String key) {
+
+		Map<String, Object> dynamicAttributes =
+			(Map<String, Object>)request.getAttribute(
+				namespace.concat("dynamicAttributes"));
+		Map<String, Object> scopedAttributes =
+			(Map<String, Object>)request.getAttribute(
+				namespace.concat("scopedAttributes"));
+
+		if (((dynamicAttributes != null) &&
+			 dynamicAttributes.containsKey(key)) ||
+			((scopedAttributes != null) &&
+			 scopedAttributes.containsKey(key))) {
+
+			return request.getAttribute(namespace.concat(key));
+		}
+
+		return null;
 	}
 
 }

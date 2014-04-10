@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,6 +36,10 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 			var TPL_BUTTON = '<div class="field-labels-inline">' +
 								'<input type="button" value="<%= UnicodeLanguageUtil.get(pageContext, "select") %>" />' +
 							'<div>';
+
+			var TPL_GEOLOCATION = '<div class="field-labels-inline">' +
+										'<input type="button" value="<%= UnicodeLanguageUtil.get(pageContext, "geolocate") %>" />' +
+									'<div>';
 
 			var TPL_LINK_TO_PAGE = '<div class="lfr-ddm-link-to-page">' +
 									'<a href="javascript:;"><%= UnicodeLanguageUtil.get(pageContext, "link") %></a>' +
@@ -82,6 +86,11 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 					value: 'keyword'
 				},
 
+				localizable: {
+					seter: booleanParse,
+					value: true
+				},
+
 				name: {
 					setter: Liferay.FormBuilder.normalizeKey,
 					valueFn: function() {
@@ -123,7 +132,7 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 					};
 				}
 
-				var repeatableOptions = {
+				var booleanOptions = {
 					'false': '<liferay-ui:message key="no" />',
 					'true': '<liferay-ui:message key="yes" />'
 				};
@@ -143,14 +152,26 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 							name: '<liferay-ui:message key="indexable" />'
 						},
 						{
-							attributeName: 'repeatable',
+							attributeName: 'localizable',
 							editor: new A.RadioCellEditor(
 								{
-									options: repeatableOptions
+									options: booleanOptions
 								}
 							),
 							formatter: function(val) {
-								return repeatableOptions[val.data.value];
+								return booleanOptions[val.data.value];
+							},
+							name: '<liferay-ui:message key="localizable" />'
+						},
+						{
+							attributeName: 'repeatable',
+							editor: new A.RadioCellEditor(
+								{
+									options: booleanOptions
+								}
+							),
+							formatter: function(val) {
+								return booleanOptions[val.data.value];
 							},
 							name: '<liferay-ui:message key="repeatable" />'
 						}
@@ -315,6 +336,54 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 
 					}
 
+				}
+			);
+
+			var DDMGeolocationField = A.Component.create(
+				{
+					ATTRS: {
+						dataType: {
+							value: 'geolocation'
+						},
+
+						fieldNamespace: {
+							value: 'ddm'
+						}
+					},
+
+					EXTENDS: A.FormBuilderTextField,
+
+					NAME: 'ddm-geolocation',
+
+					prototype: {
+						getHTML: function() {
+							return TPL_GEOLOCATION;
+						}
+					}
+				}
+			);
+
+			var DDMImageField = A.Component.create(
+				{
+					ATTRS: {
+						dataType: {
+							value: 'image'
+						},
+
+						fieldNamespace: {
+							value: 'ddm'
+						}
+					},
+
+					EXTENDS: A.FormBuilderField,
+
+					NAME: 'ddm-image',
+
+					prototype: {
+						getHTML: function() {
+							return TPL_WCM_IMAGE;
+						}
+					}
 				}
 			);
 
@@ -531,40 +600,17 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 				}
 			);
 
-			var WCMImageField = A.Component.create(
-				{
-					ATTRS: {
-						dataType: {
-							value: 'image'
-						},
-
-						fieldNamespace: {
-							value: 'wcm'
-						}
-					},
-
-					EXTENDS: A.FormBuilderField,
-
-					NAME: 'wcm-image',
-
-					prototype: {
-						getHTML: function() {
-							return TPL_WCM_IMAGE;
-						}
-					}
-				}
-			);
-
 			FormBuilderTypes['ddm-date'] = DDMDateField;
 			FormBuilderTypes['ddm-decimal'] = DDMDecimalField;
 			FormBuilderTypes['ddm-documentlibrary'] = DDMDocumentLibraryField;
+			FormBuilderTypes['ddm-geolocation'] = DDMGeolocationField;
+			FormBuilderTypes['ddm-image'] = DDMImageField;
 			FormBuilderTypes['ddm-integer'] = DDMIntegerField;
 			FormBuilderTypes['ddm-link-to-page'] = DDMLinkToPageField;
 			FormBuilderTypes['ddm-number'] = DDMNumberField;
 			FormBuilderTypes['ddm-paragraph'] = DDMParagraphField;
 			FormBuilderTypes['ddm-separator'] = DDMSeparatorField;
 			FormBuilderTypes['ddm-text-html'] = DDMHTMLTextField;
-			FormBuilderTypes['wcm-image'] = WCMImageField;
 		},
 		'',
 		{

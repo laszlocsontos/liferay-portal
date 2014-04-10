@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1667,6 +1667,11 @@ public class JournalArticleWrapper implements JournalArticle,
 	}
 
 	@Override
+	public com.liferay.portal.kernel.xml.Document getDocument() {
+		return _journalArticle.getDocument();
+	}
+
+	@Override
 	public com.liferay.portlet.journal.model.JournalFolder getFolder()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -1686,9 +1691,23 @@ public class JournalArticleWrapper implements JournalArticle,
 		return _journalArticle.hasApprovedVersion();
 	}
 
+	/**
+	* @deprecated As of 7.0.0, with no direct replacement
+	*/
+	@Deprecated
 	@Override
 	public boolean isTemplateDriven() {
 		return _journalArticle.isTemplateDriven();
+	}
+
+	@Override
+	public void setDefaultLanguageId(java.lang.String defaultLanguageId) {
+		_journalArticle.setDefaultLanguageId(defaultLanguageId);
+	}
+
+	@Override
+	public void setDocument(com.liferay.portal.kernel.xml.Document document) {
+		_journalArticle.setDocument(document);
 	}
 
 	@Override

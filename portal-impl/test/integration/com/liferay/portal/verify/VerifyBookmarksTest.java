@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
@@ -37,12 +38,16 @@ import org.junit.runner.RunWith;
  * @author Eudaldo Alonso
  * @author Sergio González
  */
-@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
+@ExecutionTestListeners(
+	listeners = {
+		MainServletExecutionTestListener.class,
+		TransactionalExecutionTestListener.class
+	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Transactional
 public class VerifyBookmarksTest extends BaseVerifyTestCase {
 
 	@Test
-	@Transactional
 	public void testBookmarksEntryTreePathWithBookmarksEntryInTrash()
 		throws Exception {
 
@@ -67,7 +72,6 @@ public class VerifyBookmarksTest extends BaseVerifyTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testBookmarksEntryTreePathWithBookmarksParentFolderInTrash()
 		throws Exception {
 
@@ -96,7 +100,6 @@ public class VerifyBookmarksTest extends BaseVerifyTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testBookmarksFolderTreePathWithBookmarksFolderInTrash()
 		throws Exception {
 

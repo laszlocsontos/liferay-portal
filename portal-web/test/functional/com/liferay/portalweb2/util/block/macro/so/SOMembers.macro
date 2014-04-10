@@ -22,6 +22,8 @@
 	</command>
 
 	<command name="inviteMember">
+		<var name="key_userName" value="${userName}" />
+
 		<execute action="SOMembers#assertClick" locator-key1="INVITE_BUTTON" value1="Invite members to this site." />
 
 		<execute action="SOMembersInvite#type" locator-key1="FIND_MEMBERS_SEARCH_FIELD" value1="${userName}" />
@@ -44,9 +46,11 @@
 		<var name="key_siteName" value="${siteName}" />
 
 		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute action="SOUserBar#selectFrameTop" />
 		<execute action="SOUserBar#click" locator-key1="GO_TO" />
 		<execute action="SOUserBar#select" locator-key1="GO_TO_SITE_CATEGORY_SELECT" value1="My Sites" />
 		<execute action="SOUserBar#assertTextNotEquals" locator-key1="GO_TO_SITE_LIST" value1="Liferay" />
+		<execute action="SOUserBar#selectFrameTop" />
 		<execute action="SOUserBar#click" locator-key1="GO_TO" />
 		<execute action="SOUserBar#type" locator-key1="GO_TO_SEARCH_FIELD" value1="${siteName}" />
 		<execute action="SOUserBar#assertTextEquals" locator-key1="GO_TO_SITE_NAME_LINK" value1="${siteName}" />
@@ -98,6 +102,8 @@
 				<execute action="SOSiteHome#assertElementPresent" locator-key1="EVENTS_DISPLAY_OPTIONS" />
 				<execute action="SOSiteHome#click" locator-key1="NAVIGATION_MEMBERS" value1="Members" />
 
+				<var name="key_userEmailAddress" value="${userEmailAddress}" />
+
 				<execute action="SOMembers#type" locator-key1="MEMBERS_LIST_SEARCH" value1="${userEmailAddress}" />
 				<execute action="SOMembers#assertTextEquals" locator-key1="MEMBERS_LIST_NAME" value1="${userLastName}, ${userFirstName}" />
 				<execute action="SOMembers#assertTextEquals" locator-key1="MEMBERS_LIST_EMAIL" value1="${userEmailAddress}" />
@@ -133,9 +139,11 @@
 		<var name="key_siteName" value="${siteName}" />
 
 		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute action="SOUserBar#selectFrameTop" />
 		<execute action="SOUserBar#click" locator-key1="GO_TO" />
 		<execute action="SOUserBar#select" locator-key1="GO_TO_SITE_CATEGORY_SELECT" value1="My Sites" />
 		<execute action="SOUserBar#assertTextNotEquals" locator-key1="GO_TO_SITE_LIST" value1="Liferay" />
+		<execute action="SOUserBar#selectFrameTop" />
 		<execute action="SOUserBar#click" locator-key1="GO_TO" />
 		<execute action="SOUserBar#type" locator-key1="GO_TO_SEARCH_FIELD" value1="${siteName}" />
 		<execute action="SOUserBar#assertTextEquals" locator-key1="GO_TO_SITE_EMPTY" value1="There are no results." />
@@ -167,6 +175,8 @@
 	</command>
 
 	<command name="viewMember">
+		<var name="key_userEmailAddress" value="${userEmailAddress}" />
+
 		<execute action="SOMembers#assertTextEquals" locator-key1="MEMBERS_LINK_ALL" value1="View all 2 users." />
 		<execute action="SOMembers#type" locator-key1="MEMBERS_LIST_SEARCH" value1="${userEmailAddress}" />
 		<execute action="SOMembers#assertTextEquals" locator-key1="MEMBERS_LIST_NAME" value1="${userLastName}, ${userFirstName}" />

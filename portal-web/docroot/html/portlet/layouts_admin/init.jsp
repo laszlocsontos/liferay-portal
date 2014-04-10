@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@
 <%@ page import="com.liferay.portal.DuplicateLockException" %><%@
 page import="com.liferay.portal.ImageTypeException" %><%@
 page import="com.liferay.portal.LARFileException" %><%@
+page import="com.liferay.portal.LARFileNameException" %><%@
 page import="com.liferay.portal.LARFileSizeException" %><%@
 page import="com.liferay.portal.LARTypeException" %><%@
 page import="com.liferay.portal.LayoutFriendlyURLException" %><%@

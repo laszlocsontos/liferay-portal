@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -99,7 +99,7 @@ public class HttpClientSPIAgentTest {
 
 	@Before
 	public void setUp() {
-		_mockHttpServletRequest = new MockHttpServletRequest();
+		PropsUtil.setProps(new PropsImpl());
 
 		_portlet = new PortletImpl() {
 
@@ -742,8 +742,6 @@ public class HttpClientSPIAgentTest {
 
 		// Unable to send, successfully close
 
-		PropsUtil.setProps(new PropsImpl());
-
 		httpClientSPIAgent = new HttpClientSPIAgent(
 			_spiConfiguration,
 			new MockRegistrationReference(
@@ -1122,7 +1120,8 @@ public class HttpClientSPIAgentTest {
 
 	private static final String _SERVLET_CONTEXT_NAME = "SERVLET_CONTEXT_NAME";
 
-	private MockHttpServletRequest _mockHttpServletRequest;
+	private MockHttpServletRequest _mockHttpServletRequest =
+		new MockHttpServletRequest();
 	private Portlet _portlet;
 	private SPIConfiguration _spiConfiguration = new SPIConfiguration(
 		null, null, 1234, "baseDir", null, null, null);

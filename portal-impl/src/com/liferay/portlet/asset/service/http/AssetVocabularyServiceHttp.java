@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -315,8 +315,7 @@ public class AssetVocabularyServiceHttp {
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupsVocabularies(
 		HttpPrincipal httpPrincipal, long[] groupIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
 					"getGroupsVocabularies",
@@ -330,10 +329,6 @@ public class AssetVocabularyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
-				}
-
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
 				}
@@ -352,8 +347,7 @@ public class AssetVocabularyServiceHttp {
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupsVocabularies(
 		HttpPrincipal httpPrincipal, long[] groupIds, java.lang.String className)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
 					"getGroupsVocabularies",
@@ -368,10 +362,6 @@ public class AssetVocabularyServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
-				}
-
 				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
 					throw (com.liferay.portal.kernel.exception.SystemException)e;
 				}
@@ -531,13 +521,45 @@ public class AssetVocabularyServiceHttp {
 		}
 	}
 
+	public static java.util.List<com.liferay.portlet.asset.model.AssetVocabulary> getGroupVocabularies(
+		HttpPrincipal httpPrincipal, long[] groupIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		try {
+			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
+					"getGroupVocabularies",
+					_getGroupVocabulariesParameterTypes13);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupIds);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
+					throw (com.liferay.portal.kernel.exception.SystemException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (java.util.List<com.liferay.portlet.asset.model.AssetVocabulary>)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static int getGroupVocabulariesCount(HttpPrincipal httpPrincipal,
 		long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
 					"getGroupVocabulariesCount",
-					_getGroupVocabulariesCountParameterTypes13);
+					_getGroupVocabulariesCountParameterTypes14);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId);
 
@@ -569,10 +591,42 @@ public class AssetVocabularyServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
 					"getGroupVocabulariesCount",
-					_getGroupVocabulariesCountParameterTypes14);
+					_getGroupVocabulariesCountParameterTypes15);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					name);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
+					throw (com.liferay.portal.kernel.exception.SystemException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return ((Integer)returnObj).intValue();
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
+	public static int getGroupVocabulariesCount(HttpPrincipal httpPrincipal,
+		long[] groupIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		try {
+			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
+					"getGroupVocabulariesCount",
+					_getGroupVocabulariesCountParameterTypes16);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupIds);
 
 			Object returnObj = null;
 
@@ -605,7 +659,7 @@ public class AssetVocabularyServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
 					"getGroupVocabulariesDisplay",
-					_getGroupVocabulariesDisplayParameterTypes15);
+					_getGroupVocabulariesDisplayParameterTypes17);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					name, start, end, addDefaultVocabulary, obc);
@@ -644,7 +698,7 @@ public class AssetVocabularyServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
 					"getGroupVocabulariesDisplay",
-					_getGroupVocabulariesDisplayParameterTypes16);
+					_getGroupVocabulariesDisplayParameterTypes18);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					name, start, end, obc);
@@ -683,7 +737,7 @@ public class AssetVocabularyServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
 					"getJSONGroupVocabularies",
-					_getJSONGroupVocabulariesParameterTypes17);
+					_getJSONGroupVocabulariesParameterTypes19);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					name, start, end, obc);
@@ -720,7 +774,7 @@ public class AssetVocabularyServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
-					"getVocabularies", _getVocabulariesParameterTypes18);
+					"getVocabularies", _getVocabulariesParameterTypes20);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					vocabularyIds);
@@ -757,7 +811,7 @@ public class AssetVocabularyServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
-					"getVocabulary", _getVocabularyParameterTypes19);
+					"getVocabulary", _getVocabularyParameterTypes21);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					vocabularyId);
@@ -788,6 +842,45 @@ public class AssetVocabularyServiceHttp {
 		}
 	}
 
+	public static com.liferay.portlet.asset.model.AssetVocabularyDisplay searchVocabulariesDisplay(
+		HttpPrincipal httpPrincipal, long groupId, java.lang.String title,
+		int start, int end, boolean addDefaultVocabulary)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		try {
+			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
+					"searchVocabulariesDisplay",
+					_searchVocabulariesDisplayParameterTypes22);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
+					title, start, end, addDefaultVocabulary);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
+					throw (com.liferay.portal.kernel.exception.SystemException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (com.liferay.portlet.asset.model.AssetVocabularyDisplay)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static com.liferay.portlet.asset.model.AssetVocabulary updateVocabulary(
 		HttpPrincipal httpPrincipal, long vocabularyId,
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
@@ -798,7 +891,7 @@ public class AssetVocabularyServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
-					"updateVocabulary", _updateVocabularyParameterTypes20);
+					"updateVocabulary", _updateVocabularyParameterTypes23);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					vocabularyId, titleMap, descriptionMap, settings,
@@ -840,7 +933,7 @@ public class AssetVocabularyServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(AssetVocabularyServiceUtil.class,
-					"updateVocabulary", _updateVocabularyParameterTypes21);
+					"updateVocabulary", _updateVocabularyParameterTypes24);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					vocabularyId, title, titleMap, descriptionMap, settings,
@@ -918,39 +1011,49 @@ public class AssetVocabularyServiceHttp {
 			long.class, java.lang.String.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getGroupVocabulariesCountParameterTypes13 = new Class[] {
-			long.class
+	private static final Class<?>[] _getGroupVocabulariesParameterTypes13 = new Class[] {
+			long[].class
 		};
 	private static final Class<?>[] _getGroupVocabulariesCountParameterTypes14 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _getGroupVocabulariesCountParameterTypes15 = new Class[] {
 			long.class, java.lang.String.class
 		};
-	private static final Class<?>[] _getGroupVocabulariesDisplayParameterTypes15 =
+	private static final Class<?>[] _getGroupVocabulariesCountParameterTypes16 = new Class[] {
+			long[].class
+		};
+	private static final Class<?>[] _getGroupVocabulariesDisplayParameterTypes17 =
 		new Class[] {
 			long.class, java.lang.String.class, int.class, int.class,
 			boolean.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getGroupVocabulariesDisplayParameterTypes16 =
+	private static final Class<?>[] _getGroupVocabulariesDisplayParameterTypes18 =
 		new Class[] {
 			long.class, java.lang.String.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getJSONGroupVocabulariesParameterTypes17 = new Class[] {
+	private static final Class<?>[] _getJSONGroupVocabulariesParameterTypes19 = new Class[] {
 			long.class, java.lang.String.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getVocabulariesParameterTypes18 = new Class[] {
+	private static final Class<?>[] _getVocabulariesParameterTypes20 = new Class[] {
 			long[].class
 		};
-	private static final Class<?>[] _getVocabularyParameterTypes19 = new Class[] {
+	private static final Class<?>[] _getVocabularyParameterTypes21 = new Class[] {
 			long.class
 		};
-	private static final Class<?>[] _updateVocabularyParameterTypes20 = new Class[] {
+	private static final Class<?>[] _searchVocabulariesDisplayParameterTypes22 = new Class[] {
+			long.class, java.lang.String.class, int.class, int.class,
+			boolean.class
+		};
+	private static final Class<?>[] _updateVocabularyParameterTypes23 = new Class[] {
 			long.class, java.util.Map.class, java.util.Map.class,
 			java.lang.String.class,
 			com.liferay.portal.service.ServiceContext.class
 		};
-	private static final Class<?>[] _updateVocabularyParameterTypes21 = new Class[] {
+	private static final Class<?>[] _updateVocabularyParameterTypes24 = new Class[] {
 			long.class, java.lang.String.class, java.util.Map.class,
 			java.util.Map.class, java.lang.String.class,
 			com.liferay.portal.service.ServiceContext.class

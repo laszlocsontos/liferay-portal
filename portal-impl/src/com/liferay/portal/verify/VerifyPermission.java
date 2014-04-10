@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Organization;
+import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
@@ -35,6 +36,7 @@ import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.impl.ResourcePermissionLocalServiceImpl;
 import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.util.PortletKeys;
 
 import java.util.List;
 
@@ -109,7 +111,30 @@ public class VerifyPermission extends VerifyProcess {
 		deleteDefaultPrivateLayoutPermissions();
 
 		checkPermissions();
+		fixDockbarPermissions();
 		fixOrganizationRolePermissions();
+	}
+
+	protected void fixDockbarPermissions() throws Exception {
+		long[] companyIds = PortalInstances.getCompanyIdsBySQL();
+
+		for (long companyId : companyIds) {
+			try {
+				Role role = RoleLocalServiceUtil.getRole(
+					companyId, RoleConstants.USER);
+
+				ResourcePermissionLocalServiceUtil.addResourcePermission(
+					companyId, PortletKeys.DOCKBAR,
+					ResourceConstants.SCOPE_COMPANY,
+					String.valueOf(role.getCompanyId()), role.getRoleId(),
+					ActionKeys.VIEW);
+			}
+			catch (Exception e) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(e, e);
+				}
+			}
+		}
 	}
 
 	protected void fixOrganizationRolePermissions() throws Exception {

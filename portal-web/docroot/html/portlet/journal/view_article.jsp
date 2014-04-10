@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,8 @@ long groupId = BeanParamUtil.getLong(article, request, "groupId", scopeGroupId);
 String articleId = ParamUtil.getString(request, "articleId");
 String languageId = LanguageUtil.getLanguageId(request);
 int articlePage = ParamUtil.getInteger(renderRequest, "page", 1);
-String xmlRequest = PortletRequestUtil.toXML(renderRequest, renderResponse);
 
-JournalArticleDisplay articleDisplay = JournalContentUtil.getDisplay(groupId, articleId, null, null, languageId, themeDisplay, articlePage, xmlRequest);
+JournalArticleDisplay articleDisplay = JournalContentUtil.getDisplay(groupId, articleId, null, null, languageId, articlePage, new PortletRequestModel(renderRequest, renderResponse), themeDisplay);
 
 try {
 	article = JournalArticleLocalServiceUtil.getLatestArticle(groupId, articleId, WorkflowConstants.STATUS_ANY);

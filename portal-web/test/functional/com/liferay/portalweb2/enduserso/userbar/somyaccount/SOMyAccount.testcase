@@ -1,6 +1,7 @@
 <definition component-name="social-office-user-bar">
 	<property name="hook.plugins.includes" value="deploy-listener-hook,portal-compat-hook,so-activities-hook,so-hook" />
 	<property name="portlet.plugins.includes" value="calendar-portlet,chat-portlet,contacts-portlet,events-display-portlet,marketplace-portlet,microblogs-portlet,notifications-portlet,private-messaging-portlet,so-announcements-portlet,so-configurations-portlet,so-portlet,tasks-portlet,wysiwyg-portlet" />
+	<property name="testray.main.component.name" value="Social Office" />
 	<property name="theme.plugins.includes" value="so-theme" />
 	<property name="web.plugins.includes" value="resources-importer-web" />
 
@@ -142,10 +143,19 @@
 
 	<command name="AddProfilePicture" priority="5">
 		<var name="imageFileName" value="Document_4.jpg" />
+		<var name="imageFileNameEdit" value="Document_3.jpg" />
 		<var name="userName" value="${userName}" />
 
 		<execute macro="MyAccount#addProfilePicture">
 			<var name="imageFileName" value="${imageFileName}" />
+		</execute>
+
+		<execute macro="Page#gotoMyProfile" />
+
+		<execute macro="SOProfile#viewProfilePicture" />
+
+		<execute macro="MyAccount#addProfilePicture">
+			<var name="imageFileName" value="${imageFileNameEdit}" />
 		</execute>
 
 		<execute macro="Page#gotoMyProfile" />

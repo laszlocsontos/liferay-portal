@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,12 +21,14 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -35,13 +37,13 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PrimitiveLongList;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
@@ -79,7 +81,6 @@ import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.sites.util.SitesUtil;
-import com.liferay.util.ContentUtil;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -87,6 +88,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -817,24 +819,9 @@ public class AssetPublisherImpl implements AssetPublisher {
 	public Map<Locale, String> getEmailAssetEntryAddedBodyMap(
 		PortletPreferences portletPreferences) {
 
-		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
-			portletPreferences, "emailAssetEntryAddedBody");
-
-		Locale defaultLocale = LocaleUtil.getSiteDefault();
-
-		String defaultValue = map.get(defaultLocale);
-
-		if (Validator.isNotNull(defaultValue)) {
-			return map;
-		}
-
-		map.put(
-			defaultLocale,
-			ContentUtil.get(
-				PropsUtil.get(
-					PropsKeys.ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_BODY)));
-
-		return map;
+		return LocalizationUtil.getLocalizationMap(
+			portletPreferences, "emailAssetEntryAddedBody",
+			PropsKeys.ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_BODY);
 	}
 
 	@Override
@@ -856,25 +843,66 @@ public class AssetPublisherImpl implements AssetPublisher {
 	public Map<Locale, String> getEmailAssetEntryAddedSubjectMap(
 		PortletPreferences portletPreferences) {
 
-		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
-			portletPreferences, "emailAssetEntryAddedSubject");
+		return LocalizationUtil.getLocalizationMap(
+			portletPreferences, "emailAssetEntryAddedSubject",
+			PropsKeys.ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_SUBJECT);
+	}
 
-		Locale defaultLocale = LocaleUtil.getSiteDefault();
+	@Override
+	public Map<String, String> getEmailDefinitionTerms(
+		PortletRequest portletRequest, String emailFromAddress,
+		String emailFromName) {
 
-		String defaultValue = map.get(defaultLocale);
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		if (Validator.isNotNull(defaultValue)) {
-			return map;
-		}
+		Map<String, String> definitionTerms =
+			new LinkedHashMap<String, String>();
 
-		map.put(
-			defaultLocale,
-			ContentUtil.get(
-				PropsUtil.get(
-					PropsKeys.ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_SUBJECT))
-		);
+		definitionTerms.put(
+			"[$ASSET_ENTRIES$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-list-of-assets"));
+		definitionTerms.put(
+			"[$COMPANY_ID$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-id-associated-with-the-assets"));
+		definitionTerms.put(
+			"[$COMPANY_MX$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-mx-associated-with-the-assets"));
+		definitionTerms.put(
+			"[$COMPANY_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-name-associated-with-the-assets"));
+		definitionTerms.put(
+			"[$FROM_ADDRESS$]", HtmlUtil.escape(emailFromAddress));
+		definitionTerms.put("[$FROM_NAME$]", HtmlUtil.escape(emailFromName));
 
-		return map;
+		Company company = themeDisplay.getCompany();
+
+		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
+
+		definitionTerms.put(
+			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+		definitionTerms.put(
+			"[$SITE_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-site-name-associated-with-the-assets"));
+		definitionTerms.put(
+			"[$TO_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-address-of-the-email-recipient"));
+		definitionTerms.put(
+			"[$TO_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-name-of-the-email-recipient"));
+
+		return definitionTerms;
 	}
 
 	@Override
@@ -1077,6 +1105,18 @@ public class AssetPublisherImpl implements AssetPublisher {
 	}
 
 	@Override
+	public long getSubscriptionClassPK(long plid, String portletId)
+		throws PortalException, SystemException {
+
+		com.liferay.portal.model.PortletPreferences portletPreferencesModel =
+			PortletPreferencesLocalServiceUtil.getPortletPreferences(
+				PortletKeys.PREFS_OWNER_ID_DEFAULT,
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portletId);
+
+		return portletPreferencesModel.getPortletPreferencesId();
+	}
+
+	@Override
 	public boolean isScopeIdSelectable(
 			PermissionChecker permissionChecker, String scopeId,
 			long companyGroupId, Layout layout)
@@ -1132,7 +1172,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		return SubscriptionLocalServiceUtil.isSubscribed(
 			companyId, userId,
 			com.liferay.portal.model.PortletPreferences.class.getName(),
-			_getPortletPreferencesId(plid, portletId));
+			getSubscriptionClassPK(plid, portletId));
 	}
 
 	@Override
@@ -1177,7 +1217,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 
 		subscriptionSender.addPersistedSubscribers(
 			com.liferay.portal.model.PortletPreferences.class.getName(),
-			_getPortletPreferencesId(plid, portletId));
+			getSubscriptionClassPK(plid, portletId));
 
 		subscriptionSender.flushNotificationsAsync();
 	}
@@ -1214,7 +1254,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 			List<String> assetEntryUuids, PortletPreferences portletPreferences)
 		throws Exception {
 
-		if (assetEntryUuids.size() == 0) {
+		if (assetEntryUuids.isEmpty()) {
 			return;
 		}
 
@@ -1267,7 +1307,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		SubscriptionLocalServiceUtil.addSubscription(
 			permissionChecker.getUserId(), groupId,
 			com.liferay.portal.model.PortletPreferences.class.getName(),
-			_getPortletPreferencesId(plid, portletId));
+			getSubscriptionClassPK(plid, portletId));
 	}
 
 	@Override
@@ -1288,7 +1328,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 		SubscriptionLocalServiceUtil.deleteSubscription(
 			permissionChecker.getUserId(),
 			com.liferay.portal.model.PortletPreferences.class.getName(),
-			_getPortletPreferencesId(plid, portletId));
+			getSubscriptionClassPK(plid, portletId));
 	}
 
 	private void _checkAssetEntries(
@@ -1426,17 +1466,6 @@ public class AssetPublisherImpl implements AssetPublisher {
 		}
 
 		return xml;
-	}
-
-	private long _getPortletPreferencesId(long plid, String portletId)
-		throws PortalException, SystemException {
-
-		com.liferay.portal.model.PortletPreferences portletPreferencesModel =
-			PortletPreferencesLocalServiceUtil.getPortletPreferences(
-				PortletKeys.PREFS_OWNER_ID_DEFAULT,
-				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portletId);
-
-		return portletPreferencesModel.getPortletPreferencesId();
 	}
 
 	private Map<String, Long> _getRecentFolderIds(

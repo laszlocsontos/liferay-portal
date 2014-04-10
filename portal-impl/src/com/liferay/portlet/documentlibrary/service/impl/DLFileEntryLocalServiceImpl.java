@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -178,7 +178,7 @@ public class DLFileEntryLocalServiceImpl
 		Date now = new Date();
 
 		validateFileEntryTypeId(
-			PortalUtil.getSiteAndCompanyGroupIds(groupId), folderId,
+			PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId), folderId,
 			fileEntryTypeId);
 
 		validateFile(
@@ -206,19 +206,17 @@ public class DLFileEntryLocalServiceImpl
 				repository.getDlFolderId());
 		}
 
+		long classNameId = 0;
+		long classPK = 0;
+
 		if ((repositoryDLFolder != null) && repositoryDLFolder.isHidden()) {
-			long classNameId = classNameLocalService.getClassNameId(
+			classNameId = classNameLocalService.getClassNameId(
 				(String)serviceContext.getAttribute("className"));
-			long classPK = ParamUtil.getLong(serviceContext, "classPK");
-
-			if (Validator.isNotNull(classNameId) &&
-				Validator.isNotNull(classPK)) {
-
-				dlFileEntry.setClassNameId(classNameId);
-				dlFileEntry.setClassPK(classPK);
-			}
+			classPK = ParamUtil.getLong(serviceContext, "classPK");
 		}
 
+		dlFileEntry.setClassNameId(classNameId);
+		dlFileEntry.setClassPK(classPK);
 		dlFileEntry.setRepositoryId(repositoryId);
 		dlFileEntry.setFolderId(folderId);
 		dlFileEntry.setTreePath(dlFileEntry.buildTreePath());
@@ -1047,6 +1045,18 @@ public class DLFileEntryLocalServiceImpl
 
 	@Override
 	public List<DLFileEntry> getFileEntries(
+			long groupId, long userId, List<Long> repositoryIds,
+			List<Long> folderIds, String[] mimeTypes,
+			QueryDefinition queryDefinition)
+		throws Exception {
+
+		return dlFileEntryFinder.findByG_U_R_F_M(
+			groupId, userId, repositoryIds, folderIds, mimeTypes,
+			queryDefinition);
+	}
+
+	@Override
+	public List<DLFileEntry> getFileEntries(
 			long groupId, long userId, List<Long> folderIds, String[] mimeTypes,
 			QueryDefinition queryDefinition)
 		throws Exception {
@@ -1094,6 +1104,18 @@ public class DLFileEntryLocalServiceImpl
 
 		return dlFileEntryFinder.countByG_F(
 			groupId, folderIds, new QueryDefinition(status));
+	}
+
+	@Override
+	public int getFileEntriesCount(
+			long groupId, long userId, List<Long> repositoryIds,
+			List<Long> folderIds, String[] mimeTypes,
+			QueryDefinition queryDefinition)
+		throws Exception {
+
+		return dlFileEntryFinder.countByG_U_R_F_M(
+			groupId, userId, repositoryIds, folderIds, mimeTypes,
+			queryDefinition);
 	}
 
 	@Override
@@ -1512,7 +1534,8 @@ public class DLFileEntryLocalServiceImpl
 		}
 
 		validateFileEntryTypeId(
-			PortalUtil.getSiteAndCompanyGroupIds(dlFileEntry.getGroupId()),
+			PortalUtil.getCurrentAndAncestorSiteGroupIds(
+				dlFileEntry.getGroupId()),
 			dlFileEntry.getFolderId(), fileEntryTypeId);
 
 		return updateFileEntry(

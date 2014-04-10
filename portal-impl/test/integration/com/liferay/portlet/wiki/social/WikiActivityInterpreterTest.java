@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,13 +51,10 @@ public class WikiActivityInterpreterTest
 
 	@Override
 	protected void addActivities() throws Exception {
-		WikiNode wikiNode = WikiTestUtil.addNode(
-			TestPropsValues.getUserId(), group.getGroupId(),
-			ServiceTestUtil.randomString(), ServiceTestUtil.randomString());
+		WikiNode wikiNode = WikiTestUtil.addNode(group.getGroupId());
 
 		_page = WikiTestUtil.addPage(
-			TestPropsValues.getUserId(), group.getGroupId(),
-			wikiNode.getNodeId(), ServiceTestUtil.randomString(), true);
+			group.getGroupId(), wikiNode.getNodeId(), true);
 
 		_attachmentFileName = ServiceTestUtil.randomString() + ".docx";
 

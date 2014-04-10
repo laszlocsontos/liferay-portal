@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,10 @@ package com.liferay.portlet.messageboards.util;
 import com.liferay.portal.kernel.dao.shard.ShardCallable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
@@ -30,50 +32,57 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
+import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.Subscription;
+import com.liferay.portal.model.ThemeConstants;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.settings.ParameterMapSettings;
+import com.liferay.portal.settings.Settings;
+import com.liferay.portal.settings.SettingsFactoryUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.PortletSettings;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.messageboards.MBSettings;
 import com.liferay.portlet.messageboards.model.MBBan;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.messageboards.model.MBMessageConstants;
 import com.liferay.portlet.messageboards.model.MBStatsUser;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.permission.MBMessagePermission;
-import com.liferay.util.ContentUtil;
 import com.liferay.util.mail.JavaMailUtil;
 
 import java.io.InputStream;
@@ -84,6 +93,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,6 +119,8 @@ public class MBUtil {
 	public static final String BB_CODE_EDITOR_WYSIWYG_IMPL_KEY =
 		"editor.wysiwyg.portal-web.docroot.html.portlet.message_boards." +
 			"edit_message.bb_code.jsp";
+
+	public static final String EMOTICONS = "/emoticons";
 
 	public static final String MESSAGE_POP_PORTLET_PREFIX = "mb_message.";
 
@@ -303,6 +315,13 @@ public class MBUtil {
 		return sb.toString();
 	}
 
+	public static String getBBCodeHTML(String msgBody, String pathThemeImages) {
+		return StringUtil.replace(
+			BBCodeTranslatorUtil.getHTML(msgBody),
+			ThemeConstants.TOKEN_THEME_IMAGES_PATH + EMOTICONS,
+			pathThemeImages + EMOTICONS);
+	}
+
 	public static long getCategoryId(
 		HttpServletRequest request, MBCategory category) {
 
@@ -347,146 +366,149 @@ public class MBUtil {
 		return classPKs;
 	}
 
-	public static String getEmailFromAddress(PortletSettings portletSettings) {
-		return portletSettings.getValue(
-			PropsKeys.MESSAGE_BOARDS_EMAIL_FROM_ADDRESS,
-			PropsValues.MESSAGE_BOARDS_EMAIL_FROM_ADDRESS);
+	public static Map<String, String> getEmailDefinitionTerms(
+		PortletRequest portletRequest, String emailFromAddress,
+		String emailFromName) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Map<String, String> definitionTerms =
+			new LinkedHashMap<String, String>();
+
+		definitionTerms.put(
+			"[$CATEGORY_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-category-in-which-the-message-has-been-posted"));
+		definitionTerms.put(
+			"[$COMPANY_ID$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-id-associated-with-the-message-board"));
+		definitionTerms.put(
+			"[$COMPANY_MX$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-mx-associated-with-the-message-board"));
+		definitionTerms.put(
+			"[$COMPANY_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-name-associated-with-the-message-board"));
+		definitionTerms.put(
+			"[$FROM_ADDRESS$]", HtmlUtil.escape(emailFromAddress));
+		definitionTerms.put("[$FROM_NAME$]", HtmlUtil.escape(emailFromName));
+
+		if (PropsValues.POP_SERVER_NOTIFICATIONS_ENABLED) {
+			definitionTerms.put(
+				"[$MAILING_LIST_ADDRESS$]",
+				LanguageUtil.get(
+					themeDisplay.getLocale(),
+					"the-email-address-of-the-mailing-list"));
+		}
+
+		definitionTerms.put(
+			"[$MESSAGE_BODY$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-message-body"));
+		definitionTerms.put(
+			"[$MESSAGE_ID$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-message-id"));
+		definitionTerms.put(
+			"[$MESSAGE_SUBJECT$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-message-subject"));
+		definitionTerms.put(
+			"[$MESSAGE_URL$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-message-url"));
+		definitionTerms.put(
+			"[$MESSAGE_USER_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-email-address-of-the-user-who-added-the-message"));
+		definitionTerms.put(
+			"[$MESSAGE_USER_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-user-who-added-the-message"));
+
+		Company company = themeDisplay.getCompany();
+
+		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
+
+		definitionTerms.put(
+			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+		definitionTerms.put(
+			"[$SITE_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-site-name-associated-with-the-message-board"));
+
+		if (!PropsValues.MESSAGE_BOARDS_EMAIL_BULK) {
+			definitionTerms.put(
+				"[$TO_ADDRESS$]",
+				LanguageUtil.get(
+					themeDisplay.getLocale(),
+					"the-address-of-the-email-recipient"));
+			definitionTerms.put(
+				"[$TO_NAME$]",
+				LanguageUtil.get(
+					themeDisplay.getLocale(),
+					"the-name-of-the-email-recipient"));
+		}
+
+		return definitionTerms;
 	}
 
-	public static String getEmailFromName(PortletSettings portletSettings) {
-		return portletSettings.getValue(
-			PropsKeys.MESSAGE_BOARDS_EMAIL_FROM_NAME,
-			PropsValues.MESSAGE_BOARDS_EMAIL_FROM_NAME);
-	}
+	public static Map<String, String> getEmailFromDefinitionTerms(
+		PortletRequest portletRequest) {
 
-	public static boolean getEmailHtmlFormat(PortletSettings portletSettings) {
-		String emailHtmlFormat = portletSettings.getValue(
-			"emailHtmlFormat", StringPool.BLANK);
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		if (Validator.isNotNull(emailHtmlFormat)) {
-			return GetterUtil.getBoolean(emailHtmlFormat);
+		Map<String, String> definitionTerms =
+			new LinkedHashMap<String, String>();
+
+		definitionTerms.put(
+			"[$COMPANY_ID$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-id-associated-with-the-message-board"));
+		definitionTerms.put(
+			"[$COMPANY_MX$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-mx-associated-with-the-message-board"));
+		definitionTerms.put(
+			"[$COMPANY_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-company-name-associated-with-the-message-board"));
+
+		if (PropsValues.POP_SERVER_NOTIFICATIONS_ENABLED) {
+			definitionTerms.put(
+				"[$MAILING_LIST_ADDRESS$]",
+				LanguageUtil.get(
+					themeDisplay.getLocale(),
+					"the-email-address-of-the-mailing-list"));
 		}
-		else {
-			return PropsValues.MESSAGE_BOARDS_EMAIL_HTML_FORMAT;
-		}
-	}
 
-	public static String getEmailMessageAddedBody(
-		PortletSettings portletSettings) {
+		definitionTerms.put(
+			"[$MESSAGE_USER_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-email-address-of-the-user-who-added-the-message"));
+		definitionTerms.put(
+			"[$MESSAGE_USER_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-user-who-added-the-message"));
+		definitionTerms.put(
+			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+		definitionTerms.put(
+			"[$SITE_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-site-name-associated-with-the-message-board"));
 
-		String emailMessageAddedBody = portletSettings.getValue(
-			"emailMessageAddedBody", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageAddedBody)) {
-			return emailMessageAddedBody;
-		}
-		else {
-			return ContentUtil.get(
-				PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_BODY);
-		}
-	}
-
-	public static boolean getEmailMessageAddedEnabled(
-		PortletSettings portletSettings) {
-
-		String emailMessageAddedEnabled = portletSettings.getValue(
-			"emailMessageAddedEnabled", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageAddedEnabled)) {
-			return GetterUtil.getBoolean(emailMessageAddedEnabled);
-		}
-		else {
-			return PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_ENABLED;
-		}
-	}
-
-	public static String getEmailMessageAddedSignature(
-		PortletSettings portletSettings) {
-
-		String emailMessageAddedSignature = portletSettings.getValue(
-			"emailMessageAddedSignature", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageAddedSignature)) {
-			return emailMessageAddedSignature;
-		}
-		else {
-			return ContentUtil.get(
-				PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SIGNATURE);
-		}
-	}
-
-	public static String getEmailMessageAddedSubject(
-		PortletSettings portletSettings) {
-
-		String emailMessageAddedSubject = portletSettings.getValue(
-			"emailMessageAddedSubject", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageAddedSubject)) {
-			return emailMessageAddedSubject;
-		}
-		else {
-			return ContentUtil.get(
-				PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_ADDED_SUBJECT);
-		}
-	}
-
-	public static String getEmailMessageUpdatedBody(
-		PortletSettings portletSettings) {
-
-		String emailMessageUpdatedBody = portletSettings.getValue(
-			"emailMessageUpdatedBody", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageUpdatedBody)) {
-			return emailMessageUpdatedBody;
-		}
-		else {
-			return ContentUtil.get(
-				PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_BODY);
-		}
-	}
-
-	public static boolean getEmailMessageUpdatedEnabled(
-		PortletSettings portletSettings) {
-
-		String emailMessageUpdatedEnabled = portletSettings.getValue(
-			"emailMessageUpdatedEnabled", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageUpdatedEnabled)) {
-			return GetterUtil.getBoolean(emailMessageUpdatedEnabled);
-		}
-		else {
-			return PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_ENABLED;
-		}
-	}
-
-	public static String getEmailMessageUpdatedSignature(
-		PortletSettings portletSettings) {
-
-		String emailMessageUpdatedSignature = portletSettings.getValue(
-			"emailMessageUpdatedSignature", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageUpdatedSignature)) {
-			return emailMessageUpdatedSignature;
-		}
-		else {
-			return ContentUtil.get(
-				PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SIGNATURE);
-		}
-	}
-
-	public static String getEmailMessageUpdatedSubject(
-		PortletSettings portletSettings) {
-
-		String emailMessageUpdatedSubject = portletSettings.getValue(
-			"emailMessageUpdatedSubject", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageUpdatedSubject)) {
-			return emailMessageUpdatedSubject;
-		}
-		else {
-			return ContentUtil.get(
-				PropsValues.MESSAGE_BOARDS_EMAIL_MESSAGE_UPDATED_SUBJECT);
-		}
+		return definitionTerms;
 	}
 
 	public static List<Object> getEntries(Hits hits) {
@@ -561,15 +583,26 @@ public class MBUtil {
 		return entries;
 	}
 
-	public static String getMessageFormat(PortletSettings portletSettings) {
-		String messageFormat = portletSettings.getValue(
-			"messageFormat", MBMessageConstants.DEFAULT_FORMAT);
+	public static MBSettings getMBSettings(long groupId)
+		throws PortalException, SystemException {
 
-		if (isValidMessageFormat(messageFormat)) {
-			return messageFormat;
-		}
+		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
+			groupId, MBConstants.SERVICE_NAME);
 
-		return "html";
+		return new MBSettings(settings);
+	}
+
+	public static MBSettings getMBSettings(
+			long groupId, HttpServletRequest request)
+		throws PortalException, SystemException {
+
+		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
+			groupId, MBConstants.SERVICE_NAME);
+
+		ParameterMapSettings parameterMapSettings = new ParameterMapSettings(
+			settings, request.getParameterMap());
+
+		return new MBSettings(parameterMapSettings);
 	}
 
 	public static long getMessageId(String mailId) {
@@ -674,6 +707,22 @@ public class MBUtil {
 		return sb.toString();
 	}
 
+	public static String getSubjectForEmail(Message message) throws Exception {
+		long parentMessageId = getParentMessageId(message);
+
+		MBMessage parentMessage = MBMessageLocalServiceUtil.getMBMessage(
+			parentMessageId);
+
+		String subject = parentMessage.getSubject();
+
+		if (subject.startsWith("RE:")) {
+			return subject;
+		}
+		else {
+			return "RE: " + parentMessage.getSubject();
+		}
+	}
+
 	public static String getSubjectWithoutMessageId(Message message)
 		throws Exception {
 
@@ -693,12 +742,11 @@ public class MBUtil {
 	}
 
 	public static String[] getThreadPriority(
-			PortletSettings portletSettings, String languageId, double value,
+			MBSettings mbSettings, String languageId, double value,
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		String[] priorities = LocalizationUtil.getPortletSettingsValues(
-			portletSettings, "priorities", languageId);
+		String[] priorities = mbSettings.getPriorities(languageId);
 
 		String[] priorityPair = _findThreadPriority(
 			value, themeDisplay, priorities);
@@ -707,8 +755,7 @@ public class MBUtil {
 			String defaultLanguageId = LocaleUtil.toLanguageId(
 				LocaleUtil.getSiteDefault());
 
-			priorities = LocalizationUtil.getPortletSettingsValues(
-				portletSettings, "priorities", defaultLanguageId);
+			priorities = mbSettings.getPriorities(defaultLanguageId);
 
 			priorityPair = _findThreadPriority(value, themeDisplay, priorities);
 		}
@@ -745,13 +792,12 @@ public class MBUtil {
 	}
 
 	public static String getUserRank(
-			PortletSettings portletSettings, String languageId, int posts)
+			MBSettings mbSettings, String languageId, int posts)
 		throws Exception {
 
 		String rank = StringPool.BLANK;
 
-		String[] ranks = LocalizationUtil.getPortletSettingsValues(
-			portletSettings, "ranks", languageId);
+		String[] ranks = mbSettings.getRanks(languageId);
 
 		for (int i = 0; i < ranks.length; i++) {
 			String[] kvp = StringUtil.split(ranks[i], CharPool.EQUAL);
@@ -771,8 +817,7 @@ public class MBUtil {
 	}
 
 	public static String[] getUserRank(
-			PortletSettings portletSettings, String languageId,
-			MBStatsUser statsUser)
+			MBSettings mbSettings, String languageId, MBStatsUser statsUser)
 		throws Exception {
 
 		String[] rank = {StringPool.BLANK, StringPool.BLANK};
@@ -783,8 +828,7 @@ public class MBUtil {
 
 		long companyId = group.getCompanyId();
 
-		String[] ranks = LocalizationUtil.getPortletSettingsValues(
-			portletSettings, "ranks", languageId);
+		String[] ranks = mbSettings.getRanks(languageId);
 
 		for (int i = 0; i < ranks.length; i++) {
 			String[] kvp = StringUtil.split(ranks[i], CharPool.EQUAL);
@@ -847,14 +891,6 @@ public class MBUtil {
 		return false;
 	}
 
-	public static boolean isAllowAnonymousPosting(
-		PortletSettings portletSettings) {
-
-		return GetterUtil.getBoolean(
-			portletSettings.getValue("allowAnonymousPosting", null),
-			PropsValues.MESSAGE_BOARDS_ANONYMOUS_POSTING_ENABLED);
-	}
-
 	public static boolean isValidMessageFormat(String messageFormat) {
 		String editorImpl = PropsUtil.get(BB_CODE_EDITOR_WYSIWYG_IMPL_KEY);
 
@@ -906,13 +942,63 @@ public class MBUtil {
 		return true;
 	}
 
+	public static void propagatePermissions(
+			long companyId, long groupId, long parentMessageId,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		MBMessage parentMessage = MBMessageLocalServiceUtil.getMBMessage(
+			parentMessageId);
+
+		Role defaultGroupRole = RoleLocalServiceUtil.getDefaultGroupRole(
+			groupId);
+		Role guestRole = RoleLocalServiceUtil.getRole(
+			companyId, RoleConstants.GUEST);
+
+		long[] roleIds = {defaultGroupRole.getRoleId(), guestRole.getRoleId()};
+
+		List<String> actionIds = ResourceActionsUtil.getModelResourceActions(
+			MBMessage.class.getName());
+
+		Map<Long, Set<String>> roleIdsToActionIds =
+			ResourcePermissionLocalServiceUtil.
+				getAvailableResourcePermissionActionIds(
+					companyId, MBMessage.class.getName(),
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(parentMessage.getMessageId()), roleIds,
+					actionIds);
+
+		Set<String> defaultGroupActionIds = roleIdsToActionIds.get(
+			defaultGroupRole.getRoleId());
+
+		if (defaultGroupActionIds == null) {
+			serviceContext.setGroupPermissions(new String[]{});
+		}
+		else {
+			serviceContext.setGroupPermissions(
+				defaultGroupActionIds.toArray(
+					new String[defaultGroupActionIds.size()]));
+		}
+
+		Set<String> guestActionIds = roleIdsToActionIds.get(
+			guestRole.getRoleId());
+
+		if (guestActionIds == null) {
+			serviceContext.setGuestPermissions(new String[]{});
+		}
+		else {
+			serviceContext.setGuestPermissions(
+				guestActionIds.toArray(new String[guestActionIds.size()]));
+		}
+	}
+
 	public static String replaceMessageBodyPaths(
 		ThemeDisplay themeDisplay, String messageBody) {
 
 		return StringUtil.replace(
 			messageBody,
 			new String[] {
-				"@theme_images_path@", "href=\"/", "src=\"/"
+				ThemeConstants.TOKEN_THEME_IMAGES_PATH, "href=\"/", "src=\"/"
 			},
 			new String[] {
 				themeDisplay.getPathThemeImages(),
@@ -1048,7 +1134,8 @@ public class MBUtil {
 		double value, ThemeDisplay themeDisplay, String[] priorities) {
 
 		for (int i = 0; i < priorities.length; i++) {
-			String[] priority = StringUtil.split(priorities[i]);
+			String[] priority = StringUtil.split(
+				priorities[i], StringPool.PIPE);
 
 			try {
 				String priorityName = priority[0];

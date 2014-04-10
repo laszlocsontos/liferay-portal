@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -79,20 +79,15 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 	}
 
 	@Test
-	public void testExportImportBasicJournalArticle() throws Exception {
-		exportImportJournalArticle(false, false);
-	}
-
-	@Test
 	public void testExportImportCompanyScopeStructuredJournalArticle()
 		throws Exception {
 
-		exportImportJournalArticle(true, true);
+		exportImportJournalArticle(true);
 	}
 
 	@Test
 	public void testExportImportStructuredJournalArticle() throws Exception {
-		exportImportJournalArticle(true, false);
+		exportImportJournalArticle(false);
 	}
 
 	@Override
@@ -108,8 +103,7 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 			(JournalArticle)stagedModel);
 	}
 
-	protected void exportImportJournalArticle(
-			boolean structuredContent, boolean companyScopeDependencies)
+	protected void exportImportJournalArticle(boolean companyScopeDependencies)
 		throws Exception {
 
 		JournalArticle article = null;
@@ -127,24 +121,17 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 			groupId = companyGroup.getGroupId();
 		}
 
-		if (structuredContent) {
-			ddmStructure = DDMStructureTestUtil.addStructure(
-				groupId, JournalArticle.class.getName());
+		ddmStructure = DDMStructureTestUtil.addStructure(
+			groupId, JournalArticle.class.getName());
 
-			ddmTemplate = DDMTemplateTestUtil.addTemplate(
-				groupId, ddmStructure.getStructureId());
+		ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			groupId, ddmStructure.getStructureId());
 
-			String content = DDMStructureTestUtil.getSampleStructuredContent();
+		String content = DDMStructureTestUtil.getSampleStructuredContent();
 
-			article = JournalTestUtil.addArticleWithXMLContent(
-				group.getGroupId(), content, ddmStructure.getStructureKey(),
-				ddmTemplate.getTemplateKey());
-		}
-		else {
-			article = JournalTestUtil.addArticle(
-				group.getGroupId(), ServiceTestUtil.randomString(),
-				ServiceTestUtil.randomString());
-		}
+		article = JournalTestUtil.addArticleWithXMLContent(
+			group.getGroupId(), content, ddmStructure.getStructureKey(),
+			ddmTemplate.getTemplateKey());
 
 		String exportedResourceUuid = article.getArticleResourceUuid();
 
@@ -160,10 +147,6 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 				exportedResourceUuid, importedGroup.getGroupId());
 
 		Assert.assertNotNull(importedJournalArticleResource);
-
-		if (!structuredContent) {
-			return;
-		}
 
 		groupId = importedGroup.getGroupId();
 
@@ -208,9 +191,6 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 
 		Map<String, String[]> parameterMap = new HashMap<String, String[]>();
 
-		parameterMap.put(
-			PortletDataHandlerKeys.CATEGORIES,
-			new String[] {Boolean.TRUE.toString()});
 		parameterMap.put(
 			PortletDataHandlerKeys.PERMISSIONS,
 			new String[] {Boolean.TRUE.toString()});

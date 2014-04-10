@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -133,7 +133,7 @@ else {
 						List<LayoutPrototype> layoutPrototypes = LayoutPrototypeServiceUtil.search(company.getCompanyId(), Boolean.TRUE, null);
 
 						for (LayoutPrototype layoutPrototype : layoutPrototypes) {
-							String name = HtmlUtil.escape(layoutPrototype.getName(user.getLanguageId()));
+							String name = HtmlUtil.escape(layoutPrototype.getName(locale));
 						%>
 
 							<aui:nav-item cssClass="lfr-page-template" data-search="<%= name %>">
@@ -141,7 +141,7 @@ else {
 									<aui:input id='<%= "addLayoutSelectedPageTemplate" + layoutPrototype.getUuid() %>' label="<%= name %>" name="selectedPageTemplate" type="radio" />
 
 									<div class="lfr-page-template-description">
-										<small><%= HtmlUtil.escape(layoutPrototype.getDescription()) %></small>
+										<small><%= HtmlUtil.escape(layoutPrototype.getDescription(locale)) %></small>
 									</div>
 								</div>
 
@@ -243,7 +243,7 @@ else {
 <aui:script use="liferay-dockbar-add-page">
 	new Liferay.Dockbar.AddPage(
 		{
-			createPageMessage: '<%= LanguageUtil.get(pageContext, "loading") %>',
+			createPageMessage: '<liferay-ui:message key="loading" />',
 			focusItem: A.one('#<portlet:namespace />addLayoutName'),
 			namespace: '<portlet:namespace />',
 			nodeList: A.one('#<portlet:namespace />templateList'),

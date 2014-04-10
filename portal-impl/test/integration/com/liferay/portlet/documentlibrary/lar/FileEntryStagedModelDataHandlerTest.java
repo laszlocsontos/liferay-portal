@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -110,8 +110,7 @@ public class FileEntryStagedModelDataHandlerTest
 
 		Folder folder = DLAppTestUtil.addFolder(
 			stagingGroup.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			ServiceTestUtil.randomString());
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFolder.class, folder);
@@ -140,8 +139,7 @@ public class FileEntryStagedModelDataHandlerTest
 			dependentStagedModelsMap, DLFileEntryType.class, dlFileEntryType);
 
 		Folder folder = DLAppTestUtil.addFolder(
-			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			ServiceTestUtil.randomString());
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFolder.class, folder);
@@ -186,6 +184,11 @@ public class FileEntryStagedModelDataHandlerTest
 	@Override
 	protected Class<? extends StagedModel> getStagedModelClass() {
 		return DLFileEntry.class;
+	}
+
+	@Override
+	protected boolean isCommentableStagedModel() {
+		return true;
 	}
 
 	protected void validateCompanyDependenciesImport(

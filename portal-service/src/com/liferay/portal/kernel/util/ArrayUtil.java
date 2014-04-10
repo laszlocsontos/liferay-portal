@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1242,6 +1242,16 @@ public class ArrayUtil {
 		}
 
 		return list.toArray(new String[list.size()]);
+	}
+
+	public static void replace(
+		String[] values, String oldValue, String newValue) {
+
+		for (int i = 0; i < values.length; i++) {
+			if (values[i].equals(oldValue)) {
+				values[i] = newValue;
+			}
+		}
 	}
 
 	public static void reverse(boolean[] array) {

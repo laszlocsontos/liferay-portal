@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,11 @@
 
 package com.liferay.portal.tools.deploy;
 
+import com.liferay.portal.ant.CopyTask;
+import com.liferay.portal.ant.DeleteTask;
+import com.liferay.portal.ant.ExpandTask;
+import com.liferay.portal.ant.UpToDateTask;
+import com.liferay.portal.ant.WarTask;
 import com.liferay.portal.deploy.DeployUtil;
 import com.liferay.portal.kernel.deploy.Deployer;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
@@ -53,19 +58,14 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.plugin.PluginPackageUtil;
 import com.liferay.portal.security.lang.SecurityManagerUtil;
+import com.liferay.portal.tools.ToolDependencies;
 import com.liferay.portal.tools.WebXMLBuilder;
 import com.liferay.portal.util.ExtRegistry;
-import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.webserver.DynamicResourceServlet;
-import com.liferay.util.ant.CopyTask;
-import com.liferay.util.ant.DeleteTask;
-import com.liferay.util.ant.ExpandTask;
-import com.liferay.util.ant.UpToDateTask;
-import com.liferay.util.ant.WarTask;
 import com.liferay.util.xml.DocUtil;
 import com.liferay.util.xml.XMLFormatter;
 
@@ -94,7 +94,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	public static final String DEPLOY_TO_PREFIX = "DEPLOY_TO__";
 
 	public static void main(String[] args) {
-		InitUtil.initWithSpring();
+		ToolDependencies.wireDeployers();
 
 		List<String> wars = new ArrayList<String>();
 		List<String> jars = new ArrayList<String>();
@@ -125,6 +125,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		portletExtTaglibDTD = System.getProperty(
 			"deployer.portlet.ext.taglib.dtd");
 		securityTaglibDTD = System.getProperty("deployer.security.taglib.dtd");
+		stagingTaglibDTD = System.getProperty("deployer.staging.taglib.dtd");
 		themeTaglibDTD = System.getProperty("deployer.theme.taglib.dtd");
 		uiTaglibDTD = System.getProperty("deployer.ui.taglib.dtd");
 		utilTaglibDTD = System.getProperty("deployer.util.taglib.dtd");
@@ -275,6 +276,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			deployer.setPortletExtTaglibDTD(portletExtTaglibDTD);
 			deployer.setPortletTaglibDTD(portletTaglibDTD);
 			deployer.setSecurityTaglibDTD(securityTaglibDTD);
+			deployer.setStagingTaglibDTD(stagingTaglibDTD);
 			deployer.setThemeTaglibDTD(themeTaglibDTD);
 			deployer.setTomcatLibDir(tomcatLibDir);
 			deployer.setUiTaglibDTD(uiTaglibDTD);
@@ -532,6 +534,12 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				srcFile + "/WEB-INF/tld/liferay-security.tld", true);
 		}
 
+		if (Validator.isNotNull(stagingTaglibDTD)) {
+			FileUtil.copyFile(
+				stagingTaglibDTD, srcFile + "/WEB-INF/tld/liferay-staging.tld",
+				true);
+		}
+
 		if (Validator.isNotNull(themeTaglibDTD)) {
 			FileUtil.copyFile(
 				themeTaglibDTD, srcFile + "/WEB-INF/tld/liferay-theme.tld",
@@ -621,7 +629,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				if (fileName.endsWith(".war") || fileName.endsWith(".zip")) {
 					deploy = true;
 
-					if (wars.size() > 0) {
+					if (!wars.isEmpty()) {
 						if (!wars.contains(srcFile.getName())) {
 							deploy = false;
 						}
@@ -1229,6 +1237,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			Validator.isNotNull(portletTaglibDTD) ||
 			Validator.isNotNull(portletExtTaglibDTD) ||
 			Validator.isNotNull(securityTaglibDTD) ||
+			Validator.isNotNull(stagingTaglibDTD) ||
 			Validator.isNotNull(themeTaglibDTD) ||
 			Validator.isNotNull(uiTaglibDTD) ||
 			Validator.isNotNull(utilTaglibDTD)) {
@@ -1277,6 +1286,17 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			sb.append("</taglib-uri>");
 			sb.append("<taglib-location>");
 			sb.append("/WEB-INF/tld/liferay-security.tld");
+			sb.append("</taglib-location>");
+			sb.append("</taglib>");
+		}
+
+		if (Validator.isNotNull(stagingTaglibDTD)) {
+			sb.append("<taglib>");
+			sb.append("<taglib-uri>");
+			sb.append("http://liferay.com/tld/staging");
+			sb.append("</taglib-uri>");
+			sb.append("<taglib-location>");
+			sb.append("/WEB-INF/tld/liferay-staging.tld");
 			sb.append("</taglib-location>");
 			sb.append("</taglib>");
 		}
@@ -1579,7 +1599,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		if (!GetterUtil.getBoolean(
 				properties.getProperty(
-					"servlet-context-include-filters-enabled"), true)) {
+					"servlet-context-include-filters-enabled"),
+				true)) {
 
 			return StringPool.BLANK;
 		}
@@ -1812,7 +1833,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		Properties properties = getPluginPackageProperties(srcFile);
 
-		if ((properties == null) || (properties.size() == 0)) {
+		if ((properties == null) || properties.isEmpty()) {
 			return null;
 		}
 
@@ -2141,6 +2162,11 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	}
 
 	@Override
+	public void setStagingTaglibDTD(String stagingTaglibDTD) {
+		this.stagingTaglibDTD = stagingTaglibDTD;
+	}
+
+	@Override
 	public void setThemeTaglibDTD(String themeTaglibDTD) {
 		this.themeTaglibDTD = themeTaglibDTD;
 	}
@@ -2412,6 +2438,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	protected String portletExtTaglibDTD;
 	protected String portletTaglibDTD;
 	protected String securityTaglibDTD;
+	protected String stagingTaglibDTD;
 	protected String themeTaglibDTD;
 	protected String tomcatLibDir;
 	protected String uiTaglibDTD;

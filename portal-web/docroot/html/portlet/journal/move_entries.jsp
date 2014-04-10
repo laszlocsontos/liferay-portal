@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,7 +120,7 @@ for (JournalArticle curArticle : articles) {
 				for (JournalFolder folder : invalidMoveFolders) {
 				%>
 
-					<li class="move-folder move-error">
+					<li class="move-error move-folder">
 						<span class="folder-title">
 							<%= folder.getName() %>
 						</span>
@@ -217,7 +217,7 @@ for (JournalArticle curArticle : articles) {
 
 		<aui:field-wrapper label="new-folder">
 			<div class="input-append">
-				<liferay-ui:input-resource id="folderName" url="<%= folderName %>" />
+				<liferay-ui:input-resource id="folderName" label="new-folder" url="<%= folderName %>" />
 
 				<aui:button name="selectFolderButton" value="select" />
 			</div>
@@ -244,8 +244,9 @@ for (JournalArticle curArticle : articles) {
 				{
 					dialog: {
 						constrain: true,
+						destroyOnHide: true,
 						modal: true,
-						width: 680
+						width: 1024
 					},
 					id: '<portlet:namespace />selectFolder',
 					title: '<liferay-ui:message arguments="folder" key="select-x" />',

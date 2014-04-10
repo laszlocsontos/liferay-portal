@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,11 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+import com.liferay.registry.ServiceTracker;
+import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -852,6 +857,16 @@ public class SearchEngineUtil {
 		return searchEngineId;
 	}
 
+	private SearchEngineUtil() {
+		Registry registry = RegistryUtil.getRegistry();
+
+		_serviceTracker = registry.trackServices(
+			SearchEngineConfigurator.class,
+			new SearchEngineConfiguratorServiceTrackerCustomizer());
+
+		_serviceTracker.open();
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(SearchEngineUtil.class);
 
 	private static String _defaultSearchEngineId;
@@ -861,5 +876,46 @@ public class SearchEngineUtil {
 	private static Map<String, SearchEngine> _searchEngines =
 		new ConcurrentHashMap<String, SearchEngine>();
 	private static SearchPermissionChecker _searchPermissionChecker;
+
+	private ServiceTracker<SearchEngineConfigurator, SearchEngineConfigurator>
+		_serviceTracker;
+
+	private class SearchEngineConfiguratorServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer
+			<SearchEngineConfigurator, SearchEngineConfigurator> {
+
+		@Override
+		public SearchEngineConfigurator addingService(
+			ServiceReference<SearchEngineConfigurator> serviceReference) {
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			SearchEngineConfigurator searchEngineConfigurator =
+				registry.getService(serviceReference);
+
+			searchEngineConfigurator.afterPropertiesSet();
+
+			return searchEngineConfigurator;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<SearchEngineConfigurator> serviceReference,
+			SearchEngineConfigurator searchEngineConfigurator) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<SearchEngineConfigurator> serviceReference,
+			SearchEngineConfigurator searchEngineConfigurator) {
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			registry.ungetService(serviceReference);
+
+			searchEngineConfigurator.destroy();
+		}
+
+	}
 
 }

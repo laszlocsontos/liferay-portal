@@ -24,6 +24,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>WIKI_NODE_TITLE</td>
+	<td>//h3[@class='header-title']/span</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ADD_WIKI_BUTTON</td>
 	<td>//button[@id='_154_addNodeButton']</td>
 	<td></td>
@@ -40,7 +45,7 @@
 </tr>
 <tr>
 	<td>SUCCESS_MESSAGE_RECYCLE_BIN</td>
-	<td>//form[@id='_154_undoForm']</td>
+	<td>//form[@id='_182_undoForm']</td>
 	<td></td>
 </tr>
 <tr>

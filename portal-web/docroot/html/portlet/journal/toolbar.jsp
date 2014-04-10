@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -83,7 +83,7 @@ String strutsAction = ParamUtil.getString(request, "struts_action");
 		</c:if>
 	</aui:nav>
 
-	<aui:nav-bar-search cssClass="pull-right" file="/html/portlet/journal/article_search.jsp" />
+	<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/journal/article_search.jsp" />
 </aui:nav-bar>
 
 <aui:script>
@@ -130,7 +130,7 @@ String strutsAction = ParamUtil.getString(request, "struts_action");
 				},
 				refererPortletName: '<%= PortletKeys.JOURNAL %>',
 				refererWebDAVToken: '<%= portlet.getWebDAVStorageToken() %>',
-				showGlobalScope: false,
+				showGlobalScope: true,
 				showManageTemplates: true,
 				title: '<%= UnicodeLanguageUtil.get(pageContext, "structures") %>'
 			}
@@ -148,6 +148,7 @@ String strutsAction = ParamUtil.getString(request, "struts_action");
 				groupId: <%= scopeGroupId %>,
 				refererPortletName: '<%= PortletKeys.JOURNAL %>',
 				refererWebDAVToken: '<%= portlet.getWebDAVStorageToken() %>',
+				showGlobalScope: true,
 				showHeader: false,
 				struts_action: '/dynamic_data_mapping/view_template',
 				title: '<%= UnicodeLanguageUtil.get(pageContext, "templates") %>'

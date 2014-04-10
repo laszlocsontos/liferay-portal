@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,12 @@
 
 package com.liferay.portal.dao.orm.common;
 
+import com.liferay.portal.kernel.cache.CacheManagerListener;
 import com.liferay.portal.kernel.cache.CacheRegistryItem;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.cache.PortalCacheManager;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -25,7 +27,6 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.util.PropsValues;
 
@@ -45,7 +46,8 @@ import org.apache.commons.collections.map.LRUMap;
  * @author Shuyang Zhou
  */
 @DoPrivileged
-public class FinderCacheImpl implements CacheRegistryItem, FinderCache {
+public class FinderCacheImpl
+	implements CacheManagerListener, CacheRegistryItem, FinderCache {
 
 	public static final String CACHE_NAME = FinderCache.class.getName();
 
@@ -78,6 +80,11 @@ public class FinderCacheImpl implements CacheRegistryItem, FinderCache {
 		if (_localCacheAvailable) {
 			_localCache.remove();
 		}
+	}
+
+	@Override
+	public void dispose() {
+		_portalCaches.clear();
 	}
 
 	@Override
@@ -133,8 +140,21 @@ public class FinderCacheImpl implements CacheRegistryItem, FinderCache {
 	}
 
 	@Override
+	public void init() {
+	}
+
+	@Override
 	public void invalidate() {
 		clearCache();
+	}
+
+	@Override
+	public void notifyCacheAdded(String name) {
+	}
+
+	@Override
+	public void notifyCacheRemoved(String name) {
+		_portalCaches.remove(name);
 	}
 
 	@Override
@@ -213,6 +233,11 @@ public class FinderCacheImpl implements CacheRegistryItem, FinderCache {
 
 	public void setMultiVMPool(MultiVMPool multiVMPool) {
 		_multiVMPool = multiVMPool;
+
+		PortalCacheManager<? extends Serializable, ? extends Serializable>
+			portalCacheManager = _multiVMPool.getCacheManager();
+
+		portalCacheManager.registerCacheManagerListener(this);
 	}
 
 	private PortalCache<Serializable, Serializable> _getPortalCache(
@@ -264,7 +289,7 @@ public class FinderCacheImpl implements CacheRegistryItem, FinderCache {
 				list.add(result);
 			}
 
-			list = new UnmodifiableList<Serializable>(list);
+			list = Collections.unmodifiableList(list);
 
 			return (Serializable)list;
 		}

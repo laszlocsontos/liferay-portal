@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -1161,9 +1161,11 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			if ((delimeter == CharPool.APOSTROPHE) &&
 				!value.contains(StringPool.QUOTE)) {
 
-				return StringUtil.replace(
+				line = StringUtil.replace(
 					line, StringPool.APOSTROPHE + value + StringPool.APOSTROPHE,
 					StringPool.QUOTE + value + StringPool.QUOTE);
+
+				return sortJSPAttributes(fileName, line, lineCount);
 			}
 
 			StringBundler sb = new StringBundler(5);
@@ -1187,6 +1189,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 					line = StringUtil.replaceLast(
 						line, currentAttributeAndValue,
 						previousAttributeAndValue);
+
+					return sortJSPAttributes(fileName, line, lineCount);
 				}
 
 				return line;
@@ -1280,8 +1284,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 	private static final String[] _TAG_LIBRARIES = new String[] {
 		"aui", "c", "html", "jsp", "liferay-portlet", "liferay-security",
-		"liferay-theme", "liferay-ui", "liferay-util", "portlet", "struts",
-		"tiles"
+		"liferay-staging", "liferay-theme", "liferay-ui", "liferay-util",
+		"portlet", "struts", "tiles"
 	};
 
 	private List<String> _duplicateImportClassNames = new ArrayList<String>();

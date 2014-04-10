@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,8 @@ if (article.getVersion() > JournalArticleConstants.VERSION_DEFAULT) {
 	}
 }
 
+DDMStructure ddmStructure = DDMStructureLocalServiceUtil.getStructure(themeDisplay.getSiteGroupId(), PortalUtil.getClassNameId(JournalArticle.class), article.getStructureId(), true);
+
 String articleImageURL = article.getArticleImageURL(themeDisplay);
 %>
 
@@ -45,6 +47,7 @@ String articleImageURL = article.getArticleImageURL(themeDisplay);
 	assetTagClassName="<%= JournalArticle.class.getName() %>"
 	assetTagClassPK="<%= article.getResourcePrimKey() %>"
 	author="<%= article.getUserName() %>"
+	classTypeName="<%= ddmStructure.getName(locale) %>"
 	createDate="<%= createDate %>"
 	description="<%= article.getDescription(locale) %>"
 	displayDate="<%= article.getDisplayDate() %>"

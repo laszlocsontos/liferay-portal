@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,7 @@ ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
 
 		<aui:input checked="<%= true %>" helpMessage="all-content-publish-help" id="allContent" label="all-content" name="<%= PortletDataHandlerKeys.PORTLET_DATA_ALL %>" type="radio" value="<%= true %>" />
 
-		<c:if test="<%= selGroup.isStagingGroup() && localPublishing %>">
+		<c:if test="<%= group.isStagingGroup() && localPublishing %>">
 			<div class="hide" id="<portlet:namespace />globalContent">
 				<aui:fieldset cssClass="portlet-data-section" label="all-content">
 					<aui:input label="delete-portlet-data-before-importing" name="<%= PortletDataHandlerKeys.DELETE_PORTLET_DATA %>" type="checkbox" />
@@ -192,9 +192,6 @@ ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
 
 			<li class="options">
 				<ul class="portlet-list">
-					<li class="tree-item">
-						<aui:input helpMessage="export-import-categories-help" label="categories" name="<%= PortletDataHandlerKeys.CATEGORIES %>" type="checkbox" value="<%= true %>" />
-					</li>
 
 					<%
 					Set<String> displayedControls = new HashSet<String>();

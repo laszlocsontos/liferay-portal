@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -124,7 +125,22 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 
 	@Override
 	public String getSearchSummary(Locale locale) {
-		return getSummary(locale);
+		return getSummary(null, null);
+	}
+
+	@Override
+	public String getSummary() {
+		return getSummary(null, null);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(PortletRequest,
+	 *             PortletResponse)}
+	 */
+	@Deprecated
+	@Override
+	public String getSummary(Locale locale) {
+		return getSummary(null, null);
 	}
 
 	@Override
@@ -238,6 +254,15 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 	}
 
 	@Override
+	public PortletURL getURLViewDiffs(
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse)
+		throws Exception {
+
+		return null;
+	}
+
+	@Override
 	public String getURLViewInContext(
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
@@ -341,6 +366,14 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		return themeDisplay.getPathThemeImages() + "/common/page.png";
 	}
 
+	protected Locale getLocale(PortletRequest portletRequest) {
+		if (portletRequest != null) {
+			return portletRequest.getLocale();
+		}
+
+		return LocaleUtil.getMostRelevantLocale();
+	}
+
 	protected String getURLViewInContext(
 		LiferayPortletRequest liferayPortletRequest, String noSuchEntryRedirect,
 		String path, String primaryKeyParameterName,
@@ -364,7 +397,7 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		sb.append(StringPool.EQUAL);
 		sb.append(primaryKeyParameterValue);
 
-		return sb.toString();
+		return PortalUtil.addPreservedParameters(themeDisplay, sb.toString());
 	}
 
 	private static final String[] _AVAILABLE_LANGUAGE_IDS = new String[0];

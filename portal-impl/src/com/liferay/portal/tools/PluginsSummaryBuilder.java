@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,14 +16,13 @@ package com.liferay.portal.tools;
 
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.NumericalStringComparator;
+import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.portal.kernel.util.OSDetector;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.InitUtil;
 
 import java.io.File;
 
@@ -42,7 +41,7 @@ import org.apache.tools.ant.DirectoryScanner;
 public class PluginsSummaryBuilder {
 
 	public static void main(String[] args) {
-		InitUtil.initWithSpring();
+		ToolDependencies.wireBasic();
 
 		File pluginsDir = new File(System.getProperty("plugins.dir"));
 
@@ -170,7 +169,7 @@ public class PluginsSummaryBuilder {
 		throws Exception {
 
 		Set<String> ticketIds = new TreeSet<String>(
-			new NumericalStringComparator()
+			new NaturalOrderStringComparator()
 		);
 
 		Runtime runtime = Runtime.getRuntime();

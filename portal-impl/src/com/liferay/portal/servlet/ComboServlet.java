@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,9 +33,9 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.minifier.MinifierUtil;
 import com.liferay.portal.servlet.filters.dynamiccss.DynamicCSSUtil;
 import com.liferay.portal.util.AggregateUtil;
-import com.liferay.portal.util.MinifierUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -109,7 +109,7 @@ public class ComboServlet extends HttpServlet {
 			modulePathsSet.add(name);
 		}
 
-		if (modulePathsSet.size() == 0) {
+		if (modulePathsSet.isEmpty()) {
 			response.sendError(
 				HttpServletResponse.SC_BAD_REQUEST,
 				"Modules paths set is empty");
@@ -299,7 +299,7 @@ public class ComboServlet extends HttpServlet {
 				}
 				else if (minifierType.equals("js")) {
 					stringFileContent = MinifierUtil.minifyJavaScript(
-						stringFileContent);
+						resourcePath, stringFileContent);
 				}
 			}
 
@@ -339,25 +339,21 @@ public class ComboServlet extends HttpServlet {
 		return url;
 	}
 
-	protected ServletContext getServletContext(String contextPath)
+	protected ServletContext getServletContext(String contextName)
 		throws ServletException {
 
-		if (Validator.isNull(contextPath)) {
+		if (Validator.isNull(contextName)) {
 			return getServletContext();
 		}
 
-		if (contextPath.startsWith(StringPool.SLASH)) {
-			contextPath = contextPath.substring(1);
-		}
-
-		ServletContext servletContext = ServletContextPool.get(contextPath);
+		ServletContext servletContext = ServletContextPool.get(contextName);
 
 		if (servletContext != null) {
 			return servletContext;
 		}
 
 		throw new ServletException(
-			"Servlet context " + contextPath + " does not exist");
+			"Servlet context " + contextName + " does not exist");
 	}
 
 	protected boolean validateModuleExtension(String moduleName)

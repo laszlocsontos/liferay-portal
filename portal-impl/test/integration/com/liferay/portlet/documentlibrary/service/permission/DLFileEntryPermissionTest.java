@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,8 +20,8 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.permission.BasePermissionTestCase;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
 
@@ -33,7 +33,7 @@ import org.junit.runner.RunWith;
  * @author Eric Chin
  * @author Shinn Lok
  */
-@ExecutionTestListeners(listeners = {EnvironmentExecutionTestListener.class})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class DLFileEntryPermissionTest extends BasePermissionTestCase {
 
@@ -60,14 +60,14 @@ public class DLFileEntryPermissionTest extends BasePermissionTestCase {
 	protected void doSetUp() throws Exception {
 		_fileEntry = DLAppTestUtil.addFileEntry(
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			true, ServiceTestUtil.randomString());
+			ServiceTestUtil.randomString());
 
 		Folder folder = DLAppTestUtil.addFolder(
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			ServiceTestUtil.randomString(), true);
 
 		_subfileEntry = DLAppTestUtil.addFileEntry(
-			group.getGroupId(), folder.getFolderId(), false,
+			group.getGroupId(), folder.getFolderId(),
 			ServiceTestUtil.randomString());
 	}
 

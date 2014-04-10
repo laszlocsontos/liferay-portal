@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -95,7 +95,9 @@ assetBrowserURL.setWindowState(LiferayWindowState.POP_UP);
 <liferay-ui:icon-menu cssClass="select-existing-selector" icon='<%= themeDisplay.getPathThemeImages() + "/common/search.png" %>' id='<%= randomNamespace + "inputAssetLinks" %>' message="select" showWhenSingleIcon="<%= true %>">
 
 	<%
-	for (AssetRendererFactory assetRendererFactory : AssetRendererFactoryRegistryUtil.getAssetRendererFactories(company.getCompanyId())) {
+	List <AssetRendererFactory> assetRendererFactories = ListUtil.sort(AssetRendererFactoryRegistryUtil.getAssetRendererFactories(company.getCompanyId()), new AssetRendererFactoryTypeNameComparator(locale));
+
+	for (AssetRendererFactory assetRendererFactory : assetRendererFactories) {
 		if (assetRendererFactory.isLinkable() && assetRendererFactory.isSelectable()) {
 			if (assetEntryId > 0) {
 				assetBrowserURL.setParameter("refererAssetEntryId", String.valueOf(assetEntryId));
@@ -112,29 +114,57 @@ assetBrowserURL.setWindowState(LiferayWindowState.POP_UP);
 			}
 
 			assetBrowserURL.setParameter("groupId", String.valueOf(groupId));
-			assetBrowserURL.setParameter("selectedGroupIds", themeDisplay.getCompanyGroupId() + "," + groupId);
+			assetBrowserURL.setParameter("selectedGroupIds", StringUtil.merge(PortalUtil.getSharedContentSiteGroupIds(company.getCompanyId(), groupId, user.getUserId())));
 			assetBrowserURL.setParameter("typeSelection", assetRendererFactory.getClassName());
 
 			Map<String, Object> data = new HashMap<String, Object>();
 
-			data.put("href", assetBrowserURL.toString());
-			data.put("title", LanguageUtil.format(pageContext, "select-x", assetRendererFactory.getTypeName(locale, false), false));
+			if (!assetRendererFactory.isSupportsClassTypes()) {
+				data.put("href", assetBrowserURL.toString());
 
-			String type = assetRendererFactory.getTypeName(locale, false);
+				String type = assetRendererFactory.getTypeName(locale);
 
-			data.put("type", assetRendererFactory.getClassName());
-		%>
+				data.put("title", LanguageUtil.format(pageContext, "select-x", type, false));
+				data.put("type", type);
+	%>
 
-			<liferay-ui:icon
-				cssClass="asset-selector"
-				data="<%= data %>"
-				id="<%= FriendlyURLNormalizerUtil.normalize(type) %>"
-				message="<%= assetRendererFactory.getTypeName(locale, false) %>"
-				src="<%= assetRendererFactory.getIconPath(portletRequest) %>"
-				url="javascript:;"
-			/>
+				<liferay-ui:icon
+					cssClass="asset-selector"
+					data="<%= data %>"
+					id="<%= FriendlyURLNormalizerUtil.normalize(type) %>"
+					message="<%= type %>"
+					src="<%= assetRendererFactory.getIconPath(portletRequest) %>"
+					url="javascript:;"
+				/>
 
-		<%
+	<%
+			}
+			else {
+				Map<Long, String> assetAvailableClassTypes = assetRendererFactory.getClassTypes(PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId), locale);
+
+				for (Map.Entry<Long, String> assetAvailableClassType : assetAvailableClassTypes.entrySet()) {
+					assetBrowserURL.setParameter("subtypeSelectionId", String.valueOf(assetAvailableClassType.getKey()));
+
+					data.put("href", assetBrowserURL.toString());
+
+					String type = assetAvailableClassType.getValue();
+
+					data.put("title", LanguageUtil.format(pageContext, "select-x", type, false));
+					data.put("type", type);
+	%>
+
+					<liferay-ui:icon
+						cssClass="asset-selector"
+						data="<%= data %>"
+						id="<%= groupId + FriendlyURLNormalizerUtil.normalize(type) %>"
+						message="<%= type %>"
+						src="<%= assetRendererFactory.getIconPath(portletRequest) %>"
+						url="javascript:;"
+					/>
+
+	<%
+				}
+			}
 		}
 	}
 	%>
@@ -186,7 +216,7 @@ assetBrowserURL.setWindowState(LiferayWindowState.POP_UP);
 
 		<liferay-ui:search-container-column-text
 			name="type"
-			value="<%= assetRendererFactory.getTypeName(locale, false) %>"
+			value="<%= assetRendererFactory.getTypeName(locale) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
