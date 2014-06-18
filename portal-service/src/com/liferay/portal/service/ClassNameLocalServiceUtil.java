@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,11 +46,9 @@ public class ClassNameLocalServiceUtil {
 	*
 	* @param className the class name
 	* @return the class name that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.ClassName addClassName(
-		com.liferay.portal.model.ClassName className)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.ClassName className) {
 		return getService().addClassName(className);
 	}
 
@@ -71,12 +69,10 @@ public class ClassNameLocalServiceUtil {
 	* @param classNameId the primary key of the class name
 	* @return the class name that was removed
 	* @throws PortalException if a class name with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.ClassName deleteClassName(
 		long classNameId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteClassName(classNameId);
 	}
 
@@ -85,11 +81,9 @@ public class ClassNameLocalServiceUtil {
 	*
 	* @param className the class name
 	* @return the class name that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.ClassName deleteClassName(
-		com.liferay.portal.model.ClassName className)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.ClassName className) {
 		return getService().deleteClassName(className);
 	}
 
@@ -102,12 +96,10 @@ public class ClassNameLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -122,12 +114,11 @@ public class ClassNameLocalServiceUtil {
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,14 +134,12 @@ public class ClassNameLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -160,11 +149,9 @@ public class ClassNameLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -174,18 +161,15 @@ public class ClassNameLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
 	public static com.liferay.portal.model.ClassName fetchClassName(
-		long classNameId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long classNameId) {
 		return getService().fetchClassName(classNameId);
 	}
 
@@ -195,19 +179,29 @@ public class ClassNameLocalServiceUtil {
 	* @param classNameId the primary key of the class name
 	* @return the class name
 	* @throws PortalException if a class name with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.ClassName getClassName(
 		long classNameId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getClassName(classNameId);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
@@ -221,11 +215,9 @@ public class ClassNameLocalServiceUtil {
 	* @param start the lower bound of the range of class names
 	* @param end the upper bound of the range of class names (not inclusive)
 	* @return the range of class names
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.ClassName> getClassNames(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return getService().getClassNames(start, end);
 	}
 
@@ -233,10 +225,8 @@ public class ClassNameLocalServiceUtil {
 	* Returns the number of class names.
 	*
 	* @return the number of class names
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getClassNamesCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getClassNamesCount() {
 		return getService().getClassNamesCount();
 	}
 
@@ -245,11 +235,9 @@ public class ClassNameLocalServiceUtil {
 	*
 	* @param className the class name
 	* @return the class name that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.ClassName updateClassName(
-		com.liferay.portal.model.ClassName className)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.ClassName className) {
 		return getService().updateClassName(className);
 	}
 
@@ -272,19 +260,16 @@ public class ClassNameLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.model.ClassName addClassName(
-		java.lang.String value)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String value) {
 		return getService().addClassName(value);
 	}
 
-	public static void checkClassNames()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void checkClassNames() {
 		getService().checkClassNames();
 	}
 
 	public static com.liferay.portal.model.ClassName fetchClassName(
-		java.lang.String value)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String value) {
 		return getService().fetchClassName(value);
 	}
 
@@ -297,8 +282,7 @@ public class ClassNameLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.model.ClassName getClassName(
-		java.lang.String value)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String value) {
 		return getService().getClassName(value);
 	}
 

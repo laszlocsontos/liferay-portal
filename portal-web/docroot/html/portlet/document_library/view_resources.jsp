@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@
 
 <%
 String navigation = ParamUtil.getString(request, "navigation", "home");
+String browseBy = ParamUtil.getString(request, "browseBy");
 
 Folder folder = (Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
 
@@ -38,7 +39,6 @@ if (folder != null) {
 	repositoryId = folder.getRepositoryId();
 }
 
-String browseBy = ParamUtil.getString(request, "browseBy");
 boolean viewEntries = ParamUtil.getBoolean(request, "viewEntries");
 boolean viewEntriesPage = ParamUtil.getBoolean(request, "viewEntriesPage");
 boolean viewFolders = ParamUtil.getBoolean(request, "viewFolders");
@@ -87,6 +87,10 @@ request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 		<div id="<portlet:namespace />entries">
 			<liferay-util:include page="/html/portlet/document_library/view_entries.jsp" />
 		</div>
+
+		<span id="<portlet:namespace />addButton">
+			<liferay-util:include page="/html/portlet/document_library/add_button.jsp" />
+		</span>
 
 		<span id="<portlet:namespace />sortButton">
 			<liferay-util:include page="/html/portlet/document_library/sort_button.jsp" />

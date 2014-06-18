@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,21 +40,27 @@ public interface AssetEntry extends AssetEntryModel, PersistedModel {
 			public Long get(AssetEntry assetEntry) {
 				return assetEntry.getEntryId();
 			}
+
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
+
+			@Override
+			public Class<AssetEntry> getTypeClass() {
+				return AssetEntry.class;
+			}
 		};
 
 	public com.liferay.portlet.asset.model.AssetRenderer getAssetRenderer();
 
 	public com.liferay.portlet.asset.model.AssetRendererFactory getAssetRendererFactory();
 
-	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories()
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public java.util.List<com.liferay.portlet.asset.model.AssetCategory> getCategories();
 
-	public long[] getCategoryIds()
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public long[] getCategoryIds();
 
-	public java.lang.String[] getTagNames()
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public java.lang.String[] getTagNames();
 
-	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags()
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags();
 }

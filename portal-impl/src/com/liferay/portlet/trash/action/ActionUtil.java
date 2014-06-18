@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portlet.trash.DuplicateEntryException;
+import com.liferay.portlet.trash.RestoreEntryException;
 import com.liferay.portlet.trash.TrashEntryConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.service.TrashEntryLocalServiceUtil;
@@ -47,16 +47,16 @@ public class ActionUtil {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		try {
-			trashHandler.checkDuplicateTrashEntry(
+			trashHandler.checkRestorableEntry(
 				entry, TrashEntryConstants.DEFAULT_CONTAINER_ID, newName);
 
 			jsonObject.put("success", true);
 		}
-		catch (DuplicateEntryException dee) {
-			jsonObject.put("duplicateEntryId", dee.getDuplicateEntryId());
-			jsonObject.put("oldName", dee.getOldName());
+		catch (RestoreEntryException ree) {
+			jsonObject.put("duplicateEntryId", ree.getDuplicateEntryId());
+			jsonObject.put("oldName", ree.getOldName());
 			jsonObject.put("success", false);
-			jsonObject.put("trashEntryId", dee.getTrashEntryId());
+			jsonObject.put("trashEntryId", ree.getTrashEntryId());
 		}
 
 		return jsonObject;

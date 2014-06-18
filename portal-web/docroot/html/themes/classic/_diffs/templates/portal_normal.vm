@@ -14,7 +14,7 @@
 
 <body class="$css_class">
 
-<a href="#main-content" id="skip-to-content">#language ("skip-to-content")</a>
+#quick_access("#main-content")
 
 $theme.include($body_top_include)
 
@@ -46,8 +46,6 @@ $theme.include($body_top_include)
 		<h1 class="hide-accessible">$the_title</h1>
 
 		<nav id="breadcrumbs">
-			<h1 class="hide-accessible">#language ("breadcrumbs")</h1>
-
 			#breadcrumbs()
 		</nav>
 

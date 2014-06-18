@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -126,9 +126,8 @@ public class MediaWikiImporter implements WikiImporter {
 	}
 
 	protected long getUserId(
-			long userId, WikiNode node, String author,
-			Map<String, String> usersMap)
-		throws SystemException {
+		long userId, WikiNode node, String author,
+		Map<String, String> usersMap) {
 
 		User user = null;
 
@@ -557,7 +556,7 @@ public class MediaWikiImporter implements WikiImporter {
 
 	protected String[] readAssetTagNames(
 			long userId, WikiNode node, String content)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Matcher matcher = _categoriesPattern.matcher(content);
 

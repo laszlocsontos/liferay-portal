@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -73,12 +75,10 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 *
 	 * @param systemEvent the system event
 	 * @return the system event that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public SystemEvent addSystemEvent(SystemEvent systemEvent)
-		throws SystemException {
+	public SystemEvent addSystemEvent(SystemEvent systemEvent) {
 		systemEvent.setNew(true);
 
 		return systemEventPersistence.update(systemEvent);
@@ -101,12 +101,11 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 * @param systemEventId the primary key of the system event
 	 * @return the system event that was removed
 	 * @throws PortalException if a system event with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SystemEvent deleteSystemEvent(long systemEventId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return systemEventPersistence.remove(systemEventId);
 	}
 
@@ -115,12 +114,10 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 *
 	 * @param systemEvent the system event
 	 * @return the system event that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public SystemEvent deleteSystemEvent(SystemEvent systemEvent)
-		throws SystemException {
+	public SystemEvent deleteSystemEvent(SystemEvent systemEvent) {
 		return systemEventPersistence.remove(systemEvent);
 	}
 
@@ -137,12 +134,10 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return systemEventPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -157,12 +152,10 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return systemEventPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end);
 	}
@@ -179,12 +172,11 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return systemEventPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -194,11 +186,9 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return systemEventPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -208,18 +198,16 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return systemEventPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public SystemEvent fetchSystemEvent(long systemEventId)
-		throws SystemException {
+	public SystemEvent fetchSystemEvent(long systemEventId) {
 		return systemEventPersistence.fetchByPrimaryKey(systemEventId);
 	}
 
@@ -229,17 +217,47 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 * @param systemEventId the primary key of the system event
 	 * @return the system event
 	 * @throws PortalException if a system event with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public SystemEvent getSystemEvent(long systemEventId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return systemEventPersistence.findByPrimaryKey(systemEventId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.SystemEventLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SystemEvent.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("systemEventId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.SystemEventLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SystemEvent.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("systemEventId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteSystemEvent((SystemEvent)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return systemEventPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -253,11 +271,9 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 * @param start the lower bound of the range of system events
 	 * @param end the upper bound of the range of system events (not inclusive)
 	 * @return the range of system events
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<SystemEvent> getSystemEvents(int start, int end)
-		throws SystemException {
+	public List<SystemEvent> getSystemEvents(int start, int end) {
 		return systemEventPersistence.findAll(start, end);
 	}
 
@@ -265,10 +281,9 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 * Returns the number of system events.
 	 *
 	 * @return the number of system events
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSystemEventsCount() throws SystemException {
+	public int getSystemEventsCount() {
 		return systemEventPersistence.countAll();
 	}
 
@@ -277,12 +292,10 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 *
 	 * @param systemEvent the system event
 	 * @return the system event that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public SystemEvent updateSystemEvent(SystemEvent systemEvent)
-		throws SystemException {
+	public SystemEvent updateSystemEvent(SystemEvent systemEvent) {
 		return systemEventPersistence.update(systemEvent);
 	}
 
@@ -590,7 +603,7 @@ public abstract class SystemEventLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = systemEventPersistence.getDataSource();
 

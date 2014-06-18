@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,15 +14,18 @@
 
 package com.liferay.portlet;
 
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
-import com.liferay.portal.kernel.util.ResourceBundleThreadLocal;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.language.LanguageResources;
+import com.liferay.portal.language.ResourceBundleEnumeration;
 
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -33,11 +36,34 @@ public class StrutsResourceBundle extends ResourceBundle {
 	public StrutsResourceBundle(String portletName, Locale locale) {
 		_portletName = portletName;
 		_locale = locale;
+
+		setParent(LanguageResources.getResourceBundle(locale));
+	}
+
+	@Override
+	public boolean containsKey(String key) {
+		if (key == null) {
+			throw new NullPointerException();
+		}
+
+		if (_keys.contains(key)) {
+			key = _buildKey(key);
+		}
+
+		return parent.containsKey(key);
 	}
 
 	@Override
 	public Enumeration<String> getKeys() {
-		return null;
+		Set<String> keys = new HashSet<String>();
+
+		for (String key : _keys) {
+			if (parent.containsKey(_buildKey(key))) {
+				keys.add(key);
+			}
+		}
+
+		return new ResourceBundleEnumeration(keys, parent.getKeys());
 	}
 
 	@Override
@@ -51,23 +77,34 @@ public class StrutsResourceBundle extends ResourceBundle {
 			throw new NullPointerException();
 		}
 
-		if (key.equals(JavaConstants.JAVAX_PORTLET_DESCRIPTION) ||
-			key.equals(JavaConstants.JAVAX_PORTLET_KEYWORDS) ||
-			key.equals(JavaConstants.JAVAX_PORTLET_LONG_TITLE) ||
-			key.equals(JavaConstants.JAVAX_PORTLET_SHORT_TITLE) ||
-			key.equals(JavaConstants.JAVAX_PORTLET_TITLE)) {
-
-			key = key.concat(StringPool.PERIOD).concat(_portletName);
+		if (_keys.contains(key)) {
+			key = _buildKey(key);
 		}
 
-		String value = LanguageUtil.get(_locale, key);
-
-		if ((value == null) && ResourceBundleThreadLocal.isReplace()) {
-			value = ResourceBundleUtil.NULL_VALUE;
+		if (parent.containsKey(key)) {
+			try {
+				return parent.getObject(key);
+			}
+			catch (MissingResourceException mre) {
+				return null;
+			}
 		}
 
-		return value;
+		return null;
 	}
+
+	private String _buildKey(String key) {
+		return key.concat(StringPool.PERIOD).concat(_portletName);
+	}
+
+	private static Set<String> _keys = SetUtil.fromArray(
+		new String[] {
+			JavaConstants.JAVAX_PORTLET_DESCRIPTION,
+			JavaConstants.JAVAX_PORTLET_KEYWORDS,
+			JavaConstants.JAVAX_PORTLET_LONG_TITLE,
+			JavaConstants.JAVAX_PORTLET_SHORT_TITLE,
+			JavaConstants.JAVAX_PORTLET_TITLE
+		});
 
 	private Locale _locale;
 	private String _portletName;

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,14 +45,14 @@ List<SocialRequest> requests = (List<SocialRequest>)request.getAttribute(WebKeys
 			<aui:row>
 				<aui:col width="<%= 50 %>">
 					<liferay-ui:user-display
-						displayStyle="<%= 2 %>"
+						displayStyle="2"
 						userId="<%= socialRequest.getUserId() %>"
 					/>
 				</aui:col>
 				<aui:col width="<%= 50 %>">
 					<c:choose>
 						<c:when test="<%= requestFeedEntry == null %>">
-							<div class="alert alert-error">
+							<div class="alert alert-danger">
 								<liferay-ui:message key="request-cannot-be-interpreted-because-it-does-not-have-an-associated-interpreter" />
 							</div>
 						</c:when>
@@ -83,7 +83,7 @@ List<SocialRequest> requests = (List<SocialRequest>)request.getAttribute(WebKeys
 								%>
 
 								<liferay-ui:icon
-									image="activate"
+									iconCssClass="icon-ok-sign"
 									message="confirm"
 									url="<%= portletURL.toString() %>"
 								/>
@@ -93,7 +93,7 @@ List<SocialRequest> requests = (List<SocialRequest>)request.getAttribute(WebKeys
 								%>
 
 								<liferay-ui:icon
-									image="deactivate"
+									iconCssClass="icon-remove-sign"
 									message="ignore"
 									url="<%= portletURL.toString() %>"
 								/>

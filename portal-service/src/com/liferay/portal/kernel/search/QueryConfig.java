@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.search;
 
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -74,16 +75,14 @@ public class QueryConfig implements Serializable {
 
 	public int getQueryIndexingThreshold() {
 		return GetterUtil.getInteger(
-			_attributes.get(
-				PropsKeys.INDEX_SEARCH_QUERY_INDEXING_THRESHOLD),
-				_INDEX_SEARCH_QUERY_INDEXING_THRESHOLD);
+			_attributes.get(PropsKeys.INDEX_SEARCH_QUERY_INDEXING_THRESHOLD),
+			_INDEX_SEARCH_QUERY_INDEXING_THRESHOLD);
 	}
 
 	public int getQuerySuggestionMax() {
 		return GetterUtil.getInteger(
-			_attributes.get(
-				PropsKeys.INDEX_SEARCH_QUERY_SUGGESTION_MAX),
-				_INDEX_SEARCH_QUERY_SUGGESTION_MAX);
+			_attributes.get(PropsKeys.INDEX_SEARCH_QUERY_SUGGESTION_MAX),
+			_INDEX_SEARCH_QUERY_SUGGESTION_MAX);
 	}
 
 	public int getQuerySuggestionScoresThreshold() {
@@ -95,6 +94,22 @@ public class QueryConfig implements Serializable {
 
 	public String[] getSelectedFieldNames() {
 		return (String[])_attributes.get(_SELECTED_FIELD_NAMES);
+	}
+
+	public boolean isAllFieldsSelected() {
+		String[] selectedFieldNames = getSelectedFieldNames();
+
+		if (ArrayUtil.isEmpty(selectedFieldNames)) {
+			return true;
+		}
+
+		if ((selectedFieldNames.length == 1) &&
+			selectedFieldNames[0].equals(Field.ANY)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isCollatedSpellCheckResultEnabled() {
@@ -117,9 +132,8 @@ public class QueryConfig implements Serializable {
 
 	public boolean isQueryIndexingEnabled() {
 		return GetterUtil.getBoolean(
-			_attributes.get(
-				PropsKeys.INDEX_SEARCH_QUERY_INDEXING_ENABLED),
-				_INDEX_SEARCH_QUERY_INDEXING_ENABLED);
+			_attributes.get(PropsKeys.INDEX_SEARCH_QUERY_INDEXING_ENABLED),
+			_INDEX_SEARCH_QUERY_INDEXING_ENABLED);
 	}
 
 	public boolean isQuerySuggestionEnabled() {
@@ -211,9 +225,10 @@ public class QueryConfig implements Serializable {
 
 	public void setQuerySuggestionScoresThreshold(
 		int querySuggestionScoresThreshold) {
-			_attributes.put(
-				PropsKeys.INDEX_SEARCH_QUERY_SUGGESTION_SCORES_THRESHOLD,
-				querySuggestionScoresThreshold);
+
+		_attributes.put(
+			PropsKeys.INDEX_SEARCH_QUERY_SUGGESTION_SCORES_THRESHOLD,
+			querySuggestionScoresThreshold);
 	}
 
 	public void setQuerySuggestionsMax(int querySuggestionMax) {
@@ -269,9 +284,7 @@ public class QueryConfig implements Serializable {
 
 	private static final int _INDEX_SEARCH_QUERY_INDEXING_THRESHOLD =
 		GetterUtil.getInteger(
-			PropsUtil.get(
-				PropsKeys.INDEX_SEARCH_QUERY_INDEXING_THRESHOLD),
-			50);
+			PropsUtil.get(PropsKeys.INDEX_SEARCH_QUERY_INDEXING_THRESHOLD), 50);
 
 	private static final boolean _INDEX_SEARCH_QUERY_SUGGESTION_ENABLED =
 		GetterUtil.getBoolean(
@@ -285,7 +298,8 @@ public class QueryConfig implements Serializable {
 	private static final int
 		_INDEX_SEARCH_QUERY_SUGGESTION_SCORES_THRESHOLD = GetterUtil.getInteger(
 			PropsUtil.get(
-				PropsKeys.INDEX_SEARCH_QUERY_SUGGESTION_SCORES_THRESHOLD), 50);
+				PropsKeys.INDEX_SEARCH_QUERY_SUGGESTION_SCORES_THRESHOLD),
+			50);
 
 	private static final boolean _INDEX_SEARCH_SCORING_ENABLED =
 		GetterUtil.getBoolean(

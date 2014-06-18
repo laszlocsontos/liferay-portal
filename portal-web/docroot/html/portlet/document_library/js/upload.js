@@ -87,12 +87,6 @@ AUI.add(
 
 		var STR_NAVIGATION_OVERLAY_BACKGROUND = '#FFF';
 
-		var STR_SIZE_SUFFIX_KB = 'k';
-
-		var STR_SIZE_SUFFIX_MB = 'MB';
-
-		var STR_SIZE_SUFFIX_GB = 'GB';
-
 		var STR_SPACE = ' ';
 
 		var STR_THUMBNAIL_EXTENSION = '.png';
@@ -121,7 +115,7 @@ AUI.add(
 		var TPL_ERROR_FOLDER = new A.Template(
 			'<span class="lfr-status-success-label">{validFilesLength}</span>',
 			'<span class="lfr-status-error-label">{invalidFilesLength}</span>',
-			'<ul class="unstyled">',
+			'<ul class="list-unstyled">',
 				'<tpl for="invalidFiles">',
 					'<li><b>{name}</b>: {errorMessage}</li>',
 				'</tpl>',
@@ -130,7 +124,7 @@ AUI.add(
 
 		var TPL_IMAGE_THUMBNAIL = themeDisplay.getPathContext() + '/documents/' + themeDisplay.getScopeGroupId() + '/{0}/{1}';
 
-		DocumentLibraryUpload = function() {
+		var DocumentLibraryUpload = function() {
 		};
 
 		DocumentLibraryUpload.NAME = 'documentlibraryupload';
@@ -177,7 +171,7 @@ AUI.add(
 
 				AArray.each(
 					files,
-					function(item, index, collection) {
+					function(item, index) {
 						queue.addToQueueBottom(item);
 					}
 				);
@@ -260,7 +254,7 @@ AUI.add(
 
 								event.fileList = AArray.map(
 									dragDropFiles,
-									function(item, index, collection) {
+									function(item, index) {
 										return new A.FileHTML5(item);
 									}
 								);
@@ -329,7 +323,7 @@ AUI.add(
 
 				AArray.each(
 					queuedFiles,
-					function(item, index, collection) {
+					function(item, index) {
 						fileList.push(item);
 					}
 				);
@@ -394,22 +388,20 @@ AUI.add(
 			_createEntryRow: function(name, size) {
 				var instance = this;
 
-				var storageSize = instance._formatStorageSize(size);
-
 				var searchContainerNode = instance._entriesContainer.one(SELECTOR_SEARCH_CONTAINER);
 
 				var searchContainer = Liferay.SearchContainer.get(searchContainerNode.attr('id'));
 
 				var columnValues = AArray.map(
 					instance._columnNames,
-					function(item, index, collection) {
+					function(item, index) {
 						var value = '';
 
 						if (item == 'name') {
 							value = sub(TPL_ENTRY_ROW_TITLE, [name]);
 						}
 						else if (item == 'size') {
-							value = storageSize;
+							value = instance.formatStorage(size);
 						}
 						else if (item == 'downloads') {
 							value = '0';
@@ -496,7 +488,7 @@ AUI.add(
 				if (!currentUploadData.folder) {
 					AArray.each(
 						fileList,
-						function(item, index, collection) {
+						function(item, index) {
 							item.overlay.destroy();
 
 							item.progressBar.destroy();
@@ -597,34 +589,6 @@ AUI.add(
 
 					resultsNode.addClass(uploadResultClass);
 				}
-			},
-
-			_formatStorageSize: function(size) {
-				var instance = this;
-
-				var suffix = STR_SIZE_SUFFIX_KB;
-
-				size /= SIZE_DENOMINATOR;
-
-				if (size > SIZE_DENOMINATOR) {
-					suffix = STR_SIZE_SUFFIX_MB;
-
-					size /= SIZE_DENOMINATOR;
-				}
-
-				if (size > SIZE_DENOMINATOR) {
-					suffix = STR_SIZE_SUFFIX_GB;
-
-					size /= SIZE_DENOMINATOR;
-				}
-
-				var precision = 1;
-
-				if (suffix == STR_SIZE_SUFFIX_KB) {
-					precision = 0;
-				}
-
-				return LString.round(size, precision) + suffix;
 			},
 
 			_getCurrentUploadData: function() {
@@ -805,6 +769,43 @@ AUI.add(
 				};
 			},
 
+			_getUploadStatus: function(key) {
+				var instance = this;
+
+				var dataSet = instance._getDataSet();
+
+				return dataSet.item(String(key));
+			},
+
+			_getUploadURL: function(folderId) {
+				var instance = this;
+
+				var uploadURL = instance._uploadURL;
+
+				if (!uploadURL) {
+					var config = instance._config;
+
+					var redirect = config.redirect;
+
+					uploadURL = unescape(config.uploadURL);
+
+					instance._uploadURL = Liferay.Util.addParams(
+						{
+							redirect: redirect,
+							ts: Lang.now()
+						},
+						uploadURL
+					);
+				}
+
+				return sub(
+					uploadURL,
+					{
+						folderId: folderId
+					}
+				);
+			},
+
 			_getUploader: function() {
 				var instance = this;
 
@@ -853,35 +854,6 @@ AUI.add(
 				}
 
 				return uploader;
-			},
-
-			_getUploadURL: function(folderId) {
-				var instance = this;
-
-				var uploadURL = instance._uploadURL;
-
-				if (!uploadURL) {
-					var config = instance._config;
-
-					var redirect = config.redirect;
-
-					uploadURL = unescape(config.uploadURL);
-
-					instance._uploadURL = Liferay.Util.addParams(
-						{
-							redirect: redirect,
-							ts: Lang.now()
-						},
-						uploadURL
-					);
-				}
-
-				return sub(
-					uploadURL,
-					{
-						folderId: folderId
-					}
-				);
 			},
 
 			_initDLUpload: function() {
@@ -941,14 +913,6 @@ AUI.add(
 				}
 			},
 
-			_getUploadStatus: function(key) {
-				var instance = this;
-
-				var dataSet = instance._getDataSet();
-
-				return dataSet.item(String(key));
-			},
-
 			_onFileSelect: function(event) {
 				var instance = this;
 
@@ -996,10 +960,10 @@ AUI.add(
 						key,
 						{
 							fileList: validFiles,
-							target: folderNode,
 							folder: (key != instance._folderId),
 							folderId: key,
-							invalidFiles: filesPartition.rejects
+							invalidFiles: filesPartition.rejects,
+							target: folderNode
 						}
 					);
 				}
@@ -1178,16 +1142,6 @@ AUI.add(
 				progressBar.set('value', Math.ceil(value));
 			},
 
-			_updateThumbnail: function(node, fileName) {
-				var instance = this;
-
-				var imageNode = node.one('img');
-
-				var thumbnailPath = instance._getMediaThumbnail(fileName);
-
-				imageNode.attr('src', thumbnailPath);
-			},
-
 			_updateStatusUI: function(target, filesPartition) {
 				var instance = this;
 
@@ -1234,23 +1188,31 @@ AUI.add(
 				}
 			},
 
+			_updateThumbnail: function(node, fileName) {
+				var instance = this;
+
+				var imageNode = node.one('img');
+
+				var thumbnailPath = instance._getMediaThumbnail(fileName);
+
+				imageNode.attr('src', thumbnailPath);
+			},
+
 			_validateFiles: function(data) {
 				var instance = this;
 
 				var maxFileSize = instance._maxFileSize;
 
-				var invalidSizeText = sub(instance._invalidFileSizeText, [maxFileSize / 1024]);
-
 				return AArray.partition(
 					data,
-					function(item, index, collection) {
+					function(item, index) {
 						var errorMessage;
 
 						var size = item.get('size') || 0;
 						var type = item.get('type') || '';
 
 						if ((maxFileSize !== 0) && (size > maxFileSize)) {
-							errorMessage = invalidSizeText;
+							errorMessage = sub(instance._invalidFileSizeText, [instance.formatStorage(instance._maxFileSize)]);
 						}
 						else if (!type) {
 							errorMessage = instance._invalidFileType;
@@ -1274,6 +1236,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-data-set-deprecated', 'aui-overlay-manager-deprecated', 'aui-overlay-mask-deprecated', 'aui-progressbar', 'aui-template-deprecated', 'aui-tooltip', 'liferay-app-view-folders', 'liferay-app-view-move', 'liferay-app-view-paginator', 'liferay-app-view-select', 'liferay-search-container', 'uploader']
+		requires: ['aui-data-set-deprecated', 'aui-overlay-manager-deprecated', 'aui-overlay-mask-deprecated', 'aui-progressbar', 'aui-template-deprecated', 'aui-tooltip', 'liferay-app-view-folders', 'liferay-app-view-move', 'liferay-app-view-paginator', 'liferay-app-view-select', 'liferay-search-container', 'liferay-storage-formatter', 'uploader']
 	}
 );

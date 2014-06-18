@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,8 +27,7 @@ public class PortalPreferencesWrapperCacheUtil {
 		PortalPreferencesWrapperCacheUtil.class.getName();
 
 	public static PortalPreferencesWrapper get(long ownerId, int ownerType) {
-		String cacheKey = StringUtil.toHexString(ownerId).concat(
-			StringUtil.toHexString(ownerType));
+		String cacheKey = _getCacheKey(ownerId, ownerType);
 
 		return _portalPreferencesWrapperPortalCache.get(cacheKey);
 	}
@@ -37,18 +36,24 @@ public class PortalPreferencesWrapperCacheUtil {
 		long ownerId, int ownerType,
 		PortalPreferencesWrapper portalPreferencesWrapper) {
 
-		String cacheKey = StringUtil.toHexString(ownerId).concat(
-			StringUtil.toHexString(ownerType));
+		String cacheKey = _getCacheKey(ownerId, ownerType);
 
 		_portalPreferencesWrapperPortalCache.putQuiet(
 			cacheKey, portalPreferencesWrapper);
 	}
 
 	public static void remove(long ownerId, int ownerType) {
-		String cacheKey = StringUtil.toHexString(ownerId).concat(
-			StringUtil.toHexString(ownerType));
+		String cacheKey = _getCacheKey(ownerId, ownerType);
 
 		_portalPreferencesWrapperPortalCache.remove(cacheKey);
+	}
+
+	private static String _getCacheKey(long ownerId, int ownerType) {
+		String cacheKey = StringUtil.toHexString(ownerId);
+
+		cacheKey = cacheKey.concat(StringUtil.toHexString(ownerType));
+
+		return cacheKey;
 	}
 
 	private static PortalCache<String, PortalPreferencesWrapper>

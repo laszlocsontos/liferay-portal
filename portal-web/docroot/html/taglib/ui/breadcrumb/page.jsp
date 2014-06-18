@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,10 @@
 
 <%@ include file="/html/taglib/ui/breadcrumb/init.jsp" %>
 
-<c:if test="<%= Validator.isNotNull(breadcrumbString) %>">
-	<ul aria-label="<%= LanguageUtil.get(pageContext, "breadcrumb") %>" class="breadcrumb">
-		<%= breadcrumbString %>
-	</ul>
-</c:if>
+<div id="<portlet:namespace />breadcrumbs-defaultScreen">
+	<h1 class="hide-accessible"><liferay-ui:message key="breadcrumbs" /></h1>
+
+	<c:if test="<%= Validator.isNotNull(breadcrumbString) %>">
+		<liferay-util:include page='<%= "/html/taglib/ui/breadcrumb/display_style_" + displayStyle + ".jsp" %>' />
+	</c:if>
+</div>

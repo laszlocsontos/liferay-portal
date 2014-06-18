@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,7 @@ public class JournalFolderSoap implements Serializable {
 		soapModel.setTreePath(model.getTreePath());
 		soapModel.setName(model.getName());
 		soapModel.setDescription(model.getDescription());
+		soapModel.setRestrictionType(model.getRestrictionType());
 		soapModel.setStatus(model.getStatus());
 		soapModel.setStatusByUserId(model.getStatusByUserId());
 		soapModel.setStatusByUserName(model.getStatusByUserName());
@@ -195,6 +196,14 @@ public class JournalFolderSoap implements Serializable {
 		_description = description;
 	}
 
+	public int getRestrictionType() {
+		return _restrictionType;
+	}
+
+	public void setRestrictionType(int restrictionType) {
+		_restrictionType = restrictionType;
+	}
+
 	public int getStatus() {
 		return _status;
 	}
@@ -239,6 +248,7 @@ public class JournalFolderSoap implements Serializable {
 	private String _treePath;
 	private String _name;
 	private String _description;
+	private int _restrictionType;
 	private int _status;
 	private long _statusByUserId;
 	private String _statusByUserName;

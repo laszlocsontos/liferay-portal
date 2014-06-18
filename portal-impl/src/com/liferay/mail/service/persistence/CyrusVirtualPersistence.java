@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,13 +30,13 @@ public interface CyrusVirtualPersistence extends BasePersistence<Dummy> {
 	public CyrusVirtual findByPrimaryKey(String emailAddress)
 		throws NoSuchCyrusVirtualException, SystemException;
 
-	public List<CyrusVirtual> findByUserId(long userId) throws SystemException;
+	public List<CyrusVirtual> findByUserId(long userId);
 
 	public void remove(String emailAddress)
 		throws NoSuchCyrusVirtualException, SystemException;
 
-	public void removeByUserId(long userId) throws SystemException;
+	public void removeByUserId(long userId);
 
-	public void update(CyrusVirtual virtual) throws SystemException;
+	public void update(CyrusVirtual virtual);
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,19 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -80,12 +88,10 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param userGroup the user group
 	 * @return the user group that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public UserGroup addUserGroup(UserGroup userGroup)
-		throws SystemException {
+	public UserGroup addUserGroup(UserGroup userGroup) {
 		userGroup.setNew(true);
 
 		return userGroupPersistence.update(userGroup);
@@ -108,12 +114,11 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param userGroupId the primary key of the user group
 	 * @return the user group that was removed
 	 * @throws PortalException if a user group with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public UserGroup deleteUserGroup(long userGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return userGroupPersistence.remove(userGroupId);
 	}
 
@@ -123,12 +128,11 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param userGroup the user group
 	 * @return the user group that was removed
 	 * @throws PortalException
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public UserGroup deleteUserGroup(UserGroup userGroup)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return userGroupPersistence.remove(userGroup);
 	}
 
@@ -145,12 +149,10 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return userGroupPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -165,12 +167,10 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return userGroupPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end);
 	}
@@ -187,12 +187,11 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return userGroupPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -202,11 +201,9 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return userGroupPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -216,17 +213,16 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return userGroupPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public UserGroup fetchUserGroup(long userGroupId) throws SystemException {
+	public UserGroup fetchUserGroup(long userGroupId) {
 		return userGroupPersistence.fetchByPrimaryKey(userGroupId);
 	}
 
@@ -236,11 +232,10 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param uuid the user group's UUID
 	 * @param  companyId the primary key of the company
 	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public UserGroup fetchUserGroupByUuidAndCompanyId(String uuid,
-		long companyId) throws SystemException {
+		long companyId) {
 		return userGroupPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -250,17 +245,99 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param userGroupId the primary key of the user group
 	 * @return the user group
 	 * @throws PortalException if a user group with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public UserGroup getUserGroup(long userGroupId)
-		throws PortalException, SystemException {
+	public UserGroup getUserGroup(long userGroupId) throws PortalException {
 		return userGroupPersistence.findByPrimaryKey(userGroupId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.UserGroupLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(UserGroup.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("userGroupId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.UserGroupLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(UserGroup.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("userGroupId");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType.toString(),
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType.toString(),
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+					UserGroup stagedModel = (UserGroup)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						stagedModel);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(UserGroup.class.getName())));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteUserGroup((UserGroup)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return userGroupPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -271,11 +348,10 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param  companyId the primary key of the company
 	 * @return the matching user group
 	 * @throws PortalException if a matching user group could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public UserGroup getUserGroupByUuidAndCompanyId(String uuid, long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return userGroupPersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -289,11 +365,9 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of user groups
 	 * @param end the upper bound of the range of user groups (not inclusive)
 	 * @return the range of user groups
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<UserGroup> getUserGroups(int start, int end)
-		throws SystemException {
+	public List<UserGroup> getUserGroups(int start, int end) {
 		return userGroupPersistence.findAll(start, end);
 	}
 
@@ -301,10 +375,9 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the number of user groups.
 	 *
 	 * @return the number of user groups
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getUserGroupsCount() throws SystemException {
+	public int getUserGroupsCount() {
 		return userGroupPersistence.countAll();
 	}
 
@@ -313,439 +386,387 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param userGroup the user group
 	 * @return the user group that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public UserGroup updateUserGroup(UserGroup userGroup)
-		throws SystemException {
+	public UserGroup updateUserGroup(UserGroup userGroup) {
 		return userGroupPersistence.update(userGroup);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addGroupUserGroup(long groupId, long userGroupId)
-		throws SystemException {
+	public void addGroupUserGroup(long groupId, long userGroupId) {
 		groupPersistence.addUserGroup(groupId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addGroupUserGroup(long groupId, UserGroup userGroup)
-		throws SystemException {
+	public void addGroupUserGroup(long groupId, UserGroup userGroup) {
 		groupPersistence.addUserGroup(groupId, userGroup);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addGroupUserGroups(long groupId, long[] userGroupIds)
-		throws SystemException {
+	public void addGroupUserGroups(long groupId, long[] userGroupIds) {
 		groupPersistence.addUserGroups(groupId, userGroupIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addGroupUserGroups(long groupId, List<UserGroup> UserGroups)
-		throws SystemException {
+	public void addGroupUserGroups(long groupId, List<UserGroup> UserGroups) {
 		groupPersistence.addUserGroups(groupId, UserGroups);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearGroupUserGroups(long groupId) throws SystemException {
+	public void clearGroupUserGroups(long groupId) {
 		groupPersistence.clearUserGroups(groupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteGroupUserGroup(long groupId, long userGroupId)
-		throws SystemException {
+	public void deleteGroupUserGroup(long groupId, long userGroupId) {
 		groupPersistence.removeUserGroup(groupId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteGroupUserGroup(long groupId, UserGroup userGroup)
-		throws SystemException {
+	public void deleteGroupUserGroup(long groupId, UserGroup userGroup) {
 		groupPersistence.removeUserGroup(groupId, userGroup);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteGroupUserGroups(long groupId, long[] userGroupIds)
-		throws SystemException {
+	public void deleteGroupUserGroups(long groupId, long[] userGroupIds) {
 		groupPersistence.removeUserGroups(groupId, userGroupIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteGroupUserGroups(long groupId, List<UserGroup> UserGroups)
-		throws SystemException {
+	public void deleteGroupUserGroups(long groupId, List<UserGroup> UserGroups) {
 		groupPersistence.removeUserGroups(groupId, UserGroups);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the groupIds of the groups associated with the user group.
+	 *
+	 * @param userGroupId the userGroupId of the user group
+	 * @return long[] the groupIds of groups associated with the user group
 	 */
 	@Override
-	public List<UserGroup> getGroupUserGroups(long groupId)
-		throws SystemException {
+	public long[] getGroupPrimaryKeys(long userGroupId) {
+		return userGroupPersistence.getGroupPrimaryKeys(userGroupId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<UserGroup> getGroupUserGroups(long groupId) {
 		return groupPersistence.getUserGroups(groupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<UserGroup> getGroupUserGroups(long groupId, int start, int end)
-		throws SystemException {
+	public List<UserGroup> getGroupUserGroups(long groupId, int start, int end) {
 		return groupPersistence.getUserGroups(groupId, start, end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<UserGroup> getGroupUserGroups(long groupId, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return groupPersistence.getUserGroups(groupId, start, end,
 			orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getGroupUserGroupsCount(long groupId) throws SystemException {
+	public int getGroupUserGroupsCount(long groupId) {
 		return groupPersistence.getUserGroupsSize(groupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasGroupUserGroup(long groupId, long userGroupId)
-		throws SystemException {
+	public boolean hasGroupUserGroup(long groupId, long userGroupId) {
 		return groupPersistence.containsUserGroup(groupId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasGroupUserGroups(long groupId) throws SystemException {
+	public boolean hasGroupUserGroups(long groupId) {
 		return groupPersistence.containsUserGroups(groupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void setGroupUserGroups(long groupId, long[] userGroupIds)
-		throws SystemException {
+	public void setGroupUserGroups(long groupId, long[] userGroupIds) {
 		groupPersistence.setUserGroups(groupId, userGroupIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addTeamUserGroup(long teamId, long userGroupId)
-		throws SystemException {
+	public void addTeamUserGroup(long teamId, long userGroupId) {
 		teamPersistence.addUserGroup(teamId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addTeamUserGroup(long teamId, UserGroup userGroup)
-		throws SystemException {
+	public void addTeamUserGroup(long teamId, UserGroup userGroup) {
 		teamPersistence.addUserGroup(teamId, userGroup);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addTeamUserGroups(long teamId, long[] userGroupIds)
-		throws SystemException {
+	public void addTeamUserGroups(long teamId, long[] userGroupIds) {
 		teamPersistence.addUserGroups(teamId, userGroupIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addTeamUserGroups(long teamId, List<UserGroup> UserGroups)
-		throws SystemException {
+	public void addTeamUserGroups(long teamId, List<UserGroup> UserGroups) {
 		teamPersistence.addUserGroups(teamId, UserGroups);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearTeamUserGroups(long teamId) throws SystemException {
+	public void clearTeamUserGroups(long teamId) {
 		teamPersistence.clearUserGroups(teamId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteTeamUserGroup(long teamId, long userGroupId)
-		throws SystemException {
+	public void deleteTeamUserGroup(long teamId, long userGroupId) {
 		teamPersistence.removeUserGroup(teamId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteTeamUserGroup(long teamId, UserGroup userGroup)
-		throws SystemException {
+	public void deleteTeamUserGroup(long teamId, UserGroup userGroup) {
 		teamPersistence.removeUserGroup(teamId, userGroup);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteTeamUserGroups(long teamId, long[] userGroupIds)
-		throws SystemException {
+	public void deleteTeamUserGroups(long teamId, long[] userGroupIds) {
 		teamPersistence.removeUserGroups(teamId, userGroupIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteTeamUserGroups(long teamId, List<UserGroup> UserGroups)
-		throws SystemException {
+	public void deleteTeamUserGroups(long teamId, List<UserGroup> UserGroups) {
 		teamPersistence.removeUserGroups(teamId, UserGroups);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the teamIds of the teams associated with the user group.
+	 *
+	 * @param userGroupId the userGroupId of the user group
+	 * @return long[] the teamIds of teams associated with the user group
 	 */
 	@Override
-	public List<UserGroup> getTeamUserGroups(long teamId)
-		throws SystemException {
+	public long[] getTeamPrimaryKeys(long userGroupId) {
+		return userGroupPersistence.getTeamPrimaryKeys(userGroupId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<UserGroup> getTeamUserGroups(long teamId) {
 		return teamPersistence.getUserGroups(teamId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<UserGroup> getTeamUserGroups(long teamId, int start, int end)
-		throws SystemException {
+	public List<UserGroup> getTeamUserGroups(long teamId, int start, int end) {
 		return teamPersistence.getUserGroups(teamId, start, end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<UserGroup> getTeamUserGroups(long teamId, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return teamPersistence.getUserGroups(teamId, start, end,
 			orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getTeamUserGroupsCount(long teamId) throws SystemException {
+	public int getTeamUserGroupsCount(long teamId) {
 		return teamPersistence.getUserGroupsSize(teamId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasTeamUserGroup(long teamId, long userGroupId)
-		throws SystemException {
+	public boolean hasTeamUserGroup(long teamId, long userGroupId) {
 		return teamPersistence.containsUserGroup(teamId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasTeamUserGroups(long teamId) throws SystemException {
+	public boolean hasTeamUserGroups(long teamId) {
 		return teamPersistence.containsUserGroups(teamId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void setTeamUserGroups(long teamId, long[] userGroupIds)
-		throws SystemException {
+	public void setTeamUserGroups(long teamId, long[] userGroupIds) {
 		teamPersistence.setUserGroups(teamId, userGroupIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addUserUserGroup(long userId, long userGroupId)
-		throws SystemException {
+	public void addUserUserGroup(long userId, long userGroupId) {
 		userPersistence.addUserGroup(userId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addUserUserGroup(long userId, UserGroup userGroup)
-		throws SystemException {
+	public void addUserUserGroup(long userId, UserGroup userGroup) {
 		userPersistence.addUserGroup(userId, userGroup);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addUserUserGroups(long userId, long[] userGroupIds)
-		throws SystemException {
+	public void addUserUserGroups(long userId, long[] userGroupIds) {
 		userPersistence.addUserGroups(userId, userGroupIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addUserUserGroups(long userId, List<UserGroup> UserGroups)
-		throws SystemException {
+	public void addUserUserGroups(long userId, List<UserGroup> UserGroups) {
 		userPersistence.addUserGroups(userId, UserGroups);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearUserUserGroups(long userId) throws SystemException {
+	public void clearUserUserGroups(long userId) {
 		userPersistence.clearUserGroups(userId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteUserUserGroup(long userId, long userGroupId)
-		throws SystemException {
+	public void deleteUserUserGroup(long userId, long userGroupId) {
 		userPersistence.removeUserGroup(userId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteUserUserGroup(long userId, UserGroup userGroup)
-		throws SystemException {
+	public void deleteUserUserGroup(long userId, UserGroup userGroup) {
 		userPersistence.removeUserGroup(userId, userGroup);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteUserUserGroups(long userId, long[] userGroupIds)
-		throws SystemException {
+	public void deleteUserUserGroups(long userId, long[] userGroupIds) {
 		userPersistence.removeUserGroups(userId, userGroupIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteUserUserGroups(long userId, List<UserGroup> UserGroups)
-		throws SystemException {
+	public void deleteUserUserGroups(long userId, List<UserGroup> UserGroups) {
 		userPersistence.removeUserGroups(userId, UserGroups);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the userIds of the users associated with the user group.
+	 *
+	 * @param userGroupId the userGroupId of the user group
+	 * @return long[] the userIds of users associated with the user group
 	 */
 	@Override
-	public List<UserGroup> getUserUserGroups(long userId)
-		throws SystemException {
+	public long[] getUserPrimaryKeys(long userGroupId) {
+		return userGroupPersistence.getUserPrimaryKeys(userGroupId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<UserGroup> getUserUserGroups(long userId) {
 		return userPersistence.getUserGroups(userId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<UserGroup> getUserUserGroups(long userId, int start, int end)
-		throws SystemException {
+	public List<UserGroup> getUserUserGroups(long userId, int start, int end) {
 		return userPersistence.getUserGroups(userId, start, end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<UserGroup> getUserUserGroups(long userId, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return userPersistence.getUserGroups(userId, start, end,
 			orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getUserUserGroupsCount(long userId) throws SystemException {
+	public int getUserUserGroupsCount(long userId) {
 		return userPersistence.getUserGroupsSize(userId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasUserUserGroup(long userId, long userGroupId)
-		throws SystemException {
+	public boolean hasUserUserGroup(long userId, long userGroupId) {
 		return userPersistence.containsUserGroup(userId, userGroupId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasUserUserGroups(long userId) throws SystemException {
+	public boolean hasUserUserGroups(long userId) {
 		return userPersistence.containsUserGroups(userId);
 	}
 
 	/**
 	 * @throws PortalException
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void setUserUserGroups(long userId, long[] userGroupIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 		userPersistence.setUserGroups(userId, userGroupIds);
 	}
 
@@ -1315,7 +1336,7 @@ public abstract class UserGroupLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = userGroupPersistence.getDataSource();
 

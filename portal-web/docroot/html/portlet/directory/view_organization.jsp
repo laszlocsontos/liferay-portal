@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,27 +39,27 @@ request.setAttribute("websites.classPK", organizationId);
 		<liferay-util:include page="/html/portlet/directory/organization/details.jsp" />
 	</div>
 
-	<div class="section entity-email-addresses">
+	<div class="section">
 		<liferay-util:include page="/html/portlet/directory/common/additional_email_addresses.jsp" />
 	</div>
 
-	<div class="section entity-websites">
+	<div class="section">
 		<liferay-util:include page="/html/portlet/directory/common/websites.jsp" />
 	</div>
 
-	<div class="section entity-addresses">
+	<div class="section">
 		<liferay-util:include page="/html/portlet/directory/organization/addresses.jsp" />
 	</div>
 
-	<div class="section entity-phones">
+	<div class="section">
 		<liferay-util:include page="/html/portlet/directory/organization/phone_numbers.jsp" />
 	</div>
 
-	<div class="section entity-services">
+	<div class="section">
 		<liferay-util:include page="/html/portlet/directory/organization/services.jsp" />
 	</div>
 
-	<div class="section entity-comments">
+	<div class="section">
 		<liferay-util:include page="/html/portlet/directory/organization/comments.jsp" />
 	</div>
 </div>

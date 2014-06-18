@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.mobile.device.rulegroup.action.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mobile.device.rulegroup.action.ActionHandler;
@@ -37,7 +36,7 @@ public abstract class BaseRedirectActionHandler implements ActionHandler {
 	public void applyAction(
 			MDRAction mdrAction, HttpServletRequest request,
 			HttpServletResponse response)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String url = getURL(mdrAction, request, response);
 
@@ -71,7 +70,7 @@ public abstract class BaseRedirectActionHandler implements ActionHandler {
 	protected abstract String getURL(
 			MDRAction mdrAction, HttpServletRequest request,
 			HttpServletResponse response)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	private static Log _log = LogFactoryUtil.getLog(
 		BaseRedirectActionHandler.class);

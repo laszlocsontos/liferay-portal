@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,24 +39,24 @@ for (int i = 0; i < organizations.size(); i++) {
 %>
 
 <c:if test="<%= !personalPhones.isEmpty() || !organizationPhones.isEmpty() %>">
-	<h3><liferay-ui:message key="phones" /></h3>
+	<h3 class="icon-phone-sign"><liferay-ui:message key="phones" /></h3>
 
 	<c:if test="<%= !organizationPhones.isEmpty() %>">
 		<h4><liferay-ui:message key="organization-phones" /></h4>
 
 		<ul class="property-list">
 
-		<%
-		for (Phone phone: organizationPhones) {
-		%>
+			<%
+			for (Phone phone : organizationPhones) {
+			%>
 
-			<li class="<%= phone.isPrimary() ? "primary" : "" %>">
-				<%= phone.getNumber() %> <%= phone.getExtension() %> <%= LanguageUtil.get(pageContext, phone.getType().getName()) %>
-			</li>
+				<li class="<%= (phone.isPrimary() && !organizationPhones.isEmpty()) ? "icon-star" : StringPool.BLANK %>">
+					<%= phone.getNumber() %> <%= phone.getExtension() %> <%= LanguageUtil.get(pageContext, phone.getType().getName()) %>
+				</li>
 
-		<%
-		}
-		%>
+			<%
+			}
+			%>
 
 		</ul>
 	</c:if>
@@ -66,17 +66,17 @@ for (int i = 0; i < organizations.size(); i++) {
 
 		<ul class="property-list">
 
-		<%
-		for (Phone phone: personalPhones) {
-		%>
+			<%
+			for (Phone phone : personalPhones) {
+			%>
 
-			<li class="<%= phone.isPrimary() ? "primary" : "" %>">
-				<%= phone.getNumber() %> <%= phone.getExtension() %> <%= LanguageUtil.get(pageContext, phone.getType().getName()) %>
-			</li>
+				<li class="<%= (phone.isPrimary() && !personalPhones.isEmpty()) ? "icon-star" : StringPool.BLANK %>">
+					<%= phone.getNumber() %> <%= phone.getExtension() %> <%= LanguageUtil.get(pageContext, phone.getType().getName()) %>
+				</li>
 
-		<%
-		}
-		%>
+			<%
+			}
+			%>
 
 		</ul>
 	</c:if>

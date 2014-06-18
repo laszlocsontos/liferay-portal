@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ long groupId = GetterUtil.getLong((String)workflowContext.get(WorkflowConstants.
 String className = (String)workflowContext.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME);
 long classPK = GetterUtil.getLong((String)workflowContext.get(WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
 
-WorkflowHandler workflowHandler = WorkflowHandlerRegistryUtil.getWorkflowHandler(className);
+WorkflowHandler<?> workflowHandler = WorkflowHandlerRegistryUtil.getWorkflowHandler(className);
 
 AssetRenderer assetRenderer = workflowHandler.getAssetRenderer(classPK);
 AssetRendererFactory assetRendererFactory = workflowHandler.getAssetRendererFactory();
@@ -54,10 +54,11 @@ if ((workflowTask.getAssigneeUserId() == user.getUserId()) && !workflowTask.isCo
 }
 
 PortletURL editPortletURL = workflowHandler.getURLEdit(classPK, liferayPortletRequest, liferayPortletResponse);
+PortletURL viewDiffsPortletURL = workflowHandler.getURLViewDiffs(classPK, liferayPortletRequest, liferayPortletResponse);
 
 String viewFullContentURLString = null;
 
-if (assetRenderer.isPreviewInContext()) {
+if ((assetRenderer != null) && assetRenderer.isPreviewInContext()) {
 	viewFullContentURLString = assetRenderer.getURLViewInContext((LiferayPortletRequest)renderRequest, (LiferayPortletResponse)renderResponse, null);
 }
 else {
@@ -99,83 +100,73 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 		<liferay-ui:error exception="<%= WorkflowTaskDueDateException.class %>" message="please-enter-a-valid-due-date" />
 
 		<aui:row>
-			<aui:col width="<%= 60 %>">
+			<aui:col width="<%= 50 %>">
 				<div class="lfr-asset-assigned">
-					<aui:field-wrapper label="assigned-to">
-						<c:choose>
-							<c:when test="<%= workflowTask.isAssignedToSingleUser() %>">
-								<liferay-ui:input-resource url="<%= PortalUtil.getUserName(workflowTask.getAssigneeUserId(), StringPool.BLANK) %>" />
-							</c:when>
-							<c:otherwise>
-								<liferay-ui:input-resource url='<%= LanguageUtil.get(pageContext, "nobody") %>' />
-							</c:otherwise>
-						</c:choose>
+					<c:choose>
+						<c:when test="<%= workflowTask.isAssignedToSingleUser() %>">
+							<aui:input cssClass="assigned-to" inlineField="<%= true %>" name="assignedTo" type="resource" value="<%= PortalUtil.getUserName(workflowTask.getAssigneeUserId(), StringPool.BLANK) %>" />
+						</c:when>
+						<c:otherwise>
+							<aui:input cssClass="assigned-to" inlineField="<%= true %>" name="assignedTo" type="resource" value='<%= LanguageUtil.get(pageContext, "nobody") %>' />
+						</c:otherwise>
+					</c:choose>
 
-						<c:if test="<%= !workflowTask.isAssignedToSingleUser() %>">
-							<%= StringPool.DASH %>
+					<c:if test="<%= !workflowTask.isAssignedToSingleUser() %>">
+						<portlet:actionURL var="assignToMeURL">
+							<portlet:param name="struts_action" value="/workflow_tasks/edit_workflow_task" />
+							<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ASSIGN %>" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+							<portlet:param name="workflowTaskId" value="<%= String.valueOf(workflowTask.getWorkflowTaskId()) %>" />
+							<portlet:param name="assigneeUserId" value="<%= String.valueOf(user.getUserId()) %>" />
+						</portlet:actionURL>
 
-							<portlet:actionURL var="assignToMeURL">
-								<portlet:param name="struts_action" value="/workflow_tasks/edit_workflow_task" />
-								<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ASSIGN %>" />
-								<portlet:param name="redirect" value="<%= currentURL %>" />
-								<portlet:param name="workflowTaskId" value="<%= String.valueOf(workflowTask.getWorkflowTaskId()) %>" />
-								<portlet:param name="assigneeUserId" value="<%= String.valueOf(user.getUserId()) %>" />
-							</portlet:actionURL>
+						<aui:a cssClass="icon-signin" href="<%= assignToMeURL %>" id='<%= randomId + "taskAssignToMeLink" %>' label="assign-to-me" />
+					</c:if>
 
-							<span class="workflow-task task-assign-to-me-link"><aui:a href="<%= assignToMeURL %>" id='<%= randomId + "taskAssignToMeLink" %>' label="assign-to-me" /></span>
-						</c:if>
+					&nbsp;
 
-						&nbsp;
+					<%
+					long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getCompanyId(), workflowTask.getWorkflowTaskId());
+					%>
 
-						<%
-						long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getCompanyId(), workflowTask.getWorkflowTaskId());
-						%>
+					<c:if test="<%= _hasOtherAssignees(pooledActorsIds, workflowTask, user) %>">
+						<%= StringPool.DASH %>
 
-						<c:if test="<%= _hasOtherAssignees(pooledActorsIds, workflowTask, user) %>">
-							<%= StringPool.DASH %>
+						<portlet:actionURL var="assignURL">
+							<portlet:param name="struts_action" value="/workflow_tasks/edit_workflow_task" />
+							<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ASSIGN %>" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+							<portlet:param name="workflowTaskId" value="<%= String.valueOf(workflowTask.getWorkflowTaskId()) %>" />
+						</portlet:actionURL>
 
-							<portlet:actionURL var="assignURL">
-								<portlet:param name="struts_action" value="/workflow_tasks/edit_workflow_task" />
-								<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ASSIGN %>" />
-								<portlet:param name="redirect" value="<%= currentURL %>" />
-								<portlet:param name="workflowTaskId" value="<%= String.valueOf(workflowTask.getWorkflowTaskId()) %>" />
-							</portlet:actionURL>
-
-							<span class="workflow-task task-assign-link"><aui:a href="<%= assignURL %>" id='<%= randomId + "taskAssignLink" %>' label="assign-to-..." /></span>
-						</c:if>
-					</aui:field-wrapper>
+						<aui:a cssClass="icon-signin" href="<%= assignURL %>" id='<%= randomId + "taskAssignLink" %>' label="assign-to-..." />
+					</c:if>
 				</div>
 
-				<div class="lfr-asset-status">
-					<aui:field-wrapper label="state">
-						<liferay-ui:input-resource url="<%= LanguageUtil.get(pageContext, HtmlUtil.escape(WorkflowInstanceLinkLocalServiceUtil.getState(companyId, groupId, className, classPK))) %>" />
-					</aui:field-wrapper>
-				</div>
+				<aui:input name="state" type="resource" value="<%= LanguageUtil.get(pageContext, HtmlUtil.escape(WorkflowInstanceLinkLocalServiceUtil.getState(companyId, groupId, className, classPK))) %>" />
 			</aui:col>
 
-			<aui:col>
-				<div class="lfr-asset-date">
-					<aui:field-wrapper label="create-date">
-						<liferay-ui:input-resource url="<%= dateFormatDateTime.format(workflowTask.getCreateDate()) %>" />
-					</aui:field-wrapper>
-				</div>
+			<aui:col width="<%= 50 %>">
+				<aui:input name="createDate" type="resource" value="<%= dateFormatDateTime.format(workflowTask.getCreateDate()) %>" />
 
-				<div class="lfr-asset-due-date">
-					<aui:field-wrapper label="due-date">
-						<liferay-ui:input-resource url='<%= (workflowTask.getDueDate() == null) ? LanguageUtil.get(pageContext, "never") : dateFormatDateTime.format(workflowTask.getDueDate()) %>' />
+				<aui:input inlineField="<%= true %>" name="dueDate" type="resource" value='<%= (workflowTask.getDueDate() == null) ? LanguageUtil.get(pageContext, "never") : dateFormatDateTime.format(workflowTask.getDueDate()) %>' />
 
-						<c:if test="<%= !workflowTask.isCompleted() %>">
-							<portlet:actionURL var="updateDueDateURL">
-								<portlet:param name="struts_action" value="/workflow_tasks/edit_workflow_task" />
-								<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UPDATE %>" />
-								<portlet:param name="redirect" value="<%= currentURL %>" />
-								<portlet:param name="workflowTaskId" value="<%= StringUtil.valueOf(workflowTask.getWorkflowTaskId()) %>" />
-							</portlet:actionURL>
+				<c:if test="<%= !workflowTask.isCompleted() %>">
+					<portlet:actionURL var="updateDueDateURL">
+						<portlet:param name="struts_action" value="/workflow_tasks/edit_workflow_task" />
+						<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UPDATE %>" />
+						<portlet:param name="redirect" value="<%= currentURL %>" />
+						<portlet:param name="workflowTaskId" value="<%= StringUtil.valueOf(workflowTask.getWorkflowTaskId()) %>" />
+					</portlet:actionURL>
 
-							<%= StringPool.DASH %> (<span class="workflow-task task-due-date-link"><aui:a href="<%= updateDueDateURL %>" id='<%= randomId + "taskDueDateLink" %>' label="change" />)
-						</c:if>
-					</aui:field-wrapper>
-				</div>
+					<liferay-ui:icon
+						iconCssClass="icon-time"
+						id='<%= randomId + "taskDueDateLink" %>'
+						label="<%= true %>"
+						message="change"
+						url="javascript:;"
+					/>
+				</c:if>
 			</aui:col>
 		</aui:row>
 
@@ -193,7 +184,21 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 					<div class="task-content-actions">
 						<liferay-ui:icon-list>
 							<c:if test="<%= assetRenderer.hasViewPermission(permissionChecker) %>">
-								<liferay-ui:icon image="view" message="view[action]" method="get" target='<%= assetRenderer.isPreviewInContext() ? "_blank" : StringPool.BLANK %>' url="<%= viewFullContentURLString %>" />
+								<liferay-ui:icon iconCssClass="icon-search" message="view[action]" method="get" target='<%= assetRenderer.isPreviewInContext() ? "_blank" : StringPool.BLANK %>' url="<%= viewFullContentURLString %>" />
+
+								<c:if test="<%= viewDiffsPortletURL != null %>">
+
+									<%
+									viewDiffsPortletURL.setParameter("redirect", currentURL);
+									viewDiffsPortletURL.setParameter("hideControls", Boolean.TRUE.toString());
+									viewDiffsPortletURL.setWindowState(LiferayWindowState.POP_UP);
+									viewDiffsPortletURL.setPortletMode(PortletMode.VIEW);
+
+									String taglibViewDiffsURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "viewDiffs', title: '" + HtmlUtil.escapeJS(LanguageUtil.get(pageContext, "diffs")) + "', uri:'" + HtmlUtil.escapeJS(viewDiffsPortletURL.toString()) + "'});";
+									%>
+
+									<liferay-ui:icon iconCssClass="icon-copy" message="diffs" url="<%= taglibViewDiffsURL %>" />
+								</c:if>
 							</c:if>
 
 							<c:if test="<%= editPortletURL != null %>">
@@ -215,7 +220,7 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 										String taglibEditURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "editAsset', title: '" + HtmlUtil.escapeJS(LanguageUtil.format(pageContext, "edit-x", HtmlUtil.escape(assetRenderer.getTitle(locale)), false)) + "', uri:'" + HtmlUtil.escapeJS(editPortletURLString) + "'});";
 										%>
 
-										<liferay-ui:icon image="edit" url="<%= taglibEditURL %>" />
+										<liferay-ui:icon iconCssClass="icon-edit" message="edit" url="<%= taglibEditURL %>" />
 									</c:when>
 									<c:when test="<%= assetRenderer.hasEditPermission(permissionChecker) && !showEditURL && !workflowTask.isCompleted() %>">
 										<liferay-ui:icon-help message="please-assign-the-task-to-yourself-to-be-able-to-edit-the-content" />
@@ -226,7 +231,11 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 					</div>
 
 					<h3 class="task-content-title">
-						<img alt="" src="<%= workflowHandler.getIconPath(liferayPortletRequest) %>" /> <%= HtmlUtil.escape(workflowHandler.getTitle(classPK, locale)) %>
+						<liferay-ui:icon
+							iconCssClass="<%= workflowHandler.getIconCssClass() %>"
+							label="<%= true %>"
+							message="<%= HtmlUtil.escape(workflowHandler.getTitle(classPK, locale)) %>"
+						/>
 					</h3>
 
 					<%
@@ -238,7 +247,7 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 
 					<c:choose>
 						<c:when test="<%= path == null %>">
-							<%= HtmlUtil.escape(workflowHandler.getSummary(classPK, locale)) %>
+							<%= HtmlUtil.escape(workflowHandler.getSummary(classPK, renderRequest, renderResponse)) %>
 						</c:when>
 						<c:otherwise>
 							<liferay-util:include page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>" />
@@ -246,6 +255,8 @@ request.setAttribute(WebKeys.WORKFLOW_ASSET_PREVIEW, Boolean.TRUE);
 					</c:choose>
 
 					<%
+					boolean filterByMetadata = false;
+
 					String[] metadataFields = new String[] {"author", "categories", "tags"};
 					%>
 

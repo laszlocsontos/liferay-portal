@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -435,11 +435,9 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* Returns the user uuid of this user.
 	*
 	* @return the user uuid of this user
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _user.getUserUuid();
 	}
 
@@ -1372,8 +1370,7 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_user.persist();
 	}
 
@@ -1387,11 +1384,9 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* Returns the user's addresses.
 	*
 	* @return the user's addresses
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.util.List<com.liferay.portal.model.Address> getAddresses()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Address> getAddresses() {
 		return _user.getAddresses();
 	}
 
@@ -1400,12 +1395,10 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	*
 	* @return the user's birth date
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.Date getBirthday()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getBirthday();
 	}
 
@@ -1414,12 +1407,10 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	*
 	* @return the user's company's mail domain
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.lang.String getCompanyMx()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getCompanyMx();
 	}
 
@@ -1428,13 +1419,11 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	*
 	* @return the user's associated contact
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	* @see Contact
 	*/
 	@Override
 	public com.liferay.portal.model.Contact getContact()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getContact();
 	}
 
@@ -1486,13 +1475,13 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* @param mainPath the main path
 	* @return the user's display URL
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0, replaced by {@link #getDisplayURL(ThemeDisplay)}
 	*/
+	@Deprecated
 	@Override
 	public java.lang.String getDisplayURL(java.lang.String portalURL,
 		java.lang.String mainPath)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getDisplayURL(portalURL, mainPath);
 	}
 
@@ -1523,17 +1512,17 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* @param portalURL the portal's URL
 	* @param mainPath the main path
 	* @param privateLayout whether to use the URL of the user's default
-	intranet(versus extranet)  site home page, if no friendly URL is
-	available for the user's profile
+	intranet(versus extranet)  site home page, if no friendly URL
+	is available for the user's profile
 	* @return the user's display URL
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0, replaced by {@link #getDisplayURL(ThemeDisplay)}
 	*/
+	@Deprecated
 	@Override
 	public java.lang.String getDisplayURL(java.lang.String portalURL,
 		java.lang.String mainPath, boolean privateLayout)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getDisplayURL(portalURL, mainPath, privateLayout);
 	}
 
@@ -1561,13 +1550,11 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* @param themeDisplay the theme display
 	* @return the user's display URL
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.lang.String getDisplayURL(
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getDisplayURL(themeDisplay);
 	}
 
@@ -1601,14 +1588,12 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	available for the user's profile
 	* @return the user's display URL
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.lang.String getDisplayURL(
 		com.liferay.portal.theme.ThemeDisplay themeDisplay,
 		boolean privateLayout)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getDisplayURL(themeDisplay, privateLayout);
 	}
 
@@ -1616,11 +1601,9 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* Returns the user's email addresses.
 	*
 	* @return the user's email addresses
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses() {
 		return _user.getEmailAddresses();
 	}
 
@@ -1630,12 +1613,10 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* @return <code>true</code> if the user is female; <code>false</code>
 	otherwise
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean getFemale()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getFemale();
 	}
 
@@ -1651,27 +1632,23 @@ public class UserWrapper implements User, ModelWrapper<User> {
 
 	@Override
 	public com.liferay.portal.model.Group getGroup()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getGroup();
 	}
 
 	@Override
 	public long getGroupId()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getGroupId();
 	}
 
 	@Override
-	public long[] getGroupIds()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public long[] getGroupIds() {
 		return _user.getGroupIds();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Group> getGroups()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Group> getGroups() {
 		return _user.getGroups();
 	}
 
@@ -1682,8 +1659,7 @@ public class UserWrapper implements User, ModelWrapper<User> {
 
 	@Override
 	public java.lang.String getLogin()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getLogin();
 	}
 
@@ -1693,51 +1669,43 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	* @return <code>true</code> if the user is male; <code>false</code>
 	otherwise
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean getMale()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMale();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySiteGroups()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySiteGroups();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySiteGroups(
 		boolean includeControlPanel, int max)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySiteGroups(includeControlPanel, max);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySiteGroups(
-		int max)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		int max) throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySiteGroups(max);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySiteGroups(
 		java.lang.String[] classNames, boolean includeControlPanel, int max)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySiteGroups(classNames, includeControlPanel, max);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySiteGroups(
 		java.lang.String[] classNames, int max)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySiteGroups(classNames, max);
 	}
 
@@ -1747,8 +1715,7 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	@Deprecated
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySites()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySites();
 	}
 
@@ -1760,8 +1727,7 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySites(
 		boolean includeControlPanel, int max)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySites(includeControlPanel, max);
 	}
 
@@ -1771,8 +1737,7 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	@Deprecated
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySites(int max)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySites(max);
 	}
 
@@ -1784,8 +1749,7 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySites(
 		java.lang.String[] classNames, boolean includeControlPanel, int max)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySites(classNames, includeControlPanel, max);
 	}
 
@@ -1797,37 +1761,32 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getMySites(
 		java.lang.String[] classNames, int max)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getMySites(classNames, max);
 	}
 
 	@Override
 	public long[] getOrganizationIds()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getOrganizationIds();
 	}
 
 	@Override
 	public long[] getOrganizationIds(boolean includeAdministrative)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getOrganizationIds(includeAdministrative);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Organization> getOrganizations()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getOrganizations();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Organization> getOrganizations(
 		boolean includeAdministrative)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getOrganizations(includeAdministrative);
 	}
 
@@ -1838,8 +1797,7 @@ public class UserWrapper implements User, ModelWrapper<User> {
 
 	@Override
 	public com.liferay.portal.model.PasswordPolicy getPasswordPolicy()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getPasswordPolicy();
 	}
 
@@ -1849,37 +1807,32 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Phone> getPhones()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Phone> getPhones() {
 		return _user.getPhones();
 	}
 
 	@Override
 	public java.lang.String getPortraitURL(
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getPortraitURL(themeDisplay);
 	}
 
 	@Override
 	public int getPrivateLayoutsPageCount()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getPrivateLayoutsPageCount();
 	}
 
 	@Override
 	public int getPublicLayoutsPageCount()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getPublicLayoutsPageCount();
 	}
 
 	@Override
 	public java.util.Set<java.lang.String> getReminderQueryQuestions()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getReminderQueryQuestions();
 	}
 
@@ -1895,41 +1848,35 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	}
 
 	@Override
-	public long[] getRoleIds()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public long[] getRoleIds() {
 		return _user.getRoleIds();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Role> getRoles()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Role> getRoles() {
 		return _user.getRoles();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getSiteGroups()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getSiteGroups();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Group> getSiteGroups(
 		boolean includeAdministrative)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.getSiteGroups(includeAdministrative);
 	}
 
 	@Override
-	public long[] getTeamIds()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public long[] getTeamIds() {
 		return _user.getTeamIds();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Team> getTeams()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Team> getTeams() {
 		return _user.getTeams();
 	}
 
@@ -1939,62 +1886,52 @@ public class UserWrapper implements User, ModelWrapper<User> {
 	}
 
 	@Override
-	public long[] getUserGroupIds()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public long[] getUserGroupIds() {
 		return _user.getUserGroupIds();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.UserGroup> getUserGroups()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.UserGroup> getUserGroups() {
 		return _user.getUserGroups();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Website> getWebsites()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Website> getWebsites() {
 		return _user.getWebsites();
 	}
 
 	@Override
 	public boolean hasCompanyMx()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.hasCompanyMx();
 	}
 
 	@Override
 	public boolean hasCompanyMx(java.lang.String emailAddress)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.hasCompanyMx(emailAddress);
 	}
 
 	@Override
 	public boolean hasMySites()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.hasMySites();
 	}
 
 	@Override
-	public boolean hasOrganization()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+	public boolean hasOrganization() {
 		return _user.hasOrganization();
 	}
 
 	@Override
 	public boolean hasPrivateLayouts()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.hasPrivateLayouts();
 	}
 
 	@Override
 	public boolean hasPublicLayouts()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.hasPublicLayouts();
 	}
 
@@ -2020,15 +1957,13 @@ public class UserWrapper implements User, ModelWrapper<User> {
 
 	@Override
 	public boolean isFemale()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.isFemale();
 	}
 
 	@Override
 	public boolean isMale()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _user.isMale();
 	}
 

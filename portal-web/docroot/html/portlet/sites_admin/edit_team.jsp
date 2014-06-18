@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,9 +58,7 @@ if (group.isOrganization()) {
 
 	<aui:fieldset>
 		<c:if test="<%= team != null %>">
-			<aui:field-wrapper label="team-id">
-				<liferay-ui:input-resource url="<%= String.valueOf(team.getTeamId()) %>" />
-			</aui:field-wrapper>
+			<aui:input name="teamId" type="resource" value="<%= String.valueOf(team.getTeamId()) %>" />
 		</c:if>
 
 		<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="name" />
@@ -77,7 +75,7 @@ if (group.isOrganization()) {
 
 <aui:script>
 	function <portlet:namespace />saveTeam() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (team == null) ? Constants.ADD : Constants.UPDATE %>";
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (team == null) ? Constants.ADD : Constants.UPDATE %>';
 
 		submitForm(document.<portlet:namespace />fm);
 	}

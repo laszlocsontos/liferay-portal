@@ -12,7 +12,6 @@ package ${packagePath}.service;
 
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
@@ -152,6 +151,27 @@ public class ClpSerializer {
 				<#if entity.hasColumns()>
 					if (oldModelClassName.equals("${packagePath}.model.impl.${entity.name}Impl")) {
 						return translateOutput${entity.name}(oldModel);
+					} else if (oldModelClassName.endsWith("Clp")) {
+						try {						
+							Class<?> originalClpSerializerClass = (Class<?>) oldModelClass.getMethod("getClpSerializerClass").invoke(oldModel);
+						
+							ClassLoader currentClassLoader = ClpSerializer.class.getClassLoader(); 
+							
+							Class<?> newClpSerializerClass = (Class<?>) currentClassLoader.loadClass(originalClpSerializerClass.getName());
+									
+							String remoteModelGetterName = "get" + oldModel.getModelClass().getSimpleName() + "RemoteModel";
+						
+							Object remoteModel = oldModelClass.getMethod(remoteModelGetterName).invoke(oldModel);
+							
+							BaseModel<?> newModel = (BaseModel<?>) newClpSerializerClass.getMethod("translateOutput", BaseModel.class).invoke(null, remoteModel);
+							
+							return newModel;
+						}
+						catch (Throwable t) {
+							if (_log.isInfoEnabled()) {
+								_log.info("Cannot translate " + oldModelClassName);
+						}
+				}
 					}
 				</#if>
 			</#list>

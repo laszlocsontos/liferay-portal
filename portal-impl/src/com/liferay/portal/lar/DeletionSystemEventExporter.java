@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -34,7 +33,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.SystemEvent;
 import com.liferay.portal.model.SystemEventConstants;
-import com.liferay.portal.service.persistence.SystemEventActionableDynamicQuery;
+import com.liferay.portal.service.SystemEventLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
 import java.util.Date;
@@ -44,6 +43,10 @@ import java.util.Set;
  * @author Zsolt Berentey
  */
 public class DeletionSystemEventExporter {
+
+	public static DeletionSystemEventExporter getInstance() {
+		return _instance;
+	}
 
 	public void exportDeletionSystemEvents(
 			PortletDataContext portletDataContext)
@@ -72,95 +75,109 @@ public class DeletionSystemEventExporter {
 			document.formattedString());
 	}
 
+	protected void addCreateDateProperty(
+		PortletDataContext portletDataContext, DynamicQuery dynamicQuery) {
+
+		if (!portletDataContext.hasDateRange()) {
+			return;
+		}
+
+		Property createDateProperty = PropertyFactoryUtil.forName("createDate");
+
+		Date startDate = portletDataContext.getStartDate();
+
+		dynamicQuery.add(createDateProperty.ge(startDate));
+
+		Date endDate = portletDataContext.getEndDate();
+
+		dynamicQuery.add(createDateProperty.le(endDate));
+	}
+
+	protected void doAddCriteria(
+		PortletDataContext portletDataContext,
+		Set<StagedModelType> deletionSystemEventStagedModelTypes,
+		DynamicQuery dynamicQuery) {
+
+		Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
+
+		Property groupIdProperty = PropertyFactoryUtil.forName("groupId");
+
+		disjunction.add(groupIdProperty.eq(0L));
+		disjunction.add(
+			groupIdProperty.eq(portletDataContext.getScopeGroupId()));
+
+		dynamicQuery.add(disjunction);
+
+		if (!deletionSystemEventStagedModelTypes.isEmpty()) {
+			Property classNameIdProperty = PropertyFactoryUtil.forName(
+				"classNameId");
+
+			Property referrerClassNameIdProperty = PropertyFactoryUtil.forName(
+				"referrerClassNameId");
+
+			Disjunction referrerClassNameIdDisjunction =
+				RestrictionsFactoryUtil.disjunction();
+
+			for (StagedModelType stagedModelType :
+					deletionSystemEventStagedModelTypes) {
+
+				Conjunction conjunction = RestrictionsFactoryUtil.conjunction();
+
+				conjunction.add(
+					classNameIdProperty.eq(stagedModelType.getClassNameId()));
+
+				if (stagedModelType.getReferrerClassNameId() >= 0) {
+					conjunction.add(
+						referrerClassNameIdProperty.eq(
+							stagedModelType.getReferrerClassNameId()));
+				}
+
+				referrerClassNameIdDisjunction.add(conjunction);
+			}
+
+			dynamicQuery.add(referrerClassNameIdDisjunction);
+		}
+
+		Property typeProperty = PropertyFactoryUtil.forName("type");
+
+		dynamicQuery.add(typeProperty.eq(SystemEventConstants.TYPE_DELETE));
+
+		addCreateDateProperty(portletDataContext, dynamicQuery);
+	}
+
 	protected void doExportDeletionSystemEvents(
 			final PortletDataContext portletDataContext,
 			final Element rootElement,
 			final Set<StagedModelType> deletionSystemEventStagedModelTypes)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
-			new SystemEventActionableDynamicQuery() {
+			SystemEventLocalServiceUtil.getActionableDynamicQuery();
 
-			@Override
-			protected void addCriteria(DynamicQuery dynamicQuery) {
-				Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
+		actionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
 
-				Property groupIdProperty = PropertyFactoryUtil.forName(
-					"groupId");
-
-				disjunction.add(groupIdProperty.eq(0L));
-				disjunction.add(
-					groupIdProperty.eq(portletDataContext.getScopeGroupId()));
-
-				dynamicQuery.add(disjunction);
-
-				if (!deletionSystemEventStagedModelTypes.isEmpty()) {
-					Property classNameIdProperty = PropertyFactoryUtil.forName(
-						"classNameId");
-
-					Property referrerClassNameIdProperty =
-						PropertyFactoryUtil.forName("referrerClassNameId");
-
-					Disjunction referrerClassNameIdDisjunction =
-						RestrictionsFactoryUtil.disjunction();
-
-					for (StagedModelType stagedModelType :
-							deletionSystemEventStagedModelTypes) {
-
-						Conjunction conjunction =
-							RestrictionsFactoryUtil.conjunction();
-
-						conjunction.add(
-							classNameIdProperty.eq(
-								stagedModelType.getClassNameId()));
-
-						if (stagedModelType.getReferrerClassNameId() >= 0) {
-							conjunction.add(
-								referrerClassNameIdProperty.eq(
-									stagedModelType.getReferrerClassNameId()));
-						}
-
-						referrerClassNameIdDisjunction.add(conjunction);
-					}
-
-					dynamicQuery.add(referrerClassNameIdDisjunction);
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					doAddCriteria(
+						portletDataContext, deletionSystemEventStagedModelTypes,
+						dynamicQuery);
 				}
 
-				Property typeProperty = PropertyFactoryUtil.forName("type");
-
-				dynamicQuery.add(
-					typeProperty.eq(SystemEventConstants.TYPE_DELETE));
-
-				_addCreateDateProperty(dynamicQuery);
-			}
-
-			@Override
-			protected void performAction(Object object) {
-				SystemEvent systemEvent = (SystemEvent)object;
-
-				exportDeletionSystemEvent(
-					portletDataContext, systemEvent, rootElement);
-			}
-
-			private void _addCreateDateProperty(DynamicQuery dynamicQuery) {
-				if (!portletDataContext.hasDateRange()) {
-					return;
-				}
-
-				Property createDateProperty = PropertyFactoryUtil.forName(
-					"createDate");
-
-				Date startDate = portletDataContext.getStartDate();
-
-				dynamicQuery.add(createDateProperty.ge(startDate));
-
-				Date endDate = portletDataContext.getEndDate();
-
-				dynamicQuery.add(createDateProperty.le(endDate));
-			}
-		};
-
+			});
 		actionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object) {
+					SystemEvent systemEvent = (SystemEvent)object;
+
+					exportDeletionSystemEvent(
+						portletDataContext, systemEvent, rootElement);
+				}
+
+			});
 
 		actionableDynamicQuery.performActions();
 	}
@@ -197,5 +214,11 @@ public class DeletionSystemEventExporter {
 				systemEvent.getClassNameId(),
 				systemEvent.getReferrerClassNameId()));
 	}
+
+	private DeletionSystemEventExporter() {
+	}
+
+	private static DeletionSystemEventExporter _instance =
+		new DeletionSystemEventExporter();
 
 }

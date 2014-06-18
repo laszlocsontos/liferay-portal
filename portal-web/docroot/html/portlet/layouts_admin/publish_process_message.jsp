@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,8 +45,8 @@ BackgroundTask backgroundTask = (BackgroundTask)row.getObject();
 		}
 		%>
 
-		<div class="progress progress-striped active">
-			<div class="bar" style="width: <%= percentage %>%;">
+		<div class="active progress progress-striped">
+			<div class="progress-bar" style="width: <%= percentage %>%;">
 				<c:if test="<%= allModelAdditionCountersTotal > 0 %>">
 					<%= currentModelAdditionCountersTotal %> / <%= allModelAdditionCountersTotal %>
 				</c:if>

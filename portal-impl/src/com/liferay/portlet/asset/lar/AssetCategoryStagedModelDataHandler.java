@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -52,8 +51,7 @@ public class AssetCategoryStagedModelDataHandler
 
 	@Override
 	public void deleteStagedModel(
-			String uuid, long groupId, String className, String extraData)
-		throws SystemException {
+		String uuid, long groupId, String className, String extraData) {
 
 		AssetCategory category =
 			AssetCategoryLocalServiceUtil.fetchAssetCategoryByUuidAndGroupId(
@@ -140,6 +138,23 @@ public class AssetCategoryStagedModelDataHandler
 			AssetCategory.class, category.getCategoryId());
 
 		portletDataContext.addZipEntry(categoryPath, category);
+	}
+
+	@Override
+	protected void doImportMissingReference(
+			PortletDataContext portletDataContext, String uuid, long groupId,
+			long categoryId)
+		throws Exception {
+
+		AssetCategory existingCategory =
+			AssetCategoryLocalServiceUtil.fetchAssetCategoryByUuidAndGroupId(
+				uuid, groupId);
+
+		Map<Long, Long> categoryIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				AssetCategory.class);
+
+		categoryIds.put(categoryId, existingCategory.getCategoryId());
 	}
 
 	@Override
@@ -273,7 +288,7 @@ public class AssetCategoryStagedModelDataHandler
 
 	protected Map<Locale, String> getCategoryTitleMap(
 			long groupId, AssetCategory category, String name)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Map<Locale, String> titleMap = category.getTitleMap();
 

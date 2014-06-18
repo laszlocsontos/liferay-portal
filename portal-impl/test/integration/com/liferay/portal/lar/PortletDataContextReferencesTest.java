@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,21 +14,31 @@
 
 package com.liferay.portal.lar;
 
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.kernel.zip.ZipWriter;
+import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
+import com.liferay.portal.model.Portlet;
+import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.test.ResetDatabaseExecutionTestListener;
+import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portlet.asset.model.AssetCategory;
+import com.liferay.portlet.asset.model.AssetVocabulary;
+import com.liferay.portlet.asset.util.test.AssetTestUtil;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
-import com.liferay.portlet.bookmarks.util.BookmarksTestUtil;
+import com.liferay.portlet.bookmarks.util.test.BookmarksTestUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,24 +54,26 @@ import org.junit.runner.RunWith;
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		ResetDatabaseExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class PortletDataContextReferencesTest {
 
 	@Before
 	public void setUp() throws Exception {
+		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+
 		_portletDataContext =
 			PortletDataContextFactoryUtil.createExportPortletDataContext(
 				TestPropsValues.getCompanyId(), TestPropsValues.getGroupId(),
-				new HashMap<String, String[]>(), null, null, null);
+				new HashMap<String, String[]>(), null, null, zipWriter);
 
 		Document document = SAXReaderUtil.createDocument();
 
 		Element rootElement = document.addElement("root");
 
 		_portletDataContext.setExportDataRootElement(rootElement);
+		_portletDataContext.setImportDataRootElement(rootElement);
 
 		Element missingReferencesElement = rootElement.addElement(
 			"missing-references");
@@ -71,7 +83,39 @@ public class PortletDataContextReferencesTest {
 
 		_bookmarksEntry = BookmarksTestUtil.addEntry(true);
 		_bookmarksFolder = BookmarksTestUtil.addFolder(
-			TestPropsValues.getGroupId(), ServiceTestUtil.randomString());
+			TestPropsValues.getGroupId(), RandomTestUtil.randomString());
+	}
+
+	@Test
+	public void testCleanUpMissingReferences() throws Exception {
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(
+			PortletKeys.ASSET_PUBLISHER);
+
+		AssetVocabulary assetVocabulary = AssetTestUtil.addVocabulary(
+			TestPropsValues.getGroupId());
+
+		AssetCategory assetCategory = AssetTestUtil.addCategory(
+			TestPropsValues.getGroupId(), assetVocabulary.getVocabularyId());
+
+		_portletDataContext.addReferenceElement(
+			portlet, _portletDataContext.getExportDataRootElement(),
+			assetCategory, PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+
+		Element missingReferencesElement =
+			_portletDataContext.getMissingReferencesElement();
+
+		List<Element> missingReferenceElements =
+			missingReferencesElement.elements();
+
+		Assert.assertFalse(missingReferenceElements.isEmpty());
+		Assert.assertEquals(1, missingReferenceElements.size());
+
+		StagedModelDataHandlerUtil.exportStagedModel(
+			_portletDataContext, assetCategory);
+
+		missingReferenceElements = missingReferencesElement.elements();
+
+		Assert.assertTrue(missingReferenceElements.isEmpty());
 	}
 
 	@Test
@@ -153,6 +197,39 @@ public class PortletDataContextReferencesTest {
 	}
 
 	@Test
+	public void testMultipleMissingReferences() throws Exception {
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(
+			PortletKeys.ASSET_PUBLISHER);
+
+		_portletDataContext.addReferenceElement(
+			portlet, _portletDataContext.getExportDataRootElement(),
+			_bookmarksEntry, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
+			true);
+		_portletDataContext.addReferenceElement(
+			portlet, _portletDataContext.getExportDataRootElement(),
+			_bookmarksEntry, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
+			true);
+
+		Element missingReferencesElement =
+			_portletDataContext.getMissingReferencesElement();
+
+		List<Element> missingReferenceElements =
+			missingReferencesElement.elements();
+
+		Assert.assertFalse(missingReferenceElements.isEmpty());
+		Assert.assertEquals(1, missingReferenceElements.size());
+
+		Element missingReferenceElement = missingReferenceElements.get(0);
+
+		Assert.assertEquals(
+			BookmarksEntry.class.getName(),
+			missingReferenceElement.attributeValue("class-name"));
+		Assert.assertEquals(
+			String.valueOf(_bookmarksEntry.getEntryId()),
+			missingReferenceElement.attributeValue("class-pk"));
+	}
+
+	@Test
 	public void testNotMissingMissingReference() throws Exception {
 		Element bookmarksEntryElement =
 			_portletDataContext.getExportDataElement(_bookmarksEntry);
@@ -189,6 +266,72 @@ public class PortletDataContextReferencesTest {
 			missingReferencesElement.elements();
 
 		Assert.assertEquals(0, missingReferenceElements.size());
+	}
+
+	@Test
+	public void testNotReferenceMissingReference() throws Exception {
+		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+
+		_portletDataContext.setZipWriter(zipWriter);
+
+		Element bookmarksEntryElement =
+			_portletDataContext.getExportDataElement(_bookmarksEntry);
+
+		_portletDataContext.addClassedModel(
+			bookmarksEntryElement,
+			ExportImportPathUtil.getModelPath(_bookmarksEntry),
+			_bookmarksEntry);
+
+		Element bookmarksFolderElement =
+			_portletDataContext.getExportDataElement(_bookmarksFolder);
+
+		_portletDataContext.addReferenceElement(
+			_bookmarksFolder, bookmarksFolderElement, _bookmarksEntry,
+			PortletDataContext.REFERENCE_TYPE_CHILD, true);
+
+		Element missingReferencesElement =
+			_portletDataContext.getMissingReferencesElement();
+
+		List<Element> missingReferenceElements =
+			missingReferencesElement.elements();
+
+		Assert.assertTrue(missingReferenceElements.isEmpty());
+	}
+
+	@Test
+	public void testSameMissingReferenceMultipleTimes() throws Exception {
+		Element bookmarksEntryElement =
+			_portletDataContext.getExportDataElement(_bookmarksEntry);
+
+		bookmarksEntryElement.addAttribute(
+			"path", ExportImportPathUtil.getModelPath(_bookmarksEntry));
+
+		_portletDataContext.addReferenceElement(
+			_bookmarksEntry, bookmarksEntryElement, _bookmarksFolder,
+			PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+		_portletDataContext.addReferenceElement(
+			_bookmarksEntry, bookmarksEntryElement, _bookmarksFolder,
+			PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+
+		Element missingReferencesElement =
+			_portletDataContext.getMissingReferencesElement();
+
+		List<Element> missingReferenceElements =
+			missingReferencesElement.elements();
+
+		Assert.assertEquals(1, missingReferenceElements.size());
+
+		List<Element> referencesElements =
+			_portletDataContext.getReferenceElements(
+				_bookmarksEntry, BookmarksFolder.class);
+
+		Assert.assertEquals(2, referencesElements.size());
+
+		for (Element referenceElement : referencesElements) {
+			Assert.assertTrue(
+				GetterUtil.getBoolean(
+					referenceElement.attributeValue("missing")));
+		}
 	}
 
 	private BookmarksEntry _bookmarksEntry;

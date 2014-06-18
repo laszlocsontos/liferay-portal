@@ -18,15 +18,9 @@
 					<encoding>UTF-8</encoding>
 				</source-folder>
 				<source-folder>
-					<label>osgi\bootstrap\src</label>
+					<label>modules\core\registry-api\src</label>
 					<type>java</type>
-					<location>osgi/bootstrap/src</location>
-					<encoding>UTF-8</encoding>
-				</source-folder>
-				<source-folder>
-					<label>osgi\modules\registry\registry-api\src\main\java</label>
-					<type>java</type>
-					<location>osgi/modules/registry/registry-api/src/main/java</location>
+					<location>modules/core/registry-api/src</location>
 					<encoding>UTF-8</encoding>
 				</source-folder>
 				<source-folder>
@@ -69,6 +63,12 @@
 					<label>portal-service\test\unit</label>
 					<type>java</type>
 					<location>portal-service/test/unit</location>
+					<encoding>UTF-8</encoding>
+				</source-folder>
+				<source-folder>
+					<label>portal-test\src</label>
+					<type>java</type>
+					<location>portal-test/src</location>
 					<encoding>UTF-8</encoding>
 				</source-folder>
 				<source-folder>
@@ -150,12 +150,8 @@
 			<view>
 				<items>
 					<source-folder style="packages">
-						<label>osgi\bootstrap\src</label>
-						<location>osgi/bootstrap/src</location>
-					</source-folder>
-					<source-folder style="packages">
-						<label>osgi\modules\registry\registry-api\src\main\java</label>
-						<location>osgi/modules/registry/registry-api/src/main/java</location>
+						<label>modules\core\registry\registry-api\src</label>
+						<location>modules/core/registry/registry-api/src</location>
 					</source-folder>
 					<source-folder style="packages">
 						<label>portal-impl\src</label>
@@ -180,6 +176,10 @@
 					<source-folder style="packages">
 						<label>portal-service\test\unit</label>
 						<location>portal-service/test/unit</location>
+					</source-folder>
+					<source-folder style="packages">
+						<label>portal-test\src</label>
+						<location>portal-test/src</location>
 					</source-folder>
 					<source-folder style="packages">
 						<label>portal-web\test\functional</label>
@@ -255,6 +255,7 @@
 				<classpath mode="compile">lib/development/antelope.jar</classpath>
 				<classpath mode="compile">lib/development/catalina.jar</classpath>
 				<classpath mode="compile">lib/development/cobertura.jar</classpath>
+				<classpath mode="compile">lib/development/com.liferay.ant.bnd.jar</classpath>
 				<classpath mode="compile">lib/development/deployment.jar</classpath>
 				<classpath mode="compile">lib/development/derby.jar</classpath>
 				<classpath mode="compile">lib/development/derbytools.jar</classpath>
@@ -280,7 +281,9 @@
 				<classpath mode="compile">lib/development/jhighlight.jar</classpath>
 				<classpath mode="compile">lib/development/jms.jar</classpath>
 				<classpath mode="compile">lib/development/jndi.jar</classpath>
+				<classpath mode="compile">lib/development/jsch.jar</classpath>
 				<classpath mode="compile">lib/development/jserrorcollector.jar</classpath>
+				<classpath mode="compile">lib/development/jsonassert.jar</classpath>
 				<classpath mode="compile">lib/development/jsp-api.jar</classpath>
 				<classpath mode="compile">lib/development/jta.jar</classpath>
 				<classpath mode="compile">lib/development/jtds.jar</classpath>
@@ -306,6 +309,7 @@
 				<classpath mode="compile">lib/development/selenium-java.jar</classpath>
 				<classpath mode="compile">lib/development/selenium-server.jar</classpath>
 				<classpath mode="compile">lib/development/servlet-api.jar</classpath>
+				<classpath mode="compile">lib/development/sikuli-api.jar</classpath>
 				<classpath mode="compile">lib/development/sikuli-script.jar</classpath>
 				<classpath mode="compile">lib/development/smtp.jar</classpath>
 				<classpath mode="compile">lib/development/sonar-ant-task.jar</classpath>
@@ -322,12 +326,7 @@
 				<classpath mode="compile">lib/portal/antlr3-runtime.jar</classpath>
 				<classpath mode="compile">lib/portal/antlr3.jar</classpath>
 				<classpath mode="compile">lib/portal/aopalliance.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-analysis.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-commons.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-tree.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-util.jar</classpath>
-				<classpath mode="compile">lib/portal/asm-xml.jar</classpath>
-				<classpath mode="compile">lib/portal/asm.jar</classpath>
+				<classpath mode="compile">lib/portal/asm-debug-all.jar</classpath>
 				<classpath mode="compile">lib/portal/aspectj-rt.jar</classpath>
 				<classpath mode="compile">lib/portal/aspectj-weaver.jar</classpath>
 				<classpath mode="compile">lib/portal/axiom-api.jar</classpath>
@@ -346,16 +345,19 @@
 				<classpath mode="compile">lib/portal/cas-client-core.jar</classpath>
 				<classpath mode="compile">lib/portal/ccpp-ri.jar</classpath>
 				<classpath mode="compile">lib/portal/ccpp.jar</classpath>
-				<classpath mode="compile">lib/portal/cglib.jar</classpath>
+				<classpath mode="compile">lib/portal/cglib-nodep.jar</classpath>
 				<classpath mode="compile">lib/portal/chardet.jar</classpath>
 				<classpath mode="compile">lib/portal/chemistry-opencmis-client-api.jar</classpath>
 				<classpath mode="compile">lib/portal/chemistry-opencmis-client-bindings.jar</classpath>
 				<classpath mode="compile">lib/portal/chemistry-opencmis-client-impl.jar</classpath>
 				<classpath mode="compile">lib/portal/chemistry-opencmis-commons-api.jar</classpath>
 				<classpath mode="compile">lib/portal/chemistry-opencmis-commons-impl.jar</classpath>
+				<classpath mode="compile">lib/portal/closure-compiler.jar</classpath>
 				<classpath mode="compile">lib/portal/commons-beanutils.jar</classpath>
 				<classpath mode="compile">lib/portal/commons-codec.jar</classpath>
 				<classpath mode="compile">lib/portal/commons-collections.jar</classpath>
+				<classpath mode="compile">lib/portal/commons-compiler.jar</classpath>
+				<classpath mode="compile">lib/portal/commons-compiler-jdk.jar</classpath>
 				<classpath mode="compile">lib/portal/commons-compress.jar</classpath>
 				<classpath mode="compile">lib/portal/commons-configuration.jar</classpath>
 				<classpath mode="compile">lib/portal/commons-dbcp.jar</classpath>
@@ -409,8 +411,9 @@
 				<classpath mode="compile">lib/portal/jai_core.jar</classpath>
 				<classpath mode="compile">lib/portal/jakarta-regexp.jar</classpath>
 				<classpath mode="compile">lib/portal/jamwiki-core.jar</classpath>
-				<classpath mode="compile">lib/portal/javassist.jar</classpath>
+				<classpath mode="compile">lib/portal/janino.jar</classpath>
 				<classpath mode="compile">lib/portal/java-diff.jar</classpath>
+				<classpath mode="compile">lib/portal/javassist.jar</classpath>
 				<classpath mode="compile">lib/portal/jaxb-impl.jar</classpath>
 				<classpath mode="compile">lib/portal/jaxen.jar</classpath>
 				<classpath mode="compile">lib/portal/jaxrpc.jar</classpath>
@@ -543,8 +546,7 @@
 				<classpath mode="compile">lib/portal/xstream.jar</classpath>
 				<classpath mode="compile">lib/portal/xuggle-xuggler.jar</classpath>
 				<classpath mode="compile">lib/portal/xz.jar</classpath>
-				<classpath mode="compile">osgi/lib/common/core/osgi.cmpn.jar</classpath>
-				<classpath mode="compile">osgi/lib/common/core/osgi.core.jar</classpath>
+				<classpath mode="compile">modules/core/registry-impl/lib/org.eclipse.osgi.jar</classpath>
 				<source-level>1.5</source-level>
 			</compilation-unit>
 		</java-data>

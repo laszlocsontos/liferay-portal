@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.lar;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -89,7 +90,7 @@ public class ExportImportDateUtil {
 
 	public static DateRange getDateRange(
 			ExportImportConfiguration configuration)
-		throws Exception {
+		throws PortalException {
 
 		Map<String, Serializable> settingsMap = configuration.getSettingsMap();
 
@@ -126,7 +127,7 @@ public class ExportImportDateUtil {
 	}
 
 	public static DateRange getDateRange(long configurationId)
-		throws Exception {
+		throws PortalException {
 
 		ExportImportConfiguration exportImportConfiguration =
 			ExportImportConfigurationLocalServiceUtil.
@@ -138,7 +139,7 @@ public class ExportImportDateUtil {
 	public static DateRange getDateRange(
 			PortletRequest portletRequest, long groupId, boolean privateLayout,
 			long plid, String portletId, String defaultRange)
-		throws Exception {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -207,7 +208,7 @@ public class ExportImportDateUtil {
 			int endDateMonth, int endDateDay, int endDateHour,
 			int endDateMinute, String portletId, long groupId, long plid,
 			boolean privateLayout, Locale locale, TimeZone timeZone)
-		throws Exception {
+		throws PortalException {
 
 		Date startDate = null;
 		Date endDate = null;

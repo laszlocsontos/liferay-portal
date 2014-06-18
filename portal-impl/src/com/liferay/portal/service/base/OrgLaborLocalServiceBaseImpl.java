@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -68,11 +70,10 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param orgLabor the org labor
 	 * @return the org labor that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public OrgLabor addOrgLabor(OrgLabor orgLabor) throws SystemException {
+	public OrgLabor addOrgLabor(OrgLabor orgLabor) {
 		orgLabor.setNew(true);
 
 		return orgLaborPersistence.update(orgLabor);
@@ -95,12 +96,10 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param orgLaborId the primary key of the org labor
 	 * @return the org labor that was removed
 	 * @throws PortalException if a org labor with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public OrgLabor deleteOrgLabor(long orgLaborId)
-		throws PortalException, SystemException {
+	public OrgLabor deleteOrgLabor(long orgLaborId) throws PortalException {
 		return orgLaborPersistence.remove(orgLaborId);
 	}
 
@@ -109,11 +108,10 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param orgLabor the org labor
 	 * @return the org labor that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public OrgLabor deleteOrgLabor(OrgLabor orgLabor) throws SystemException {
+	public OrgLabor deleteOrgLabor(OrgLabor orgLabor) {
 		return orgLaborPersistence.remove(orgLabor);
 	}
 
@@ -130,12 +128,10 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return orgLaborPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -150,12 +146,10 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return orgLaborPersistence.findWithDynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -171,12 +165,11 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return orgLaborPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -186,11 +179,9 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return orgLaborPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -200,17 +191,16 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return orgLaborPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public OrgLabor fetchOrgLabor(long orgLaborId) throws SystemException {
+	public OrgLabor fetchOrgLabor(long orgLaborId) {
 		return orgLaborPersistence.fetchByPrimaryKey(orgLaborId);
 	}
 
@@ -220,17 +210,46 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param orgLaborId the primary key of the org labor
 	 * @return the org labor
 	 * @throws PortalException if a org labor with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public OrgLabor getOrgLabor(long orgLaborId)
-		throws PortalException, SystemException {
+	public OrgLabor getOrgLabor(long orgLaborId) throws PortalException {
 		return orgLaborPersistence.findByPrimaryKey(orgLaborId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.OrgLaborLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(OrgLabor.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("orgLaborId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.OrgLaborLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(OrgLabor.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("orgLaborId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteOrgLabor((OrgLabor)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return orgLaborPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -244,11 +263,9 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of org labors
 	 * @param end the upper bound of the range of org labors (not inclusive)
 	 * @return the range of org labors
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<OrgLabor> getOrgLabors(int start, int end)
-		throws SystemException {
+	public List<OrgLabor> getOrgLabors(int start, int end) {
 		return orgLaborPersistence.findAll(start, end);
 	}
 
@@ -256,10 +273,9 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the number of org labors.
 	 *
 	 * @return the number of org labors
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getOrgLaborsCount() throws SystemException {
+	public int getOrgLaborsCount() {
 		return orgLaborPersistence.countAll();
 	}
 
@@ -268,11 +284,10 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param orgLabor the org labor
 	 * @return the org labor that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public OrgLabor updateOrgLabor(OrgLabor orgLabor) throws SystemException {
+	public OrgLabor updateOrgLabor(OrgLabor orgLabor) {
 		return orgLaborPersistence.update(orgLabor);
 	}
 
@@ -431,7 +446,7 @@ public abstract class OrgLaborLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = orgLaborPersistence.getDataSource();
 

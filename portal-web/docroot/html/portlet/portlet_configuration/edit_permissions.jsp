@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -103,10 +103,6 @@ if (Validator.isNotNull(roleTypesParam)) {
 	roleTypes = StringUtil.split(roleTypesParam, 0);
 }
 
-if (group.isCompany()) {
-	roleTypes = new int[] {RoleConstants.TYPE_REGULAR};
-}
-
 PortletURL actionPortletURL = renderResponse.createActionURL();
 
 actionPortletURL.setParameter("struts_action", "/portlet_configuration/edit_permissions");
@@ -164,6 +160,8 @@ definePermissionsURL.setRefererPlid(plid);
 		</c:choose>
 
 		<%
+		boolean filterGroupRoles = !ResourceActionsUtil.isPortalModelResource(modelResource);
+
 		List<String> actions = ResourceActionsUtil.getResourceActions(portletResource, modelResource);
 
 		if (modelResource.equals(Group.class.getName())) {
@@ -204,6 +202,10 @@ definePermissionsURL.setRefererPlid(plid);
 				actions.remove(ActionKeys.UPDATE);
 				actions.remove(ActionKeys.VIEW);
 			}
+
+			if ((modelResourceRole.getType() == RoleConstants.TYPE_ORGANIZATION) || (modelResourceRole.getType() == RoleConstants.TYPE_SITE)) {
+				filterGroupRoles = true;
+			}
 		}
 
 		List<Role> roles = ListUtil.copy(ResourceActionsUtil.getRoles(company.getCompanyId(), group, modelResource, roleTypes));
@@ -212,7 +214,7 @@ definePermissionsURL.setRefererPlid(plid);
 
 		roles.remove(administratorRole);
 
-		if (!ResourceActionsUtil.isPortalModelResource(modelResource)) {
+		if (filterGroupRoles) {
 			Role organizationAdministratorRole = RoleLocalServiceUtil.getRole(company.getCompanyId(), RoleConstants.ORGANIZATION_ADMINISTRATOR);
 
 			roles.remove(organizationAdministratorRole);
@@ -234,10 +236,6 @@ definePermissionsURL.setRefererPlid(plid);
 
 		if (modelResource.equals(Role.class.getName())) {
 			modelResourceRoleId = GetterUtil.getLong(resourcePrimKey);
-
-			Role role = RoleLocalServiceUtil.getRole(modelResourceRoleId);
-
-			roles.remove(role);
 		}
 
 		roles.addAll(RoleLocalServiceUtil.getTeamRoles(groupId, new long[] {modelResourceRoleId}));
@@ -297,8 +295,6 @@ definePermissionsURL.setRefererPlid(plid);
 				keyProperty="roleId"
 				modelVar="role"
 			>
-				<liferay-util:param name="className" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
-				<liferay-util:param name="classHoverName" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
 
 				<%
 				String definePermissionsHREF = null;
@@ -315,8 +311,13 @@ definePermissionsURL.setRefererPlid(plid);
 				<liferay-ui:search-container-column-text
 					href="<%= definePermissionsHREF %>"
 					name="role"
-					value="<%= role.getTitle(locale) %>"
-				/>
+				>
+					<liferay-ui:icon
+						iconCssClass="<%= RolesAdminUtil.getIconCssClass(role) %>"
+						label="<%= true %>"
+						message="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
+					/>
+				</liferay-ui:search-container-column-text>
 
 				<%
 
@@ -368,61 +369,20 @@ definePermissionsURL.setRefererPlid(plid);
 				%>
 
 					<liferay-ui:search-container-column-text
-						buffer="buffer"
 						name="<%= ResourceActionsUtil.getAction(pageContext, action) %>"
 					>
 
 						<%
-						buffer.append("<input ");
-
-						if (checked) {
-							buffer.append("checked ");
-						}
+						String dataMessage = StringPool.BLANK;
 
 						if (Validator.isNotNull(preselectedMsg)) {
-							buffer.append("class=\"lfr-checkbox-preselected\" ");
+							dataMessage = HtmlUtil.escapeAttribute(LanguageUtil.format(pageContext, preselectedMsg, new Object[] {role.getTitle(locale), ResourceActionsUtil.getAction(pageContext, action), Validator.isNull(modelResource) ? selResourceDescription : ResourceActionsUtil.getModelResource(locale, resource.getName()), HtmlUtil.escape(group.getDescriptiveName(locale))}, false));
 						}
 
-						if (disabled) {
-							buffer.append("disabled ");
-						}
-
-						buffer.append("id=\"");
-						buffer.append(FriendlyURLNormalizerUtil.normalize(role.getName()));
-
-						if (Validator.isNotNull(preselectedMsg)) {
-							buffer.append(ActionUtil.PRESELECTED);
-						}
-						else {
-							buffer.append(ActionUtil.ACTION);
-						}
-
-						buffer.append(action);
-						buffer.append("\" ");
-
-						buffer.append("name=\"");
-						buffer.append(renderResponse.getNamespace());
-						buffer.append(role.getRoleId());
-
-						if (Validator.isNotNull(preselectedMsg)) {
-							buffer.append(ActionUtil.PRESELECTED);
-						}
-						else {
-							buffer.append(ActionUtil.ACTION);
-						}
-
-						buffer.append(action);
-						buffer.append("\" ");
-
-						if (Validator.isNotNull(preselectedMsg)) {
-							buffer.append("onclick=\"return false;\" onmouseover=\"Liferay.Portal.ToolTip.show(this, '");
-							buffer.append(UnicodeLanguageUtil.format(pageContext, preselectedMsg, new Object[] {role.getTitle(locale), ResourceActionsUtil.getAction(pageContext, action), Validator.isNull(modelResource) ? selResourceDescription : ResourceActionsUtil.getModelResource(locale, resource.getName()), HtmlUtil.escape(group.getDescriptiveName(locale))}, false));
-							buffer.append("'); return false;\" ");
-						}
-
-						buffer.append("type=\"checkbox\" />");
+						String actionSeparator = Validator.isNotNull(preselectedMsg) ? ActionUtil.PRESELECTED : ActionUtil.ACTION;
 						%>
 
+						<input <%= checked ? "checked" : StringPool.BLANK %> class="<%= Validator.isNotNull(preselectedMsg) ? "lfr-checkbox-preselected" : StringPool.BLANK %>" data-message="<%= dataMessage %>" <%= disabled ? "disabled" : StringPool.BLANK %> id="<%= FriendlyURLNormalizerUtil.normalize(role.getName()) + actionSeparator + action %>" name="<%= renderResponse.getNamespace() + role.getRoleId() + actionSeparator + action %>" type="checkbox" />
 					</liferay-ui:search-container-column-text>
 
 				<%
@@ -439,3 +399,17 @@ definePermissionsURL.setRefererPlid(plid);
 		</aui:button-row>
 	</aui:form>
 </div>
+
+<aui:script use="aui-base">
+	A.one('#<portlet:namespace />fm').delegate(
+		'mouseover',
+		function(event) {
+			var currentTarget = event.currentTarget;
+
+			Liferay.Portal.ToolTip.show(this, currentTarget.attr('data-message'));
+
+			return false;
+		},
+		'.lfr-checkbox-preselected'
+	);
+</aui:script>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,37 +15,28 @@
 package com.liferay.portlet.documentlibrary.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
+import com.liferay.portlet.asset.model.ClassTypeReader;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryTypePermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -62,9 +53,14 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 
 	public static final String TYPE = "document";
 
+	public DLFileEntryAssetRendererFactory() {
+		setLinkable(true);
+		setSupportsClassTypes(true);
+	}
+
 	@Override
 	public AssetRenderer getAssetRenderer(long classPK, int type)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		FileEntry fileEntry = null;
 		FileVersion fileVersion = null;
@@ -94,60 +90,13 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	public List<Tuple> getClassTypeFieldNames(
-			long classTypeId, Locale locale, int start, int end)
-		throws Exception {
-
-		List<Tuple> classTypeFieldNames = new ArrayList<Tuple>();
-
-		DLFileEntryType dlFileEntryType =
-			DLFileEntryTypeLocalServiceUtil.getDLFileEntryType(classTypeId);
-
-		List<DDMStructure> ddmStructures = dlFileEntryType.getDDMStructures();
-
-		for (DDMStructure ddmStructure : ddmStructures) {
-			classTypeFieldNames.addAll(
-				getDDMStructureFieldNames(ddmStructure, locale));
-		}
-
-		return ListUtil.subList(classTypeFieldNames, start, end);
+	public ClassTypeReader getClassTypeReader() {
+		return new DLFileEntryClassTypeReader();
 	}
 
 	@Override
-	public int getClassTypeFieldNamesCount(long classTypeId, Locale locale)
-		throws Exception {
-
-		List<Tuple> classTypeFieldNames = new ArrayList<Tuple>();
-
-		DLFileEntryType dlFileEntryType =
-			DLFileEntryTypeLocalServiceUtil.getDLFileEntryType(classTypeId);
-
-		List<DDMStructure> ddmStructures = dlFileEntryType.getDDMStructures();
-
-		for (DDMStructure ddmStructure : ddmStructures) {
-			classTypeFieldNames.addAll(
-				getDDMStructureFieldNames(ddmStructure, locale));
-		}
-
-		return classTypeFieldNames.size();
-	}
-
-	@Override
-	public Map<Long, String> getClassTypes(long[] groupIds, Locale locale)
-		throws Exception {
-
-		Map<Long, String> classTypes = new HashMap<Long, String>();
-
-		List<DLFileEntryType> dlFileEntryTypes =
-			DLFileEntryTypeServiceUtil.getFileEntryTypes(groupIds);
-
-		for (DLFileEntryType dlFileEntryType : dlFileEntryTypes) {
-			classTypes.put(
-				dlFileEntryType.getFileEntryTypeId(),
-				dlFileEntryType.getName(locale));
-		}
-
-		return classTypes;
+	public String getIconCssClass() {
+		return "icon-file-alt";
 	}
 
 	@Override
@@ -156,12 +105,16 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	public String getTypeName(Locale locale, boolean hasSubtypes) {
-		if (hasSubtypes) {
-			return LanguageUtil.get(locale, "basic-document");
-		}
+	public String getTypeName(Locale locale, long subtypeId) {
+		try {
+			DLFileEntryType dlFileEntryType =
+				DLFileEntryTypeLocalServiceUtil.getFileEntryType(subtypeId);
 
-		return super.getTypeName(locale, hasSubtypes);
+			return dlFileEntryType.getName(locale);
+		}
+		catch (Exception e) {
+			return super.getTypeName(locale, subtypeId);
+		}
 	}
 
 	@Override
@@ -228,15 +181,8 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	public boolean isLinkable() {
-		return _LINKABLE;
-	}
-
-	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/clip.png";
 	}
-
-	private static final boolean _LINKABLE = true;
 
 }

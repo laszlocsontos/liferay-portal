@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,7 +51,13 @@ public class WorkflowConstants {
 
 	public static final String CONTEXT_TRANSITION_NAME = "transitionName";
 
+	public static final String CONTEXT_URL = "url";
+
 	public static final String CONTEXT_USER_ID = "userId";
+
+	public static final String CONTEXT_USER_PORTRAIT_URL = "userPortraitURL";
+
+	public static final String CONTEXT_USER_URL = "userURL";
 
 	public static final long DEFAULT_GROUP_ID = 0;
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,29 +29,20 @@ FileVersion fileVersion = (FileVersion)objArray[1];
 
 <liferay-ui:icon-menu direction='<%= "down" %>' extended="<%= false %>" icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
 	<liferay-ui:icon
-		image="download"
+		iconCssClass="icon-download"
+		message="download"
 		url="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, StringPool.BLANK) %>"
 	/>
 
 	<portlet:renderURL var="viewFileVersionURL">
-		<c:choose>
-			<c:when test="<%= portletName.equals(PortletKeys.TRASH) %>">
-				<portlet:param name="struts_action" value="/trash/view_content" />
-				<portlet:param name="className" value="<%= DLFileEntryConstants.getClassName() %>" />
-				<portlet:param name="classPK" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
-			</c:when>
-			<c:otherwise>
-				<portlet:param name="struts_action" value="/document_library/view_file_entry" />
-			</c:otherwise>
-		</c:choose>
-
+		<portlet:param name="struts_action" value="/document_library/view_file_entry" />
 		<portlet:param name="redirect" value="<%= redirect %>" />
 		<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
 		<portlet:param name="version" value="<%= fileVersion.getVersion() %>" />
 	</portlet:renderURL>
 
 	<liferay-ui:icon
-		image="view"
+		iconCssClass="icon-search"
 		message="view[action]"
 		url="<%= viewFileVersionURL %>"
 	/>
@@ -72,7 +63,7 @@ FileVersion fileVersion = (FileVersion)objArray[1];
 		</portlet:actionURL>
 
 		<liferay-ui:icon
-			image="undo"
+			iconCssClass="icon-undo"
 			message="revert"
 			url="<%= revertURL %>"
 		/>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,9 +16,9 @@ package com.liferay.portal.dao.jdbc.aop;
 
 import com.liferay.portal.kernel.dao.jdbc.aop.MasterDataSource;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
 import com.liferay.portal.spring.aop.ServiceBeanAopCacheManager;
@@ -26,7 +26,6 @@ import com.liferay.portal.spring.aop.ServiceBeanMethodInvocation;
 import com.liferay.portal.spring.transaction.AnnotationTransactionAttributeSource;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -116,11 +115,9 @@ public class DynamicDataSourceAdviceTest {
 
 	@Test
 	public void testAnnotationType() throws Exception {
-		Field masterDataSourceField = ReflectionUtil.getDeclaredField(
-			DynamicDataSourceAdvice.class, "_nullMasterDataSource");
-
 		MasterDataSource masterDataSource =
-			(MasterDataSource)masterDataSourceField.get(null);
+			(MasterDataSource)ReflectionTestUtil.getFieldValue(
+				DynamicDataSourceAdvice.class, "_nullMasterDataSource");
 
 		Assert.assertSame(
 			MasterDataSource.class, masterDataSource.annotationType());

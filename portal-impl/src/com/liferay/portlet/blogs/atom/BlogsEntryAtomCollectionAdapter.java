@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -193,10 +193,10 @@ public class BlogsEntryAtomCollectionAdapter
 		serviceContext.setScopeGroupId(groupId);
 
 		return BlogsEntryServiceUtil.addEntry(
-			title, summary, content, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute, allowPingbacks,
-			allowTrackbacks, trackbacks, false, null, null, null,
-			serviceContext);
+			title, StringPool.BLANK, summary, content, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			allowPingbacks, allowTrackbacks, trackbacks, false, null, null,
+			null, serviceContext);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -292,10 +292,10 @@ public class AggregateClassLoader extends ClassLoader {
 		catch (InvocationTargetException ite) {
 			Throwable t = ite.getTargetException();
 
-			throw new IOException(t.getMessage());
+			throw new IOException(t);
 		}
 		catch (Exception e) {
-			throw new IOException(e.getMessage());
+			throw new IOException(e);
 		}
 	}
 

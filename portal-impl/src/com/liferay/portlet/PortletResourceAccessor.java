@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -115,6 +115,16 @@ public interface PortletResourceAccessor
 			return false;
 		}
 
+		@Override
+		public Class<List<String>> getAttributeClass() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Class<Portlet> getTypeClass() {
+			return Portlet.class;
+		}
+
 	}
 
 	public static abstract class PortalPortletResourceAccessor
@@ -123,6 +133,16 @@ public interface PortletResourceAccessor
 		@Override
 		public boolean isPortalResource() {
 			return true;
+		}
+
+		@Override
+		public Class<List<String>> getAttributeClass() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Class<Portlet> getTypeClass() {
+			return Portlet.class;
 		}
 
 	}

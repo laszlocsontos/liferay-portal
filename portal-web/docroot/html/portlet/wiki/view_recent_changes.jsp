@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,11 +32,11 @@ WikiNode node = (WikiNode)request.getAttribute(WebKeys.WIKI_NODE);
 
 <br />
 
-<c:if test="<%= enableRSS %>">
+<c:if test="<%= wikiPortletInstanceSettings.isEnableRSS() %>">
 	<liferay-ui:rss
-		delta="<%= rssDelta %>"
-		displayStyle="<%= rssDisplayStyle %>"
-		feedType="<%= rssFeedType %>"
+		delta="<%= wikiPortletInstanceSettings.getRssDelta() %>"
+		displayStyle="<%= wikiPortletInstanceSettings.getRssDisplayStyle() %>"
+		feedType="<%= wikiPortletInstanceSettings.getRssFeedType() %>"
 		url='<%= themeDisplay.getPathMain() + "/wiki/rss?p_l_id=" + plid + "&nodeId=" + node.getNodeId() %>'
 	/>
 </c:if>

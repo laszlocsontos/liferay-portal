@@ -1,4 +1,6 @@
 <definition component-name="portal-collaboration">
+	<property name="testray.main.component.name" value="Collaboration" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -7,6 +9,8 @@
 		<execute macro="MessageboardsCategory#tearDownCP" />
 
 		<execute macro="MessageboardsThread#tearDownCP" />
+
+		<execute macro="MessageboardsPortlet#tearDownConfigurationGeneralCP" />
 	</tear-down>
 
 	<command name="AddMBCategory" priority="5">
@@ -21,7 +25,10 @@
 		</execute>
 
 		<execute macro="MessageboardsCategory#viewCP">
+			<var name="categoriesNumber" value="0" />
 			<var name="categoryName" value="${categoryName}" />
+			<var name="postsNumber" value="0" />
+			<var name="threadsNumber" value="0" />
 		</execute>
 	</command>
 
@@ -67,6 +74,7 @@
 		</execute>
 
 		<execute macro="MessageboardsThread#viewCP">
+			<var name="postsNumber" value="1" />
 			<var name="threadBody" value="${threadBody}" />
 			<var name="threadSubject" value="${threadSubject}" />
 		</execute>
@@ -101,6 +109,7 @@
 		</execute>
 
 		<execute macro="MessageboardsThread#viewCP">
+			<var name="postsNumber" value="1" />
 			<var name="threadBody" value="${threadBodyEdit}" />
 			<var name="threadSubject" value="${threadSubjectEdit}" />
 		</execute>
@@ -134,5 +143,39 @@
 		<execute macro="MessageboardsThread#viewDefaultCP">
 			<var name="threadSubject" value="${threadSubject}" />
 		</execute>
+	</command>
+
+	<command name="ViewAnonymousPostingAllowedCheckboxConfiguration" priority="4">
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Message Boards" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewAnonymousPostingCheckboxCP" />
+
+		<execute macro="Portlet#gotoPortletOptions">
+			<var name="portletOption" value="Configuration" />
+		</execute>
+
+		<execute macro="MessageboardsPortlet#configureAnonymousPostingCP">
+			<var name="anonymousPostingEnabled" value="false" />
+		</execute>
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Message Boards" />
+		</execute>
+
+		<execute macro="Portlet#gotoPortletOptions">
+			<var name="portletOption" value="Configuration" />
+		</execute>
+
+		<execute macro="MessageboardsPortlet#viewAnonymousPostingConfigurationCP">
+			<var name="anonymousPostingEnabled" value="false" />
+		</execute>
+
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Message Boards" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewNoAnonymousPostingCheckboxCP" />
 	</command>
 </definition>

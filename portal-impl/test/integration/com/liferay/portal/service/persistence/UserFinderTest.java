@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
@@ -27,36 +26,38 @@ import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portal.util.GroupTestUtil;
-import com.liferay.portal.util.OrganizationTestUtil;
-import com.liferay.portal.util.RoleTestUtil;
-import com.liferay.portal.util.TestPropsValues;
-import com.liferay.portal.util.UserGroupTestUtil;
-import com.liferay.portal.util.UserTestUtil;
+import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.TransactionalTestRule;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.OrganizationTestUtil;
+import com.liferay.portal.util.test.RoleTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portal.util.test.UserGroupTestUtil;
+import com.liferay.portal.util.test.UserTestUtil;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Jozsef Illes
  */
-@ExecutionTestListeners(
-	listeners = {
-		EnvironmentExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class UserFinderTest {
+
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -92,68 +93,82 @@ public class UserFinderTest {
 		UserGroupLocalServiceUtil.deleteUserGroup(_userGroup);
 	}
 
-	@Test
-	public void testCountByKeywordsWithInheritedGroups() throws Exception {
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
+	@Before
+	public void setUp() throws Exception {
+		_inheritedUserGroupsParams = new LinkedHashMap<String, Object>();
 
-		params.put("inherit", Boolean.TRUE);
-		params.put(
+		_inheritedUserGroupsParams.put("inherit", Boolean.TRUE);
+		_inheritedUserGroupsParams.put(
 			"usersGroups",
 			new Long[] {
 				_group.getGroupId(), _organization.getGroupId(),
 				_userGroup.getGroupId()
 			});
 
+		_inheritedUserGroupsExpectedCount = UserFinderUtil.countByKeywords(
+			TestPropsValues.getCompanyId(), null,
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserGroupsParams);
+
+		_roleId = RoleTestUtil.addRegularRole(_group.getGroupId());
+
+		_inheritedUserRolesParams = new LinkedHashMap<String, Object>();
+
+		_inheritedUserRolesParams.put("inherit", Boolean.TRUE);
+		_inheritedUserRolesParams.put("usersRoles", _roleId);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		RoleLocalServiceUtil.deleteRole(_roleId);
+
+		GroupLocalServiceUtil.clearOrganizationGroups(
+			_organization.getOrganizationId());
+		GroupLocalServiceUtil.clearUserGroupGroups(_userGroup.getUserGroupId());
+	}
+
+	@Test
+	public void testCountByKeywordsWithInheritedGroups() throws Exception {
 		int count = UserFinderUtil.countByKeywords(
 			TestPropsValues.getCompanyId(), null,
-			WorkflowConstants.STATUS_APPROVED, params);
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserGroupsParams);
 
-		Assert.assertEquals(4, count);
+		Assert.assertEquals(_inheritedUserGroupsExpectedCount, count);
 	}
 
 	@Test
 	public void testCountByKeywordsWithInheritedRoles() throws Exception {
-		long roleId = RoleTestUtil.addRegularRole(_group.getGroupId());
+		int expectedCount = UserFinderUtil.countByKeywords(
+			TestPropsValues.getCompanyId(), null,
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserRolesParams);
 
-		RoleLocalServiceUtil.addGroupRole(_organization.getGroupId(), roleId);
-		RoleLocalServiceUtil.addGroupRole(_userGroup.getGroupId(), roleId);
-
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
-
-		params.put("inherit", Boolean.TRUE);
-		params.put("usersRoles", roleId);
+		RoleLocalServiceUtil.addGroupRole(_organization.getGroupId(), _roleId);
+		RoleLocalServiceUtil.addGroupRole(_userGroup.getGroupId(), _roleId);
 
 		int count = UserFinderUtil.countByKeywords(
 			TestPropsValues.getCompanyId(), null,
-			WorkflowConstants.STATUS_APPROVED, params);
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserRolesParams);
 
-		Assert.assertEquals(4, count);
+		Assert.assertEquals(expectedCount + 2, count);
 	}
 
 	@Test
 	public void testCountByKeywordsWithInheritedRolesThroughSite()
 		throws Exception {
 
+		int expectedCount = UserFinderUtil.countByKeywords(
+			TestPropsValues.getCompanyId(), null,
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserRolesParams);
+
 		GroupLocalServiceUtil.addOrganizationGroup(
 			_organization.getOrganizationId(), _group);
 		GroupLocalServiceUtil.addUserGroupGroup(
 			_userGroup.getUserGroupId(), _group);
 
-		long roleId = RoleTestUtil.addRegularRole(_group.getGroupId());
-
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
-
-		params.put("inherit", Boolean.TRUE);
-		params.put("usersRoles", roleId);
-
 		int count = UserFinderUtil.countByKeywords(
 			TestPropsValues.getCompanyId(), null,
-			WorkflowConstants.STATUS_APPROVED, params);
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserRolesParams);
 
-		Assert.assertEquals(4, count);
+		Assert.assertEquals(expectedCount + 2, count);
 	}
 
 	@Test
@@ -203,81 +218,64 @@ public class UserFinderTest {
 
 	@Test
 	public void testFindByKeywordsWithInheritedGroups() throws Exception {
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
-
-		params.put("inherit", Boolean.TRUE);
-		params.put(
-			"usersGroups",
-			new Long[] {
-				_group.getGroupId(), _organization.getGroupId(),
-				_userGroup.getGroupId()
-			});
-
 		List<User> users = UserFinderUtil.findByKeywords(
 			TestPropsValues.getCompanyId(), null,
-			WorkflowConstants.STATUS_APPROVED, params, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserGroupsParams,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertTrue(users.contains(_groupUser));
 		Assert.assertTrue(users.contains(_organizationUser));
 		Assert.assertTrue(users.contains(_userGroupUser));
 		Assert.assertTrue(users.contains(TestPropsValues.getUser()));
-		Assert.assertEquals(4, users.size());
+		Assert.assertEquals(_inheritedUserGroupsExpectedCount, users.size());
 	}
 
 	@Test
 	public void testFindByKeywordsWithInheritedRoles() throws Exception {
-		long roleId = RoleTestUtil.addRegularRole(_group.getGroupId());
+		List<User> expectedUsers = UserFinderUtil.findByKeywords(
+			TestPropsValues.getCompanyId(), null,
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserRolesParams,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
-		RoleLocalServiceUtil.addGroupRole(_organization.getGroupId(), roleId);
-		RoleLocalServiceUtil.addGroupRole(_userGroup.getGroupId(), roleId);
-
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
-
-		params.put("inherit", Boolean.TRUE);
-		params.put("usersRoles", roleId);
+		RoleLocalServiceUtil.addGroupRole(_organization.getGroupId(), _roleId);
+		RoleLocalServiceUtil.addGroupRole(_userGroup.getGroupId(), _roleId);
 
 		List<User> users = UserFinderUtil.findByKeywords(
 			TestPropsValues.getCompanyId(), null,
-			WorkflowConstants.STATUS_APPROVED, params, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserRolesParams,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertTrue(users.contains(_groupUser));
 		Assert.assertTrue(users.contains(_organizationUser));
 		Assert.assertTrue(users.contains(_userGroupUser));
 		Assert.assertTrue(users.contains(TestPropsValues.getUser()));
-		Assert.assertEquals(4, users.size());
+		Assert.assertEquals(expectedUsers.size() + 2, users.size());
 	}
 
 	@Test
 	public void testFindByKeywordsWithInheritedRolesThroughSite()
 		throws Exception {
 
+		List<User> expectedUsers = UserFinderUtil.findByKeywords(
+			TestPropsValues.getCompanyId(), null,
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserRolesParams,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
 		GroupLocalServiceUtil.addOrganizationGroup(
 			_organization.getOrganizationId(), _group);
 		GroupLocalServiceUtil.addUserGroupGroup(
 			_userGroup.getUserGroupId(), _group);
 
-		long roleId = RoleTestUtil.addRegularRole(_group.getGroupId());
-
-		LinkedHashMap<String, Object> params =
-			new LinkedHashMap<String, Object>();
-
-		params.put("inherit", Boolean.TRUE);
-		params.put("usersRoles", roleId);
-
 		List<User> users = UserFinderUtil.findByKeywords(
 			TestPropsValues.getCompanyId(), null,
-			WorkflowConstants.STATUS_APPROVED, params, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+			WorkflowConstants.STATUS_APPROVED, _inheritedUserRolesParams,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertTrue(users.contains(_groupUser));
 		Assert.assertTrue(users.contains(_organizationUser));
 		Assert.assertTrue(users.contains(_userGroupUser));
 		Assert.assertTrue(users.contains(TestPropsValues.getUser()));
-		Assert.assertEquals(4, users.size());
+		Assert.assertEquals(expectedUsers.size() + 2, users.size());
 	}
 
 	private static Group _group;
@@ -286,5 +284,10 @@ public class UserFinderTest {
 	private static User _organizationUser;
 	private static UserGroup _userGroup;
 	private static User _userGroupUser;
+
+	private int _inheritedUserGroupsExpectedCount;
+	private LinkedHashMap<String, Object> _inheritedUserGroupsParams;
+	private LinkedHashMap<String, Object> _inheritedUserRolesParams;
+	private long _roleId;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.lar;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.LongWrapper;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.xml.Document;
@@ -25,13 +26,14 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.journal.lar.JournalArticleStagedModelDataHandlerTest;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFolder;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +45,23 @@ import org.junit.Assert;
 @Sync
 public class ManifestSummaryTest
 	extends JournalArticleStagedModelDataHandlerTest {
+
+	@Override
+	protected void addComments(StagedModel stagedModel) throws Exception {
+		return;
+	}
+
+	@Override
+	protected void addRatings(StagedModel stagedModel) throws Exception {
+		return;
+	}
+
+	@Override
+	protected AssetEntry fetchAssetEntry(StagedModel stagedModel, Group group)
+		throws Exception {
+
+		return null;
+	}
 
 	@Override
 	protected void validateExport(
@@ -76,9 +95,9 @@ public class ManifestSummaryTest
 
 		Element headerElement = rootElement.addElement("header");
 
-		_exportDateString = Time.getRFC822();
+		_exportDate = new Date();
 
-		headerElement.addAttribute("export-date", _exportDateString);
+		headerElement.addAttribute("export-date", Time.getRFC822(_exportDate));
 
 		ExportImportHelperUtil.writeManifestSummary(document, manifestSummary);
 
@@ -93,9 +112,7 @@ public class ManifestSummaryTest
 		throws Exception {
 
 		ManifestSummary manifestSummary =
-			ExportImportHelperUtil.getManifestSummary(
-				TestPropsValues.getUserId(), liveGroup.getGroupId(),
-				getParameterMap(), zipWriter.getFile());
+			ExportImportHelperUtil.getManifestSummary(portletDataContext);
 
 		Map<String, LongWrapper> modelAdditionCounters =
 			manifestSummary.getModelAdditionCounters();
@@ -113,13 +130,11 @@ public class ManifestSummaryTest
 			1, manifestSummary.getModelAdditionCount(JournalArticle.class));
 		Assert.assertEquals(
 			1, manifestSummary.getModelAdditionCount(JournalFolder.class));
-
-		String exportedDateString = Time.getRFC822(
-			manifestSummary.getExportDate());
-
-		Assert.assertEquals(_exportDateString, exportedDateString);
+		Assert.assertTrue(
+			DateUtil.equals(
+				_exportDate, manifestSummary.getExportDate(), true));
 	}
 
-	private String _exportDateString;
+	private Date _exportDate;
 
 }

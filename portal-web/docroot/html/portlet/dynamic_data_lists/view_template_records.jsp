@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,7 +29,7 @@ DDMStructure ddmStructure = recordSet.getDDMStructure();
 <aui:form action="<%= editRecordSetURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveRecordSet();" %>'>
 	<c:if test="<%= DDLRecordSetPermission.contains(permissionChecker, recordSet.getRecordSetId(), ActionKeys.ADD_RECORD) && editable %>">
 		<aui:nav-bar>
-			<aui:nav>
+			<aui:nav cssClass="navbar-nav">
 				<portlet:renderURL var="addRecordURL">
 					<portlet:param name="struts_action" value="/dynamic_data_lists/edit_record" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />

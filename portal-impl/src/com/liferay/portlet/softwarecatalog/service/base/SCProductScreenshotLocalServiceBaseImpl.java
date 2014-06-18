@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -70,12 +72,11 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 *
 	 * @param scProductScreenshot the s c product screenshot
 	 * @return the s c product screenshot that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public SCProductScreenshot addSCProductScreenshot(
-		SCProductScreenshot scProductScreenshot) throws SystemException {
+		SCProductScreenshot scProductScreenshot) {
 		scProductScreenshot.setNew(true);
 
 		return scProductScreenshotPersistence.update(scProductScreenshot);
@@ -99,12 +100,11 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @param productScreenshotId the primary key of the s c product screenshot
 	 * @return the s c product screenshot that was removed
 	 * @throws PortalException if a s c product screenshot with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SCProductScreenshot deleteSCProductScreenshot(
-		long productScreenshotId) throws PortalException, SystemException {
+		long productScreenshotId) throws PortalException {
 		return scProductScreenshotPersistence.remove(productScreenshotId);
 	}
 
@@ -113,12 +113,11 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 *
 	 * @param scProductScreenshot the s c product screenshot
 	 * @return the s c product screenshot that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SCProductScreenshot deleteSCProductScreenshot(
-		SCProductScreenshot scProductScreenshot) throws SystemException {
+		SCProductScreenshot scProductScreenshot) {
 		return scProductScreenshotPersistence.remove(scProductScreenshot);
 	}
 
@@ -135,12 +134,10 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return scProductScreenshotPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -155,12 +152,10 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return scProductScreenshotPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -177,12 +172,11 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return scProductScreenshotPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -192,11 +186,9 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return scProductScreenshotPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -206,18 +198,17 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return scProductScreenshotPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public SCProductScreenshot fetchSCProductScreenshot(
-		long productScreenshotId) throws SystemException {
+		long productScreenshotId) {
 		return scProductScreenshotPersistence.fetchByPrimaryKey(productScreenshotId);
 	}
 
@@ -227,17 +218,47 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @param productScreenshotId the primary key of the s c product screenshot
 	 * @return the s c product screenshot
 	 * @throws PortalException if a s c product screenshot with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public SCProductScreenshot getSCProductScreenshot(long productScreenshotId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scProductScreenshotPersistence.findByPrimaryKey(productScreenshotId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.softwarecatalog.service.SCProductScreenshotLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SCProductScreenshot.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("productScreenshotId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.softwarecatalog.service.SCProductScreenshotLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SCProductScreenshot.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("productScreenshotId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteSCProductScreenshot((SCProductScreenshot)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scProductScreenshotPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -251,11 +272,9 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * @param start the lower bound of the range of s c product screenshots
 	 * @param end the upper bound of the range of s c product screenshots (not inclusive)
 	 * @return the range of s c product screenshots
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<SCProductScreenshot> getSCProductScreenshots(int start, int end)
-		throws SystemException {
+	public List<SCProductScreenshot> getSCProductScreenshots(int start, int end) {
 		return scProductScreenshotPersistence.findAll(start, end);
 	}
 
@@ -263,10 +282,9 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 * Returns the number of s c product screenshots.
 	 *
 	 * @return the number of s c product screenshots
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSCProductScreenshotsCount() throws SystemException {
+	public int getSCProductScreenshotsCount() {
 		return scProductScreenshotPersistence.countAll();
 	}
 
@@ -275,12 +293,11 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 *
 	 * @param scProductScreenshot the s c product screenshot
 	 * @return the s c product screenshot that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public SCProductScreenshot updateSCProductScreenshot(
-		SCProductScreenshot scProductScreenshot) throws SystemException {
+		SCProductScreenshot scProductScreenshot) {
 		return scProductScreenshotPersistence.update(scProductScreenshot);
 	}
 
@@ -440,7 +457,7 @@ public abstract class SCProductScreenshotLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = scProductScreenshotPersistence.getDataSource();
 

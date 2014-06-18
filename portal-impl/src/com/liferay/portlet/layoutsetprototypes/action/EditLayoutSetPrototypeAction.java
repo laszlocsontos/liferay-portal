@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portlet.layoutsetprototypes.action;
 
 import com.liferay.portal.NoSuchLayoutSetPrototypeException;
 import com.liferay.portal.RequiredLayoutSetPrototypeException;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -71,8 +72,6 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				hideDefaultSuccessMessage(actionRequest);
-
 				LayoutSetPrototype layoutSetPrototype =
 					updateLayoutSetPrototype(actionRequest);
 
@@ -102,6 +101,15 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 				siteAdministrationURL.setParameter("redirect", controlPanelURL);
 
 				redirect = siteAdministrationURL.toString();
+
+				if (cmd.equals(Constants.ADD)) {
+					hideDefaultSuccessMessage(actionRequest);
+
+					MultiSessionMessages.add(
+						actionRequest,
+						PortletKeys.SITE_TEMPLATE_SETTINGS +
+							"requestProcessed");
+				}
 			}
 			else if (cmd.equals(Constants.DELETE)) {
 				deleteLayoutSetPrototypes(actionRequest);
@@ -203,7 +211,8 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 
 		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
-		String description = ParamUtil.getString(actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 		boolean layoutsUpdateable = ParamUtil.getBoolean(
 			actionRequest, "layoutsUpdateable");
@@ -219,7 +228,7 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 
 			layoutSetPrototype =
 				LayoutSetPrototypeServiceUtil.addLayoutSetPrototype(
-					nameMap, description, active, layoutsUpdateable,
+					nameMap, descriptionMap, active, layoutsUpdateable,
 					serviceContext);
 		}
 		else {
@@ -228,7 +237,7 @@ public class EditLayoutSetPrototypeAction extends PortletAction {
 
 			layoutSetPrototype =
 				LayoutSetPrototypeServiceUtil.updateLayoutSetPrototype(
-					layoutSetPrototypeId, nameMap, description, active,
+					layoutSetPrototypeId, nameMap, descriptionMap, active,
 					layoutsUpdateable, serviceContext);
 		}
 

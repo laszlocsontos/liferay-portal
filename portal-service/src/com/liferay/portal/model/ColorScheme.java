@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.model;
 
+import com.liferay.portal.kernel.util.Accessor;
+
 import java.io.Serializable;
 
 import java.util.Properties;
@@ -22,6 +24,26 @@ import java.util.Properties;
  * @author Brian Wing Shun Chan
  */
 public interface ColorScheme extends Comparable<ColorScheme>, Serializable {
+
+	public static final Accessor<ColorScheme, String> NAME_ACCESSOR =
+		new Accessor<ColorScheme, String>() {
+
+			@Override
+			public String get(ColorScheme colorScheme) {
+				return colorScheme.getName();
+			}
+
+			@Override
+			public Class<String> getAttributeClass() {
+				return String.class;
+			}
+
+			@Override
+			public Class<ColorScheme> getTypeClass() {
+				return ColorScheme.class;
+			}
+
+		};
 
 	public String getColorSchemeId();
 

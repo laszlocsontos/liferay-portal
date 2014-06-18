@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,11 +46,9 @@ public class CompanyLocalServiceUtil {
 	*
 	* @param company the company
 	* @return the company that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company addCompany(
-		com.liferay.portal.model.Company company)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Company company) {
 		return getService().addCompany(company);
 	}
 
@@ -70,11 +68,9 @@ public class CompanyLocalServiceUtil {
 	* @param companyId the primary key of the company
 	* @return the company that was removed
 	* @throws PortalException if a company with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company deleteCompany(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteCompany(companyId);
 	}
 
@@ -83,11 +79,9 @@ public class CompanyLocalServiceUtil {
 	*
 	* @param company the company
 	* @return the company that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company deleteCompany(
-		com.liferay.portal.model.Company company)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Company company) {
 		return getService().deleteCompany(company);
 	}
 
@@ -100,12 +94,10 @@ public class CompanyLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -120,12 +112,11 @@ public class CompanyLocalServiceUtil {
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -141,14 +132,12 @@ public class CompanyLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -158,11 +147,9 @@ public class CompanyLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -172,17 +159,14 @@ public class CompanyLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.portal.model.Company fetchCompany(long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static com.liferay.portal.model.Company fetchCompany(long companyId) {
 		return getService().fetchCompany(companyId);
 	}
 
@@ -192,18 +176,28 @@ public class CompanyLocalServiceUtil {
 	* @param companyId the primary key of the company
 	* @return the company
 	* @throws PortalException if a company with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company getCompany(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getCompany(companyId);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
@@ -217,11 +211,9 @@ public class CompanyLocalServiceUtil {
 	* @param start the lower bound of the range of companies
 	* @param end the upper bound of the range of companies (not inclusive)
 	* @return the range of companies
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Company> getCompanies(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return getService().getCompanies(start, end);
 	}
 
@@ -229,10 +221,8 @@ public class CompanyLocalServiceUtil {
 	* Returns the number of companies.
 	*
 	* @return the number of companies
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getCompaniesCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getCompaniesCount() {
 		return getService().getCompaniesCount();
 	}
 
@@ -241,11 +231,9 @@ public class CompanyLocalServiceUtil {
 	*
 	* @param company the company
 	* @return the company that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company updateCompany(
-		com.liferay.portal.model.Company company)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Company company) {
 		return getService().updateCompany(company);
 	}
 
@@ -282,14 +270,12 @@ public class CompanyLocalServiceUtil {
 	* @return the company
 	* @throws PortalException if the web domain, virtual host name, or mail
 	domain was invalid
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company addCompany(
 		java.lang.String webId, java.lang.String virtualHostname,
 		java.lang.String mx, java.lang.String shardName, boolean system,
 		int maxUsers, boolean active)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addCompany(webId, virtualHostname, mx, shardName, system,
 			maxUsers, active);
@@ -304,12 +290,10 @@ public class CompanyLocalServiceUtil {
 	* @param webId the company's web domain
 	* @return the company with the web domain
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company checkCompany(
 		java.lang.String webId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().checkCompany(webId);
 	}
 
@@ -325,12 +309,10 @@ public class CompanyLocalServiceUtil {
 	* @param shardName the company's shard
 	* @return the company with the web domain, mail domain, and shard
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company checkCompany(
 		java.lang.String webId, java.lang.String mx, java.lang.String shardName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().checkCompany(webId, mx, shardName);
 	}
 
@@ -341,11 +323,9 @@ public class CompanyLocalServiceUtil {
 	* @param companyId the primary key of the company
 	* @throws PortalException if a company with the primary key could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void checkCompanyKey(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().checkCompanyKey(companyId);
 	}
 
@@ -353,13 +333,12 @@ public class CompanyLocalServiceUtil {
 	* Deletes the company's logo.
 	*
 	* @param companyId the primary key of the company
+	* @return the deleted logo's company
 	* @throws PortalException if the company with the primary key could not be
 	found or if the company's logo could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company deleteLogo(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteLogo(companyId);
 	}
 
@@ -369,11 +348,9 @@ public class CompanyLocalServiceUtil {
 	* @param companyId the primary key of the company
 	* @return the company with the primary key, <code>null</code> if a company
 	with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company fetchCompanyById(
-		long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId) {
 		return getService().fetchCompanyById(companyId);
 	}
 
@@ -383,11 +360,9 @@ public class CompanyLocalServiceUtil {
 	* @param virtualHostname the virtual host name
 	* @return the company with the virtual host name, <code>null</code> if a
 	company with the virtual host could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company fetchCompanyByVirtualHost(
-		java.lang.String virtualHostname)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String virtualHostname) {
 		return getService().fetchCompanyByVirtualHost(virtualHostname);
 	}
 
@@ -395,10 +370,8 @@ public class CompanyLocalServiceUtil {
 	* Returns all the companies.
 	*
 	* @return the companies
-	* @throws SystemException if a system exception occurred
 	*/
-	public static java.util.List<com.liferay.portal.model.Company> getCompanies()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static java.util.List<com.liferay.portal.model.Company> getCompanies() {
 		return getService().getCompanies();
 	}
 
@@ -408,12 +381,15 @@ public class CompanyLocalServiceUtil {
 	* @param system whether the company is the very first company (i.e., the
 	super company)
 	* @return the companies used by WSRP
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Company> getCompanies(
-		boolean system)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean system) {
 		return getService().getCompanies(system);
+	}
+
+	public static java.util.List<com.liferay.portal.model.Company> getCompanies(
+		boolean system, int start, int end) {
+		return getService().getCompanies(system, start, end);
 	}
 
 	/**
@@ -422,10 +398,8 @@ public class CompanyLocalServiceUtil {
 	* @param system whether the company is the very first company (i.e., the
 	super company)
 	* @return the number of companies used by WSRP
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getCompaniesCount(boolean system)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getCompaniesCount(boolean system) {
 		return getService().getCompaniesCount(system);
 	}
 
@@ -436,12 +410,10 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the primary key
 	* @throws PortalException if a company with the primary key could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company getCompanyById(
 		long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getCompanyById(companyId);
 	}
 
@@ -451,12 +423,9 @@ public class CompanyLocalServiceUtil {
 	* @param logoId the ID of the company's logo
 	* @return the company with the logo
 	* @throws PortalException if the company with the logo could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company getCompanyByLogoId(
-		long logoId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		long logoId) throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getCompanyByLogoId(logoId);
 	}
 
@@ -467,12 +436,10 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the mail domain
 	* @throws PortalException if the company with the mail domain could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company getCompanyByMx(
 		java.lang.String mx)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getCompanyByMx(mx);
 	}
 
@@ -484,12 +451,10 @@ public class CompanyLocalServiceUtil {
 	* @throws PortalException if the company with the virtual host name could
 	not be found or if the virtual host was not associated with a
 	company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company getCompanyByVirtualHost(
 		java.lang.String virtualHostname)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getCompanyByVirtualHost(virtualHostname);
 	}
 
@@ -500,12 +465,10 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the web domain
 	* @throws PortalException if the company with the web domain could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company getCompanyByWebId(
 		java.lang.String webId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getCompanyByWebId(webId);
 	}
 
@@ -532,10 +495,8 @@ public class CompanyLocalServiceUtil {
 	*
 	* @param companyId the primary key of the company
 	* @param keys the company's preferences keys to be remove
-	* @throws SystemException if a system exception occurred
 	*/
-	public static void removePreferences(long companyId, java.lang.String[] keys)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void removePreferences(long companyId, java.lang.String[] keys) {
 		getService().removePreferences(companyId, keys);
 	}
 
@@ -555,11 +516,9 @@ public class CompanyLocalServiceUtil {
 	* @param end the upper bound of the range of assets to return (not
 	inclusive)
 	* @return the matching assets in the company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.kernel.search.Hits search(long companyId,
-		long userId, java.lang.String keywords, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long userId, java.lang.String keywords, int start, int end) {
 		return getService().search(companyId, userId, keywords, start, end);
 	}
 
@@ -580,12 +539,10 @@ public class CompanyLocalServiceUtil {
 	* @param end the upper bound of the range of assets to return (not
 	inclusive)
 	* @return the matching assets in the portlet within the company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.kernel.search.Hits search(long companyId,
 		long userId, java.lang.String portletId, long groupId,
-		java.lang.String type, java.lang.String keywords, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String type, java.lang.String keywords, int start, int end) {
 		return getService()
 				   .search(companyId, userId, portletId, groupId, type,
 			keywords, start, end);
@@ -603,13 +560,11 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the primary key
 	* @throws PortalException if a company with primary key could not be found
 	or if the new information was invalid
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company updateCompany(
 		long companyId, java.lang.String virtualHostname, java.lang.String mx,
 		int maxUsers, boolean active)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateCompany(companyId, virtualHostname, mx, maxUsers,
 			active);
@@ -642,7 +597,6 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the primary key
 	* @throws PortalException if a company with the primary key could not be
 	found or if the new information was invalid
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company updateCompany(
 		long companyId, java.lang.String virtualHostname, java.lang.String mx,
@@ -651,8 +605,7 @@ public class CompanyLocalServiceUtil {
 		java.lang.String legalId, java.lang.String legalType,
 		java.lang.String sicCode, java.lang.String tickerSymbol,
 		java.lang.String industry, java.lang.String type, java.lang.String size)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateCompany(companyId, virtualHostname, mx, homeURL,
 			logo, logoBytes, name, legalName, legalId, legalType, sicCode,
@@ -686,7 +639,6 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the primary key
 	* @throws PortalException if a company with the primary key could not
 	be found or if the new information was invalid
-	* @throws SystemException if a system exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
 	String, String, boolean, byte[], String, String, String,
 	String, String, String, String, String, String)}
@@ -699,8 +651,7 @@ public class CompanyLocalServiceUtil {
 		java.lang.String legalType, java.lang.String sicCode,
 		java.lang.String tickerSymbol, java.lang.String industry,
 		java.lang.String type, java.lang.String size)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateCompany(companyId, virtualHostname, mx, homeURL,
 			name, legalName, legalId, legalType, sicCode, tickerSymbol,
@@ -714,12 +665,10 @@ public class CompanyLocalServiceUtil {
 	* @param languageId the ID of the company's default user's language
 	* @param timeZoneId the ID of the company's default user's time zone
 	* @throws PortalException if the company's default user could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void updateDisplay(long companyId,
 		java.lang.String languageId, java.lang.String timeZoneId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().updateDisplay(companyId, languageId, timeZoneId);
 	}
 
@@ -731,12 +680,10 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the primary key
 	* @throws PortalException if the company's logo ID could not be found or if
 	the logo's image was corrupted
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company updateLogo(long companyId,
 		byte[] bytes)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().updateLogo(companyId, bytes);
 	}
 
@@ -748,12 +695,10 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the primary key
 	* @throws PortalException the company's logo ID could not be found or if
 	the logo's image was corrupted
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company updateLogo(long companyId,
 		java.io.File file)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().updateLogo(companyId, file);
 	}
 
@@ -765,12 +710,10 @@ public class CompanyLocalServiceUtil {
 	* @return the company with the primary key
 	* @throws PortalException if the company's logo ID could not be found or if
 	the company's logo image was corrupted
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Company updateLogo(long companyId,
 		java.io.InputStream is)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().updateLogo(companyId, is);
 	}
 
@@ -783,12 +726,10 @@ public class CompanyLocalServiceUtil {
 	com.liferay.portal.kernel.util.UnicodeProperties}
 	* @throws PortalException if the properties contained new locales that were
 	not supported
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void updatePreferences(long companyId,
 		com.liferay.portal.kernel.util.UnicodeProperties properties)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().updatePreferences(companyId, properties);
 	}
 
@@ -809,13 +750,11 @@ public class CompanyLocalServiceUtil {
 	to be verified via email
 	* @param siteLogo whether to allow site administrators to use their own
 	logo instead of the enterprise logo
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void updateSecurity(long companyId,
 		java.lang.String authType, boolean autoLogin, boolean sendPassword,
 		boolean strangers, boolean strangersWithMx, boolean strangersVerify,
-		boolean siteLogo)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean siteLogo) {
 		getService()
 			.updateSecurity(companyId, authType, autoLogin, sendPassword,
 			strangers, strangersWithMx, strangersVerify, siteLogo);

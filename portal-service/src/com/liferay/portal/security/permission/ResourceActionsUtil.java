@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.security.permission;
 
 import com.liferay.portal.NoSuchResourceActionException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Portlet;
@@ -241,15 +240,13 @@ public class ResourceActionsUtil {
 	 */
 	@Deprecated
 	public static List<Role> getRoles(
-			long companyId, Group group, String modelResource)
-		throws SystemException {
+		long companyId, Group group, String modelResource) {
 
 		return getResourceActions().getRoles(companyId, group, modelResource);
 	}
 
 	public static List<Role> getRoles(
-			long companyId, Group group, String modelResource, int[] roleTypes)
-		throws SystemException {
+		long companyId, Group group, String modelResource, int[] roleTypes) {
 
 		return getResourceActions().getRoles(
 			companyId, group, modelResource, roleTypes);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,25 +28,29 @@ import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.messageboards.NoSuchStatsUserException;
 import com.liferay.portlet.messageboards.model.MBStatsUser;
 import com.liferay.portlet.messageboards.model.impl.MBStatsUserModelImpl;
+import com.liferay.portlet.messageboards.service.MBStatsUserLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +62,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class MBStatsUserPersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<MBStatsUser> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -79,11 +92,15 @@ public class MBStatsUserPersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<MBStatsUser> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		MBStatsUser mbStatsUser = _persistence.create(pk);
 
@@ -110,17 +127,17 @@ public class MBStatsUserPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		MBStatsUser newMBStatsUser = _persistence.create(pk);
 
-		newMBStatsUser.setGroupId(ServiceTestUtil.nextLong());
+		newMBStatsUser.setGroupId(RandomTestUtil.nextLong());
 
-		newMBStatsUser.setUserId(ServiceTestUtil.nextLong());
+		newMBStatsUser.setUserId(RandomTestUtil.nextLong());
 
-		newMBStatsUser.setMessageCount(ServiceTestUtil.nextInt());
+		newMBStatsUser.setMessageCount(RandomTestUtil.nextInt());
 
-		newMBStatsUser.setLastPostDate(ServiceTestUtil.nextDate());
+		newMBStatsUser.setLastPostDate(RandomTestUtil.nextDate());
 
 		_persistence.update(newMBStatsUser);
 
@@ -142,7 +159,7 @@ public class MBStatsUserPersistenceTest {
 	@Test
 	public void testCountByGroupId() {
 		try {
-			_persistence.countByGroupId(ServiceTestUtil.nextLong());
+			_persistence.countByGroupId(RandomTestUtil.nextLong());
 
 			_persistence.countByGroupId(0L);
 		}
@@ -154,7 +171,7 @@ public class MBStatsUserPersistenceTest {
 	@Test
 	public void testCountByUserId() {
 		try {
-			_persistence.countByUserId(ServiceTestUtil.nextLong());
+			_persistence.countByUserId(RandomTestUtil.nextLong());
 
 			_persistence.countByUserId(0L);
 		}
@@ -166,8 +183,8 @@ public class MBStatsUserPersistenceTest {
 	@Test
 	public void testCountByG_U() {
 		try {
-			_persistence.countByG_U(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong());
+			_persistence.countByG_U(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
 
 			_persistence.countByG_U(0L, 0L);
 		}
@@ -179,8 +196,8 @@ public class MBStatsUserPersistenceTest {
 	@Test
 	public void testCountByG_NotU_NotM() {
 		try {
-			_persistence.countByG_NotU_NotM(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong(), ServiceTestUtil.nextInt());
+			_persistence.countByG_NotU_NotM(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
 
 			_persistence.countByG_NotU_NotM(0L, 0L, 0);
 		}
@@ -200,7 +217,7 @@ public class MBStatsUserPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -239,7 +256,7 @@ public class MBStatsUserPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		MBStatsUser missingMBStatsUser = _persistence.fetchByPrimaryKey(pk);
 
@@ -247,19 +264,103 @@ public class MBStatsUserPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		MBStatsUser newMBStatsUser1 = addMBStatsUser();
+		MBStatsUser newMBStatsUser2 = addMBStatsUser();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBStatsUser1.getPrimaryKey());
+		primaryKeys.add(newMBStatsUser2.getPrimaryKey());
+
+		Map<Serializable, MBStatsUser> mbStatsUsers = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, mbStatsUsers.size());
+		Assert.assertEquals(newMBStatsUser1,
+			mbStatsUsers.get(newMBStatsUser1.getPrimaryKey()));
+		Assert.assertEquals(newMBStatsUser2,
+			mbStatsUsers.get(newMBStatsUser2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, MBStatsUser> mbStatsUsers = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(mbStatsUsers.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		MBStatsUser newMBStatsUser = addMBStatsUser();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBStatsUser.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, MBStatsUser> mbStatsUsers = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, mbStatsUsers.size());
+		Assert.assertEquals(newMBStatsUser,
+			mbStatsUsers.get(newMBStatsUser.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, MBStatsUser> mbStatsUsers = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(mbStatsUsers.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		MBStatsUser newMBStatsUser = addMBStatsUser();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBStatsUser.getPrimaryKey());
+
+		Map<Serializable, MBStatsUser> mbStatsUsers = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, mbStatsUsers.size());
+		Assert.assertEquals(newMBStatsUser,
+			mbStatsUsers.get(newMBStatsUser.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new MBStatsUserActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = MBStatsUserLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					MBStatsUser mbStatsUser = (MBStatsUser)object;
 
 					Assert.assertNotNull(mbStatsUser);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -292,7 +393,7 @@ public class MBStatsUserPersistenceTest {
 				MBStatsUser.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("statsUserId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<MBStatsUser> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -331,7 +432,7 @@ public class MBStatsUserPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("statsUserId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("statsUserId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -357,17 +458,17 @@ public class MBStatsUserPersistenceTest {
 	}
 
 	protected MBStatsUser addMBStatsUser() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		MBStatsUser mbStatsUser = _persistence.create(pk);
 
-		mbStatsUser.setGroupId(ServiceTestUtil.nextLong());
+		mbStatsUser.setGroupId(RandomTestUtil.nextLong());
 
-		mbStatsUser.setUserId(ServiceTestUtil.nextLong());
+		mbStatsUser.setUserId(RandomTestUtil.nextLong());
 
-		mbStatsUser.setMessageCount(ServiceTestUtil.nextInt());
+		mbStatsUser.setMessageCount(RandomTestUtil.nextInt());
 
-		mbStatsUser.setLastPostDate(ServiceTestUtil.nextDate());
+		mbStatsUser.setLastPostDate(RandomTestUtil.nextDate());
 
 		_persistence.update(mbStatsUser);
 
@@ -375,6 +476,7 @@ public class MBStatsUserPersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(MBStatsUserPersistenceTest.class);
+	private ModelListener<MBStatsUser>[] _modelListeners;
 	private MBStatsUserPersistence _persistence = (MBStatsUserPersistence)PortalBeanLocatorUtil.locate(MBStatsUserPersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -161,7 +161,7 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 				</portlet:renderURL>
 
 				<liferay-ui:icon
-					image="post"
+					iconCssClass="icon-plus"
 					message="post-new-thread"
 					url="<%= addMessageURL %>"
 				/>
@@ -189,7 +189,8 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 				/>
 
 				<liferay-ui:icon
-					image="permissions"
+					iconCssClass="icon-lock"
+					message="permissions"
 					method="get"
 					url="<%= permissionsURL %>"
 					useDialog="<%= true %>"
@@ -211,7 +212,7 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 				/>
 			</c:if>
 
-			<c:if test="<%= MBMessagePermission.contains(permissionChecker, message, ActionKeys.SUBSCRIBE) && (MBUtil.getEmailMessageAddedEnabled(groupPortletSettings) || MBUtil.getEmailMessageUpdatedEnabled(groupPortletSettings)) %>">
+			<c:if test="<%= MBMessagePermission.contains(permissionChecker, message, ActionKeys.SUBSCRIBE) && (mbSettings.isEmailMessageAddedEnabled() || mbSettings.isEmailMessageUpdatedEnabled()) %>">
 				<c:choose>
 					<c:when test="<%= SubscriptionLocalServiceUtil.isSubscribed(user.getCompanyId(), user.getUserId(), MBThread.class.getName(), message.getThreadId()) %>">
 						<portlet:actionURL var="unsubscribeURL">
@@ -222,7 +223,8 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 						</portlet:actionURL>
 
 						<liferay-ui:icon
-							image="unsubscribe"
+							iconCssClass="icon-remove-sign"
+							message="unsubscribe"
 							url="<%= unsubscribeURL %>"
 						/>
 					</c:when>
@@ -235,7 +237,8 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 						</portlet:actionURL>
 
 						<liferay-ui:icon
-							image="subscribe"
+							iconCssClass="icon-ok-sign"
+							message="subscribe"
 							url="<%= subscribeURL %>"
 						/>
 					</c:otherwise>
@@ -253,7 +256,7 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 						</portlet:actionURL>
 
 						<liferay-ui:icon
-							image="unlock"
+							iconCssClass="icon-unlock"
 							message="unlock-thread"
 							url="<%= unlockThreadURL %>"
 						/>
@@ -267,7 +270,7 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 						</portlet:actionURL>
 
 						<liferay-ui:icon
-							image="lock"
+							iconCssClass="icon-lock"
 							message="lock-thread"
 							url="<%= lockThreadURL %>"
 						/>
@@ -284,7 +287,7 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 				</portlet:renderURL>
 
 				<liferay-ui:icon
-					image="forward"
+					iconCssClass="icon-move"
 					message="move-thread"
 					url="<%= editThreadURL %>"
 				/>
@@ -386,7 +389,7 @@ MBThreadFlag threadFlag = MBThreadFlagLocalServiceUtil.getThreadFlag(themeDispla
 	</c:choose>
 
 	<c:if test="<%= !viewableThread %>">
-		<div class="alert alert-error">
+		<div class="alert alert-danger">
 			<liferay-ui:message key="you-do-not-have-permission-to-access-the-requested-resource" />
 		</div>
 	</c:if>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,24 +16,11 @@ package com.liferay.portal.kernel.lar.exportimportconfiguration;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.ExportImportDateUtil;
-import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
-import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
-import com.liferay.portal.kernel.staging.StagingUtil;
-import com.liferay.portal.kernel.util.DateRange;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.ExportImportConfiguration;
-import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ExportImportConfigurationLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
 
@@ -52,7 +39,7 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			addExportLayoutExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		return addExportImportConfiguration(
 			portletRequest,
@@ -62,7 +49,7 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			addPublishLayoutLocalExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		return addExportImportConfiguration(
 			portletRequest,
@@ -72,180 +59,86 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			addPublishLayoutRemoteExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws Exception {
+		throws PortalException {
 
 		return addExportImportConfiguration(
 			portletRequest,
 			ExportImportConfigurationConstants.TYPE_PUBLISH_LAYOUT_REMOTE);
 	}
 
-	public static void exportLayoutsByExportImportConfiguration(
-			long exportImportConfigurationId)
-		throws Exception {
+	public static ExportImportConfiguration
+			updateExportLayoutExportImportConfiguration(
+				PortletRequest portletRequest)
+		throws PortalException {
 
-		ExportImportConfiguration exportImportConfiguration =
-			ExportImportConfigurationLocalServiceUtil.
-				getExportImportConfiguration(exportImportConfigurationId);
+		return updateExportImportConfiguration(
+			portletRequest,
+			ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT);
+	}
 
-		String fileName =
-			exportImportConfiguration.getName() + StringPool.DASH +
-				Time.getShortTimestamp();
+	public static ExportImportConfiguration
+			updatePublishLayoutLocalExportImportConfiguration(
+				PortletRequest portletRequest)
+		throws PortalException {
 
-		fileName = fileName.replace(StringPool.SPACE, StringPool.UNDERLINE);
+		return updateExportImportConfiguration(
+			portletRequest,
+			ExportImportConfigurationConstants.TYPE_PUBLISH_LAYOUT_LOCAL);
+	}
 
-		Map<String, Serializable> settingsMap =
-			exportImportConfiguration.getSettingsMap();
+	public static ExportImportConfiguration
+			updatePublishLayoutRemoteExportImportConfiguration(
+				PortletRequest portletRequest)
+		throws PortalException {
 
-		Map<String, String[]> parameterMap =
-			(Map<String, String[]>)settingsMap.get("parameterMap");
-
-		long groupId = MapUtil.getLong(settingsMap, "sourceGroupId");
-		boolean privateLayout = GetterUtil.getBoolean(
-			settingsMap.get("privateLayout"));
-
-		Map<Long, Boolean> layoutIdMap = (Map<Long, Boolean>)settingsMap.get(
-			"layoutIdMap");
-
-		long[] layoutIds = ExportImportHelperUtil.getLayoutIds(layoutIdMap);
-
-		DateRange dateRange = ExportImportDateUtil.getDateRange(
-			exportImportConfiguration);
-
-		LayoutServiceUtil.exportLayoutsAsFileInBackground(
-			fileName, groupId, privateLayout, layoutIds, parameterMap,
-			dateRange.getStartDate(), dateRange.getEndDate(), fileName);
+		return updateExportImportConfiguration(
+			portletRequest,
+			ExportImportConfigurationConstants.TYPE_PUBLISH_LAYOUT_REMOTE);
 	}
 
 	protected static ExportImportConfiguration addExportImportConfiguration(
 			PortletRequest portletRequest, int type)
-		throws Exception {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		long groupId = ParamUtil.getLong(portletRequest, "groupId");
-		String exportImportConfigurationName = ParamUtil.getString(
-			portletRequest, "name");
-		String exportImportConfigurationDescription = ParamUtil.getString(
-			portletRequest, "description");
+		String name = ParamUtil.getString(portletRequest, "name");
+		String description = ParamUtil.getString(portletRequest, "description");
 
-		Map<String, Serializable> settingsMap = buildSettingsMap(
-			themeDisplay, portletRequest, groupId, type);
+		Map<String, Serializable> settingsMap =
+			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
+				portletRequest, groupId, type);
 
 		return ExportImportConfigurationLocalServiceUtil.
 			addExportImportConfiguration(
-				themeDisplay.getUserId(), groupId,
-				exportImportConfigurationName,
-				exportImportConfigurationDescription, type, settingsMap,
-				new ServiceContext());
+				themeDisplay.getUserId(), groupId, name, description, type,
+				settingsMap, new ServiceContext());
 	}
 
-	protected static Map<String, Serializable> buildSettingsMap(
-			ThemeDisplay themeDisplay, PortletRequest portletRequest,
-			long groupId, int type)
-		throws Exception {
+	protected static ExportImportConfiguration updateExportImportConfiguration(
+			PortletRequest portletRequest, int type)
+		throws PortalException {
 
-		boolean privateLayout = true;
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		String tabs1 = ParamUtil.getString(portletRequest, "tabs1");
+		long exportImportConfigurationId = ParamUtil.getLong(
+			portletRequest, "exportImportConfigurationId");
 
-		if (tabs1.equals("public-pages")) {
-			privateLayout = false;
-		}
-		else {
-			privateLayout = ParamUtil.getBoolean(
-				portletRequest, "privateLayout");
-		}
+		long groupId = ParamUtil.getLong(portletRequest, "groupId");
+		String name = ParamUtil.getString(portletRequest, "name");
+		String description = ParamUtil.getString(portletRequest, "description");
 
-		String defaultDateRange =
-			ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE;
+		Map<String, Serializable> settingsMap =
+			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
+				portletRequest, groupId, type);
 
-		if (type == ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT) {
-			defaultDateRange = ExportImportDateUtil.RANGE_ALL;
-		}
-
-		DateRange dateRange = ExportImportDateUtil.getDateRange(
-			portletRequest, groupId, privateLayout, 0, null, defaultDateRange);
-
-		if (type == ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT) {
-			return ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
-				themeDisplay.getUserId(), groupId, privateLayout, null,
-				portletRequest.getParameterMap(), dateRange.getStartDate(),
-				dateRange.getEndDate(), themeDisplay.getLocale(),
-				themeDisplay.getTimeZone());
-		}
-
-		String scope = ParamUtil.getString(portletRequest, "scope");
-
-		if (Validator.isNull(scope)) {
-			scope = "all-pages";
-		}
-
-		Map<Long, Boolean> layoutIdMap = null;
-
-		if (scope.equals("selected-pages")) {
-			layoutIdMap = ExportImportHelperUtil.getLayoutIdMap(portletRequest);
-		}
-
-		Group stagingGroup = GroupLocalServiceUtil.getGroup(groupId);
-
-		Group liveGroup = stagingGroup.getLiveGroup();
-
-		Map<String, String[]> parameterMap = StagingUtil.getStagingParameters(
-			portletRequest);
-
-		if (liveGroup != null) {
-			return ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
-				themeDisplay.getUserId(), stagingGroup.getGroupId(),
-				liveGroup.getGroupId(), privateLayout, layoutIdMap,
-				parameterMap, dateRange.getStartDate(), dateRange.getEndDate(),
-				themeDisplay.getLocale(), themeDisplay.getTimeZone());
-		}
-
-		if (liveGroup == null) {
-			parameterMap.put(
-				PortletDataHandlerKeys.PUBLISH_TO_REMOTE,
-				new String[] {Boolean.TRUE.toString()});
-		}
-
-		UnicodeProperties groupTypeSettingsProperties =
-			stagingGroup.getTypeSettingsProperties();
-
-		String remoteAddress = ParamUtil.getString(
-			portletRequest, "remoteAddress",
-			groupTypeSettingsProperties.getProperty("remoteAddress"));
-
-		remoteAddress = StagingUtil.stripProtocolFromRemoteAddress(
-			remoteAddress);
-
-		int remotePort = ParamUtil.getInteger(
-			portletRequest, "remotePort",
-			GetterUtil.getInteger(
-				groupTypeSettingsProperties.getProperty("remotePort")));
-		String remotePathContext = ParamUtil.getString(
-			portletRequest, "remotePathContext",
-			groupTypeSettingsProperties.getProperty("remotePathContext"));
-		boolean secureConnection = ParamUtil.getBoolean(
-			portletRequest, "secureConnection",
-			GetterUtil.getBoolean(
-				groupTypeSettingsProperties.getProperty("secureConnection")));
-		long remoteGroupId = ParamUtil.getLong(
-			portletRequest, "remoteGroupId",
-			GetterUtil.getLong(
-				groupTypeSettingsProperties.getProperty("remoteGroupId")));
-		boolean remotePrivateLayout = ParamUtil.getBoolean(
-			portletRequest, "remotePrivateLayout");
-
-		StagingUtil.validateRemote(
-			remoteAddress, remotePort, remotePathContext, secureConnection,
-			remoteGroupId);
-
-		return ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
-			themeDisplay.getUserId(), groupId, privateLayout, layoutIdMap,
-			parameterMap, remoteAddress, remotePort, remotePathContext,
-			secureConnection, remoteGroupId, remotePrivateLayout,
-			dateRange.getStartDate(), dateRange.getEndDate(),
-			themeDisplay.getLocale(), themeDisplay.getTimeZone());
+		return ExportImportConfigurationLocalServiceUtil.
+			updateExportImportConfiguration(
+				themeDisplay.getUserId(), exportImportConfigurationId, name,
+				description, settingsMap, new ServiceContext());
 	}
 
 }

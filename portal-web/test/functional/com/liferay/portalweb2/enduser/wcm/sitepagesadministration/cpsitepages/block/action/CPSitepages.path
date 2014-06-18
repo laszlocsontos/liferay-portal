@@ -19,18 +19,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SITE_NAME</td>
+	<td>//a[contains(@title,'${key_siteName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SUCCESS_MESSAGE</td>
 	<td>//div[contains(@class,'alert') and contains(@class,'alert-success')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>INFO_MESSAGE_1</td>
-	<td>xpath=(//div[contains(@class,'alert') and contains(@class,'alert-error')])[1]</td>
+	<td>xpath=(//div[contains(@class,'alert') and (contains(@class,'alert-error') or contains(@class,'alert-danger'))])[1]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>INFO_MESSAGE_2</td>
-	<td>xpath=(//div[contains(@class,'alert') and contains(@class,'alert-error')])[2]</td>
+	<td>xpath=(//div[contains(@class,'alert') and (contains(@class,'alert-error') or contains(@class,'alert-danger'))])[2]</td>
 	<td></td>
 </tr>
 <tr>
@@ -49,6 +54,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SITE_PAGES_LINK</td>
+	<td>//ul[@class='visit-links']/li/a</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -62,6 +72,16 @@
 <tr>
 	<td>NAVIGATION_PRIVATE_PAGES</td>
 	<td>//li[contains(@id,'_156_tabs')]/a[contains(.,'Private Pages')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NAVIGATION_MY_PROFILE</td>
+	<td>//li[contains(@id,'_156_tabs')]/a[contains(.,'My Profile')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NAVIGATION_MY_DASHBOARD</td>
+	<td>//li[contains(@id,'_156_tabs')]/a[contains(.,'My Dashboard')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -142,6 +162,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PAGE_TREE_PAGE_SPECIFIC_PAGE</td>
+	<td>//span[contains(@class,'tree-label')]/a[contains(.,'${key_sitePageName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_PAGE_PLUS_ICON</td>
+	<td>//div[contains(@class,'tree-collapsed')]/i[contains(@class,'icon-plus')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PAGE_TREE_PAGE_LINK</td>
 	<td>xpath=(//a[contains(@id,'layoutsTree_layout_') and contains(.,'${key_sitePageName}')])</td>
 	<td></td>
@@ -172,6 +202,36 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PAGE_TREE_PAGE_LINK_5</td>
+	<td>xpath=(//a[contains(@id,'layoutsTree_layout_')])[5]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_PAGE_LINK_6</td>
+	<td>xpath=(//a[contains(@id,'layoutsTree_layout_')])[6]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_PAGE_LINK_7</td>
+	<td>xpath=(//a[contains(@id,'layoutsTree_layout_')])[7]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_PAGE_LINK_8</td>
+	<td>xpath=(//a[contains(@id,'layoutsTree_layout_')])[8]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_PAGE_LINK_TO_PAGE</td>
+	<td>xpath=(//li[contains(@id,'layoutsTree_layoutId_2')]/div/i[contains(@class,'icon-link')])</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_LOAD_MORE_RESULTS_LINK</td>
+	<td>//ul/li/div[contains(.,'${key_pageName}')]/..//a[@class='tree-node-paginator']</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -180,6 +240,11 @@
 <tr>
 	<td>DETAILS_NAME_FIELD</td>
 	<td>//input[@id='_156_name']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_LANGAUGE_TRANSLATIONS</td>
+	<td>//div[contains(@id,'nameContentBox')]//li[contains(@data-value,'${key_pageTranslation}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -200,6 +265,16 @@
 <tr>
 	<td>DETAILS_HIDDEN_CHECKBOX</td>
 	<td>//input[@id='_156_hiddenCheckbox']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_PAGE_TEMPLATE_UPDATEABLE_CHECKBOX</td>
+	<td>//input[contains(@id,'UpdateableCheckbox')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_PAGE_TEMPLATE_PROTOTYPE_LINK_CHECKBOX</td>
+	<td>//input[contains(@id,'PrototypeLinkEnabledCheckbox')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -246,7 +321,7 @@
 </tr>
 <tr>
 	<td>STAGING_BUTTON</td>
-	<td>//li[@class='dropdown']/a/span[contains(.,'Staging')]</td>
+	<td>//div/ul/li[contains(.,'Staging')]/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -285,9 +360,44 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--LOGO-->
+<tr>
+	<td>LOGO_NAVIGATION</td>
+	<td>//a[@id='_156_logoLink']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LOGO_CHANGE_BUTTON</td>
+	<td>//button[contains(.,'Change')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LOGO_UPLOAD_IMAGE_IFRAME</td>
+	<td>//iframe[@id='_156_changeLogo_iframe_']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LOGO_UPLOAD_BROWSE_BUTTON</td>
+	<td>//input[@id='_195_fileName']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LOGO_UPLOAD_SAVE_BUTTON</td>
+	<td>//button[contains(.,'Save')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LOGO_UPLOAD_CLOSE_BUTTON</td>
+	<td>//button[contains(.,'Close')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--SEO-->
 <!--LOOK_AND_FEEL-->
-<!--LOGO-->
 <!--LAYOUT-->
 <!--JAVASCRIPT-->
 <!--CUSTOM_FIELDS-->

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,6 @@
 
 package com.liferay.portal.security.auth;
 
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.ldap.PortalLDAPImporterUtil;
 import com.liferay.portal.util.PortalUtil;
@@ -56,12 +54,7 @@ public class NtlmAutoLogin extends BaseAutoLogin {
 			return null;
 		}
 
-		String redirect = ParamUtil.getString(request, "redirect");
-
-		if (Validator.isNotNull(redirect)) {
-			request.setAttribute(
-				AutoLogin.AUTO_LOGIN_REDIRECT_AND_CONTINUE, redirect);
-		}
+		addRedirect(request);
 
 		String[] credentials = new String[3];
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,9 @@
  */
 
 package com.liferay.portal.kernel.util;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,6 +51,31 @@ public class StringUtilTest {
 		Assert.assertEquals(
 			"Hello (World) (Liferay)",
 			StringUtil.appendParentheticalSuffix("Hello (World)", "Liferay"));
+	}
+
+	@Test
+	public void testEqualsIgnoreBreakLine() throws Exception {
+		Assert.assertTrue(
+			StringUtil.equalsIgnoreBreakLine("Hello\n World", "Hello World"));
+		Assert.assertTrue(
+			StringUtil.equalsIgnoreBreakLine("Hello\r\n World", "Hello World"));
+		Assert.assertTrue(
+			StringUtil.equalsIgnoreBreakLine("\nHello World", "Hello World"));
+		Assert.assertTrue(
+			StringUtil.equalsIgnoreBreakLine("Hello World\n", "Hello World"));
+		Assert.assertFalse(StringUtil.equalsIgnoreBreakLine("Hello World", ""));
+		Assert.assertFalse(
+			StringUtil.equalsIgnoreBreakLine("Hello World\n", null));
+	}
+
+	@Test
+	public void testEqualsIgnoreCase() throws Exception {
+		Assert.assertTrue(
+			StringUtil.equalsIgnoreCase("HELLO WORLD", "Hello World"));
+		Assert.assertTrue(
+			StringUtil.equalsIgnoreCase("Hello \n World", "hello \n worlD"));
+		Assert.assertFalse(StringUtil.equalsIgnoreCase("Hello \n World", ""));
+		Assert.assertFalse(StringUtil.equalsIgnoreCase("Hello \n World", null));
 	}
 
 	@Test
@@ -146,6 +174,25 @@ public class StringUtilTest {
 	}
 
 	@Test
+	public void testMerge() {
+		Assert.assertEquals(
+			"1,2,3", StringUtil.merge(new String[] {"1", " 2 ", "3"}));
+		Assert.assertEquals("1", StringUtil.merge(new String[] {"1"}));
+		Assert.assertEquals("", StringUtil.merge(new String[0]));
+		Assert.assertEquals(
+			"true,false,true",
+			StringUtil.merge(new boolean[] {true, false, true}));
+		Assert.assertEquals("true", StringUtil.merge(new boolean[] {true}));
+		Assert.assertEquals(
+			"1.1,2.2,3.3", StringUtil.merge(new double[] {1.1, 2.2, 3.3}));
+		Assert.assertEquals("1.1", StringUtil.merge(new double[] {1.1}));
+		Assert.assertEquals("1,2,3", StringUtil.merge(new int[] {1, 2, 3}));
+		Assert.assertEquals("1", StringUtil.merge(new int[] {1}));
+		Assert.assertEquals("1,2,3", StringUtil.merge(new long[] {1, 2, 3}));
+		Assert.assertEquals("1", StringUtil.merge(new long[] {1}));
+	}
+
+	@Test
 	public void testReplaceChar() throws Exception {
 		Assert.assertEquals(
 			"127_0_0_1", StringUtil.replace("127.0.0.1", '.', '_'));
@@ -211,6 +258,22 @@ public class StringUtilTest {
 				new String[] {"Aloha", "ALOHA"}));
 	}
 
+	@Test(timeout = 1000)
+	public void testReplaceMap() throws Exception {
+		Map<String, String> map = new HashMap<String, String>();
+
+		map.put("Hallo", "Hello");
+		map.put("Wirld", "World");
+
+		Assert.assertEquals(
+			"Hello World",
+			StringUtil.replace("AB Hallo CD AB Wirld CD", "AB ", " CD", map));
+		Assert.assertEquals(
+			"Hello World",
+			StringUtil.replace(
+				"Hello World", StringPool.BLANK, StringPool.BLANK, map));
+	}
+
 	@Test
 	public void testReplaceSpaceString() throws Exception {
 		Assert.assertEquals(
@@ -235,6 +298,25 @@ public class StringUtilTest {
 				"Hello World HELLO WORLD Hello World",
 				new String[] {"Hello", "HELLO"},
 				new String[] {"Aloha", "ALOHA"}));
+	}
+
+	@Test(timeout = 1000)
+	public void testReplaceWithStringBundle() throws Exception {
+		Map<String, StringBundler> map = new HashMap<String, StringBundler>();
+
+		map.put("Hallo", new StringBundler("Hello"));
+		map.put("Wirld", new StringBundler("World"));
+
+		Assert.assertEquals(
+			"Hello World",
+			String.valueOf(
+				StringUtil.replaceWithStringBundler(
+					"AB Hallo CD AB Wirld CD", "AB ", " CD", map)));
+		Assert.assertEquals(
+			"Hello World",
+			String.valueOf(
+				StringUtil.replaceWithStringBundler(
+					"Hello World", StringPool.BLANK, StringPool.BLANK, map)));
 	}
 
 	@Test
@@ -304,9 +386,65 @@ public class StringUtilTest {
 		Assert.assertEquals("lmn", lines[4]);
 	}
 
+	@Test(timeout = 1000)
+	public void testStripBetween() throws Exception {
+		Assert.assertEquals(
+			"One small leap for mankind",
+			StringUtil.stripBetween(
+				"One small step for man, one giant leap for mankind", "step",
+				"giant "));
+		Assert.assertEquals(
+			"One small step for man, one giant leap for mankind",
+			StringUtil.stripBetween(
+				"One small step for man, one giant leap for mankind",
+				StringPool.BLANK, StringPool.BLANK));
+	}
+
 	@Test
 	public void testStripChar() {
 		Assert.assertEquals("abcd", StringUtil.strip(" a b  c   d", ' '));
+	}
+
+	@Test
+	public void testToLowerCase() throws Exception {
+		Assert.assertEquals(
+			"hello world", StringUtil.toLowerCase("hello world"));
+		Assert.assertEquals(
+			"hello world", StringUtil.toLowerCase("HELLO WORLD"));
+		Assert.assertEquals(
+			"hello world", StringUtil.toLowerCase("hElLo WoRlD"));
+		Assert.assertEquals(
+			"hello-world-1", StringUtil.toLowerCase("HELLO-WORLD-1"));
+	}
+
+	@Test
+	public void testToLowerCaseWithNonASCIICharacters() throws Exception {
+		Assert.assertEquals("\u00F1", StringUtil.toLowerCase("\u00D1"));
+		Assert.assertEquals(
+			"hello world \u00F1", StringUtil.toLowerCase("hello world \u00D1"));
+		Assert.assertEquals(
+			"hello-world-\u00F1", StringUtil.toLowerCase("HELLO-WORLD-\u00D1"));
+	}
+
+	@Test
+	public void testToUpperCase() throws Exception {
+		Assert.assertEquals(
+			"HELLO WORLD", StringUtil.toUpperCase("hello world"));
+		Assert.assertEquals(
+			"HELLO WORLD", StringUtil.toUpperCase("HELLO WORLD"));
+		Assert.assertEquals(
+			"HELLO WORLD", StringUtil.toUpperCase("hElLo WoRlD"));
+		Assert.assertEquals(
+			"HELLO-WORLD-1", StringUtil.toUpperCase("hello-world-1"));
+	}
+
+	@Test
+	public void testToUpperCaseWithNonASCIICharacters() throws Exception {
+		Assert.assertEquals("\u00D1", StringUtil.toUpperCase("\u00F1"));
+		Assert.assertEquals(
+			"HELLO WORLD \u00D1", StringUtil.toUpperCase("hello world \u00F1"));
+		Assert.assertEquals(
+			"HELLO-WORLD-\u00D1", StringUtil.toUpperCase("HELLO-WORLD-\u00F1"));
 	}
 
 	@Test

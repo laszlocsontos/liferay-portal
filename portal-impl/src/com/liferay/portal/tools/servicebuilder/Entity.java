@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,6 +47,16 @@ public class Entity {
 			@Override
 			public String get(Entity entity) {
 				return entity.getName();
+			}
+
+			@Override
+			public Class<String> getAttributeClass() {
+				return String.class;
+			}
+
+			@Override
+			public Class<Entity> getTypeClass() {
+				return Entity.class;
 			}
 
 		};
@@ -486,7 +496,7 @@ public class Entity {
 	}
 
 	public boolean hasColumns() {
-		if ((_columnList == null) || (_columnList.size() == 0)) {
+		if (ListUtil.isEmpty(_columnList)) {
 			return false;
 		}
 		else {
@@ -538,16 +548,6 @@ public class Entity {
 
 		for (EntityColumn col : _blobList) {
 			if (col.isLazy()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public boolean hasLocalizedColumn() {
-		for (EntityColumn col : _columnList) {
-			if (col.isLocalized()) {
 				return true;
 			}
 		}
@@ -698,6 +698,16 @@ public class Entity {
 
 	public boolean isJsonEnabled() {
 		return _jsonEnabled;
+	}
+
+	public boolean isLocalizedModel() {
+		for (EntityColumn col : _columnList) {
+			if (col.isLocalized()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public boolean isMvccEnabled() {

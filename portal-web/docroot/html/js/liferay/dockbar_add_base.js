@@ -2,14 +2,11 @@ AUI.add(
 	'liferay-dockbar-add-base',
 	function(A) {
 		var DDM = A.DD.DDM;
-
 		var Lang = A.Lang;
-
 		var Dockbar = Liferay.Dockbar;
-
 		var Layout = Liferay.Layout;
-
 		var Portlet = Liferay.Portlet;
+		var Util = Liferay.Util;
 
 		var PROXY_NODE_ITEM = Layout.PROXY_NODE_ITEM;
 
@@ -29,10 +26,6 @@ AUI.add(
 
 		var AddBase = A.Component.create(
 			{
-				EXTENDS: A.Base,
-
-				NAME: 'addbase',
-
 				ATTRS: {
 					focusItem: {
 						setter: A.one
@@ -46,12 +39,12 @@ AUI.add(
 						setter: A.one
 					},
 
-					nodeSelector: {
-						validator: Lang.isString
-					},
-
 					nodeList: {
 						setter: A.one
+					},
+
+					nodeSelector: {
+						validator: Lang.isString
 					},
 
 					nodes: {
@@ -73,6 +66,10 @@ AUI.add(
 					}
 				},
 
+				EXTENDS: A.Base,
+
+				NAME: 'addbase',
+
 				prototype: {
 					initializer: function(config) {
 						var instance = this;
@@ -89,7 +86,7 @@ AUI.add(
 							var searchData = [];
 
 							nodes.each(
-								function(item, index, collection) {
+								function(item, index) {
 									searchData.push(
 										{
 											node: item,
@@ -111,6 +108,19 @@ AUI.add(
 							}
 						}
 
+						var addedMessage = instance.byId('addedMessage');
+
+						instance._hideAddedMessageTask = A.debounce(
+							function() {
+								addedMessage.hide(true);
+							},
+							2000
+						);
+
+						instance._addedMessage = addedMessage;
+
+						instance._eventHandles = [];
+
 						instance._bindUIDABase();
 					},
 
@@ -130,6 +140,9 @@ AUI.add(
 
 							if (!portletMetaData.instanceable) {
 								instance._disablePortletEntry(portletId);
+							}
+							else if (Util.isPhone() || Util.isTablet()) {
+								instance._instanceablePortletFeedback(portletId);
 							}
 
 							var beforePortletLoaded = null;
@@ -177,9 +190,7 @@ AUI.add(
 					_bindUIDABase: function() {
 						var instance = this;
 
-						instance._eventHandles = [
-							Liferay.after('showTab', instance._showTab, instance)
-						];
+						instance._eventHandles.push(Liferay.after('showTab', instance._showTab, instance));
 					},
 
 					_disablePortletEntry: function(portletId) {
@@ -259,6 +270,25 @@ AUI.add(
 						var instance = this;
 
 						return instance._searchData;
+					},
+
+					_instanceablePortletFeedback: function(portletId) {
+						var instance = this;
+
+						var addedMessagePortlet = instance.byId('portletName');
+
+						var portletNameNode = A.one('[data-portlet-id=' + portletId + ']');
+
+						var portletName = portletNameNode.attr('data-title');
+
+						addedMessagePortlet.setHTML(portletName);
+
+						instance._addedMessage.show(
+							true,
+							function() {
+								instance._hideAddedMessageTask();
+							}
+						);
 					},
 
 					_showTab: function(event) {
@@ -412,6 +442,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['liferay-dockbar', 'liferay-layout']
+		requires: ['liferay-dockbar', 'liferay-layout', 'transition']
 	}
 );

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,8 @@ public class CharPool {
 
 	public static final char BACK_SLASH = '\\';
 
+	public static final char CARET = '^';
+
 	public static final char CLOSE_BRACKET = ']';
 
 	public static final char CLOSE_CURLY_BRACE = '}';
@@ -39,9 +41,13 @@ public class CharPool {
 
 	public static final char DASH = '-';
 
+	public static final char DELETE = '\u007f';
+
 	public static final char EQUAL = '=';
 
 	public static final char EXCLAMATION = '!';
+
+	public static final char FIGURE_SPACE = '\u2007';
 
 	public static final char FORWARD_SLASH = '/';
 
@@ -103,7 +109,11 @@ public class CharPool {
 
 	public static final char MINUS = '-';
 
+	public static final char NARROW_NO_BREAK_SPACE = '\u202f';
+
 	public static final char NEW_LINE = '\n';
+
+	public static final char NO_BREAK_SPACE = '\u00a0';
 
 	public static final char NUMBER_0 = '0';
 

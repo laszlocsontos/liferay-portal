@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,26 +16,14 @@
 
 <%@ include file="/html/taglib/aui/nav_bar/init.jsp" %>
 
-<div class="navbar <%= cssClass %>" id="<%= id %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
-	<div class="navbar-inner">
-		<div class="container">
-			<span id="<%= id %>ResponsiveButton">
+<c:if test="<%= Validator.isContent(bodyContentString) %>">
+	<div class="navbar navbar-default <%= cssClass %>" id="<%= id %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
+		<div class="container-fluid">
+			<div class="navbar-header">
 				<%= responsiveButtons %>
-			</span>
+			</div>
 
-			<span id="<%= id %>bodyContent">
-				<%= bodyContentString %>
-			</span>
-
-			<aui:script use="aui-base,event-outside,liferay-menu-toggle">
-				var toggleMenu = new Liferay.MenuToggle(
-					{
-						content: '#<%= id %>bodyContent .nav-collapse, #<%= id %>ResponsiveButton .btn-navbar',
-						toggleTouch: true,
-						trigger: '#<%= id %>ResponsiveButton .btn-navbar'
-					}
-				);
-			</aui:script>
+			<%= bodyContentString %>
 		</div>
 	</div>
-</div>
+</c:if>

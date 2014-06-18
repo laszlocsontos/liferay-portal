@@ -5,17 +5,17 @@
 
 	<property name="war.file" value="${ant.project.name}" />
 
-	<property name="alloy-font-awesome.file" value="alloy-font-awesome-1.0.0.zip" />
-	<property name="ckeditor.file" value="ckeditor_4.0.3_liferay.zip" />
+	<property name="alloy.version" value="2.5.0" />
+	<property name="alloy-font-awesome.version" value="1.0.0" />
+	<property name="ckeditor.file" value="ckeditor_4.3.5_liferay.zip" />
 	<property name="fckeditor.file" value="FCKeditor_2.6.3.zip" />
-	<property name="scayt.file" value="scayt_4.0.3.zip" />
+	<property name="scayt.file" value="scayt_4.3.5.zip" />
 	<property name="tinymce.file" value="tinymce_3.5.6.zip" />
 	<property name="vaadin.file" value="vaadin-6.8.12-liferay.zip" />
-	<property name="wsc.file" value="wsc_4.0.3.zip" />
+	<property name="wsc.file" value="wsc_4.3.5.zip" />
 
 	<path id="jspc.common.classpath">
 		<pathelement path="docroot/WEB-INF/classes" />
-		<pathelement path="${classpath.jsp}" />
 		<pathelement location="${project.dir}/portal-impl/portal-impl.jar" />
 		<pathelement location="${project.dir}/portal-pacl/portal-pacl.jar" />
 		<pathelement location="${project.dir}/portal-service/portal-service.jar" />
@@ -24,6 +24,7 @@
 		<pathelement location="${project.dir}/util-taglib/util-taglib.jar" />
 		<pathelement location="${project.dir}/lib/development/activation.jar" />
 		<pathelement location="${project.dir}/lib/development/mail.jar" />
+		<pathelement location="${project.dir}/lib/global/portal-settings-shared.jar" />
 		<pathelement location="${project.dir}/lib/global/portlet.jar" />
 		<pathelement location="${project.dir}/lib/portal/alloy-taglib.jar" />
 		<pathelement location="${project.dir}/lib/portal/ant.jar" />
@@ -51,8 +52,6 @@
 
 	<target name="build-alloy">
 		<antcall target="build-alloy-bootstrap" />
-
-		<property name="alloy.version" value="2.0.0" />
 
 		<path id="alloy.zip.path">
 			<fileset dir="third-party">
@@ -167,10 +166,6 @@
 				<!-- Images -->
 
 				<copy todir="docroot/html/themes/_unstyled/images/aui" preservelastmodified="true">
-					<fileset dir="${alloy.build.dir}/aui-css/img" />
-				</copy>
-
-				<copy todir="docroot/html/themes/_unstyled/images/aui" preservelastmodified="true">
 					<fileset dir="${alloy.build.dir}/aui-skin-deprecated/images" />
 				</copy>
 
@@ -182,11 +177,11 @@
 	</target>
 
 	<target name="build-alloy-bootstrap">
-		<property name="alloy.bootstrap.version" value="2.3.2" />
+		<property name="alloy.bootstrap.version" value="3.1.1" />
 
 		<property name="alloy.bootstrap.deploy" value="docroot/html/themes/_unstyled/css/aui" />
 
-		<property name="alloy.bootstrap.file" value="alloy-bootstrap-${alloy.bootstrap.version}.zip" />
+		<property name="alloy.bootstrap.file" value="bootstrap-sass-${alloy.bootstrap.version}.zip" />
 
 		<property name="alloy.bootstrap.tmp.dir" value="docroot/html/ALLOY_BOOTSTRAP_ZIP" />
 
@@ -208,9 +203,7 @@
 
 				<!-- CSS -->
 
-				<property name="alloy.bootstrap.lib.dir" value="${alloy.bootstrap.tmp.dir}/lib" />
-
-				<delete dir="${alloy.bootstrap.lib.dir}/tests" />
+				<property name="alloy.bootstrap.lib.dir" value="${alloy.bootstrap.tmp.dir}/bootstrap-sass-${alloy.bootstrap.version}/vendor/assets/stylesheets/bootstrap" />
 
 				<copy todir="${alloy.bootstrap.deploy}" overwrite="true" preservelastmodified="true">
 					<fileset dir="${alloy.bootstrap.lib.dir}/" />
@@ -230,6 +223,16 @@
 	</target>
 
 	<target name="build-alloy-font-awesome">
+		<path id="alloy-font-awesome.zip.path">
+			<fileset dir="third-party">
+				<include name="alloy-font-awesome-${alloy-font-awesome.version}*.zip" />
+			</fileset>
+		</path>
+
+		<property name="alloy-font-awesome.zip.path" refid="alloy-font-awesome.zip.path" />
+
+		<basename file="${alloy-font-awesome.zip.path}" property="alloy-font-awesome.file" />
+
 		<if>
 			<not>
 				<uptodate
@@ -275,6 +278,8 @@
 				</copy>
 			</else>
 		</if>
+
+		<antcall target="build-fckeditor" />
 	</target>
 
 	<target name="build-ckeditor-plugins-bbcode">
@@ -420,6 +425,10 @@
 	</target>
 
 	<target name="build-css">
+		<property name="sass.tmp.dir" value="${basedir}/sass_tmp_dir" />
+
+		<mkdir dir="${sass.tmp.dir}" />
+
 		<java
 			classname="com.liferay.portal.tools.SassToCssBuilder"
 			classpathref="project.classpath"
@@ -428,6 +437,7 @@
 			newenvironment="true"
 		>
 			<jvmarg value="-Xmx1024m" />
+			<jvmarg value="-Djava.io.tmpdir=${sass.tmp.dir}" />
 			<jvmarg value="-Dliferay.lib.portal.dir=${basedir}/../lib/portal" />
 			<arg value="sass.dir.0=/html/css" />
 			<arg value="sass.dir.1=/html/portlet" />
@@ -435,6 +445,8 @@
 			<arg value="sass.docroot.dir=${basedir}/docroot" />
 			<arg value="sass.portal.common.dir=${basedir}/docroot/html/css/common" />
 		</java>
+
+		<delete dir="${sass.tmp.dir}" />
 	</target>
 
 	<target name="build-dtd">
@@ -738,9 +750,15 @@
 								alert( 'An internal server error occured.' );
 								break ;
 							case 210:
-								alert( 'You cannot upload a video file if video preview generation is disabled.' );
+								alert( 'A category is required for this file. Please use the Documents and Media application to upload the file.' );
 								break ;
 							case 211:
+								alert( 'File may contain a virus.' );
+								break ;
+							case 220:
+								alert( 'You cannot upload a video file if video preview generation is disabled.' );
+								break ;
+							case 221:
 								alert( 'You cannot upload an audio file if audio preview generation is disabled.' );
 								break ;
 							default :
@@ -790,56 +808,6 @@
 				<!-- EOL -->
 
 				<fixcrlf includes="**/*.html" srcdir="docroot/html/js/editor/fckeditor/editor/filemanager/browser/liferay" eol="unix" />
-
-				<!-- CKEditor -->
-
-				<mkdir dir="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay" />
-
-				<copy todir="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay">
-					<fileset dir="docroot/html/js/editor/fckeditor/editor/filemanager/browser/liferay" />
-				</copy>
-
-				<replace file="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay/browser.html">
-					<replacefilter token="FCKeditor" value="CKeditor" />
-				</replace>
-
-				<replace file="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay/browser.html">
-					<replacetoken><![CDATA[<meta http-equiv="Content-Type" content="text/html; charset=utf-8">]]></replacetoken>
-					<replacevalue>
-						<![CDATA[
-							<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-							<meta content="IE=EmulateIE9" http-equiv="X-UA-Compatible">
-						]]>
-					</replacevalue>
-				</replace>
-
-				<replace file="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay/frmresourceslist.html">
-					<replacetoken><![CDATA[function OpenFile( fileUrl )]]></replacetoken>
-					<replacevalue><![CDATA[function OpenFile( fileUrl, errorMessage )]]></replacevalue>
-				</replace>
-
-				<replace file="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay/frmresourceslist.html">
-					<replacetoken><![CDATA[window.top.opener.SetUrl( encodeURI( fileUrl ).replace( '#', '%23' ) ) ;]]></replacetoken>
-					<replacevalue>
-						<![CDATA[
-							if (!errorMessage) {
-								var match = window.top.location.search.match(/(?:[\?&]|&amp;)CKEditorFuncNum=([^&]+)/i);
-
-								var funcNum = (match && match.length) ? match[1] : '';
-
-								window.top.opener.CKEDITOR.tools.callFunction(funcNum, fileUrl);
-							}
-							else {
-								alert(errorMessage);
-							}
-						]]>
-					</replacevalue>
-				</replace>
-
-				<replace file="docroot/html/js/editor/ckeditor/editor/filemanager/browser/liferay/frmresourceslist.html">
-					<replacetoken><![CDATA[var sCurrentFolderPath	= oFolderNode.attributes.getNamedItem('path').value ;]]></replacetoken>
-					<replacevalue><![CDATA[var sCurrentFolderPath	= oFolderNode.attributes.getNamedItem('path').value.replace( /"/g, '') ;]]></replacevalue>
-				</replace>
 			</then>
 			<else>
 				<copy todir="docroot/html/js/editor/fckeditor">
@@ -869,14 +837,21 @@
 	</target>
 
 	<target name="build-selenium-new">
-		<delete dir="${basedir.unix}/test/functional-generated" />
+		<if>
+			<not>
+				<equals arg1="${delete.function.generated}" arg2="false" />
+			</not>
+			<then>
+				<delete dir="${basedir.unix}/test/functional-generated" />
+			</then>
+		</if>
 
 		<if>
 			<not>
 				<isset property="selenium.types" />
 			</not>
 			<then>
-				<property name="selenium.types" value="action,function,macro,path,testcase,testsuite" />
+				<property name="selenium.types" value="action,function,macro,path,testcase" />
 			</then>
 		</if>
 
@@ -889,44 +864,60 @@
 			newenvironment="true"
 		>
 			<jvmarg value="-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties" />
+			<arg value="project.dir=${project.dir}" />
 			<arg value="selenium.base.dir=test/functional" />
 			<arg value="selenium.types=${selenium.types}" />
+			<arg value="test.class=${test.class}" />
 		</java>
 	</target>
 
 	<target name="build-selenium-new-action">
 		<antcall target="build-selenium-new">
+			<param name="delete.function.generated" value="false" />
 			<param name="selenium.types" value="action" />
+		</antcall>
+	</target>
+
+	<target name="build-selenium-new-block">
+		<antcall target="build-selenium-new">
+			<param name="selenium.types" value="action,function,macro,path" />
 		</antcall>
 	</target>
 
 	<target name="build-selenium-new-function">
 		<antcall target="build-selenium-new">
+			<param name="delete.function.generated" value="false" />
 			<param name="selenium.types" value="function" />
 		</antcall>
 	</target>
 
 	<target name="build-selenium-new-macro">
 		<antcall target="build-selenium-new">
+			<param name="delete.function.generated" value="false" />
 			<param name="selenium.types" value="macro" />
 		</antcall>
 	</target>
 
 	<target name="build-selenium-new-path">
 		<antcall target="build-selenium-new">
+			<param name="delete.function.generated" value="false" />
 			<param name="selenium.types" value="path" />
 		</antcall>
 	</target>
 
 	<target name="build-selenium-new-test-case">
-		<antcall target="build-selenium-new">
-			<param name="selenium.types" value="testcase" />
-		</antcall>
-	</target>
+		<if>
+			<not>
+				<isset property="test.class" />
+			</not>
+			<then>
+				<fail>Please set "test.class".</fail>
+			</then>
+		</if>
 
-	<target name="build-selenium-new-test-suite">
 		<antcall target="build-selenium-new">
-			<param name="selenium.types" value="testsuite" />
+			<param name="delete.function.generated" value="false" />
+			<param name="selenium.types" value="testcase" />
 		</antcall>
 	</target>
 
@@ -1152,14 +1143,18 @@
 		<delete dir="test-classes" />
 		<delete dir="test-results" />
 
+		<antcall target="clean-css" />
+
+		<antcall target="clean-themes" />
+	</target>
+
+	<target name="clean-css">
 		<delete includeemptydirs="true">
 			<fileset dir="docroot/html/css" includes="**/.sass-cache/**,**/.sass_cache_*.css,**/_sass_cache_*.css" />
 			<fileset dir="docroot/html/portlet" includes="**/.sass-cache/**,**/.sass_cache_*.css,**/_sass_cache_*.css" />
 			<fileset dir="docroot/html/themes" includes="**/.sass-cache/**,**/.sass_cache_*.css,**/_sass_cache_*.css" />
 			<fileset dir="docroot/WEB-INF/tld" includes="liferay*.tld" />
 		</delete>
-
-		<antcall target="clean-themes" />
 	</target>
 
 	<target name="clean-themes">
@@ -1416,7 +1411,6 @@ Please set the property "jdk.6.home" in build.properties.
 		<antcall target="build-alloy" />
 		<antcall target="build-ckeditor" />
 		<antcall target="build-dtd" />
-		<antcall target="build-fckeditor" />
 		<antcall target="build-tinymce" />
 		<antcall target="build-vaadin" />
 
@@ -1520,11 +1514,28 @@ Please set the property "jdk.6.home" in build.properties.
 		<ant dir=".." target="deploy-properties" inheritAll="false" />
 	</target>
 
+	<target name="format-js">
+		<taskdef classname="com.philmander.jshint.JsHintAntTask" classpath="${project.dir}/tools/ant-jshint-2.0.5.jar" name="jshint" />
+
+		<jshint
+			dir="${project.dir}"
+			globals="alert: true, AUI: true, confirm: true, Liferay: true, prompt: true, submitForm: true, themeDisplay: true, YUI: true"
+			options="browser=true,curly=true,devel=false,eqeqeq=false,eqnull=true,evil=true,forin=false,funcscope=true,nonew=false,nonstandard=true,scripturl=true,strict=false,trailing=true,yui=true"
+		>
+			<exclude name="**/aui/**" />
+			<exclude name="**/dynamiccss/dependencies/r2*.js" />
+			<exclude name="**/editor/**" />
+			<exclude name="**/misc/**" />
+			<exclude name="**/selenium/**" />
+			<exclude name="**/VAADIN/**" />
+			<include name="**/*.js" />
+		</jshint>
+	</target>
+
 	<target name="war" depends="compile">
 		<antcall target="build-alloy" />
 		<antcall target="build-ckeditor" />
 		<antcall target="build-dtd" />
-		<antcall target="build-fckeditor" />
 		<antcall target="build-tinymce" />
 		<antcall target="build-vaadin" />
 

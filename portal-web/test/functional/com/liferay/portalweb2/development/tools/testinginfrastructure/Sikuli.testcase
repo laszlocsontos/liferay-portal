@@ -1,81 +1,46 @@
 <definition component-name="portal-tools">
-	<set-up>
-		<execute macro="User#firstLoginPG" />
-	</set-up>
+	<property name="testray.main.component.name" value="Tools" />
 
-	<command name="importExportSite" priority="5">
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Sites" />
-		</execute>
+	<command name="Smoke" priority="5">
+		<execute action="PGLogin#sikuliAssertElementPresent" locator-key1="SIGN_IN_BUTTON_PNG" />
+		<execute action="PGLogin#sikuliAssertElementNotPresent" locator-key1="AVERAGE_RATING_STAR_ICON_PNG" />
+		<execute action="PGLogin#sikuliType" locator-key1="EMAIL_ADDRESS_FIELD_PNG" value1="test@liferay.com" />
+		<execute action="PGLogin#sikuliType" locator-key1="PASSWORD_FIELD_PNG" value1="test" />
+		<execute action="PGLogin#check" locator-key1="REMEMBER_ME_CHECKBOX" />
+		<execute action="PGLogin#sikuliClick" locator-key1="SIGN_IN_BUTTON_PNG" />
 
-		<execute macro="Site#addBlankCP">
-			<var name="siteName" value="Site1" />
-		</execute>
+		<execute action="Dockbar#assertElementPresent" locator-key1="USER_AVATAR_IMAGE" />
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Sites" />
-		</execute>
+		<if>
+			<condition action="PGLoginTermsofservice#isElementPresent" locator-key1="I_AGREE_BUTTON" value1="I Agree" />
+			<then>
+				<execute action="PGLoginTermsofservice#assertClick" locator-key1="I_AGREE_BUTTON" value1="I Agree" />
+			</then>
+		</if>
 
-		<execute macro="Site#addBlankCP">
-			<var name="siteName" value="Site2" />
-		</execute>
+		<if>
+			<condition action="PGLoginNewpassword#isElementPresent" locator-key1="PASSWORD_FIELD" />
+			<then>
+				<execute action="PGLoginNewpassword#type" locator-key1="PASSWORD_FIELD" value1="test" />
+				<execute action="PGLoginNewpassword#type" locator-key1="ENTER_AGAIN_FIELD" value1="test" />
+				<execute action="PGLoginNewpassword#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+			</then>
+		</if>
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Sites" />
-		</execute>
+		<if>
+			<condition action="PGLoginPasswordreminder#isElementPresent" locator-key1="ANSWER_FIELD" />
+			<then>
+				<execute action="PGLoginPasswordreminder#type" locator-key1="ANSWER_FIELD" value1="test" />
+				<execute action="PGLoginPasswordreminder#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+			</then>
+		</if>
 
-		<execute macro="SitePage#addCP">
-			<var name="siteName" value="Site1" />
-			<var name="sitePageName" value="Page1" />
-			<var name="sitePagePrivacy" value="Public" />
-		</execute>
+		<execute action="BasePortlet#assertTextEquals" locator-key1="PORTLET_CONTENT" value1="You are signed in as Test Test." />
 
-		<execute macro="Page#openURL">
-			<var name="siteName" value="Site1" />
-			<var name="siteURL" value="true" />
-		</execute>
-
-		<execute macro="Portlet#addPG">
-			<var name="portletName" value="Blogs" />
-		</execute>
-
-		<execute macro="Page#openURL">
-			<var name="siteName" value="Site1" />
-			<var name="siteURL" value="true" />
-		</execute>
-
-		<execute macro="BlogsEntry#addPG">
-			<var name="entryContent" value="Content" />
-			<var name="entryTitle" value="Title" />
-		</execute>
-
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Sites" />
-		</execute>
-
-		<execute macro="Site#exportSite">
-			<var name="fileDownload" value="test.lar(14k)" />
-			<var name="fileName" value="test.lar" />
-			<var name="siteName" value="Site1" />
-		</execute>
-
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="Sites" />
-		</execute>
-
-		<execute macro="Site#importSite">
-			<var name="fileName" value="test.lar" />
-			<var name="siteName" value="Site2" />
-		</execute>
-
-		<execute macro="Page#openURL">
-			<var name="siteName" value="Site2" />
-			<var name="siteURL" value="true" />
-		</execute>
-
-		<execute macro="BlogsEntry#viewPG">
-			<var name="entryContent" value="Content" />
-			<var name="entryTitle" value="Title" />
-		</execute>
+		<execute action="Home#sikuliMouseMove" locator-key1="SIGN_IN_PORTLET" />
+		<execute action="Home#sikuliLeftMouseDown" />
+		<execute action="Home#sikuliMouseMove" locator-key1="HELLO_WORLD_PORTLET" />
+		<execute action="Home#sikuliLeftMouseUp" />
+		<execute action="Home#assertElementPresent" locator-key1="PAGE_COLUMN_2_SIGN_IN_PORTLET" />
 	</command>
 </definition>

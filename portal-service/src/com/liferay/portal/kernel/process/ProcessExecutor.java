@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -310,7 +310,7 @@ public class ProcessExecutor {
 
 	}
 
-	public static interface ShutdownHook {
+	public interface ShutdownHook {
 
 		public static final int BROKEN_PIPE_CODE = 1;
 
@@ -614,8 +614,7 @@ public class ProcessExecutor {
 					int exitCode = _process.waitFor();
 
 					if (exitCode != 0) {
-						throw new ProcessException(
-							"Subprocess terminated with exit code " + exitCode);
+						throw new TerminationProcessException(exitCode);
 					}
 				}
 				catch (InterruptedException ie) {

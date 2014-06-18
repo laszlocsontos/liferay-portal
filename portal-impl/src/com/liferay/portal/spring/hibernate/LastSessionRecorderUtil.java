@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,7 @@ import org.hibernate.Session;
  */
 public class LastSessionRecorderUtil {
 
-	public static void syncLastSessionState() throws SystemException {
+	public static void syncLastSessionState() {
 		Session session = _lastSessionThreadLocal.get();
 
 		if ((session != null) && session.isOpen()) {

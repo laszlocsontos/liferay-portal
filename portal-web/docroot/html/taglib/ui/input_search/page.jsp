@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,15 +29,17 @@ String title = GetterUtil.getString((String)request.getAttribute("liferay-ui:inp
 String value = ParamUtil.getString(request, name);
 %>
 
-<div class="<%= cssClass %>">
+<div class="<%= cssClass %> input-group">
 	<label class="hide-accessible" for="<portlet:namespace /><%= id %>"><%= title %></label>
 
-	<input class="search-query span9" id="<portlet:namespace /><%= id %>" name="<portlet:namespace /><%= name %>" placeholder="<%= placeholder %>" title="<%= title %>" type="text" value="<%= HtmlUtil.escapeAttribute(value) %>" />
+	<input class="form-control search-query" id="<portlet:namespace /><%= id %>" name="<portlet:namespace /><%= name %>" placeholder="<%= placeholder %>" title="<%= title %>" type="text" value="<%= HtmlUtil.escapeAttribute(value) %>" />
 
 	<c:if test="<%= showButton %>">
-		<button class="btn" type="submit">
-			<%= buttonLabel %>
-		</button>
+		<span class="input-group-btn">
+			<button class="btn btn-default" type="submit">
+				<%= buttonLabel %>
+			</button>
+		</span>
 	</c:if>
 </div>
 

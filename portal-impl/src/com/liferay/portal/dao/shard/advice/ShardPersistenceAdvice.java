@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,7 +90,7 @@ public class ShardPersistenceAdvice implements MethodInterceptor {
 		if (_shardAdvice.getGlobalCall() == null) {
 			String shardName = _shardAdvice.setShardNameByCompany();
 
-			ShardUtil.setTargetSource(shardName);
+			String currentShardName = ShardUtil.setTargetSource(shardName);
 
 			if (_log.isInfoEnabled()) {
 				_log.info(
@@ -98,7 +98,16 @@ public class ShardPersistenceAdvice implements MethodInterceptor {
 						methodInvocation.toString());
 			}
 
-			return methodInvocation.proceed();
+			_shardAdvice.pushCompanyService(shardName);
+
+			try {
+				return methodInvocation.proceed();
+			}
+			finally {
+				_shardAdvice.popCompanyService();
+
+				ShardUtil.setTargetSource(currentShardName);
+			}
 		}
 		else {
 			return methodInvocation.proceed();

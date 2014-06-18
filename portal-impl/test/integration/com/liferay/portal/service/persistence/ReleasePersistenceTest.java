@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,23 +31,27 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Release;
 import com.liferay.portal.model.impl.ReleaseModelImpl;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.service.ReleaseLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +63,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class ReleasePersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<Release> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -80,11 +93,15 @@ public class ReleasePersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<Release> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Release release = _persistence.create(pk);
 
@@ -111,27 +128,27 @@ public class ReleasePersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Release newRelease = _persistence.create(pk);
 
-		newRelease.setMvccVersion(ServiceTestUtil.nextLong());
+		newRelease.setMvccVersion(RandomTestUtil.nextLong());
 
-		newRelease.setCreateDate(ServiceTestUtil.nextDate());
+		newRelease.setCreateDate(RandomTestUtil.nextDate());
 
-		newRelease.setModifiedDate(ServiceTestUtil.nextDate());
+		newRelease.setModifiedDate(RandomTestUtil.nextDate());
 
-		newRelease.setServletContextName(ServiceTestUtil.randomString());
+		newRelease.setServletContextName(RandomTestUtil.randomString());
 
-		newRelease.setBuildNumber(ServiceTestUtil.nextInt());
+		newRelease.setBuildNumber(RandomTestUtil.nextInt());
 
-		newRelease.setBuildDate(ServiceTestUtil.nextDate());
+		newRelease.setBuildDate(RandomTestUtil.nextDate());
 
-		newRelease.setVerified(ServiceTestUtil.randomBoolean());
+		newRelease.setVerified(RandomTestUtil.randomBoolean());
 
-		newRelease.setState(ServiceTestUtil.nextInt());
+		newRelease.setState(RandomTestUtil.nextInt());
 
-		newRelease.setTestString(ServiceTestUtil.randomString());
+		newRelease.setTestString(RandomTestUtil.randomString());
 
 		_persistence.update(newRelease);
 
@@ -186,7 +203,7 @@ public class ReleasePersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -226,7 +243,7 @@ public class ReleasePersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Release missingRelease = _persistence.fetchByPrimaryKey(pk);
 
@@ -234,19 +251,101 @@ public class ReleasePersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Release newRelease1 = addRelease();
+		Release newRelease2 = addRelease();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newRelease1.getPrimaryKey());
+		primaryKeys.add(newRelease2.getPrimaryKey());
+
+		Map<Serializable, Release> releases = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, releases.size());
+		Assert.assertEquals(newRelease1,
+			releases.get(newRelease1.getPrimaryKey()));
+		Assert.assertEquals(newRelease2,
+			releases.get(newRelease2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Release> releases = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(releases.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Release newRelease = addRelease();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newRelease.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Release> releases = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, releases.size());
+		Assert.assertEquals(newRelease, releases.get(newRelease.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Release> releases = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(releases.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Release newRelease = addRelease();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newRelease.getPrimaryKey());
+
+		Map<Serializable, Release> releases = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, releases.size());
+		Assert.assertEquals(newRelease, releases.get(newRelease.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new ReleaseActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = ReleaseLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					Release release = (Release)object;
 
 					Assert.assertNotNull(release);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -279,7 +378,7 @@ public class ReleasePersistenceTest {
 				Release.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("releaseId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<Release> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -318,7 +417,7 @@ public class ReleasePersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("releaseId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("releaseId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -343,27 +442,27 @@ public class ReleasePersistenceTest {
 	}
 
 	protected Release addRelease() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Release release = _persistence.create(pk);
 
-		release.setMvccVersion(ServiceTestUtil.nextLong());
+		release.setMvccVersion(RandomTestUtil.nextLong());
 
-		release.setCreateDate(ServiceTestUtil.nextDate());
+		release.setCreateDate(RandomTestUtil.nextDate());
 
-		release.setModifiedDate(ServiceTestUtil.nextDate());
+		release.setModifiedDate(RandomTestUtil.nextDate());
 
-		release.setServletContextName(ServiceTestUtil.randomString());
+		release.setServletContextName(RandomTestUtil.randomString());
 
-		release.setBuildNumber(ServiceTestUtil.nextInt());
+		release.setBuildNumber(RandomTestUtil.nextInt());
 
-		release.setBuildDate(ServiceTestUtil.nextDate());
+		release.setBuildDate(RandomTestUtil.nextDate());
 
-		release.setVerified(ServiceTestUtil.randomBoolean());
+		release.setVerified(RandomTestUtil.randomBoolean());
 
-		release.setState(ServiceTestUtil.nextInt());
+		release.setState(RandomTestUtil.nextInt());
 
-		release.setTestString(ServiceTestUtil.randomString());
+		release.setTestString(RandomTestUtil.randomString());
 
 		_persistence.update(release);
 
@@ -371,6 +470,7 @@ public class ReleasePersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(ReleasePersistenceTest.class);
+	private ModelListener<Release>[] _modelListeners;
 	private ReleasePersistence _persistence = (ReleasePersistence)PortalBeanLocatorUtil.locate(ReleasePersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

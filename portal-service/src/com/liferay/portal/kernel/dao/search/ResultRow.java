@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,7 +119,6 @@ public class ResultRow {
 	}
 
 	public void addDate(int index, Date date, String href) {
-
 		DateSearchEntry dateSearchEntry = new DateSearchEntry();
 
 		dateSearchEntry.setAlign(SearchEntry.DEFAULT_ALIGN);
@@ -189,6 +188,18 @@ public class ResultRow {
 		addJSP(_searchEntries.size(), path, servletContext, request, response);
 	}
 
+	public void addJSP(String path, String cssClass) {
+		JSPSearchEntry jspSearchEntry = new JSPSearchEntry();
+
+		jspSearchEntry.setAlign(SearchEntry.DEFAULT_ALIGN);
+		jspSearchEntry.setColspan(SearchEntry.DEFAULT_COLSPAN);
+		jspSearchEntry.setCssClass(cssClass);
+		jspSearchEntry.setPath(path);
+		jspSearchEntry.setValign(SearchEntry.DEFAULT_VALIGN);
+
+		_searchEntries.add(_searchEntries.size(), jspSearchEntry);
+	}
+
 	public void addJSP(String align, String valign, int colspan, String path) {
 		addJSP(_searchEntries.size(), align, valign, colspan, path);
 	}
@@ -248,8 +259,8 @@ public class ResultRow {
 	}
 
 	public void addStatus(
-			int index, int status, String href, ServletContext servletContext,
-			HttpServletRequest request, HttpServletResponse response) {
+		int index, int status, String href, ServletContext servletContext,
+		HttpServletRequest request, HttpServletResponse response) {
 
 		StatusSearchEntry statusSearchEntry = new StatusSearchEntry();
 

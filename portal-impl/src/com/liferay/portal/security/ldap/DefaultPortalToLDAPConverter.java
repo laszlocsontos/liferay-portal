@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -185,8 +185,7 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 
 	@Override
 	public Attributes getLDAPUserAttributes(
-			long ldapServerId, User user, Properties userMappings)
-		throws SystemException {
+		long ldapServerId, User user, Properties userMappings) {
 
 		Attributes attributes = new BasicAttributes(true);
 
@@ -410,9 +409,7 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 		}
 	}
 
-	protected String getEncryptedPasswordForLDAP(User user)
-		throws SystemException {
-
+	protected String getEncryptedPasswordForLDAP(User user) {
 		String password = user.getPasswordUnencrypted();
 
 		if (Validator.isNull(password)) {

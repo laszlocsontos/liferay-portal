@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,11 +50,9 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	*
 	* @param subscription the subscription
 	* @return the subscription that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.Subscription addSubscription(
-		com.liferay.portal.model.Subscription subscription)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.model.Subscription subscription);
 
 	/**
 	* Creates a new subscription with the primary key. Does not add the subscription to the database.
@@ -71,12 +69,10 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param subscriptionId the primary key of the subscription
 	* @return the subscription that was removed
 	* @throws PortalException if a subscription with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.Subscription deleteSubscription(
 		long subscriptionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes the subscription from the database. Also notifies the appropriate model listeners.
@@ -84,12 +80,10 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param subscription the subscription
 	* @return the subscription that was removed
 	* @throws PortalException
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.Subscription deleteSubscription(
 		com.liferay.portal.model.Subscription subscription)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -98,12 +92,10 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
 
 	/**
 	* Performs a dynamic query on the database and returns a range of the matching rows.
@@ -116,12 +108,11 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException;
+		int end);
 
 	/**
 	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
@@ -135,25 +126,21 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator);
 
 	/**
 	* Returns the number of rows that match the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
 
 	/**
 	* Returns the number of rows that match the dynamic query.
@@ -161,17 +148,14 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.Subscription fetchSubscription(
-		long subscriptionId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long subscriptionId);
 
 	/**
 	* Returns the subscription with the primary key.
@@ -179,20 +163,28 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param subscriptionId the primary key of the subscription
 	* @return the subscription
 	* @throws PortalException if a subscription with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.Subscription getSubscription(
 		long subscriptionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Returns a range of all the subscriptions.
@@ -204,33 +196,27 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param start the lower bound of the range of subscriptions
 	* @param end the upper bound of the range of subscriptions (not inclusive)
 	* @return the range of subscriptions
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Subscription> getSubscriptions(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		int start, int end);
 
 	/**
 	* Returns the number of subscriptions.
 	*
 	* @return the number of subscriptions
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getSubscriptionsCount()
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public int getSubscriptionsCount();
 
 	/**
 	* Updates the subscription in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param subscription the subscription
 	* @return the subscription that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.Subscription updateSubscription(
-		com.liferay.portal.model.Subscription subscription)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.model.Subscription subscription);
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -267,12 +253,10 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param classPK the primary key of the entity's instance
 	* @return the subscription
 	* @throws PortalException if a matching user or group could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.Subscription addSubscription(long userId,
 		long groupId, java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Subscribes the user to the entity, notifying him at the given frequency.
@@ -295,13 +279,11 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param frequency the frequency for notifications
 	* @return the subscription
 	* @throws PortalException if a matching user or group could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.Subscription addSubscription(long userId,
 		long groupId, java.lang.String className, long classPK,
 		java.lang.String frequency)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes the user's subscription to the entity. A social activity with the
@@ -312,23 +294,19 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param classPK the primary key of the entity's instance
 	* @throws PortalException if a matching user or subscription could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	public void deleteSubscription(long userId, java.lang.String className,
 		long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes all the subscriptions of the user.
 	*
 	* @param userId the primary key of the user
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	public void deleteSubscriptions(long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes all the subscriptions to the entity.
@@ -337,12 +315,10 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param className the entity's class name
 	* @param classPK the primary key of the entity's instance
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	public void deleteSubscriptions(long companyId, java.lang.String className,
 		long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Returns the subscription of the user to the entity.
@@ -353,13 +329,11 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param classPK the primary key of the entity's instance
 	* @return the subscription of the user to the entity
 	* @throws PortalException if a matching subscription could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.Subscription getSubscription(
 		long companyId, long userId, java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Returns all the subscriptions of the user to the entities.
@@ -369,12 +343,10 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param className the entity's class name
 	* @param classPKs the primary key of the entities
 	* @return the subscriptions of the user to the entities
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Subscription> getSubscriptions(
-		long companyId, long userId, java.lang.String className, long[] classPKs)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long companyId, long userId, java.lang.String className, long[] classPKs);
 
 	/**
 	* Returns all the subscriptions to the entity.
@@ -383,12 +355,10 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param className the entity's class name
 	* @param classPK the primary key of the entity's instance
 	* @return the subscriptions to the entity
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Subscription> getSubscriptions(
-		long companyId, java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long companyId, java.lang.String className, long classPK);
 
 	/**
 	* Returns an ordered range of all the subscriptions of the user.
@@ -398,13 +368,11 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of results (not inclusive)
 	* @param orderByComparator the comparator to order the subscriptions
 	* @return the range of subscriptions of the user
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Subscription> getUserSubscriptions(
 		long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator);
 
 	/**
 	* Returns all the subscriptions of the user to the entities with the class
@@ -413,23 +381,19 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param userId the primary key of the user
 	* @param className the entity's class name
 	* @return the subscriptions of the user to the entities with the class name
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.Subscription> getUserSubscriptions(
-		long userId, java.lang.String className)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long userId, java.lang.String className);
 
 	/**
 	* Returns the number of subscriptions of the user.
 	*
 	* @param userId the primary key of the user
 	* @return the number of subscriptions of the user
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getUserSubscriptionsCount(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public int getUserSubscriptionsCount(long userId);
 
 	/**
 	* Returns <code>true</code> if the user is subscribed to the entity.
@@ -440,12 +404,10 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param classPK the primary key of the entity's instance
 	* @return <code>true</code> if the user is subscribed to the entity;
 	<code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean isSubscribed(long companyId, long userId,
-		java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		java.lang.String className, long classPK);
 
 	/**
 	* Returns <code>true</code> if the user is subscribed to any of the
@@ -457,10 +419,8 @@ public interface SubscriptionLocalService extends BaseLocalService,
 	* @param classPKs the primary key of the entities
 	* @return <code>true</code> if the user is subscribed to any of the
 	entities; <code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean isSubscribed(long companyId, long userId,
-		java.lang.String className, long[] classPKs)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		java.lang.String className, long[] classPKs);
 }

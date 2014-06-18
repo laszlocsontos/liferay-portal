@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -154,12 +154,10 @@ public class ImageToolUtil {
 	}
 
 	public static Image getImage(File file) throws IOException {
-
 		return getImageTool().getImage(file);
 	}
 
 	public static Image getImage(InputStream is) throws IOException {
-
 		return getImageTool().getImage(is);
 	}
 

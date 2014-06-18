@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,14 +13,6 @@
  */
 
 package com.liferay.portal.tools.sourceformatter;
-
-import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-
-import java.io.IOException;
 
 import java.util.List;
 
@@ -78,53 +70,6 @@ public class JavaTerm {
 
 	public void setType(int type) {
 		_type = type;
-	}
-
-	public void sortAnnotations() throws IOException {
-		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
-			new UnsyncStringReader(_content));
-
-		String line = null;
-
-		String annotation = StringPool.BLANK;
-		String previousAnnotation = StringPool.BLANK;
-
-		while ((line = unsyncBufferedReader.readLine()) != null) {
-			if (line.equals(StringPool.TAB + StringPool.CLOSE_CURLY_BRACE)) {
-				return;
-			}
-
-			if (StringUtil.count(line, StringPool.TAB) == 1) {
-				if (Validator.isNotNull(previousAnnotation) &&
-					(previousAnnotation.compareTo(annotation) > 0)) {
-
-					_content = StringUtil.replaceFirst(
-						_content, previousAnnotation, annotation);
-					_content = StringUtil.replaceLast(
-						_content, annotation, previousAnnotation);
-
-					return;
-				}
-
-				if (line.startsWith(StringPool.TAB + StringPool.AT)) {
-					if (Validator.isNotNull(annotation)) {
-						previousAnnotation = annotation;
-					}
-
-					annotation = line + "\n";
-				}
-				else {
-					annotation = StringPool.BLANK;
-				}
-			}
-			else {
-				if (Validator.isNull(annotation)) {
-					return;
-				}
-
-				annotation += line + "\n";
-			}
-		}
 	}
 
 	private String _content;

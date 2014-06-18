@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,15 +14,20 @@
 
 package com.liferay.portal.kernel.cache;
 
+import com.liferay.portal.kernel.nio.intraband.proxy.annotation.Proxy;
+
 import java.io.Serializable;
 
 import java.net.URL;
+
+import java.util.Set;
 
 /**
  * @author Joseph Shum
  */
 public interface PortalCacheManager<K extends Serializable, V> {
 
+	@Proxy
 	public void clearAll() throws PortalCacheException;
 
 	public void destroy();
@@ -32,8 +37,19 @@ public interface PortalCacheManager<K extends Serializable, V> {
 	public PortalCache<K, V> getCache(String name, boolean blocking)
 		throws PortalCacheException;
 
+	public Set<CacheManagerListener> getCacheManagerListeners();
+
+	@Proxy
 	public void reconfigureCaches(URL configurationURL);
 
+	public boolean registerCacheManagerListener(
+		CacheManagerListener cacheManagerListener);
+
 	public void removeCache(String name);
+
+	public boolean unregisterCacheManagerListener(
+		CacheManagerListener cacheManagerListener);
+
+	public void unregisterCacheManagerListeners();
 
 }

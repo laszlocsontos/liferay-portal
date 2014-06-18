@@ -180,7 +180,7 @@ AUI.add(
 
 						var output = instance._portletMessageContainer;
 
-						output.removeClass('alert-error').removeClass('alert-success');
+						output.removeClass('alert-danger').removeClass('alert-success');
 
 						output.addClass('alert alert-' + type);
 
@@ -199,6 +199,7 @@ AUI.add(
 						instance._setEntries(data);
 						instance._setFolders(data);
 						instance._setParentTitle(data);
+						instance._setSelectAllCheckbox(data);
 
 						instance._parseContent(data);
 
@@ -216,7 +217,7 @@ AUI.add(
 
 						AObject.each(
 							currentHistoryState,
-							function(index, item, collection) {
+							function(index, item) {
 								if (!owns(historyState, item) && !owns(defaultParams, item)) {
 									historyState[item] = null;
 								}
@@ -261,7 +262,7 @@ AUI.add(
 							instance.get('mainUrl'),
 							{
 								autoLoad: false,
-								method: 'get'
+								method: 'GET'
 							}
 						);
 
@@ -451,7 +452,7 @@ AUI.add(
 
 						AObject.each(
 							instance.get('defaultParams'),
-							function(item, index, collection) {
+							function(item, index) {
 								if (!Lang.isValue(History.get(index))) {
 									requestParams[index] = item;
 								}
@@ -472,7 +473,7 @@ AUI.add(
 
 								AObject.each(
 									initialState,
-									function(item, index, collection) {
+									function(item, index) {
 										if (index.indexOf(namespace) === 0) {
 											requestParams[index] = item;
 										}
@@ -625,6 +626,32 @@ AUI.add(
 							var parentTitleContainer = instance.byId('parentTitleContainer');
 
 							parentTitleContainer.setContent(parentTitle);
+						}
+					},
+
+					_setSelectAllCheckbox: function(content) {
+						var instance = this;
+
+						var portletContainer = instance._portletContainer;
+
+						var entriesContainer = instance.one('#entriesContainer');
+
+						if (entriesContainer && portletContainer) {
+							var entriesSize = entriesContainer.all('.app-view-entry').size();
+
+							var selectAllEntriesCheckbox = portletContainer.one('.select-all-entries');
+
+							if (selectAllEntriesCheckbox) {
+								var entries = (entriesSize > 0);
+								var hidden = selectAllEntriesCheckbox.hasClass('hide');
+
+								if (entries && hidden) {
+									selectAllEntriesCheckbox.removeClass('hide');
+								}
+								else if (!entries && !hidden) {
+									selectAllEntriesCheckbox.addClass('hide');
+								}
+							}
 						}
 					},
 

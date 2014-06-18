@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,12 +23,16 @@ import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.struts.PortletAction;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.journal.DuplicateFolderNameException;
 import com.liferay.portlet.journal.FolderNameException;
+import com.liferay.portlet.journal.InvalidDDMStructureException;
 import com.liferay.portlet.journal.NoSuchFolderException;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.journal.model.JournalFolderConstants;
 import com.liferay.portlet.journal.service.JournalFolderServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
@@ -69,8 +73,14 @@ public class EditFolderAction extends PortletAction {
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteFolders(actionRequest, true);
 			}
-			else if (cmd.equals(Constants.MOVE)) {
-				moveFolder(actionRequest);
+			else if (cmd.equals(Constants.SUBSCRIBE)) {
+				subscribeFolder(actionRequest);
+			}
+			else if (cmd.equals(Constants.UNSUBSCRIBE)) {
+				unsubscribeFolder(actionRequest);
+			}
+			else if (cmd.equals("updateWorkflowDefinitions")) {
+				updateWorkflowDefinitions(actionRequest);
 			}
 
 			sendRedirect(actionRequest, actionResponse);
@@ -84,7 +94,8 @@ public class EditFolderAction extends PortletAction {
 				setForward(actionRequest, "portlet.journal.error");
 			}
 			else if (e instanceof DuplicateFolderNameException ||
-					 e instanceof FolderNameException) {
+					 e instanceof FolderNameException ||
+					 e instanceof InvalidDDMStructureException) {
 
 				SessionErrors.add(actionRequest, e.getClass());
 			}
@@ -161,17 +172,28 @@ public class EditFolderAction extends PortletAction {
 		}
 	}
 
-	protected void moveFolder(ActionRequest actionRequest) throws Exception {
+	protected void subscribeFolder(ActionRequest actionRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		long folderId = ParamUtil.getLong(actionRequest, "folderId");
 
-		long parentFolderId = ParamUtil.getLong(
-			actionRequest, "parentFolderId");
+		JournalFolderServiceUtil.subscribe(
+			themeDisplay.getScopeGroupId(), folderId);
+	}
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			JournalFolder.class.getName(), actionRequest);
+	protected void unsubscribeFolder(ActionRequest actionRequest)
+		throws Exception {
 
-		JournalFolderServiceUtil.moveFolder(
-			folderId, parentFolderId, serviceContext);
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long folderId = ParamUtil.getLong(actionRequest, "folderId");
+
+		JournalFolderServiceUtil.unsubscribe(
+			themeDisplay.getScopeGroupId(), folderId);
 	}
 
 	protected void updateFolder(ActionRequest actionRequest) throws Exception {
@@ -200,10 +222,36 @@ public class EditFolderAction extends PortletAction {
 
 			// Update folder
 
+			long[] ddmStructureIds = StringUtil.split(
+				ParamUtil.getString(
+					actionRequest, "ddmStructuresSearchContainerPrimaryKeys"),
+				0L);
+			int restrinctionType = ParamUtil.getInteger(
+				actionRequest, "restrictionType");
+
 			JournalFolderServiceUtil.updateFolder(
-				folderId, parentFolderId, name, description,
-				mergeWithParentFolder, serviceContext);
+				folderId, parentFolderId, name, description, ddmStructureIds,
+				restrinctionType, mergeWithParentFolder, serviceContext);
 		}
+	}
+
+	protected void updateWorkflowDefinitions(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] ddmStructureIds = StringUtil.split(
+			ParamUtil.getString(
+				actionRequest, "ddmStructuresSearchContainerPrimaryKeys"),
+			0L);
+		int restrinctionType = ParamUtil.getInteger(
+			actionRequest, "restrictionType");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			JournalFolder.class.getName(), actionRequest);
+
+		JournalFolderServiceUtil.updateFolder(
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, null, null,
+			ddmStructureIds, restrinctionType, false, serviceContext);
 	}
 
 }

@@ -1,5 +1,34 @@
 <definition>
+	<command name="configureRecentBlogsPortletSelectionMethod">
+		<if>
+			<condition action="SOUserBar#isElementNotPresent" locator-key1="VISIBLE_PAGE_CONTROLS" />
+			<then>
+				<execute action="SOUserBar#click" locator-key1="TOGGLE_DOCKBAR" />
+			</then>
+		</if>
+
+		<if>
+			<condition action="SOUserBar#isElementPresent" locator-key1="EDIT_CONTROLS_NOT_FLAGGED" />
+			<then>
+				<execute action="Dockbar#mouseOver" locator-key1="EDIT_CONTROLS" />
+				<execute action="Dockbar#click" locator-key1="EDIT_CONTROLS" />
+			</then>
+		</if>
+
+		<execute action="SOBlogs#click" locator-key1="RECENT_BLOGS_OPTIONS" />
+
+		<execute action="BasePortlet#click" locator-key1="OPTIONS_MENULIST_CONFIGURATION" />
+
+		<execute action="SOBlogsRecentBlogsConfiguration#selectFrame" locator-key1="CONFIGURATION_IFRAME" />
+		<execute action="SOBlogsRecentBlogsConfiguration#select" locator-key1="SETUP_SELECTION_METHOD_SELECT" value1="${selectionMethod}" />
+		<execute action="SOBlogsRecentBlogsConfiguration#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="SOBlogsRecentBlogsConfiguration#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="You have successfully updated the setup." />
+		<execute action="SOBlogsRecentBlogsConfiguration#selectFrameTop" />
+	</command>
+
 	<command name="viewBlogsEntryRecentBlogs">
+		<var name="key_entryTitle" value="${entryTitle}" />
+
 		<execute action="SOBlogs#assertTextEquals" locator-key1="RECENT_BLOGS_ENTRY_TITLE" value1="${entryTitle}" />
 
 		<if>
@@ -55,8 +84,27 @@
 		</if>
 
 		<execute action="PGBlogsEntry#assertTextEquals" locator-key1="YOUR_RATING" value1="Your Rating" />
-		<execute action="PGBlogsEntry#assertTextEquals" locator-key1="PREVIOUS" value1="Previous" />
-		<execute action="PGBlogsEntry#assertTextEquals" locator-key1="NEXT" value1="Next" />
+
+		<if>
+			<condition action="PGBlogsEntry#isElementPresent" locator-key1="PREVIOUS" />
+			<then>
+				<execute action="PGBlogsEntry#assertTextEquals" locator-key1="PREVIOUS" value1="Previous" />
+			</then>
+			<else>
+				<execute action="PGBlogsEntry#assertTextEquals" locator-key1="PREVIOUS_LINK" value1="Previous" />
+			</else>
+		</if>
+
+		<if>
+			<condition action="PGBlogsEntry#isElementPresent" locator-key1="NEXT" />
+			<then>
+				<execute action="PGBlogsEntry#assertTextEquals" locator-key1="NEXT" value1="Next" />
+			</then>
+			<else>
+				<execute action="PGBlogsEntry#assertTextEquals" locator-key1="NEXT_LINK" value1="Next" />
+			</else>
+		</if>
+
 		<execute action="PGBlogsEntry#assertTextEquals" locator-key1="COMMENTS" value1="Comments" />
 	</command>
 </definition>

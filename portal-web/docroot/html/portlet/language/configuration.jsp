@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -65,12 +65,21 @@
 	</aui:fieldset>
 
 	<aui:fieldset>
-		<aui:select name="preferences--displayStyle--" value="<%= displayStyle %>">
-			<aui:option label="icon" value="<%= LanguageTag.LIST_ICON %>" />
-			<aui:option label="long-text" value="<%= LanguageTag.LIST_LONG_TEXT %>" />
-			<aui:option label="short-text" value="<%= LanguageTag.LIST_SHORT_TEXT %>" />
-			<aui:option label="select-box" value="<%= LanguageTag.SELECT_BOX %>" />
-		</aui:select>
+		<div class="display-template">
+
+			<%
+			TemplateHandler templateHandler = TemplateHandlerRegistryUtil.getTemplateHandler(Locale.class.getName());
+			%>
+
+			<liferay-ui:ddm-template-selector
+				classNameId="<%= PortalUtil.getClassNameId(templateHandler.getClassName()) %>"
+				displayStyle="<%= displayStyle %>"
+				displayStyleGroupId="<%= displayStyleGroupId %>"
+				displayStyles="<%= Arrays.asList(PropsValues.LANGUAGE_DISPLAY_STYLE_OPTIONS) %>"
+				label="display-template"
+				refreshURL="<%= configurationRenderURL.toString() %>"
+			/>
+		</div>
 	</aui:fieldset>
 
 	<aui:input name="preferences--displayCurrentLocale--" type="checkbox" value="<%= displayCurrentLocale %>" />

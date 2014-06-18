@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -230,7 +230,7 @@ portletURL.setParameter("tabs1", tabs1);
 
 			// Action
 
-			row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/software_catalog/product_entry_action.jsp");
+			row.addJSP("/html/portlet/software_catalog/product_entry_action.jsp", "entry-action");
 
 			// Add result row
 
@@ -436,7 +436,7 @@ portletURL.setParameter("tabs1", tabs1);
 
 			// Action
 
-			row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/software_catalog/product_entry_action.jsp");
+			row.addJSP("/html/portlet/software_catalog/product_entry_action.jsp", "entry-action");
 
 			// Add result row
 
@@ -523,7 +523,7 @@ portletURL.setParameter("tabs1", tabs1);
 
 			// Action
 
-			row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/software_catalog/framework_version_action.jsp");
+			row.addJSP("/html/portlet/software_catalog/framework_version_action.jsp", "entry-action");
 
 			// Add result row
 
@@ -648,7 +648,7 @@ portletURL.setParameter("tabs1", tabs1);
 
 			// Action
 
-			row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/software_catalog/license_action.jsp");
+			row.addJSP("/html/portlet/software_catalog/license_action.jsp", "entry-action");
 
 			// Add result row
 

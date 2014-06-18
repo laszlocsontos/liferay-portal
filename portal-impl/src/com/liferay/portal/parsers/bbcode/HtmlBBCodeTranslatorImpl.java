@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslator;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
@@ -25,6 +26,8 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.ThemeConstants;
+import com.liferay.portlet.messageboards.util.MBUtil;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -81,9 +84,16 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 
 			String image = emoticon[0];
 
-			emoticon[0] =
-				"<img alt=\"emoticon\" src=\"@theme_images_path@/emoticons/" +
-					image + "\" >";
+			StringBuilder sb = new StringBuilder(6);
+
+			sb.append("<img alt=\"emoticon\" src=\"");
+			sb.append(ThemeConstants.TOKEN_THEME_IMAGES_PATH);
+			sb.append(MBUtil.EMOTICONS);
+			sb.append("/");
+			sb.append(image);
+			sb.append("\" >");
+
+			emoticon[0] = sb.toString();
 		}
 	}
 
@@ -235,8 +245,6 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		sb.append("<div class=\"lfr-code\">");
 		sb.append("<table>");
 		sb.append("<tbody>");
-		sb.append("<tr>");
-		sb.append("<td class=\"line-numbers\">");
 
 		String code = extractData(
 			bbCodeItems, marker, "code", BBCodeParser.TYPE_DATA, true);
@@ -247,17 +255,17 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 		String[] lines = code.split("\r?\n");
 
 		for (int i = 0; i < lines.length; i++) {
+			sb.append("<tr>");
+			sb.append("<td class=\"line-numbers\">");
+			sb.append("<span class=\"number\">");
+
 			String index = String.valueOf(i + 1);
 
-			sb.append("<span class=\"number\">");
 			sb.append(index);
 			sb.append("</span>");
-		}
+			sb.append("</td>");
+			sb.append("<td class=\"lines\">");
 
-		sb.append("</td>");
-		sb.append("<td class=\"lines\">");
-
-		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i];
 
 			line = StringUtil.replace(
@@ -271,10 +279,10 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 			sb.append("<div class=\"line\">");
 			sb.append(line);
 			sb.append("</div>");
+			sb.append("</td>");
+			sb.append("</tr>");
 		}
 
-		sb.append("</td>");
-		sb.append("</tr>");
 		sb.append("</tbody>");
 		sb.append("</table>");
 		sb.append("</div>");
@@ -380,6 +388,8 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 
 		sb.append("<img src=\"");
 
+		int pos = marker.getValue();
+
 		String src = extractData(
 			bbCodeItems, marker, "img", BBCodeParser.TYPE_DATA, true);
 
@@ -389,7 +399,33 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 			sb.append(HtmlUtil.escapeAttribute(src));
 		}
 
-		sb.append("\" />");
+		sb.append("\"");
+
+		BBCodeItem bbCodeItem = bbCodeItems.get(pos);
+
+		String dimensions = bbCodeItem.getAttribute();
+
+		if (Validator.isNotNull(dimensions)) {
+			String[] dim = StringUtil.split(dimensions, CharPool.LOWER_CASE_X);
+
+			sb.append("style=\"");
+
+			if (!dim[0].equals("auto")) {
+				sb.append("width:");
+				sb.append(HtmlUtil.escapeAttribute(dim[0]));
+				sb.append("px;");
+			}
+
+			if (!dim[1].equals("auto")) {
+				sb.append("height:");
+				sb.append(HtmlUtil.escapeAttribute(dim[1]));
+				sb.append("px;");
+			}
+
+			sb.append("\"");
+		}
+
+		sb.append(" />");
 	}
 
 	protected void handleItalic(StringBundler sb, Stack<String> tags) {

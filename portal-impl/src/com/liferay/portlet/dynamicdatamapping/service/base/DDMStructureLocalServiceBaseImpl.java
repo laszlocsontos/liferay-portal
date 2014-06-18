@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,21 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -48,6 +58,8 @@ import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureLi
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructurePersistence;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateFinder;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplatePersistence;
+import com.liferay.portlet.journal.service.persistence.JournalFolderFinder;
+import com.liferay.portlet.journal.service.persistence.JournalFolderPersistence;
 
 import java.io.Serializable;
 
@@ -81,12 +93,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 *
 	 * @param ddmStructure the d d m structure
 	 * @return the d d m structure that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public DDMStructure addDDMStructure(DDMStructure ddmStructure)
-		throws SystemException {
+	public DDMStructure addDDMStructure(DDMStructure ddmStructure) {
 		ddmStructure.setNew(true);
 
 		return ddmStructurePersistence.update(ddmStructure);
@@ -109,12 +119,11 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param structureId the primary key of the d d m structure
 	 * @return the d d m structure that was removed
 	 * @throws PortalException if a d d m structure with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DDMStructure deleteDDMStructure(long structureId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ddmStructurePersistence.remove(structureId);
 	}
 
@@ -123,12 +132,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 *
 	 * @param ddmStructure the d d m structure
 	 * @return the d d m structure that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public DDMStructure deleteDDMStructure(DDMStructure ddmStructure)
-		throws SystemException {
+	public DDMStructure deleteDDMStructure(DDMStructure ddmStructure) {
 		return ddmStructurePersistence.remove(ddmStructure);
 	}
 
@@ -145,12 +152,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return ddmStructurePersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -165,12 +170,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return ddmStructurePersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -187,12 +190,11 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return ddmStructurePersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -202,11 +204,9 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return ddmStructurePersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -216,18 +216,16 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return ddmStructurePersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public DDMStructure fetchDDMStructure(long structureId)
-		throws SystemException {
+	public DDMStructure fetchDDMStructure(long structureId) {
 		return ddmStructurePersistence.fetchByPrimaryKey(structureId);
 	}
 
@@ -237,11 +235,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param uuid the d d m structure's UUID
 	 * @param  companyId the primary key of the company
 	 * @return the matching d d m structure, or <code>null</code> if a matching d d m structure could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DDMStructure fetchDDMStructureByUuidAndCompanyId(String uuid,
-		long companyId) throws SystemException {
+		long companyId) {
 		return ddmStructurePersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -251,11 +248,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param uuid the d d m structure's UUID
 	 * @param groupId the primary key of the group
 	 * @return the matching d d m structure, or <code>null</code> if a matching d d m structure could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DDMStructure fetchDDMStructureByUuidAndGroupId(String uuid,
-		long groupId) throws SystemException {
+		long groupId) {
 		return ddmStructurePersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -265,17 +261,112 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param structureId the primary key of the d d m structure
 	 * @return the d d m structure
 	 * @throws PortalException if a d d m structure with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DDMStructure getDDMStructure(long structureId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ddmStructurePersistence.findByPrimaryKey(structureId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(DDMStructure.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("structureId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(DDMStructure.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("structureId");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType.toString(),
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType.toString(),
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+
+					StagedModelType stagedModelType = exportActionableDynamicQuery.getStagedModelType();
+
+					if (stagedModelType.getReferrerClassNameId() >= 0) {
+						Property classNameIdProperty = PropertyFactoryUtil.forName(
+								"classNameId");
+
+						dynamicQuery.add(classNameIdProperty.eq(
+								stagedModelType.getReferrerClassNameId()));
+					}
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+					DDMStructure stagedModel = (DDMStructure)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						stagedModel);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(DDMStructure.class.getName())));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteDDMStructure((DDMStructure)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ddmStructurePersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -286,11 +377,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param  companyId the primary key of the company
 	 * @return the matching d d m structure
 	 * @throws PortalException if a matching d d m structure could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DDMStructure getDDMStructureByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException, SystemException {
+		long companyId) throws PortalException {
 		return ddmStructurePersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -301,11 +391,10 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param groupId the primary key of the group
 	 * @return the matching d d m structure
 	 * @throws PortalException if a matching d d m structure could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DDMStructure getDDMStructureByUuidAndGroupId(String uuid,
-		long groupId) throws PortalException, SystemException {
+		long groupId) throws PortalException {
 		return ddmStructurePersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -319,11 +408,9 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * @param start the lower bound of the range of d d m structures
 	 * @param end the upper bound of the range of d d m structures (not inclusive)
 	 * @return the range of d d m structures
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<DDMStructure> getDDMStructures(int start, int end)
-		throws SystemException {
+	public List<DDMStructure> getDDMStructures(int start, int end) {
 		return ddmStructurePersistence.findAll(start, end);
 	}
 
@@ -331,10 +418,9 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 * Returns the number of d d m structures.
 	 *
 	 * @return the number of d d m structures
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getDDMStructuresCount() throws SystemException {
+	public int getDDMStructuresCount() {
 		return ddmStructurePersistence.countAll();
 	}
 
@@ -343,168 +429,290 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 *
 	 * @param ddmStructure the d d m structure
 	 * @return the d d m structure that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public DDMStructure updateDDMStructure(DDMStructure ddmStructure)
-		throws SystemException {
+	public DDMStructure updateDDMStructure(DDMStructure ddmStructure) {
 		return ddmStructurePersistence.update(ddmStructure);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDLFileEntryTypeDDMStructure(long fileEntryTypeId,
-		long structureId) throws SystemException {
+		long structureId) {
 		dlFileEntryTypePersistence.addDDMStructure(fileEntryTypeId, structureId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDLFileEntryTypeDDMStructure(long fileEntryTypeId,
-		DDMStructure ddmStructure) throws SystemException {
+		DDMStructure ddmStructure) {
 		dlFileEntryTypePersistence.addDDMStructure(fileEntryTypeId, ddmStructure);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDLFileEntryTypeDDMStructures(long fileEntryTypeId,
-		long[] structureIds) throws SystemException {
+		long[] structureIds) {
 		dlFileEntryTypePersistence.addDDMStructures(fileEntryTypeId,
 			structureIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDLFileEntryTypeDDMStructures(long fileEntryTypeId,
-		List<DDMStructure> DDMStructures) throws SystemException {
+		List<DDMStructure> DDMStructures) {
 		dlFileEntryTypePersistence.addDDMStructures(fileEntryTypeId,
 			DDMStructures);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearDLFileEntryTypeDDMStructures(long fileEntryTypeId)
-		throws SystemException {
+	public void clearDLFileEntryTypeDDMStructures(long fileEntryTypeId) {
 		dlFileEntryTypePersistence.clearDDMStructures(fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDLFileEntryTypeDDMStructure(long fileEntryTypeId,
-		long structureId) throws SystemException {
+		long structureId) {
 		dlFileEntryTypePersistence.removeDDMStructure(fileEntryTypeId,
 			structureId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDLFileEntryTypeDDMStructure(long fileEntryTypeId,
-		DDMStructure ddmStructure) throws SystemException {
+		DDMStructure ddmStructure) {
 		dlFileEntryTypePersistence.removeDDMStructure(fileEntryTypeId,
 			ddmStructure);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDLFileEntryTypeDDMStructures(long fileEntryTypeId,
-		long[] structureIds) throws SystemException {
+		long[] structureIds) {
 		dlFileEntryTypePersistence.removeDDMStructures(fileEntryTypeId,
 			structureIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDLFileEntryTypeDDMStructures(long fileEntryTypeId,
-		List<DDMStructure> DDMStructures) throws SystemException {
+		List<DDMStructure> DDMStructures) {
 		dlFileEntryTypePersistence.removeDDMStructures(fileEntryTypeId,
 			DDMStructures);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the fileEntryTypeIds of the document library file entry types associated with the d d m structure.
+	 *
+	 * @param structureId the structureId of the d d m structure
+	 * @return long[] the fileEntryTypeIds of document library file entry types associated with the d d m structure
+	 */
+	@Override
+	public long[] getDLFileEntryTypePrimaryKeys(long structureId) {
+		return ddmStructurePersistence.getDLFileEntryTypePrimaryKeys(structureId);
+	}
+
+	/**
 	 */
 	@Override
 	public List<DDMStructure> getDLFileEntryTypeDDMStructures(
-		long fileEntryTypeId) throws SystemException {
+		long fileEntryTypeId) {
 		return dlFileEntryTypePersistence.getDDMStructures(fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<DDMStructure> getDLFileEntryTypeDDMStructures(
-		long fileEntryTypeId, int start, int end) throws SystemException {
+		long fileEntryTypeId, int start, int end) {
 		return dlFileEntryTypePersistence.getDDMStructures(fileEntryTypeId,
 			start, end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<DDMStructure> getDLFileEntryTypeDDMStructures(
 		long fileEntryTypeId, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return dlFileEntryTypePersistence.getDDMStructures(fileEntryTypeId,
 			start, end, orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getDLFileEntryTypeDDMStructuresCount(long fileEntryTypeId)
-		throws SystemException {
+	public int getDLFileEntryTypeDDMStructuresCount(long fileEntryTypeId) {
 		return dlFileEntryTypePersistence.getDDMStructuresSize(fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public boolean hasDLFileEntryTypeDDMStructure(long fileEntryTypeId,
-		long structureId) throws SystemException {
+		long structureId) {
 		return dlFileEntryTypePersistence.containsDDMStructure(fileEntryTypeId,
 			structureId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasDLFileEntryTypeDDMStructures(long fileEntryTypeId)
-		throws SystemException {
+	public boolean hasDLFileEntryTypeDDMStructures(long fileEntryTypeId) {
 		return dlFileEntryTypePersistence.containsDDMStructures(fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void setDLFileEntryTypeDDMStructures(long fileEntryTypeId,
-		long[] structureIds) throws SystemException {
+		long[] structureIds) {
 		dlFileEntryTypePersistence.setDDMStructures(fileEntryTypeId,
 			structureIds);
+	}
+
+	/**
+	 */
+	@Override
+	public void addJournalFolderDDMStructure(long folderId, long structureId) {
+		journalFolderPersistence.addDDMStructure(folderId, structureId);
+	}
+
+	/**
+	 */
+	@Override
+	public void addJournalFolderDDMStructure(long folderId,
+		DDMStructure ddmStructure) {
+		journalFolderPersistence.addDDMStructure(folderId, ddmStructure);
+	}
+
+	/**
+	 */
+	@Override
+	public void addJournalFolderDDMStructures(long folderId, long[] structureIds) {
+		journalFolderPersistence.addDDMStructures(folderId, structureIds);
+	}
+
+	/**
+	 */
+	@Override
+	public void addJournalFolderDDMStructures(long folderId,
+		List<DDMStructure> DDMStructures) {
+		journalFolderPersistence.addDDMStructures(folderId, DDMStructures);
+	}
+
+	/**
+	 */
+	@Override
+	public void clearJournalFolderDDMStructures(long folderId) {
+		journalFolderPersistence.clearDDMStructures(folderId);
+	}
+
+	/**
+	 */
+	@Override
+	public void deleteJournalFolderDDMStructure(long folderId, long structureId) {
+		journalFolderPersistence.removeDDMStructure(folderId, structureId);
+	}
+
+	/**
+	 */
+	@Override
+	public void deleteJournalFolderDDMStructure(long folderId,
+		DDMStructure ddmStructure) {
+		journalFolderPersistence.removeDDMStructure(folderId, ddmStructure);
+	}
+
+	/**
+	 */
+	@Override
+	public void deleteJournalFolderDDMStructures(long folderId,
+		long[] structureIds) {
+		journalFolderPersistence.removeDDMStructures(folderId, structureIds);
+	}
+
+	/**
+	 */
+	@Override
+	public void deleteJournalFolderDDMStructures(long folderId,
+		List<DDMStructure> DDMStructures) {
+		journalFolderPersistence.removeDDMStructures(folderId, DDMStructures);
+	}
+
+	/**
+	 * Returns the folderIds of the journal folders associated with the d d m structure.
+	 *
+	 * @param structureId the structureId of the d d m structure
+	 * @return long[] the folderIds of journal folders associated with the d d m structure
+	 */
+	@Override
+	public long[] getJournalFolderPrimaryKeys(long structureId) {
+		return ddmStructurePersistence.getJournalFolderPrimaryKeys(structureId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<DDMStructure> getJournalFolderDDMStructures(long folderId) {
+		return journalFolderPersistence.getDDMStructures(folderId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<DDMStructure> getJournalFolderDDMStructures(long folderId,
+		int start, int end) {
+		return journalFolderPersistence.getDDMStructures(folderId, start, end);
+	}
+
+	/**
+	 */
+	@Override
+	public List<DDMStructure> getJournalFolderDDMStructures(long folderId,
+		int start, int end, OrderByComparator orderByComparator) {
+		return journalFolderPersistence.getDDMStructures(folderId, start, end,
+			orderByComparator);
+	}
+
+	/**
+	 */
+	@Override
+	public int getJournalFolderDDMStructuresCount(long folderId) {
+		return journalFolderPersistence.getDDMStructuresSize(folderId);
+	}
+
+	/**
+	 */
+	@Override
+	public boolean hasJournalFolderDDMStructure(long folderId, long structureId) {
+		return journalFolderPersistence.containsDDMStructure(folderId,
+			structureId);
+	}
+
+	/**
+	 */
+	@Override
+	public boolean hasJournalFolderDDMStructures(long folderId) {
+		return journalFolderPersistence.containsDDMStructures(folderId);
+	}
+
+	/**
+	 */
+	@Override
+	public void setJournalFolderDDMStructures(long folderId, long[] structureIds) {
+		journalFolderPersistence.setDDMStructures(folderId, structureIds);
 	}
 
 	/**
@@ -940,6 +1148,81 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the journal folder local service.
+	 *
+	 * @return the journal folder local service
+	 */
+	public com.liferay.portlet.journal.service.JournalFolderLocalService getJournalFolderLocalService() {
+		return journalFolderLocalService;
+	}
+
+	/**
+	 * Sets the journal folder local service.
+	 *
+	 * @param journalFolderLocalService the journal folder local service
+	 */
+	public void setJournalFolderLocalService(
+		com.liferay.portlet.journal.service.JournalFolderLocalService journalFolderLocalService) {
+		this.journalFolderLocalService = journalFolderLocalService;
+	}
+
+	/**
+	 * Returns the journal folder remote service.
+	 *
+	 * @return the journal folder remote service
+	 */
+	public com.liferay.portlet.journal.service.JournalFolderService getJournalFolderService() {
+		return journalFolderService;
+	}
+
+	/**
+	 * Sets the journal folder remote service.
+	 *
+	 * @param journalFolderService the journal folder remote service
+	 */
+	public void setJournalFolderService(
+		com.liferay.portlet.journal.service.JournalFolderService journalFolderService) {
+		this.journalFolderService = journalFolderService;
+	}
+
+	/**
+	 * Returns the journal folder persistence.
+	 *
+	 * @return the journal folder persistence
+	 */
+	public JournalFolderPersistence getJournalFolderPersistence() {
+		return journalFolderPersistence;
+	}
+
+	/**
+	 * Sets the journal folder persistence.
+	 *
+	 * @param journalFolderPersistence the journal folder persistence
+	 */
+	public void setJournalFolderPersistence(
+		JournalFolderPersistence journalFolderPersistence) {
+		this.journalFolderPersistence = journalFolderPersistence;
+	}
+
+	/**
+	 * Returns the journal folder finder.
+	 *
+	 * @return the journal folder finder
+	 */
+	public JournalFolderFinder getJournalFolderFinder() {
+		return journalFolderFinder;
+	}
+
+	/**
+	 * Sets the journal folder finder.
+	 *
+	 * @param journalFolderFinder the journal folder finder
+	 */
+	public void setJournalFolderFinder(JournalFolderFinder journalFolderFinder) {
+		this.journalFolderFinder = journalFolderFinder;
+	}
+
+	/**
 	 * Returns the d d m structure link local service.
 	 *
 	 * @return the d d m structure link local service
@@ -1095,7 +1378,7 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = ddmStructurePersistence.getDataSource();
 
@@ -1160,6 +1443,14 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	protected DLFileEntryTypePersistence dlFileEntryTypePersistence;
 	@BeanReference(type = DLFileEntryTypeFinder.class)
 	protected DLFileEntryTypeFinder dlFileEntryTypeFinder;
+	@BeanReference(type = com.liferay.portlet.journal.service.JournalFolderLocalService.class)
+	protected com.liferay.portlet.journal.service.JournalFolderLocalService journalFolderLocalService;
+	@BeanReference(type = com.liferay.portlet.journal.service.JournalFolderService.class)
+	protected com.liferay.portlet.journal.service.JournalFolderService journalFolderService;
+	@BeanReference(type = JournalFolderPersistence.class)
+	protected JournalFolderPersistence journalFolderPersistence;
+	@BeanReference(type = JournalFolderFinder.class)
+	protected JournalFolderFinder journalFolderFinder;
 	@BeanReference(type = com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService.class)
 	protected com.liferay.portlet.dynamicdatamapping.service.DDMStructureLinkLocalService ddmStructureLinkLocalService;
 	@BeanReference(type = DDMStructureLinkPersistence.class)

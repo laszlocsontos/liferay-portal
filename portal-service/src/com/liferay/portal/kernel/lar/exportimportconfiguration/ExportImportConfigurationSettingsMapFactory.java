@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,21 @@
 
 package com.liferay.portal.kernel.lar.exportimportconfiguration;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lar.ExportImportDateUtil;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
+import com.liferay.portal.kernel.staging.StagingUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.DateRange;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.theme.ThemeDisplay;
 
 import java.io.Serializable;
 
@@ -24,18 +38,20 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.portlet.PortletRequest;
+
 /**
  * @author Daniel Kocsis
  */
 public class ExportImportConfigurationSettingsMapFactory {
 
 	public static Map<String, Serializable> buildSettingsMap(
-		long userId, long groupId, boolean privateLayout,
-		Map<Long, Boolean> layoutIdMap, Map<String, String[]> parameterMap,
-		Date startDate, Date endDate, Locale locale, TimeZone timeZone) {
+		long userId, long groupId, boolean privateLayout, long[] layoutIds,
+		Map<String, String[]> parameterMap, Date startDate, Date endDate,
+		Locale locale, TimeZone timeZone) {
 
 		return buildSettingsMap(
-			userId, groupId, 0, privateLayout, layoutIdMap, parameterMap,
+			userId, groupId, 0, privateLayout, layoutIds, parameterMap,
 			startDate, endDate, locale, timeZone);
 	}
 
@@ -48,8 +64,15 @@ public class ExportImportConfigurationSettingsMapFactory {
 		Locale locale, TimeZone timeZone) {
 
 		Map<String, Serializable> settingsMap = buildSettingsMap(
-			userId, sourceGroupId, privateLayout, layoutIdMap, parameterMap,
-			startDate, endDate, locale, timeZone);
+			userId, sourceGroupId, privateLayout, null, parameterMap, startDate,
+			endDate, locale, timeZone);
+
+		if (MapUtil.isNotEmpty(layoutIdMap)) {
+			HashMap<Long, Boolean> serializableLayoutIdMap =
+				new HashMap<Long, Boolean>(layoutIdMap);
+
+			settingsMap.put("layoutIdMap", serializableLayoutIdMap);
+		}
 
 		settingsMap.put("remoteAddress", remoteAddress);
 		settingsMap.put("remoteGroupId", remoteGroupId);
@@ -63,7 +86,7 @@ public class ExportImportConfigurationSettingsMapFactory {
 
 	public static Map<String, Serializable> buildSettingsMap(
 		long userId, long sourceGroupId, long targetGroupId,
-		boolean privateLayout, Map<Long, Boolean> layoutIdMap,
+		boolean privateLayout, long[] layoutIds,
 		Map<String, String[]> parameterMap, Date startDate, Date endDate,
 		Locale locale, TimeZone timeZone) {
 
@@ -74,11 +97,8 @@ public class ExportImportConfigurationSettingsMapFactory {
 			settingsMap.put("endDate", endDate);
 		}
 
-		if (MapUtil.isNotEmpty(layoutIdMap)) {
-			HashMap<Long, Boolean> serializableLayoutIdMap =
-				new HashMap<Long, Boolean>(layoutIdMap);
-
-			settingsMap.put("layoutIdMap", serializableLayoutIdMap);
+		if (ArrayUtil.isNotEmpty(layoutIds)) {
+			settingsMap.put("layoutIds", layoutIds);
 		}
 
 		settingsMap.put("locale", locale);
@@ -86,6 +106,10 @@ public class ExportImportConfigurationSettingsMapFactory {
 		if (parameterMap != null) {
 			HashMap<String, String[]> serializableParameterMap =
 				new HashMap<String, String[]>(parameterMap);
+
+			serializableParameterMap.put(
+				PortletDataHandlerKeys.PERFORM_DIRECT_BINARY_IMPORT,
+				new String[] {Boolean.TRUE.toString()});
 
 			settingsMap.put("parameterMap", serializableParameterMap);
 		}
@@ -105,6 +129,97 @@ public class ExportImportConfigurationSettingsMapFactory {
 		settingsMap.put("userId", userId);
 
 		return settingsMap;
+	}
+
+	public static Map<String, Serializable> buildSettingsMap(
+			PortletRequest portletRequest, long groupId, int type)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		boolean privateLayout = ParamUtil.getBoolean(
+			portletRequest, "privateLayout");
+
+		Map<Long, Boolean> layoutIdMap = ExportImportHelperUtil.getLayoutIdMap(
+			portletRequest);
+
+		String defaultDateRange =
+			ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE;
+
+		if (type == ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT) {
+			defaultDateRange = ExportImportDateUtil.RANGE_ALL;
+		}
+
+		DateRange dateRange = ExportImportDateUtil.getDateRange(
+			portletRequest, groupId, privateLayout, 0, null, defaultDateRange);
+
+		if (type == ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT) {
+			long[] layoutIds = ExportImportHelperUtil.getLayoutIds(layoutIdMap);
+
+			return buildSettingsMap(
+				themeDisplay.getUserId(), groupId, privateLayout, layoutIds,
+				portletRequest.getParameterMap(), dateRange.getStartDate(),
+				dateRange.getEndDate(), themeDisplay.getLocale(),
+				themeDisplay.getTimeZone());
+		}
+
+		Group stagingGroup = GroupLocalServiceUtil.getGroup(groupId);
+
+		Group liveGroup = stagingGroup.getLiveGroup();
+
+		Map<String, String[]> parameterMap = StagingUtil.getStagingParameters(
+			portletRequest);
+
+		if (liveGroup != null) {
+			long[] layoutIds = ExportImportHelperUtil.getLayoutIds(
+				layoutIdMap, liveGroup.getGroupId());
+
+			return buildSettingsMap(
+				themeDisplay.getUserId(), stagingGroup.getGroupId(),
+				liveGroup.getGroupId(), privateLayout, layoutIds, parameterMap,
+				dateRange.getStartDate(), dateRange.getEndDate(),
+				themeDisplay.getLocale(), themeDisplay.getTimeZone());
+		}
+
+		UnicodeProperties groupTypeSettingsProperties =
+			stagingGroup.getTypeSettingsProperties();
+
+		String remoteAddress = ParamUtil.getString(
+			portletRequest, "remoteAddress",
+			groupTypeSettingsProperties.getProperty("remoteAddress"));
+
+		remoteAddress = StagingUtil.stripProtocolFromRemoteAddress(
+			remoteAddress);
+
+		int remotePort = ParamUtil.getInteger(
+			portletRequest, "remotePort",
+			GetterUtil.getInteger(
+				groupTypeSettingsProperties.getProperty("remotePort")));
+		String remotePathContext = ParamUtil.getString(
+			portletRequest, "remotePathContext",
+			groupTypeSettingsProperties.getProperty("remotePathContext"));
+		boolean secureConnection = ParamUtil.getBoolean(
+			portletRequest, "secureConnection",
+			GetterUtil.getBoolean(
+				groupTypeSettingsProperties.getProperty("secureConnection")));
+		long remoteGroupId = ParamUtil.getLong(
+			portletRequest, "remoteGroupId",
+			GetterUtil.getLong(
+				groupTypeSettingsProperties.getProperty("remoteGroupId")));
+		boolean remotePrivateLayout = ParamUtil.getBoolean(
+			portletRequest, "remotePrivateLayout");
+
+		StagingUtil.validateRemote(
+			groupId, remoteAddress, remotePort, remotePathContext,
+			secureConnection, remoteGroupId);
+
+		return buildSettingsMap(
+			themeDisplay.getUserId(), groupId, privateLayout, layoutIdMap,
+			parameterMap, remoteAddress, remotePort, remotePathContext,
+			secureConnection, remoteGroupId, remotePrivateLayout,
+			dateRange.getStartDate(), dateRange.getEndDate(),
+			themeDisplay.getLocale(), themeDisplay.getTimeZone());
 	}
 
 }

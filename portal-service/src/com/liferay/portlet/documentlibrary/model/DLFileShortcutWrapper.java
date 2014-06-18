@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -304,11 +304,9 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* Returns the user uuid of this document library file shortcut.
 	*
 	* @return the user uuid of this document library file shortcut
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _dlFileShortcut.getUserUuid();
 	}
 
@@ -536,11 +534,9 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* Returns the status by user uuid of this document library file shortcut.
 	*
 	* @return the status by user uuid of this document library file shortcut
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getStatusByUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getStatusByUserUuid() {
 		return _dlFileShortcut.getStatusByUserUuid();
 	}
 
@@ -598,12 +594,10 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* Returns the trash entry created when this document library file shortcut was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this document library file shortcut.
 	*
 	* @return the trash entry created when this document library file shortcut was moved to the Recycle Bin
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.trash.model.TrashEntry getTrashEntry()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileShortcut.getTrashEntry();
 	}
 
@@ -641,7 +635,6 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	* Returns <code>true</code> if the parent of this document library file shortcut is in the Recycle Bin.
 	*
 	* @return <code>true</code> if the parent of this document library file shortcut is in the Recycle Bin; <code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean isInTrashContainer() {
@@ -649,9 +642,13 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	}
 
 	@Override
-	public boolean isInTrashExplicitly()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public boolean isInTrashExplicitly() {
 		return _dlFileShortcut.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return _dlFileShortcut.isInTrashImplicitly();
 	}
 
 	/**
@@ -843,35 +840,30 @@ public class DLFileShortcutWrapper implements DLFileShortcut,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_dlFileShortcut.persist();
 	}
 
 	@Override
-	public void updateTreePath(java.lang.String treePath)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void updateTreePath(java.lang.String treePath) {
 		_dlFileShortcut.updateTreePath(treePath);
 	}
 
 	@Override
 	public java.lang.String buildTreePath()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileShortcut.buildTreePath();
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFolder getDLFolder()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileShortcut.getDLFolder();
 	}
 
 	@Override
 	public com.liferay.portal.kernel.repository.model.Folder getFolder()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileShortcut.getFolder();
 	}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,34 +17,40 @@
 <%@ include file="/html/taglib/init.jsp" %>
 
 <%
-String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_app_view_display_style") + StringPool.UNDERLINE;
-
 String displayStyle = (String)request.getAttribute("liferay-ui:app-view-display-style:displayStyle");
 String[] displayStyles = (String[])request.getAttribute("liferay-ui:app-view-display-style:displayStyles");
+String eventName = (String)request.getAttribute("liferay-ui:app-view-display-style:eventName");
 Map<String, String> requestParams = (Map<String, String>)request.getAttribute("liferay-ui:app-view-display-style:requestParams");
 %>
 
 <c:if test="<%= displayStyles.length > 1 %>">
-	<div id="<portlet:namespace />displayStyleButtons">
-		<liferay-ui:icon-menu direction="down" icon='<%= "../aui/" + _getIcon(displayStyle) %>' message="" select="<%= true %>">
+	<span class="display-style-buttons-container" id="<portlet:namespace />displayStyleButtonsContainer">
+		<div class="display-style-buttons" id="<portlet:namespace />displayStyleButtons">
+			<aui:nav-item anchorCssClass="btn btn-default" dropdown="<%= true %>" iconCssClass='<%= "icon-" + _getIcon(displayStyle) %>'>
 
-			<%
-			for (int i = 0; i < displayStyles.length; i++) {
-				String dataStyle = displayStyles[i];
+				<%
+				for (int i = 0; i < displayStyles.length; i++) {
+					String dataStyle = displayStyles[i];
 
-				Map<String, Object> data = new HashMap<String, Object>();
+					Map<String, Object> data = new HashMap<String, Object>();
 
-				data.put("displayStyle", dataStyle);
-			%>
+					data.put("displayStyle", dataStyle);
+				%>
 
-				<liferay-ui:icon data="<%= data %>" image='<%= "../aui/" + _getIcon(dataStyle) %>' message="<%= dataStyle %>" onClick='<%= randomNamespace + "onClickDisplayStyle(this);" %>' url="javascript:;" />
+					<aui:nav-item
+						anchorData="<%= data %>"
+						href="javascript:;"
+						iconCssClass='<%= "icon-" + _getIcon(dataStyle) %>'
+						label="<%= dataStyle %>"
+					/>
 
-			<%
-			}
-			%>
+				<%
+				}
+				%>
 
-		</liferay-ui:icon-menu>
-	</div>
+			</aui:nav-item>
+		</div>
+	</span>
 </c:if>
 
 <c:if test="<%= displayStyles.length > 1 %>">
@@ -53,15 +59,17 @@ Map<String, String> requestParams = (Map<String, String>)request.getAttribute("l
 			var config = {};
 
 			<%
-			Set<String> requestParamNames = requestParams.keySet();
+			if (requestParams != null) {
+				Set<String> requestParamNames = requestParams.keySet();
 
-			for (String requestParamName : requestParamNames) {
-				String requestParamValue = requestParams.get(requestParamName);
+				for (String requestParamName : requestParamNames) {
+					String requestParamValue = requestParams.get(requestParamName);
 			%>
 
-				config['<portlet:namespace /><%= requestParamName %>'] = '<%= HtmlUtil.escapeJS(requestParamValue) %>';
+					config['<portlet:namespace /><%= requestParamName %>'] = '<%= HtmlUtil.escapeJS(requestParamValue) %>';
 
 			<%
+				}
 			}
 			%>
 
@@ -77,16 +85,29 @@ Map<String, String> requestParams = (Map<String, String>)request.getAttribute("l
 			);
 		}
 
-		Liferay.provide(
-			window,
-			'<%= randomNamespace %>onClickDisplayStyle',
-			function(link) {
-				var displayStyleItem = A.one(link);
+		var displayStyleButtonsMenu = A.one('#<portlet:namespace />displayStyleButtons .dropdown-menu');
 
-				changeDisplayStyle(displayStyleItem.attr('data-displayStyle'));
-			},
-			['aui-node']
-		);
+		if (displayStyleButtonsMenu) {
+			displayStyleButtonsMenu.delegate(
+				'click',
+				function(event) {
+					var displayStyle = event.currentTarget.attr('data-displayStyle');
+
+					if (<%= requestParams != null %>) {
+						changeDisplayStyle(displayStyle);
+					}
+					else if (<%= eventName != null %>) {
+						Liferay.fire(
+							'<%= eventName %>',
+							{
+								displayStyle: displayStyle
+							}
+						);
+					}
+				},
+				'li > a'
+			);
+		}
 	</aui:script>
 </c:if>
 

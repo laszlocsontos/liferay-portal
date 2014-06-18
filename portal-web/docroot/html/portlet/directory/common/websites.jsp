@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,24 +28,24 @@ if (classPK > 0) {
 %>
 
 <c:if test="<%= !websites.isEmpty() %>">
-	<h3><liferay-ui:message key="websites" /></h3>
+	<h3 class="icon-file"><liferay-ui:message key="websites" /></h3>
 
 	<ul class="property-list">
 
-	<%
-	for (Website website: websites) {
-		website = website.toEscapedModel();
-	%>
+		<%
+		for (Website website : websites) {
+			website = website.toEscapedModel();
+		%>
 
-		<li class="<%= website.isPrimary() ? "primary" : "" %>">
-			<a href="<%= website.getUrl() %>"><%= website.getUrl() %></a>
+			<li class="<%= (website.isPrimary() && !websites.isEmpty()) ? "icon-star" : StringPool.BLANK %>">
+				<a href="<%= website.getUrl() %>"><%= website.getUrl() %></a>
 
-			<%= LanguageUtil.get(pageContext, website.getType().getName()) %>
-		</li>
+				<%= LanguageUtil.get(pageContext, website.getType().getName()) %>
+			</li>
 
-	<%
-	}
-	%>
+		<%
+		}
+		%>
 
 	</ul>
 </c:if>

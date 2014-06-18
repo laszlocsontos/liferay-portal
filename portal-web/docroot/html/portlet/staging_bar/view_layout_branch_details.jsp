@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@ LayoutSetBranch layoutSetBranch = (LayoutSetBranch)request.getAttribute("view.js
 String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriendlyURL");
 %>
 
-<div class="page-variations-options span5">
+<div class="col-md-5 page-variations-options">
 
 	<%
 	List<LayoutRevision> layoutRevisions = LayoutRevisionLocalServiceUtil.getChildLayoutRevisions(layoutRevision.getLayoutSetBranchId(), LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID, plid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, new LayoutRevisionCreateDateComparator(true));
@@ -79,8 +79,8 @@ String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriend
 
 			<div class="manage-page-variations page-variations">
 				<liferay-ui:icon
+					iconCssClass="icon-cog"
 					id="manageLayoutRevisions"
-					image="../aui/cog"
 					message="manage-page-variations"
 					url="<%= layoutBranchesURL %>"
 				/>

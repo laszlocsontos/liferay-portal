@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.Ticket;
 import com.liferay.portal.service.ServiceContext;
@@ -30,10 +29,8 @@ public class TicketLocalServiceImpl extends TicketLocalServiceBaseImpl {
 
 	@Override
 	public Ticket addTicket(
-			long companyId, String className, long classPK, int type,
-			String extraInfo, Date expirationDate,
-			ServiceContext serviceContext)
-		throws SystemException {
+		long companyId, String className, long classPK, int type,
+		String extraInfo, Date expirationDate, ServiceContext serviceContext) {
 
 		long classNameId = classNameLocalService.getClassNameId(className);
 		Date now = new Date();
@@ -57,14 +54,12 @@ public class TicketLocalServiceImpl extends TicketLocalServiceBaseImpl {
 	}
 
 	@Override
-	public Ticket fetchTicket(String key) throws SystemException {
+	public Ticket fetchTicket(String key) {
 		return ticketPersistence.fetchByKey(key);
 	}
 
 	@Override
-	public Ticket getTicket(String key)
-		throws PortalException, SystemException {
-
+	public Ticket getTicket(String key) throws PortalException {
 		return ticketPersistence.findByKey(key);
 	}
 

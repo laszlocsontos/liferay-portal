@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -138,7 +138,7 @@ public class PortalOpenSearchImpl extends BaseOpenSearchImpl {
 					String snippet = results.snippet(i);
 
 					Summary summary = indexer.getSummary(
-						result, themeDisplay.getLocale(), snippet, portletURL);
+						result, snippet, portletURL, null, null);
 
 					title = summary.getTitle();
 					url = portletURL.toString();
@@ -174,7 +174,7 @@ public class PortalOpenSearchImpl extends BaseOpenSearchImpl {
 			ThemeDisplay themeDisplay, long groupId, Document result)
 		throws Exception {
 
-		String articleId = result.get(Field.ENTRY_CLASS_PK);
+		String articleId = result.get(Field.ARTICLE_ID);
 
 		JournalArticle article = JournalArticleServiceUtil.getArticle(
 			groupId, articleId);

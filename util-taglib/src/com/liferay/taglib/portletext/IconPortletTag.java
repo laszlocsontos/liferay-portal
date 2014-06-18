@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,9 @@
 package com.liferay.taglib.portletext;
 
 import com.liferay.portal.kernel.servlet.taglib.FileAvailabilityUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -57,7 +59,14 @@ public class IconPortletTag extends IconTag {
 			message = PortalUtil.getPortletTitle(
 				_portlet, pageContext.getServletContext(),
 				themeDisplay.getLocale());
-			src = _portlet.getStaticResourcePath().concat(_portlet.getIcon());
+
+			if (Validator.isNotNull(_portlet.getIcon())) {
+				src = _portlet.getStaticResourcePath().concat(
+					_portlet.getIcon());
+			}
+			else {
+				src = themeDisplay.getPathContext() + "/html/icons/default.png";
+			}
 		}
 		else {
 			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
@@ -71,7 +80,7 @@ public class IconPortletTag extends IconTag {
 		}
 
 		setAlt(StringPool.BLANK);
-		setMessage(message);
+		setMessage(HtmlUtil.escape(message));
 		setSrc(src);
 
 		return super.getPage();

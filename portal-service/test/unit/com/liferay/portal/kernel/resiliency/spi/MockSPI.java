@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,8 @@ public class MockSPI implements SPI {
 		if (failOnDestroy) {
 			throw new RemoteException();
 		}
+
+		destroyed = true;
 	}
 
 	@Override
@@ -51,8 +53,14 @@ public class MockSPI implements SPI {
 	}
 
 	@Override
-	public RegistrationReference getRegistrationReference() {
-		throw new UnsupportedOperationException();
+	public RegistrationReference getRegistrationReference()
+		throws RemoteException {
+
+		if (registrationReference == null) {
+			throw new RemoteException();
+		}
+
+		return registrationReference;
 	}
 
 	@Override
@@ -94,15 +102,23 @@ public class MockSPI implements SPI {
 	}
 
 	@Override
-	public void stop() {
-		throw new UnsupportedOperationException();
+	public void stop() throws RemoteException {
+		if (failOnStop) {
+			throw new RemoteException();
+		}
+
+		stopped = true;
 	}
 
+	public boolean destroyed;
 	public boolean failOnDestroy;
 	public boolean failOnGetConfiguration;
 	public boolean failOnIsAlive;
+	public boolean failOnStop;
 	public MPI mpi;
+	public RegistrationReference registrationReference;
 	public SPIConfiguration spiConfiguration;
 	public String spiProviderName;
+	public boolean stopped;
 
 }

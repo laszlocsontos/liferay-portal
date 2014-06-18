@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,8 +26,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
 public class ShoppingCouponFinderUtil {
 	public static int countByG_C_C_A_DT(long groupId, long companyId,
 		java.lang.String code, boolean active, java.lang.String discountType,
-		boolean andOperator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean andOperator) {
 		return getFinder()
 				   .countByG_C_C_A_DT(groupId, companyId, code, active,
 			discountType, andOperator);
@@ -35,8 +34,7 @@ public class ShoppingCouponFinderUtil {
 
 	public static java.util.List<com.liferay.portlet.shopping.model.ShoppingCoupon> findByG_C_C_A_DT(
 		long groupId, long companyId, java.lang.String code, boolean active,
-		java.lang.String discountType, boolean andOperator, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String discountType, boolean andOperator, int start, int end) {
 		return getFinder()
 				   .findByG_C_C_A_DT(groupId, companyId, code, active,
 			discountType, andOperator, start, end);

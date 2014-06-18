@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,9 +38,8 @@ public class DLContentLocalServiceImpl extends DLContentLocalServiceBaseImpl {
 
 	@Override
 	public DLContent addContent(
-			long companyId, long repositoryId, String path, String version,
-			byte[] bytes)
-		throws SystemException {
+		long companyId, long repositoryId, String path, String version,
+		byte[] bytes) {
 
 		long contentId = counterLocalService.increment();
 
@@ -68,9 +67,8 @@ public class DLContentLocalServiceImpl extends DLContentLocalServiceBaseImpl {
 
 	@Override
 	public DLContent addContent(
-			long companyId, long repositoryId, String path, String version,
-			InputStream inputStream, long size)
-		throws SystemException {
+		long companyId, long repositoryId, String path, String version,
+		InputStream inputStream, long size) {
 
 		try {
 			long contentId = counterLocalService.increment();
@@ -100,23 +98,20 @@ public class DLContentLocalServiceImpl extends DLContentLocalServiceBaseImpl {
 	@Override
 	public void deleteContent(
 			long companyId, long repositoryId, String path, String version)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		dlContentPersistence.removeByC_R_P_V(
 			companyId, repositoryId, path, version);
 	}
 
 	@Override
-	public void deleteContents(long companyId, long repositoryId, String path)
-		throws SystemException {
-
+	public void deleteContents(long companyId, long repositoryId, String path) {
 		dlContentPersistence.removeByC_R_P(companyId, repositoryId, path);
 	}
 
 	@Override
 	public void deleteContentsByDirectory(
-			long companyId, long repositoryId, String dirName)
-		throws SystemException {
+		long companyId, long repositoryId, String dirName) {
 
 		if (!dirName.endsWith(StringPool.SLASH)) {
 			dirName = dirName.concat(StringPool.SLASH);
@@ -154,24 +149,20 @@ public class DLContentLocalServiceImpl extends DLContentLocalServiceBaseImpl {
 	}
 
 	@Override
-	public List<DLContent> getContents(long companyId, long repositoryId)
-		throws SystemException {
-
+	public List<DLContent> getContents(long companyId, long repositoryId) {
 		return dlContentPersistence.findByC_R(companyId, repositoryId);
 	}
 
 	@Override
 	public List<DLContent> getContents(
-			long companyId, long repositoryId, String path)
-		throws SystemException {
+		long companyId, long repositoryId, String path) {
 
 		return dlContentPersistence.findByC_R_P(companyId, repositoryId, path);
 	}
 
 	@Override
 	public List<DLContent> getContentsByDirectory(
-			long companyId, long repositoryId, String dirName)
-		throws SystemException {
+		long companyId, long repositoryId, String dirName) {
 
 		if (!dirName.endsWith(StringPool.SLASH)) {
 			dirName = dirName.concat(StringPool.SLASH);
@@ -185,8 +176,7 @@ public class DLContentLocalServiceImpl extends DLContentLocalServiceBaseImpl {
 
 	@Override
 	public boolean hasContent(
-			long companyId, long repositoryId, String path, String version)
-		throws SystemException {
+		long companyId, long repositoryId, String path, String version) {
 
 		int count = dlContentPersistence.countByC_R_P_V(
 			companyId, repositoryId, path, version);
@@ -201,9 +191,8 @@ public class DLContentLocalServiceImpl extends DLContentLocalServiceBaseImpl {
 
 	@Override
 	public void updateDLContent(
-			long companyId, long oldRepositoryId, long newRepositoryId,
-			String oldPath, String newPath)
-		throws SystemException {
+		long companyId, long oldRepositoryId, long newRepositoryId,
+		String oldPath, String newPath) {
 
 		List<DLContent> dlContents = dlContentPersistence.findByC_R_P(
 			companyId, oldRepositoryId, oldPath);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,13 +28,13 @@ public class SearchUtilTest {
 	public void testHighlight() throws Exception {
 		StringBundler sb = new StringBundler(7);
 
-		sb.append(SearchUtil.HIGHLIGHT_1);
+		sb.append(SearchUtil.HIGHLIGHTS[0]);
 		sb.append("Hello");
-		sb.append(SearchUtil.HIGHLIGHT_2);
+		sb.append(SearchUtil.HIGHLIGHTS[1]);
 		sb.append(" World ");
-		sb.append(SearchUtil.HIGHLIGHT_1);
+		sb.append(SearchUtil.HIGHLIGHTS[0]);
 		sb.append("Liferay");
-		sb.append(SearchUtil.HIGHLIGHT_2);
+		sb.append(SearchUtil.HIGHLIGHTS[1]);
 
 		Assert.assertEquals(
 			sb.toString(),

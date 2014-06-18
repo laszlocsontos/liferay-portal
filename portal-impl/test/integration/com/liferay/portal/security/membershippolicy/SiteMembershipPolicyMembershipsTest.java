@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,27 +14,46 @@
 
 package com.liferay.portal.security.membershippolicy;
 
+import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
-import com.liferay.portal.security.membershippolicy.util.MembershipPolicyTestUtil;
+import com.liferay.portal.security.membershippolicy.util.test.MembershipPolicyTestUtil;
 import com.liferay.portal.service.GroupServiceUtil;
-import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.UserServiceUtil;
+import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
 
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Roberto Díaz
  */
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
+@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class SiteMembershipPolicyMembershipsTest
 	extends BaseSiteMembershipPolicyTestCase {
+
+	@After
+	@Override
+	public void tearDown() throws Exception {
+		super.tearDown();
+
+		ExpandoTableLocalServiceUtil.deleteTables(
+			TestPropsValues.getCompanyId(), Group.class.getName());
+	}
 
 	@Test(expected = MembershipPolicyException.class)
 	public void testAddUserToForbiddenGroups() throws Exception {
@@ -63,7 +82,7 @@ public class SiteMembershipPolicyMembershipsTest
 
 		UserServiceUtil.addGroupUsers(
 			forbiddenGroupIds[0], addUsers(),
-			ServiceTestUtil.getServiceContext());
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
@@ -75,7 +94,7 @@ public class SiteMembershipPolicyMembershipsTest
 
 		UserServiceUtil.addGroupUsers(
 			requiredGroupIds[0], addUsers(),
-			ServiceTestUtil.getServiceContext());
+			ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			initialGroupUsersCount + 2,
@@ -129,7 +148,7 @@ public class SiteMembershipPolicyMembershipsTest
 
 		UserServiceUtil.addGroupUsers(
 			requiredGroupIds[0], addUsers(),
-			ServiceTestUtil.getServiceContext());
+			ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertTrue(isPropagateMembership());
 	}
@@ -225,7 +244,7 @@ public class SiteMembershipPolicyMembershipsTest
 
 		UserServiceUtil.unsetGroupUsers(
 			standardGroupIds[0], new long[] {user.getUserId()},
-			ServiceTestUtil.getServiceContext());
+			ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertEquals(
 			initialUserGroupCount - 1,
@@ -242,7 +261,7 @@ public class SiteMembershipPolicyMembershipsTest
 
 		UserServiceUtil.unsetGroupUsers(
 			requiredGroupIds[0], new long[] {user.getUserId()},
-			ServiceTestUtil.getServiceContext());
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
@@ -258,10 +277,10 @@ public class SiteMembershipPolicyMembershipsTest
 
 		GroupServiceUtil.updateGroup(
 			group.getGroupId(), group.getParentGroupId(),
-			ServiceTestUtil.randomString(), group.getDescription(),
+			RandomTestUtil.randomString(), group.getDescription(),
 			group.getType(), group.isManualMembership(),
 			group.getMembershipRestriction(), group.getFriendlyURL(),
-			group.isActive(), ServiceTestUtil.getServiceContext());
+			group.isActive(), ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertTrue(isVerify());
 	}
@@ -270,7 +289,7 @@ public class SiteMembershipPolicyMembershipsTest
 	public void testVerifyWhenUpdatingGroupTypeSettings() throws Exception {
 		Group group = MembershipPolicyTestUtil.addGroup();
 
-		String typeSettings = ServiceTestUtil.randomString(50);
+		String typeSettings = RandomTestUtil.randomString(50);
 
 		GroupServiceUtil.updateGroup(group.getGroupId(), typeSettings);
 

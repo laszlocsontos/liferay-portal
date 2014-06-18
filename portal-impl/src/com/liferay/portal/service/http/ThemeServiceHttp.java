@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,8 +51,7 @@ import com.liferay.portal.service.ThemeServiceUtil;
  */
 public class ThemeServiceHttp {
 	public static java.util.List<com.liferay.portal.model.Theme> getThemes(
-		HttpPrincipal httpPrincipal, long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		HttpPrincipal httpPrincipal, long companyId) {
 		try {
 			MethodKey methodKey = new MethodKey(ThemeServiceUtil.class,
 					"getThemes", _getThemesParameterTypes0);
@@ -78,8 +77,7 @@ public class ThemeServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.json.JSONArray getWARThemes(
-		HttpPrincipal httpPrincipal)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		HttpPrincipal httpPrincipal) {
 		try {
 			MethodKey methodKey = new MethodKey(ThemeServiceUtil.class,
 					"getWARThemes", _getWARThemesParameterTypes1);

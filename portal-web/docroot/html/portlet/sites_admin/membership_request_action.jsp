@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@ Group group = (Group)objArray[1];
 MembershipRequest membershipRequest = (MembershipRequest)objArray[2];
 %>
 
-<liferay-ui:icon-menu>
+<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
 	<c:if test="<%= (membershipRequest.getStatusId() == MembershipRequestConstants.STATUS_PENDING) && GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.ASSIGN_MEMBERS) %>">
 		<portlet:renderURL var="replyRequestURL">
 			<portlet:param name="struts_action" value="/sites_admin/reply_membership_request" />
@@ -37,7 +37,7 @@ MembershipRequest membershipRequest = (MembershipRequest)objArray[2];
 		</portlet:renderURL>
 
 		<liferay-ui:icon
-			image="reply"
+			iconCssClass="icon-reply"
 			message="reply"
 			url="<%= replyRequestURL %>"
 		/>

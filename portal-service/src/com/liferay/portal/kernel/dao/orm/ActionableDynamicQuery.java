@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,8 @@
 package com.liferay.portal.kernel.dao.orm;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.service.BaseLocalService;
 
 /**
@@ -23,12 +24,21 @@ import com.liferay.portal.service.BaseLocalService;
  */
 public interface ActionableDynamicQuery {
 
-	public void performActions() throws PortalException, SystemException;
+	public void addDocument(Document document) throws PortalException;
 
-	public long performCount() throws PortalException, SystemException;
+	public AddCriteriaMethod getAddCriteriaMethod();
 
-	public void setBaseLocalService(BaseLocalService baseLocalService)
-		throws SystemException;
+	public PerformActionMethod getPerformActionMethod();
+
+	public PerformCountMethod getPerformCountMethod();
+
+	public void performActions() throws PortalException;
+
+	public long performCount() throws PortalException;
+
+	public void setAddCriteriaMethod(AddCriteriaMethod addCriteriaMethod);
+
+	public void setBaseLocalService(BaseLocalService baseLocalService);
 
 	public void setClass(Class<?> clazz);
 
@@ -42,8 +52,34 @@ public interface ActionableDynamicQuery {
 
 	public void setInterval(int interval);
 
+	public void setPerformActionMethod(PerformActionMethod performActionMethod);
+
+	public void setPerformCountMethod(PerformCountMethod performCountMethod);
+
 	public void setPrimaryKeyPropertyName(String primaryKeyPropertyName);
 
 	public void setSearchEngineId(String searchEngineId);
+
+	public void setTransactionAttribute(
+		TransactionAttribute transactionAttribute);
+
+	public interface AddCriteriaMethod {
+
+		public void addCriteria(DynamicQuery dynamicQuery);
+
+	}
+
+	public interface PerformActionMethod {
+
+		public void performAction(Object object)
+			throws PortalException;
+
+	}
+
+	public interface PerformCountMethod {
+
+		public long performCount() throws PortalException;
+
+	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,7 @@ public class ActionUtil {
 			entry = BookmarksEntryServiceUtil.getEntry(entryId);
 
 			if (entry.isInTrash()) {
-				throw new NoSuchEntryException();
+				throw new NoSuchEntryException("{entryId=" + entryId + "}");
 			}
 		}
 
@@ -76,7 +76,7 @@ public class ActionUtil {
 			folder = BookmarksFolderServiceUtil.getFolder(folderId);
 
 			if (folder.isInTrash()) {
-				throw new NoSuchFolderException();
+				throw new NoSuchFolderException("{folderId=" + folderId + "}");
 			}
 		}
 		else {

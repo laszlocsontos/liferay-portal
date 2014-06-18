@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,21 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -87,12 +97,10 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 *
 	 * @param repository the repository
 	 * @return the repository that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public Repository addRepository(Repository repository)
-		throws SystemException {
+	public Repository addRepository(Repository repository) {
 		repository.setNew(true);
 
 		return repositoryPersistence.update(repository);
@@ -115,12 +123,11 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param repositoryId the primary key of the repository
 	 * @return the repository that was removed
 	 * @throws PortalException if a repository with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public Repository deleteRepository(long repositoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return repositoryPersistence.remove(repositoryId);
 	}
 
@@ -129,12 +136,10 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 *
 	 * @param repository the repository
 	 * @return the repository that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public Repository deleteRepository(Repository repository)
-		throws SystemException {
+	public Repository deleteRepository(Repository repository) {
 		return repositoryPersistence.remove(repository);
 	}
 
@@ -151,12 +156,10 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return repositoryPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -171,12 +174,10 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return repositoryPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end);
 	}
@@ -193,12 +194,11 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return repositoryPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -208,11 +208,9 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return repositoryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -222,18 +220,16 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return repositoryPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public Repository fetchRepository(long repositoryId)
-		throws SystemException {
+	public Repository fetchRepository(long repositoryId) {
 		return repositoryPersistence.fetchByPrimaryKey(repositoryId);
 	}
 
@@ -243,11 +239,10 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param uuid the repository's UUID
 	 * @param  companyId the primary key of the company
 	 * @return the matching repository, or <code>null</code> if a matching repository could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Repository fetchRepositoryByUuidAndCompanyId(String uuid,
-		long companyId) throws SystemException {
+		long companyId) {
 		return repositoryPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -257,11 +252,9 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param uuid the repository's UUID
 	 * @param groupId the primary key of the group
 	 * @return the matching repository, or <code>null</code> if a matching repository could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Repository fetchRepositoryByUuidAndGroupId(String uuid, long groupId)
-		throws SystemException {
+	public Repository fetchRepositoryByUuidAndGroupId(String uuid, long groupId) {
 		return repositoryPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -271,17 +264,112 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param repositoryId the primary key of the repository
 	 * @return the repository
 	 * @throws PortalException if a repository with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Repository getRepository(long repositoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return repositoryPersistence.findByPrimaryKey(repositoryId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.RepositoryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(Repository.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("repositoryId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.RepositoryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(Repository.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("repositoryId");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType.toString(),
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType.toString(),
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+
+					StagedModelType stagedModelType = exportActionableDynamicQuery.getStagedModelType();
+
+					if (stagedModelType.getReferrerClassNameId() >= 0) {
+						Property classNameIdProperty = PropertyFactoryUtil.forName(
+								"classNameId");
+
+						dynamicQuery.add(classNameIdProperty.eq(
+								stagedModelType.getReferrerClassNameId()));
+					}
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+					Repository stagedModel = (Repository)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						stagedModel);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(Repository.class.getName())));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteRepository((Repository)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return repositoryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -292,11 +380,10 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param  companyId the primary key of the company
 	 * @return the matching repository
 	 * @throws PortalException if a matching repository could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Repository getRepositoryByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException, SystemException {
+		long companyId) throws PortalException {
 		return repositoryPersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -307,11 +394,10 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param groupId the primary key of the group
 	 * @return the matching repository
 	 * @throws PortalException if a matching repository could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Repository getRepositoryByUuidAndGroupId(String uuid, long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return repositoryPersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -325,11 +411,9 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of repositories
 	 * @param end the upper bound of the range of repositories (not inclusive)
 	 * @return the range of repositories
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<Repository> getRepositories(int start, int end)
-		throws SystemException {
+	public List<Repository> getRepositories(int start, int end) {
 		return repositoryPersistence.findAll(start, end);
 	}
 
@@ -337,10 +421,9 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 * Returns the number of repositories.
 	 *
 	 * @return the number of repositories
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getRepositoriesCount() throws SystemException {
+	public int getRepositoriesCount() {
 		return repositoryPersistence.countAll();
 	}
 
@@ -349,12 +432,10 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 *
 	 * @param repository the repository
 	 * @return the repository that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public Repository updateRepository(Repository repository)
-		throws SystemException {
+	public Repository updateRepository(Repository repository) {
 		return repositoryPersistence.update(repository);
 	}
 
@@ -1266,7 +1347,7 @@ public abstract class RepositoryLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = repositoryPersistence.getDataSource();
 

@@ -122,6 +122,13 @@
 			</then>
 		</if>
 
+		<if>
+			<isset var="bookmarkViewableBy" />
+			<then>
+				<execute action="PGBookmarksAddBookmark#select" locator-key1="VIEWABLE_BY_SELECT" value1="${bookmarkViewableBy}" />
+			</then>
+		</if>
+
 		<execute action="PGBookmarksAddBookmark#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 
 		<execute action="PGBookmarks#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
@@ -309,6 +316,15 @@
 		<execute action="CPBookmarks#assertTextNotPresent" locator-key1="BOOKMARKS_TABLE_URL" value1="${bookmarkURL}" />
 	</command>
 
+	<command name="moveToRecycleBinPG">
+		<var name="key_bookmarkName" value="${bookmarkName}" />
+
+		<execute action="PGBookmarks#assertTextEquals" locator-key1="BOOKMARKS_TABLE_NAME" value1="${bookmarkName}" />
+		<execute action="PGBookmarksFolder#assertClick" locator-key1="BOOKMARKS_TABLE_ACTIONS_BUTTON" value1="Actions" />
+		<execute action="PGBookmarksFolder#assertClick" locator-key1="BOOKMARK_ACTION_MENULIST_MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
+		<execute action="PGBookmarksFolder#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="moved to the Recycle Bin. Undo" />
+	</command>
+
 	<command name="searchCP">
 		<execute action="CPBookmarks#type" locator-key1="SEARCH_FIELD" value1="${bookmarkName}" />
 		<execute action="CPBookmarks#assertClick" locator-key1="SEARCH_BUTTON" value1="Search" />
@@ -395,7 +411,9 @@
 		<execute action="PGAssetpublisher#assertClick" locator-key1="ASSET_ABSTRACT_TITLE" value1="${bookmarkName}" />
 		<execute action="PGAssetpublisher#assertTextEquals" locator-key1="ASSET_ABSTRACT_BOOKMARK_DETAIL_NAME" value1="${bookmarkName}" />
 		<execute action="PGAssetpublisher#click" locator-key1="ASSET_ABSTRACT_BOOKMARK_DETAIL_LINK" />
+		<execute action="PGAssetpublisher#selectWindow" locator1="title=Enterprise open source portal and collaboration software. | Liferay" />
 		<execute action="PGAssetpublisher#assertElementPresent" locator-key1="ASSET_ABSTRACT_BOOKMARK_LIFERAY_LOGO" />
+		<execute action="PGAssetpublisher#close" locator1="title=Enterprise open source portal and collaboration software. | Liferay" />
 	</command>
 
 	<command name="viewCP">
@@ -403,6 +421,11 @@
 
 		<execute action="CPBookmarks#assertTextEquals" locator-key1="BOOKMARKS_TABLE_NAME" value1="${bookmarkName}" />
 		<execute action="CPBookmarks#assertTextEquals" locator-key1="BOOKMARKS_TABLE_URL" value1="${bookmarkURL}" />
+	</command>
+
+	<command name="viewNoPG">
+		<execute action="PGBookmarks#assertTextNotPresent" value1="${bookmarkName}" />
+		<execute action="PGBookmarks#assertTextNotPresent" value1="${bookmarkURL}" />
 	</command>
 
 	<command name="viewPG">

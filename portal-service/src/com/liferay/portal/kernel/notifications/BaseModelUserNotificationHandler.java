@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,11 @@
 
 package com.liferay.portal.kernel.notifications;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.UserNotificationEvent;
@@ -31,6 +32,7 @@ import com.liferay.portlet.asset.model.AssetRendererFactory;
  * @author Brian Wing Shun Chan
  * @author Sergio González
  */
+@ProviderType
 public abstract class BaseModelUserNotificationHandler
 	extends BaseUserNotificationHandler {
 
@@ -79,21 +81,14 @@ public abstract class BaseModelUserNotificationHandler
 			return null;
 		}
 
-		String title = getTitle(jsonObject, assetRenderer, serviceContext);
-
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("<div class=\"title\">");
-		sb.append(title);
-		sb.append("</div><div class=\"body\">");
-
-		String entryTitle = jsonObject.getString("entryTitle");
-
-		sb.append(HtmlUtil.escape(StringUtil.shorten(entryTitle), 50));
-
-		sb.append("</div>");
-
-		return sb.toString();
+		return StringUtil.replace(
+			getBodyTemplate(), new String[] {"[$BODY$]", "[$TITLE$]"},
+			new String[] {
+				HtmlUtil.escape(
+					StringUtil.shorten(jsonObject.getString("entryTitle")),
+					50),
+				getTitle(jsonObject, assetRenderer, serviceContext)
+			});
 	}
 
 	@Override
@@ -119,7 +114,7 @@ public abstract class BaseModelUserNotificationHandler
 				assetRenderer.getClassName());
 
 		String typeName = assetRendererFactory.getTypeName(
-			serviceContext.getLocale(), true);
+			serviceContext.getLocale());
 
 		int notificationType = jsonObject.getInt("notificationType");
 

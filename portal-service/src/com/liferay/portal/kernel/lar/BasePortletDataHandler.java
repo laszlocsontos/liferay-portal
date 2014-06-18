@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,6 +47,41 @@ import javax.portlet.PortletPreferences;
  * @author Brian Wing Shun Chan
  */
 public abstract class BasePortletDataHandler implements PortletDataHandler {
+
+	@Override
+	public PortletPreferences addDefaultData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		long startTime = 0;
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Adding default data to portlet " + portletId);
+
+			startTime = System.currentTimeMillis();
+		}
+
+		try {
+			return doAddDefaultData(
+				portletDataContext, portletId, portletPreferences);
+		}
+		catch (PortletDataException pde) {
+			throw pde;
+		}
+		catch (Exception e) {
+			throw new PortletDataException(e);
+		}
+		finally {
+			if (_log.isInfoEnabled()) {
+				long duration = System.currentTimeMillis() - startTime;
+
+				_log.info(
+					"Added default data to portlet in " +
+						Time.getDuration(duration));
+			}
+		}
+	}
 
 	@Override
 	public PortletPreferences deleteData(
@@ -318,6 +353,11 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	}
 
 	@Override
+	public String getServiceName() {
+		return null;
+	}
+
+	@Override
 	public PortletPreferences importData(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences, String data)
@@ -362,6 +402,11 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	}
 
 	@Override
+	public boolean isDataAlwaysStaged() {
+		return _dataAlwaysStaged;
+	}
+
+	@Override
 	public boolean isDataLocalized() {
 		return _dataLocalized;
 	}
@@ -395,6 +440,18 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	@Override
 	public boolean isPublishToLiveByDefault() {
 		return _publishToLiveByDefault;
+	}
+
+	@Override
+	public boolean isRollbackOnException() {
+
+		// For now, we are going to throw an exception if one portlet data
+		// handler has an exception to ensure that the transaction is rolled
+		// back for data integrity. We may decide that this is not the best
+		// behavior in the future because a bad plugin could prevent deletion of
+		// groups.
+
+		return true;
 	}
 
 	@Override
@@ -492,7 +549,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 					portletDataContext, portletId, portletPreferences);
 
 				if (displayStyleGroupId ==
-						portletDataContext.getCompanyGroupId()) {
+						portletDataContext.getSourceCompanyGroupId()) {
 
 					Element importDataRootElement =
 						portletDataContext.getImportDataRootElement();
@@ -688,6 +745,14 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 	}
 
+	protected PortletPreferences doAddDefaultData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		return portletPreferences;
+	}
+
 	protected PortletPreferences doDeleteData(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
@@ -852,6 +917,10 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	protected void setAlwaysStaged(boolean alwaysStaged) {
 	}
 
+	protected void setDataAlwaysStaged(boolean dataAlwaysStaged) {
+		_dataAlwaysStaged = dataAlwaysStaged;
+	}
+
 	protected void setDataLevel(DataLevel dataLevel) {
 		_dataLevel = dataLevel;
 	}
@@ -912,6 +981,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	private static Log _log = LogFactoryUtil.getLog(
 		BasePortletDataHandler.class);
 
+	private boolean _dataAlwaysStaged;
 	private DataLevel _dataLevel = DataLevel.SITE;
 	private boolean _dataLocalized;
 	private String[] _dataPortletPreferences = StringPool.EMPTY_ARRAY;

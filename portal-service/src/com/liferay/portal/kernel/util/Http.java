@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,6 +50,8 @@ public interface Http {
 
 	public static final String PROTOCOL_DELIMITER = "://";
 
+	public static final int URL_MAXIMUM_LENGTH = 2083;
+
 	public String addParameter(String url, String name, boolean value);
 
 	public String addParameter(String url, String name, double value);
@@ -66,6 +68,10 @@ public interface Http {
 
 	public String decodeURL(String url);
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #decodeURL(String)}
+	 */
+	@Deprecated
 	public String decodeURL(String url, boolean unescapeSpaces);
 
 	public String encodeParameters(String url);
@@ -160,6 +166,8 @@ public interface Http {
 	public String setParameter(String url, String name, short value);
 
 	public String setParameter(String url, String name, String value);
+
+	public String shortenURL(String url, int count);
 
 	public byte[] URLtoByteArray(Http.Options options) throws IOException;
 

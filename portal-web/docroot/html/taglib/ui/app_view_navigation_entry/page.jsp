@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,7 +34,7 @@ if (!data.containsKey("view-folders")) {
 }
 %>
 
-<aui:nav-item anchorCssClass='<%= "browse-" + cssClass %>' anchorData="<%= data %>" cssClass='<%= "app-view-navigation-entry " + cssClass %>' href="<%= viewURL.toString() %>" iconCssClass="<%= iconImage %>" label="<%= HtmlUtil.escape(entryTitle) %>" localizeLabel="<%= false %>" selected="<%= selected %>">
+<aui:nav-item anchorCssClass='<%= "browse-" + cssClass %>' anchorData="<%= data %>" cssClass='<%= "app-view-navigation-entry list-group-item " + cssClass %>' href="<%= viewURL.toString() %>" iconCssClass="<%= iconImage %>" label="<%= HtmlUtil.escape(entryTitle) %>" localizeLabel="<%= false %>" selected="<%= selected %>">
 
 	<%
 	request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);

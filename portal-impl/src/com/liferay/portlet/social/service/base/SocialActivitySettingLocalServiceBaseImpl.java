@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -72,12 +74,11 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 *
 	 * @param socialActivitySetting the social activity setting
 	 * @return the social activity setting that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public SocialActivitySetting addSocialActivitySetting(
-		SocialActivitySetting socialActivitySetting) throws SystemException {
+		SocialActivitySetting socialActivitySetting) {
 		socialActivitySetting.setNew(true);
 
 		return socialActivitySettingPersistence.update(socialActivitySetting);
@@ -101,12 +102,11 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 * @param activitySettingId the primary key of the social activity setting
 	 * @return the social activity setting that was removed
 	 * @throws PortalException if a social activity setting with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SocialActivitySetting deleteSocialActivitySetting(
-		long activitySettingId) throws PortalException, SystemException {
+		long activitySettingId) throws PortalException {
 		return socialActivitySettingPersistence.remove(activitySettingId);
 	}
 
@@ -115,12 +115,11 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 *
 	 * @param socialActivitySetting the social activity setting
 	 * @return the social activity setting that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SocialActivitySetting deleteSocialActivitySetting(
-		SocialActivitySetting socialActivitySetting) throws SystemException {
+		SocialActivitySetting socialActivitySetting) {
 		return socialActivitySettingPersistence.remove(socialActivitySetting);
 	}
 
@@ -137,12 +136,10 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return socialActivitySettingPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -157,12 +154,10 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return socialActivitySettingPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -179,12 +174,11 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return socialActivitySettingPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -194,11 +188,9 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return socialActivitySettingPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -208,18 +200,17 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return socialActivitySettingPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public SocialActivitySetting fetchSocialActivitySetting(
-		long activitySettingId) throws SystemException {
+		long activitySettingId) {
 		return socialActivitySettingPersistence.fetchByPrimaryKey(activitySettingId);
 	}
 
@@ -229,17 +220,47 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 * @param activitySettingId the primary key of the social activity setting
 	 * @return the social activity setting
 	 * @throws PortalException if a social activity setting with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public SocialActivitySetting getSocialActivitySetting(
-		long activitySettingId) throws PortalException, SystemException {
+		long activitySettingId) throws PortalException {
 		return socialActivitySettingPersistence.findByPrimaryKey(activitySettingId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SocialActivitySetting.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("activitySettingId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.social.service.SocialActivitySettingLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SocialActivitySetting.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("activitySettingId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteSocialActivitySetting((SocialActivitySetting)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return socialActivitySettingPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -253,11 +274,10 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 * @param start the lower bound of the range of social activity settings
 	 * @param end the upper bound of the range of social activity settings (not inclusive)
 	 * @return the range of social activity settings
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<SocialActivitySetting> getSocialActivitySettings(int start,
-		int end) throws SystemException {
+		int end) {
 		return socialActivitySettingPersistence.findAll(start, end);
 	}
 
@@ -265,10 +285,9 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 * Returns the number of social activity settings.
 	 *
 	 * @return the number of social activity settings
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSocialActivitySettingsCount() throws SystemException {
+	public int getSocialActivitySettingsCount() {
 		return socialActivitySettingPersistence.countAll();
 	}
 
@@ -277,12 +296,11 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 *
 	 * @param socialActivitySetting the social activity setting
 	 * @return the social activity setting that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public SocialActivitySetting updateSocialActivitySetting(
-		SocialActivitySetting socialActivitySetting) throws SystemException {
+		SocialActivitySetting socialActivitySetting) {
 		return socialActivitySettingPersistence.update(socialActivitySetting);
 	}
 
@@ -536,7 +554,7 @@ public abstract class SocialActivitySettingLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = socialActivitySettingPersistence.getDataSource();
 

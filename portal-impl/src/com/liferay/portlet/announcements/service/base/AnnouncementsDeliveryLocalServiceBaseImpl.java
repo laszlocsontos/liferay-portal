@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -71,12 +73,11 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 *
 	 * @param announcementsDelivery the announcements delivery
 	 * @return the announcements delivery that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AnnouncementsDelivery addAnnouncementsDelivery(
-		AnnouncementsDelivery announcementsDelivery) throws SystemException {
+		AnnouncementsDelivery announcementsDelivery) {
 		announcementsDelivery.setNew(true);
 
 		return announcementsDeliveryPersistence.update(announcementsDelivery);
@@ -99,12 +100,11 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 * @param deliveryId the primary key of the announcements delivery
 	 * @return the announcements delivery that was removed
 	 * @throws PortalException if a announcements delivery with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public AnnouncementsDelivery deleteAnnouncementsDelivery(long deliveryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return announcementsDeliveryPersistence.remove(deliveryId);
 	}
 
@@ -113,12 +113,11 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 *
 	 * @param announcementsDelivery the announcements delivery
 	 * @return the announcements delivery that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public AnnouncementsDelivery deleteAnnouncementsDelivery(
-		AnnouncementsDelivery announcementsDelivery) throws SystemException {
+		AnnouncementsDelivery announcementsDelivery) {
 		return announcementsDeliveryPersistence.remove(announcementsDelivery);
 	}
 
@@ -135,12 +134,10 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return announcementsDeliveryPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -155,12 +152,10 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return announcementsDeliveryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -177,12 +172,11 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return announcementsDeliveryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -192,11 +186,9 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return announcementsDeliveryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -206,18 +198,16 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return announcementsDeliveryPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public AnnouncementsDelivery fetchAnnouncementsDelivery(long deliveryId)
-		throws SystemException {
+	public AnnouncementsDelivery fetchAnnouncementsDelivery(long deliveryId) {
 		return announcementsDeliveryPersistence.fetchByPrimaryKey(deliveryId);
 	}
 
@@ -227,17 +217,47 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 * @param deliveryId the primary key of the announcements delivery
 	 * @return the announcements delivery
 	 * @throws PortalException if a announcements delivery with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public AnnouncementsDelivery getAnnouncementsDelivery(long deliveryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return announcementsDeliveryPersistence.findByPrimaryKey(deliveryId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.announcements.service.AnnouncementsDeliveryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(AnnouncementsDelivery.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("deliveryId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.announcements.service.AnnouncementsDeliveryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(AnnouncementsDelivery.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("deliveryId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteAnnouncementsDelivery((AnnouncementsDelivery)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return announcementsDeliveryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -251,11 +271,10 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of announcements deliveries
 	 * @param end the upper bound of the range of announcements deliveries (not inclusive)
 	 * @return the range of announcements deliveries
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<AnnouncementsDelivery> getAnnouncementsDeliveries(int start,
-		int end) throws SystemException {
+		int end) {
 		return announcementsDeliveryPersistence.findAll(start, end);
 	}
 
@@ -263,10 +282,9 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 * Returns the number of announcements deliveries.
 	 *
 	 * @return the number of announcements deliveries
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getAnnouncementsDeliveriesCount() throws SystemException {
+	public int getAnnouncementsDeliveriesCount() {
 		return announcementsDeliveryPersistence.countAll();
 	}
 
@@ -275,12 +293,11 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 *
 	 * @param announcementsDelivery the announcements delivery
 	 * @return the announcements delivery that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AnnouncementsDelivery updateAnnouncementsDelivery(
-		AnnouncementsDelivery announcementsDelivery) throws SystemException {
+		AnnouncementsDelivery announcementsDelivery) {
 		return announcementsDeliveryPersistence.update(announcementsDelivery);
 	}
 
@@ -477,7 +494,7 @@ public abstract class AnnouncementsDeliveryLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = announcementsDeliveryPersistence.getDataSource();
 

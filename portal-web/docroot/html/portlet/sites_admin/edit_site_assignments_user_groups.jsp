@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -105,69 +105,60 @@ userGroupSearch.setEmptyResultsMessage(emptyResultsMessage);
 		/>
 
 		<c:if test='<%= tabs1.equals("summary") || tabs2.equals("current") %>'>
+
+			<%
+			List<UserGroupGroupRole> userGroupGroupRoles = UserGroupGroupRoleLocalServiceUtil.getUserGroupGroupRoles(userGroup.getUserGroupId(), group.getGroupId());
+			%>
+
 			<liferay-ui:search-container-column-text
-				buffer="buffer"
 				name="site-roles"
-			>
-
-				<%
-				List<UserGroupGroupRole> userGroupGroupRoles = UserGroupGroupRoleLocalServiceUtil.getUserGroupGroupRoles(userGroup.getUserGroupId(), group.getGroupId());
-
-				for (int i = 0; i < userGroupGroupRoles.size(); i++) {
-					UserGroupGroupRole userGroupGroupRole = userGroupGroupRoles.get(i);
-
-					Role role = RoleLocalServiceUtil.getRole(userGroupGroupRole.getRoleId());
-
-					buffer.append(HtmlUtil.escape(role.getTitle(locale)));
-
-					if ((i + 1) < userGroupGroupRoles.size()) {
-						buffer.append(StringPool.COMMA_AND_SPACE);
-					}
-				}
-				%>
-
-			</liferay-ui:search-container-column-text>
+				value="<%= ListUtil.toString(userGroupGroupRoles, UsersAdmin.USER_GROUP_GROUP_ROLE_TITLE_ACCESSOR, StringPool.COMMA_AND_SPACE) %>"
+			/>
 
 			<liferay-ui:search-container-column-jsp
 				align="right"
+				cssClass="entry-action"
 				path="/html/portlet/sites_admin/user_group_action.jsp"
 			/>
 		</c:if>
 	</liferay-ui:search-container-row>
 
 	<liferay-util:buffer var="formButton">
-		<c:choose>
-			<c:when test='<%= tabs2.equals("current") %>'>
+		<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.ASSIGN_MEMBERS) %>">
+			<c:choose>
+				<c:when test='<%= tabs2.equals("current") %>'>
 
-				<%
-				viewUserGroupsURL.setParameter("tabs2", "available");
-				%>
+					<%
+					viewUserGroupsURL.setParameter("tabs2", "available");
+					%>
 
-				<liferay-ui:icon
-					image="../aui/globe"
-					label="<%= true %>"
-					message="assign-user-groups"
-					url="<%= viewUserGroupsURL.toString() %>"
-				/>
+					<liferay-ui:icon
+						iconCssClass="icon-globe"
+						label="<%= true %>"
+						message="assign-user-groups"
+						url="<%= viewUserGroupsURL.toString() %>"
+					/>
 
-				<%
-				viewUserGroupsURL.setParameter("tabs2", "current");
-				%>
+					<%
+					viewUserGroupsURL.setParameter("tabs2", "current");
+					%>
 
-			</c:when>
-			<c:otherwise>
+				</c:when>
+				<c:otherwise>
 
-				<%
-				portletURL.setParameter("tabs2", "current");
+					<%
+					portletURL.setParameter("tabs2", "current");
+					portletURL.setParameter("cur", String.valueOf(cur));
 
-				String taglibOnClick = renderResponse.getNamespace() + "updateGroupUserGroups('" + portletURL.toString() + StringPool.AMPERSAND + renderResponse.getNamespace() + "cur=" + cur + "');";
-				%>
+					String taglibOnClick = renderResponse.getNamespace() + "updateGroupUserGroups('" + portletURL.toString() + "');";
+					%>
 
-				<aui:button-row>
-					<aui:button onClick="<%= taglibOnClick %>" primary="<%= true %>" value="save" />
-				</aui:button-row>
-			</c:otherwise>
-		</c:choose>
+					<aui:button-row>
+						<aui:button onClick="<%= taglibOnClick %>" primary="<%= true %>" value="save" />
+					</aui:button-row>
+				</c:otherwise>
+			</c:choose>
+		</c:if>
 	</liferay-util:buffer>
 
 	<c:choose>
@@ -185,7 +176,7 @@ userGroupSearch.setEmptyResultsMessage(emptyResultsMessage);
 			</liferay-ui:panel>
 		</c:when>
 		<c:when test='<%= !tabs1.equals("summary") %>'>
-			<c:if test="<%= total > userGroupSearch.getDelta() %>">
+			<c:if test="<%= PropsValues.SEARCH_CONTAINER_SHOW_PAGINATION_TOP && (results.size() > PropsValues.SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA) %>">
 				<%= formButton %>
 			</c:if>
 

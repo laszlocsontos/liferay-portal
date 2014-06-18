@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 MBBan ban = (MBBan)row.getObject();
 %>
 
-<liferay-ui:icon-menu>
+<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
 	<c:if test="<%= MBPermission.contains(permissionChecker, scopeGroupId, ActionKeys.BAN_USER) %>">
 		<portlet:actionURL var="unbanUserURL">
 			<portlet:param name="struts_action" value="/message_boards/ban_user" />
@@ -32,7 +32,7 @@ MBBan ban = (MBBan)row.getObject();
 		</portlet:actionURL>
 
 		<liferay-ui:icon
-			image="../message_boards/unban_user"
+			iconCssClass="icon-ok-sign"
 			message="unban-this-user"
 			url="<%= unbanUserURL %>"
 		/>

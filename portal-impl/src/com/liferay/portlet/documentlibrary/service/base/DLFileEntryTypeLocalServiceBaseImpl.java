@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,19 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -82,12 +90,10 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 *
 	 * @param dlFileEntryType the document library file entry type
 	 * @return the document library file entry type that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public DLFileEntryType addDLFileEntryType(DLFileEntryType dlFileEntryType)
-		throws SystemException {
+	public DLFileEntryType addDLFileEntryType(DLFileEntryType dlFileEntryType) {
 		dlFileEntryType.setNew(true);
 
 		return dlFileEntryTypePersistence.update(dlFileEntryType);
@@ -110,12 +116,11 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param fileEntryTypeId the primary key of the document library file entry type
 	 * @return the document library file entry type that was removed
 	 * @throws PortalException if a document library file entry type with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DLFileEntryType deleteDLFileEntryType(long fileEntryTypeId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return dlFileEntryTypePersistence.remove(fileEntryTypeId);
 	}
 
@@ -124,12 +129,11 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 *
 	 * @param dlFileEntryType the document library file entry type
 	 * @return the document library file entry type that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DLFileEntryType deleteDLFileEntryType(
-		DLFileEntryType dlFileEntryType) throws SystemException {
+		DLFileEntryType dlFileEntryType) {
 		return dlFileEntryTypePersistence.remove(dlFileEntryType);
 	}
 
@@ -146,12 +150,10 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return dlFileEntryTypePersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -166,12 +168,10 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return dlFileEntryTypePersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -188,12 +188,11 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return dlFileEntryTypePersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -203,11 +202,9 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return dlFileEntryTypePersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -217,18 +214,16 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return dlFileEntryTypePersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public DLFileEntryType fetchDLFileEntryType(long fileEntryTypeId)
-		throws SystemException {
+	public DLFileEntryType fetchDLFileEntryType(long fileEntryTypeId) {
 		return dlFileEntryTypePersistence.fetchByPrimaryKey(fileEntryTypeId);
 	}
 
@@ -238,11 +233,10 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param uuid the document library file entry type's UUID
 	 * @param  companyId the primary key of the company
 	 * @return the matching document library file entry type, or <code>null</code> if a matching document library file entry type could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DLFileEntryType fetchDLFileEntryTypeByUuidAndCompanyId(String uuid,
-		long companyId) throws SystemException {
+		long companyId) {
 		return dlFileEntryTypePersistence.fetchByUuid_C_First(uuid, companyId,
 			null);
 	}
@@ -253,11 +247,10 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param uuid the document library file entry type's UUID
 	 * @param groupId the primary key of the group
 	 * @return the matching document library file entry type, or <code>null</code> if a matching document library file entry type could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DLFileEntryType fetchDLFileEntryTypeByUuidAndGroupId(String uuid,
-		long groupId) throws SystemException {
+		long groupId) {
 		return dlFileEntryTypePersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -267,17 +260,102 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param fileEntryTypeId the primary key of the document library file entry type
 	 * @return the document library file entry type
 	 * @throws PortalException if a document library file entry type with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DLFileEntryType getDLFileEntryType(long fileEntryTypeId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return dlFileEntryTypePersistence.findByPrimaryKey(fileEntryTypeId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(DLFileEntryType.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("fileEntryTypeId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(DLFileEntryType.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("fileEntryTypeId");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType.toString(),
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType.toString(),
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+					DLFileEntryType stagedModel = (DLFileEntryType)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						stagedModel);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(DLFileEntryType.class.getName())));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteDLFileEntryType((DLFileEntryType)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return dlFileEntryTypePersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -288,11 +366,10 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param  companyId the primary key of the company
 	 * @return the matching document library file entry type
 	 * @throws PortalException if a matching document library file entry type could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DLFileEntryType getDLFileEntryTypeByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException, SystemException {
+		long companyId) throws PortalException {
 		return dlFileEntryTypePersistence.findByUuid_C_First(uuid, companyId,
 			null);
 	}
@@ -304,11 +381,10 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param groupId the primary key of the group
 	 * @return the matching document library file entry type
 	 * @throws PortalException if a matching document library file entry type could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DLFileEntryType getDLFileEntryTypeByUuidAndGroupId(String uuid,
-		long groupId) throws PortalException, SystemException {
+		long groupId) throws PortalException {
 		return dlFileEntryTypePersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -322,11 +398,9 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * @param start the lower bound of the range of document library file entry types
 	 * @param end the upper bound of the range of document library file entry types (not inclusive)
 	 * @return the range of document library file entry types
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<DLFileEntryType> getDLFileEntryTypes(int start, int end)
-		throws SystemException {
+	public List<DLFileEntryType> getDLFileEntryTypes(int start, int end) {
 		return dlFileEntryTypePersistence.findAll(start, end);
 	}
 
@@ -334,10 +408,9 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 * Returns the number of document library file entry types.
 	 *
 	 * @return the number of document library file entry types
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getDLFileEntryTypesCount() throws SystemException {
+	public int getDLFileEntryTypesCount() {
 		return dlFileEntryTypePersistence.countAll();
 	}
 
@@ -346,313 +419,293 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 *
 	 * @param dlFileEntryType the document library file entry type
 	 * @return the document library file entry type that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DLFileEntryType updateDLFileEntryType(
-		DLFileEntryType dlFileEntryType) throws SystemException {
+		DLFileEntryType dlFileEntryType) {
 		return dlFileEntryTypePersistence.update(dlFileEntryType);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addDLFolderDLFileEntryType(long folderId, long fileEntryTypeId)
-		throws SystemException {
+	public void addDLFolderDLFileEntryType(long folderId, long fileEntryTypeId) {
 		dlFolderPersistence.addDLFileEntryType(folderId, fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDLFolderDLFileEntryType(long folderId,
-		DLFileEntryType dlFileEntryType) throws SystemException {
+		DLFileEntryType dlFileEntryType) {
 		dlFolderPersistence.addDLFileEntryType(folderId, dlFileEntryType);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDLFolderDLFileEntryTypes(long folderId,
-		long[] fileEntryTypeIds) throws SystemException {
+		long[] fileEntryTypeIds) {
 		dlFolderPersistence.addDLFileEntryTypes(folderId, fileEntryTypeIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDLFolderDLFileEntryTypes(long folderId,
-		List<DLFileEntryType> DLFileEntryTypes) throws SystemException {
+		List<DLFileEntryType> DLFileEntryTypes) {
 		dlFolderPersistence.addDLFileEntryTypes(folderId, DLFileEntryTypes);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearDLFolderDLFileEntryTypes(long folderId)
-		throws SystemException {
+	public void clearDLFolderDLFileEntryTypes(long folderId) {
 		dlFolderPersistence.clearDLFileEntryTypes(folderId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDLFolderDLFileEntryType(long folderId,
-		long fileEntryTypeId) throws SystemException {
+		long fileEntryTypeId) {
 		dlFolderPersistence.removeDLFileEntryType(folderId, fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDLFolderDLFileEntryType(long folderId,
-		DLFileEntryType dlFileEntryType) throws SystemException {
+		DLFileEntryType dlFileEntryType) {
 		dlFolderPersistence.removeDLFileEntryType(folderId, dlFileEntryType);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDLFolderDLFileEntryTypes(long folderId,
-		long[] fileEntryTypeIds) throws SystemException {
+		long[] fileEntryTypeIds) {
 		dlFolderPersistence.removeDLFileEntryTypes(folderId, fileEntryTypeIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDLFolderDLFileEntryTypes(long folderId,
-		List<DLFileEntryType> DLFileEntryTypes) throws SystemException {
+		List<DLFileEntryType> DLFileEntryTypes) {
 		dlFolderPersistence.removeDLFileEntryTypes(folderId, DLFileEntryTypes);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the folderIds of the document library folders associated with the document library file entry type.
+	 *
+	 * @param fileEntryTypeId the fileEntryTypeId of the document library file entry type
+	 * @return long[] the folderIds of document library folders associated with the document library file entry type
 	 */
 	@Override
-	public List<DLFileEntryType> getDLFolderDLFileEntryTypes(long folderId)
-		throws SystemException {
+	public long[] getDLFolderPrimaryKeys(long fileEntryTypeId) {
+		return dlFileEntryTypePersistence.getDLFolderPrimaryKeys(fileEntryTypeId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<DLFileEntryType> getDLFolderDLFileEntryTypes(long folderId) {
 		return dlFolderPersistence.getDLFileEntryTypes(folderId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<DLFileEntryType> getDLFolderDLFileEntryTypes(long folderId,
-		int start, int end) throws SystemException {
+		int start, int end) {
 		return dlFolderPersistence.getDLFileEntryTypes(folderId, start, end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<DLFileEntryType> getDLFolderDLFileEntryTypes(long folderId,
-		int start, int end, OrderByComparator orderByComparator)
-		throws SystemException {
+		int start, int end, OrderByComparator orderByComparator) {
 		return dlFolderPersistence.getDLFileEntryTypes(folderId, start, end,
 			orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getDLFolderDLFileEntryTypesCount(long folderId)
-		throws SystemException {
+	public int getDLFolderDLFileEntryTypesCount(long folderId) {
 		return dlFolderPersistence.getDLFileEntryTypesSize(folderId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public boolean hasDLFolderDLFileEntryType(long folderId,
-		long fileEntryTypeId) throws SystemException {
+		long fileEntryTypeId) {
 		return dlFolderPersistence.containsDLFileEntryType(folderId,
 			fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasDLFolderDLFileEntryTypes(long folderId)
-		throws SystemException {
+	public boolean hasDLFolderDLFileEntryTypes(long folderId) {
 		return dlFolderPersistence.containsDLFileEntryTypes(folderId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void setDLFolderDLFileEntryTypes(long folderId,
-		long[] fileEntryTypeIds) throws SystemException {
+		long[] fileEntryTypeIds) {
 		dlFolderPersistence.setDLFileEntryTypes(folderId, fileEntryTypeIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDDMStructureDLFileEntryType(long structureId,
-		long fileEntryTypeId) throws SystemException {
+		long fileEntryTypeId) {
 		ddmStructurePersistence.addDLFileEntryType(structureId, fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDDMStructureDLFileEntryType(long structureId,
-		DLFileEntryType dlFileEntryType) throws SystemException {
+		DLFileEntryType dlFileEntryType) {
 		ddmStructurePersistence.addDLFileEntryType(structureId, dlFileEntryType);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDDMStructureDLFileEntryTypes(long structureId,
-		long[] fileEntryTypeIds) throws SystemException {
+		long[] fileEntryTypeIds) {
 		ddmStructurePersistence.addDLFileEntryTypes(structureId,
 			fileEntryTypeIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addDDMStructureDLFileEntryTypes(long structureId,
-		List<DLFileEntryType> DLFileEntryTypes) throws SystemException {
+		List<DLFileEntryType> DLFileEntryTypes) {
 		ddmStructurePersistence.addDLFileEntryTypes(structureId,
 			DLFileEntryTypes);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearDDMStructureDLFileEntryTypes(long structureId)
-		throws SystemException {
+	public void clearDDMStructureDLFileEntryTypes(long structureId) {
 		ddmStructurePersistence.clearDLFileEntryTypes(structureId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDDMStructureDLFileEntryType(long structureId,
-		long fileEntryTypeId) throws SystemException {
+		long fileEntryTypeId) {
 		ddmStructurePersistence.removeDLFileEntryType(structureId,
 			fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDDMStructureDLFileEntryType(long structureId,
-		DLFileEntryType dlFileEntryType) throws SystemException {
+		DLFileEntryType dlFileEntryType) {
 		ddmStructurePersistence.removeDLFileEntryType(structureId,
 			dlFileEntryType);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDDMStructureDLFileEntryTypes(long structureId,
-		long[] fileEntryTypeIds) throws SystemException {
+		long[] fileEntryTypeIds) {
 		ddmStructurePersistence.removeDLFileEntryTypes(structureId,
 			fileEntryTypeIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteDDMStructureDLFileEntryTypes(long structureId,
-		List<DLFileEntryType> DLFileEntryTypes) throws SystemException {
+		List<DLFileEntryType> DLFileEntryTypes) {
 		ddmStructurePersistence.removeDLFileEntryTypes(structureId,
 			DLFileEntryTypes);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the structureIds of the d d m structures associated with the document library file entry type.
+	 *
+	 * @param fileEntryTypeId the fileEntryTypeId of the document library file entry type
+	 * @return long[] the structureIds of d d m structures associated with the document library file entry type
+	 */
+	@Override
+	public long[] getDDMStructurePrimaryKeys(long fileEntryTypeId) {
+		return dlFileEntryTypePersistence.getDDMStructurePrimaryKeys(fileEntryTypeId);
+	}
+
+	/**
 	 */
 	@Override
 	public List<DLFileEntryType> getDDMStructureDLFileEntryTypes(
-		long structureId) throws SystemException {
+		long structureId) {
 		return ddmStructurePersistence.getDLFileEntryTypes(structureId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<DLFileEntryType> getDDMStructureDLFileEntryTypes(
-		long structureId, int start, int end) throws SystemException {
+		long structureId, int start, int end) {
 		return ddmStructurePersistence.getDLFileEntryTypes(structureId, start,
 			end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<DLFileEntryType> getDDMStructureDLFileEntryTypes(
 		long structureId, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return ddmStructurePersistence.getDLFileEntryTypes(structureId, start,
 			end, orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getDDMStructureDLFileEntryTypesCount(long structureId)
-		throws SystemException {
+	public int getDDMStructureDLFileEntryTypesCount(long structureId) {
 		return ddmStructurePersistence.getDLFileEntryTypesSize(structureId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public boolean hasDDMStructureDLFileEntryType(long structureId,
-		long fileEntryTypeId) throws SystemException {
+		long fileEntryTypeId) {
 		return ddmStructurePersistence.containsDLFileEntryType(structureId,
 			fileEntryTypeId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasDDMStructureDLFileEntryTypes(long structureId)
-		throws SystemException {
+	public boolean hasDDMStructureDLFileEntryTypes(long structureId) {
 		return ddmStructurePersistence.containsDLFileEntryTypes(structureId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void setDDMStructureDLFileEntryTypes(long structureId,
-		long[] fileEntryTypeIds) throws SystemException {
+		long[] fileEntryTypeIds) {
 		ddmStructurePersistence.setDLFileEntryTypes(structureId,
 			fileEntryTypeIds);
 	}
@@ -979,6 +1032,25 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the d l app helper local service.
+	 *
+	 * @return the d l app helper local service
+	 */
+	public com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService getDLAppHelperLocalService() {
+		return dlAppHelperLocalService;
+	}
+
+	/**
+	 * Sets the d l app helper local service.
+	 *
+	 * @param dlAppHelperLocalService the d l app helper local service
+	 */
+	public void setDLAppHelperLocalService(
+		com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService dlAppHelperLocalService) {
+		this.dlAppHelperLocalService = dlAppHelperLocalService;
+	}
+
+	/**
 	 * Returns the document library file entry local service.
 	 *
 	 * @return the document library file entry local service
@@ -1302,7 +1374,7 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = dlFileEntryTypePersistence.getDataSource();
 
@@ -1355,6 +1427,8 @@ public abstract class DLFileEntryTypeLocalServiceBaseImpl
 	protected com.liferay.portal.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService;
 	@BeanReference(type = WorkflowInstanceLinkPersistence.class)
 	protected WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence;
+	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService.class)
+	protected com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService dlAppHelperLocalService;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileEntryLocalService.class)
 	protected com.liferay.portlet.documentlibrary.service.DLFileEntryLocalService dlFileEntryLocalService;
 	@BeanReference(type = com.liferay.portlet.documentlibrary.service.DLFileEntryService.class)

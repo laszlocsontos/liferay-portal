@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,7 +87,7 @@ List addresses = AddressServiceUtil.getAddresses(Contact.class.getName(), contac
 					String taglibUpdateBillingAddress = renderResponse.getNamespace() + "updateAddress(this[this.selectedIndex].value, 'billing');";
 					%>
 
-					<aui:select label="" name="addressBilling" onChange="<%= taglibUpdateBillingAddress %>">
+					<aui:select label="" name="addressBilling" onChange="<%= taglibUpdateBillingAddress %>" title="billing-address">
 						<aui:option label='<%= "--" + LanguageUtil.get(pageContext,"my-addresses") + "--" %>' />
 
 						<%
@@ -104,44 +104,7 @@ List addresses = AddressServiceUtil.getAddresses(Contact.class.getName(), contac
 					</aui:select>
 				</c:if>
 
-				<aui:col width="<%= 50 %>">
-					<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" label="first-name" name="billingFirstName" />
-
-					<aui:input label="last-name" name="billingLastName" />
-
-					<aui:input label="email-address" name="billingEmailAddress" />
-
-					<aui:input label="company" name="billingCompany" />
-
-					<aui:input label="street" name="billingStreet" />
-
-					<aui:input label="city" name="billingCity" />
-				</aui:col>
-
-				<aui:col width="<%= 50 %>">
-					<aui:select label="state" name="billingStateSel">
-						<aui:option label="outside-us" />
-
-						<%
-						for (int i = 0; i < StateUtil.STATES.length; i++) {
-						%>
-
-							<aui:option label="<%= StateUtil.STATES[i].getName() %>" selected="<%= billingStateSel.equals(StateUtil.STATES[i].getId()) %>" value="<%= StateUtil.STATES[i].getId() %>" />
-
-						<%
-						}
-						%>
-
-					</aui:select>
-
-					<aui:input bean="<%= null %>" label="other-state" name="billingState" value="<%= billingState %>" />
-
-					<aui:input label="postal-code" name="billingZip" />
-
-					<aui:input label="country" name="billingCountry" />
-
-					<aui:input label="phone" name="billingPhone" />
-				</aui:col>
+				<%@ include file="/html/portlet/shopping/checkout_first_billing_address.jspf" %>
 			</aui:fieldset>
 		</liferay-ui:panel>
 
@@ -163,7 +126,7 @@ List addresses = AddressServiceUtil.getAddresses(Contact.class.getName(), contac
 					String taglibUpdateShippingAddress = renderResponse.getNamespace() + "updateAddress(this[this.selectedIndex].value, 'shipping');";
 					%>
 
-					<aui:select label="" name="addressShipping" onChange="<%= taglibUpdateShippingAddress %>">
+					<aui:select label="" name="addressShipping" onChange="<%= taglibUpdateShippingAddress %>" title="shipping-address">
 						<aui:option label='<%= "--" + LanguageUtil.get(pageContext,"my-addresses") + "--" %>' />
 
 						<%
@@ -180,54 +143,15 @@ List addresses = AddressServiceUtil.getAddresses(Contact.class.getName(), contac
 					</aui:select>
 				</c:if>
 
-				<aui:col width="<%= 50 %>">
-					<aui:input label="first-name" name="shippingFirstName" />
-
-					<aui:input label="last-name" name="shippingLastName" />
-
-					<aui:input label="email-address" name="shippingEmailAddress" />
-
-					<aui:input label="company" name="shippingCompany" />
-
-					<aui:input label="street" name="shippingStreet" />
-
-					<aui:input label="city" name="shippingCity" />
-
-					<aui:input label="same-as-billing" name="shipToBilling" />
-				</aui:col>
-
-				<aui:col width="<%= 50 %>">
-					<aui:select label="state" name="shippingStateSel">
-						<aui:option label="outside-us" />
-
-						<%
-						for (int i = 0; i < StateUtil.STATES.length; i++) {
-						%>
-
-							<aui:option label="<%= StateUtil.STATES[i].getName() %>" selected="<%= shippingStateSel.equals(StateUtil.STATES[i].getId()) %>" value="<%= StateUtil.STATES[i].getId() %>" />
-
-						<%
-						}
-						%>
-
-					</aui:select>
-
-					<aui:input bean="<%= null %>" label="other-state" name="shippingState" value="<%= shippingState %>" />
-
-					<aui:input label="postal-code" name="shippingZip" />
-
-					<aui:input label="country" name="shippingCountry" />
-
-					<aui:input label="phone" name="shippingPhone" />
-				</aui:col>
+				<%@ include file="/html/portlet/shopping/checkout_first_shipping_address.jspf" %>
 			</aui:fieldset>
 		</liferay-ui:panel>
 
 		<%
-		String[] ccTypes = shoppingPrefs.getCcTypes();
+		String[] ccTypes = shoppingSettings.getCcTypes();
 		%>
 
-		<c:if test="<%= !shoppingPrefs.usePayPal() && (ccTypes.length > 0) %>">
+		<c:if test="<%= !shoppingSettings.usePayPal() && (ccTypes.length > 0) %>">
 			<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="shoppingCheckoutCreditCardPanel" persistState="<%= true %>" title="credit-card">
 				<liferay-ui:error exception="<%= CCExpirationException.class %>" message="please-enter-a-valid-credit-card-expiration-date" />
 				<liferay-ui:error exception="<%= CCNameException.class %>" message="please-enter-the-full-name-exactly-as-it-is-appears-on-your-credit-card" />
@@ -334,12 +258,12 @@ List addresses = AddressServiceUtil.getAddresses(Contact.class.getName(), contac
 			Country country = address.getCountry();
 		%>
 
-			if ("<%= address.getAddressId() %>" == addressId) {
-				document.getElementById("<portlet:namespace />" + type + "Street").value = "<%= HtmlUtil.escapeJS(address.getStreet1()) %>";
-				document.getElementById("<portlet:namespace />" + type + "City").value = "<%= HtmlUtil.escapeJS(address.getCity()) %>";
+			if ('<%= address.getAddressId() %>' == addressId) {
+				document.getElementById('<portlet:namespace />' + type + 'Street').value = '<%= HtmlUtil.escapeJS(address.getStreet1()) %>';
+				document.getElementById('<portlet:namespace />' + type + 'City').value = '<%= HtmlUtil.escapeJS(address.getCity()) %>';
 
-				var stateSel = document.getElementById("<portlet:namespace />" + type + "StateSel");
-				var stateSelValue = "<%= HtmlUtil.escapeJS(region.getRegionCode()) %>";
+				var stateSel = document.getElementById('<portlet:namespace />' + type + 'StateSel');
+				var stateSelValue = '<%= HtmlUtil.escapeJS(region.getRegionCode()) %>';
 
 				for (var i = 0; i < stateSel.length; i++) {
 					if (stateSel[i].value == stateSelValue) {
@@ -349,8 +273,8 @@ List addresses = AddressServiceUtil.getAddresses(Contact.class.getName(), contac
 					}
 				}
 
-				document.getElementById("<portlet:namespace />" + type + "Zip").value = "<%= HtmlUtil.escapeJS(address.getZip()) %>";
-				document.getElementById("<portlet:namespace />" + type + "Country").value = "<%= HtmlUtil.escapeJS(country.getName()) %>";
+				document.getElementById('<portlet:namespace />' + type + 'Zip').value = '<%= HtmlUtil.escapeJS(address.getZip()) %>';
+				document.getElementById('<portlet:namespace />' + type + 'Country').value = '<%= HtmlUtil.escapeJS(country.getName()) %>';
 			}
 
 		<%

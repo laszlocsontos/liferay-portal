@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,16 +28,16 @@ WorkflowTaskDisplayTerms displayTerms = new WorkflowTaskDisplayTerms(renderReque
 >
 
 	<aui:fieldset>
-		<aui:input label="task" name="<%= displayTerms.NAME %>" size="20" value="<%= displayTerms.getName() %>" />
+		<aui:input inlineField="<%= true %>" label="task" name="<%= displayTerms.NAME %>" size="20" value="<%= displayTerms.getName() %>" />
 
-		<aui:select name="<%= displayTerms.TYPE %>">
+		<aui:select inlineField="<%= true %>" name="<%= displayTerms.TYPE %>">
 
 			<%
 			String displayTermsType = displayTerms.getType();
 
-			List<WorkflowHandler> workflowHandlers = WorkflowHandlerRegistryUtil.getWorkflowHandlers();
+			List<WorkflowHandler<?>> workflowHandlers = WorkflowHandlerRegistryUtil.getWorkflowHandlers();
 
-			for (WorkflowHandler workflowHandler : workflowHandlers) {
+			for (WorkflowHandler<?> workflowHandler : workflowHandlers) {
 				if (!workflowHandler.isAssetTypeSearchable()) {
 					continue;
 				}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -401,15 +401,13 @@ public class RuntimePageImpl implements RuntimePage {
 
 			List<PortletRenderer> portletRenderers = entry.getValue();
 
-			if (portletParallelRender && (portletRenderers.size() > 1)) {
-				StopWatch stopWatch = null;
+			StopWatch stopWatch = new StopWatch();
 
+			stopWatch.start();
+
+			if (portletParallelRender && (portletRenderers.size() > 1)) {
 				if (_log.isDebugEnabled()) {
 					_log.debug("Start parallel rendering");
-
-					stopWatch = new StopWatch();
-
-					stopWatch.start();
 				}
 
 				if (lock == null) {
@@ -442,14 +440,8 @@ public class RuntimePageImpl implements RuntimePage {
 				}
 			}
 			else {
-				StopWatch stopWatch = null;
-
 				if (_log.isDebugEnabled()) {
 					_log.debug("Start serial rendering");
-
-					stopWatch = new StopWatch();
-
-					stopWatch.start();
 				}
 
 				for (PortletRenderer portletRenderer : portletRenderers) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,12 +72,6 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.model.VirtualHost;
 import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.base.CompanyLocalServiceBaseImpl;
-import com.liferay.portal.service.persistence.GroupActionableDynamicQuery;
-import com.liferay.portal.service.persistence.LayoutPrototypeActionableDynamicQuery;
-import com.liferay.portal.service.persistence.LayoutSetPrototypeActionableDynamicQuery;
-import com.liferay.portal.service.persistence.OrganizationActionableDynamicQuery;
-import com.liferay.portal.service.persistence.RoleActionableDynamicQuery;
-import com.liferay.portal.service.persistence.UserActionableDynamicQuery;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PortalUtil;
@@ -127,13 +121,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company
 	 * @throws PortalException if the web domain, virtual host name, or mail
 	 *         domain was invalid
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Company addCompany(
 			String webId, String virtualHostname, String mx, String shardName,
 			boolean system, int maxUsers, boolean active)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Company
 
@@ -174,12 +167,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  webId the company's web domain
 	 * @return the company with the web domain
 	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Company checkCompany(String webId)
-		throws PortalException, SystemException {
-
+	public Company checkCompany(String webId) throws PortalException {
 		String mx = webId;
 
 		return companyLocalService.checkCompany(
@@ -198,11 +188,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  shardName the company's shard
 	 * @return the company with the web domain, mail domain, and shard
 	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Company checkCompany(String webId, String mx, String shardName)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Company
 
@@ -301,7 +290,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			}
 		}
 
+		// Search engine
+
 		long companyId = company.getCompanyId();
+
+		SearchEngineUtil.initialize(companyId);
 
 		// Key
 
@@ -351,10 +344,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				defaultUser.setTimeZoneId(timeZone.getID());
 			}
 
-			defaultUser.setGreeting(
-				LanguageUtil.format(
-					defaultUser.getLocale(), "welcome-x", StringPool.BLANK,
-					false));
+			String greeting = LanguageUtil.format(
+				defaultUser.getLocale(), "welcome", null, false);
+
+			defaultUser.setGreeting(greeting + StringPool.EXCLAMATION);
 			defaultUser.setLoginDate(now);
 			defaultUser.setFailedLoginAttempts(0);
 			defaultUser.setAgreedToTermsOfUse(true);
@@ -438,12 +431,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  companyId the primary key of the company
 	 * @throws PortalException if a company with the primary key could not be
 	 *         found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void checkCompanyKey(long companyId)
-		throws PortalException, SystemException {
-
+	public void checkCompanyKey(long companyId) throws PortalException {
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 
 		if (company.getKeyObj() != null) {
@@ -461,9 +451,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	}
 
 	@Override
-	public Company deleteCompany(long companyId)
-		throws PortalException, SystemException {
-
+	public Company deleteCompany(long companyId) throws PortalException {
 		if (companyId == PortalInstances.getDefaultCompanyId()) {
 			throw new RequiredCompanyException();
 		}
@@ -487,14 +475,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * Deletes the company's logo.
 	 *
 	 * @param  companyId the primary key of the company
+	 * @return the deleted logo's company
 	 * @throws PortalException if the company with the primary key could not be
 	 *         found or if the company's logo could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Company deleteLogo(long companyId)
-		throws PortalException, SystemException {
-
+	public Company deleteLogo(long companyId) throws PortalException {
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 
 		PortalUtil.updateImageId(company, false, null, "logoId", 0, 0, 0);
@@ -508,10 +494,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  companyId the primary key of the company
 	 * @return the company with the primary key, <code>null</code> if a company
 	 *         with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Company fetchCompanyById(long companyId) throws SystemException {
+	public Company fetchCompanyById(long companyId) {
 		return companyPersistence.fetchByPrimaryKey(companyId);
 	}
 
@@ -521,12 +506,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  virtualHostname the virtual host name
 	 * @return the company with the virtual host name, <code>null</code> if a
 	 *         company with the virtual host could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Company fetchCompanyByVirtualHost(String virtualHostname)
-		throws SystemException {
-
+	public Company fetchCompanyByVirtualHost(String virtualHostname) {
 		virtualHostname = StringUtil.toLowerCase(virtualHostname.trim());
 
 		VirtualHost virtualHost = virtualHostPersistence.fetchByHostname(
@@ -543,10 +525,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * Returns all the companies.
 	 *
 	 * @return the companies
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<Company> getCompanies() throws SystemException {
+	public List<Company> getCompanies() {
 		return companyPersistence.findAll();
 	}
 
@@ -556,11 +537,15 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  system whether the company is the very first company (i.e., the
 	 *         super company)
 	 * @return the companies used by WSRP
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<Company> getCompanies(boolean system) throws SystemException {
+	public List<Company> getCompanies(boolean system) {
 		return companyPersistence.findBySystem(system);
+	}
+
+	@Override
+	public List<Company> getCompanies(boolean system, int start, int end) {
+		return companyPersistence.findBySystem(system, start, end);
 	}
 
 	/**
@@ -569,10 +554,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  system whether the company is the very first company (i.e., the
 	 *         super company)
 	 * @return the number of companies used by WSRP
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getCompaniesCount(boolean system) throws SystemException {
+	public int getCompaniesCount(boolean system) {
 		return companyPersistence.countBySystem(system);
 	}
 
@@ -583,12 +567,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company with the primary key
 	 * @throws PortalException if a company with the primary key could not be
 	 *         found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Company getCompanyById(long companyId)
-		throws PortalException, SystemException {
-
+	public Company getCompanyById(long companyId) throws PortalException {
 		return companyPersistence.findByPrimaryKey(companyId);
 	}
 
@@ -598,12 +579,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  logoId the ID of the company's logo
 	 * @return the company with the logo
 	 * @throws PortalException if the company with the logo could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Company getCompanyByLogoId(long logoId)
-		throws PortalException, SystemException {
-
+	public Company getCompanyByLogoId(long logoId) throws PortalException {
 		return companyPersistence.findByLogoId(logoId);
 	}
 
@@ -614,12 +592,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company with the mail domain
 	 * @throws PortalException if the company with the mail domain could not be
 	 *         found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Company getCompanyByMx(String mx)
-		throws PortalException, SystemException {
-
+	public Company getCompanyByMx(String mx) throws PortalException {
 		return companyPersistence.findByMx(mx);
 	}
 
@@ -631,11 +606,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @throws PortalException if the company with the virtual host name could
 	 *         not be found or if the virtual host was not associated with a
 	 *         company
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Company getCompanyByVirtualHost(String virtualHostname)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			virtualHostname = StringUtil.toLowerCase(virtualHostname.trim());
@@ -664,12 +638,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company with the web domain
 	 * @throws PortalException if the company with the web domain could not be
 	 *         found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Company getCompanyByWebId(String webId)
-		throws PortalException, SystemException {
-
+	public Company getCompanyByWebId(String webId) throws PortalException {
 		return companyPersistence.findByWebId(webId);
 	}
 
@@ -717,12 +688,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 *
 	 * @param  companyId the primary key of the company
 	 * @param  keys the company's preferences keys to be remove
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void removePreferences(long companyId, String[] keys)
-		throws SystemException {
-
+	public void removePreferences(long companyId, String[] keys) {
 		PortletPreferences preferences = PrefsPropsUtil.getPreferences(
 			companyId);
 
@@ -754,12 +722,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  end the upper bound of the range of assets to return (not
 	 *         inclusive)
 	 * @return the matching assets in the company
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Hits search(
-			long companyId, long userId, String keywords, int start, int end)
-		throws SystemException {
+		long companyId, long userId, String keywords, int start, int end) {
 
 		return search(companyId, userId, null, 0, null, keywords, start, end);
 	}
@@ -781,13 +747,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  end the upper bound of the range of assets to return (not
 	 *         inclusive)
 	 * @return the matching assets in the portlet within the company
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Hits search(
-			long companyId, long userId, String portletId, long groupId,
-			String type, String keywords, int start, int end)
-		throws SystemException {
+		long companyId, long userId, String portletId, long groupId,
+		String type, String keywords, int start, int end) {
 
 		try {
 
@@ -851,13 +815,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company with the primary key
 	 * @throws PortalException if a company with primary key could not be found
 	 *         or if the new information was invalid
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Company updateCompany(
 			long companyId, String virtualHostname, String mx, int maxUsers,
 			boolean active)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Company
 
@@ -918,7 +881,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company with the primary key
 	 * @throws PortalException if a company with the primary key could not be
 	 *         found or if the new information was invalid
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Company updateCompany(
@@ -926,7 +888,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			boolean logo, byte[] logoBytes, String name, String legalName,
 			String legalId, String legalType, String sicCode,
 			String tickerSymbol, String industry, String type, String size)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Company
 
@@ -992,7 +954,6 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return     the company with the primary key
 	 * @throws     PortalException if a company with the primary key could not
 	 *             be found or if the new information was invalid
-	 * @throws     SystemException if a system exception occurred
 	 * @deprecated As of 7.0.0, replaced by {@link #updateCompany(long, String,
 	 *             String, String, boolean, byte[], String, String, String,
 	 *             String, String, String, String, String, String)}
@@ -1004,7 +965,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			String name, String legalName, String legalId, String legalType,
 			String sicCode, String tickerSymbol, String industry, String type,
 			String size)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return updateCompany(
 			companyId, virtualHostname, mx, homeURL, true, null, name,
@@ -1019,12 +980,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @param  languageId the ID of the company's default user's language
 	 * @param  timeZoneId the ID of the company's default user's time zone
 	 * @throws PortalException if the company's default user could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void updateDisplay(
 			long companyId, String languageId, String timeZoneId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		User user = userLocalService.getDefaultUser(companyId);
 
@@ -1042,11 +1002,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company with the primary key
 	 * @throws PortalException if the company's logo ID could not be found or if
 	 *         the logo's image was corrupted
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Company updateLogo(long companyId, byte[] bytes)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Company company = checkLogo(companyId);
 
@@ -1063,11 +1022,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company with the primary key
 	 * @throws PortalException the company's logo ID could not be found or if
 	 *         the logo's image was corrupted
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Company updateLogo(long companyId, File file)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Company company = checkLogo(companyId);
 
@@ -1084,11 +1042,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 * @return the company with the primary key
 	 * @throws PortalException if the company's logo ID could not be found or if
 	 *         the company's logo image was corrupted
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Company updateLogo(long companyId, InputStream is)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Company company = checkLogo(companyId);
 
@@ -1106,11 +1063,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 *         com.liferay.portal.kernel.util.UnicodeProperties}
 	 * @throws PortalException if the properties contained new locales that were
 	 *         not supported
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void updatePreferences(long companyId, UnicodeProperties properties)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
 			companyId);
@@ -1200,14 +1156,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	 *         to be verified via email
 	 * @param  siteLogo whether to allow site administrators to use their own
 	 *         logo instead of the enterprise logo
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void updateSecurity(
-			long companyId, String authType, boolean autoLogin,
-			boolean sendPassword, boolean strangers, boolean strangersWithMx,
-			boolean strangersVerify, boolean siteLogo)
-		throws SystemException {
+		long companyId, String authType, boolean autoLogin,
+		boolean sendPassword, boolean strangers, boolean strangersWithMx,
+		boolean strangersVerify, boolean siteLogo) {
 
 		PortletPreferences preferences = PrefsPropsUtil.getPreferences(
 			companyId);
@@ -1243,9 +1197,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
-	protected Company checkLogo(long companyId)
-		throws PortalException, SystemException {
-
+	protected Company checkLogo(long companyId) throws PortalException {
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 
 		long logoId = company.getLogoId();
@@ -1262,7 +1214,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	}
 
 	protected Company doDeleteCompany(final long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Company
 
@@ -1296,43 +1248,47 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		// Layout prototype
 
 		ActionableDynamicQuery layoutPrototypeActionableDynamicQuery =
-			new LayoutPrototypeActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
-
-				LayoutPrototype layoutPrototype = (LayoutPrototype)object;
-
-				layoutPrototypeLocalService.deleteLayoutPrototype(
-					layoutPrototype);
-			}
-
-		};
+			layoutPrototypeLocalService.getActionableDynamicQuery();
 
 		layoutPrototypeActionableDynamicQuery.setCompanyId(companyId);
+		layoutPrototypeActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					LayoutPrototype layoutPrototype = (LayoutPrototype)object;
+
+					layoutPrototypeLocalService.deleteLayoutPrototype(
+						layoutPrototype);
+				}
+
+			});
 
 		layoutPrototypeActionableDynamicQuery.performActions();
 
 		// Layout set prototype
 
 		ActionableDynamicQuery layoutSetPrototypeActionableDynamicQuery =
-			new LayoutSetPrototypeActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
-
-				LayoutSetPrototype layoutSetPrototype =
-					(LayoutSetPrototype)object;
-
-				layoutSetPrototypeLocalService.deleteLayoutSetPrototype(
-					layoutSetPrototype);
-			}
-
-		};
+			layoutSetPrototypeLocalService.getActionableDynamicQuery();
 
 		layoutSetPrototypeActionableDynamicQuery.setCompanyId(companyId);
+		layoutSetPrototypeActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					LayoutSetPrototype layoutSetPrototype =
+						(LayoutSetPrototype)object;
+
+					layoutSetPrototypeLocalService.deleteLayoutSetPrototype(
+						layoutSetPrototype);
+				}
+
+			});
 
 		layoutSetPrototypeActionableDynamicQuery.performActions();
 
@@ -1349,20 +1305,22 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		// Roles
 
 		ActionableDynamicQuery roleActionableDynamicQuery =
-			new RoleActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
-
-				Role role = (Role)object;
-
-				roleLocalService.deleteRole(role);
-			}
-
-		};
+			roleLocalService.getActionableDynamicQuery();
 
 		roleActionableDynamicQuery.setCompanyId(companyId);
+		roleActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					Role role = (Role)object;
+
+					roleLocalService.deleteRole(role);
+				}
+
+			});
 
 		roleActionableDynamicQuery.performActions();
 
@@ -1404,22 +1362,24 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		// Users
 
 		ActionableDynamicQuery userActionableDynamicQuery =
-			new UserActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
-
-				User user = (User)object;
-
-				if (!user.isDefaultUser()) {
-					userLocalService.deleteUser(user.getUserId());
-				}
-			}
-
-		};
+			userLocalService.getActionableDynamicQuery();
 
 		userActionableDynamicQuery.setCompanyId(companyId);
+		userActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					User user = (User)object;
+
+					if (!user.isDefaultUser()) {
+						userLocalService.deleteUser(user.getUserId());
+					}
+				}
+
+			});
 
 		userActionableDynamicQuery.performActions();
 
@@ -1453,10 +1413,9 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	}
 
 	protected void updateAccount(
-			Company company, String name, String legalName, String legalId,
-			String legalType, String sicCode, String tickerSymbol,
-			String industry, String type, String size)
-		throws SystemException {
+		Company company, String name, String legalName, String legalId,
+		String legalType, String sicCode, String tickerSymbol, String industry,
+		String type, String size) {
 
 		Date now = new Date();
 
@@ -1549,7 +1508,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	}
 
 	protected void validateName(long companyId, String name)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Group group = groupLocalService.fetchGroup(companyId, name);
 
@@ -1559,7 +1518,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 	}
 
 	protected void validateVirtualHost(String webId, String virtualHostname)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (Validator.isNull(virtualHostname)) {
 			throw new CompanyVirtualHostException();
@@ -1591,15 +1550,50 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		}
 	}
 
-	protected class DeleteGroupActionableDynamicQuery
-		extends GroupActionableDynamicQuery {
+	protected class DeleteGroupActionableDynamicQuery {
 
-		public DeleteGroupActionableDynamicQuery() throws SystemException {
+		protected DeleteGroupActionableDynamicQuery() {
+			_actionableDynamicQuery =
+				groupLocalService.getActionableDynamicQuery();
+
+			_actionableDynamicQuery.setAddCriteriaMethod(
+				new ActionableDynamicQuery.AddCriteriaMethod() {
+
+					@Override
+					public void addCriteria(DynamicQuery dynamicQuery) {
+						Property parentGroupIdProperty =
+							PropertyFactoryUtil.forName("parentGroupId");
+
+						dynamicQuery.add(
+							parentGroupIdProperty.eq(_parentGroupId));
+
+						Property siteProperty = PropertyFactoryUtil.forName(
+							"site");
+
+						dynamicQuery.add(siteProperty.eq(Boolean.TRUE));
+					}
+
+				});
+			_actionableDynamicQuery.setPerformActionMethod(
+				new ActionableDynamicQuery.PerformActionMethod() {
+
+					@Override
+					public void performAction(Object object)
+						throws PortalException {
+
+						Group group = (Group)object;
+
+						if (!PortalUtil.isSystemGroup(group.getName()) &&
+							!group.isCompany()) {
+
+							deleteGroup(group);
+						}
+					}
+
+				});
 		}
 
-		public void deleteGroup(Group group)
-			throws PortalException, SystemException {
-
+		protected void deleteGroup(Group group) throws PortalException {
 			DeleteGroupActionableDynamicQuery
 				deleteGroupActionableDynamicQuery =
 					new DeleteGroupActionableDynamicQuery();
@@ -1616,48 +1610,59 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			LiveUsers.deleteGroup(group.getCompanyId(), group.getGroupId());
 		}
 
-		public void setParentGroupId(long parentGroupId) {
+		protected void performActions() throws PortalException {
+			_actionableDynamicQuery.performActions();
+		}
+
+		protected void setCompanyId(long companyId) {
+			_actionableDynamicQuery.setCompanyId(companyId);
+		}
+
+		protected void setParentGroupId(long parentGroupId) {
 			_parentGroupId = parentGroupId;
 		}
 
-		@Override
-		protected void addCriteria(DynamicQuery dynamicQuery) {
-			Property parentGroupIdProperty = PropertyFactoryUtil.forName(
-				"parentGroupId");
-
-			dynamicQuery.add(parentGroupIdProperty.eq(_parentGroupId));
-
-			Property siteProperty = PropertyFactoryUtil.forName("site");
-
-			dynamicQuery.add(siteProperty.eq(Boolean.TRUE));
-		}
-
-		@Override
-		protected void performAction(Object object)
-			throws PortalException, SystemException {
-
-			Group group = (Group)object;
-
-			if (!PortalUtil.isSystemGroup(group.getName()) &&
-				!group.isCompany()) {
-
-				deleteGroup(group);
-			}
-		}
-
+		private ActionableDynamicQuery _actionableDynamicQuery;
 		private long _parentGroupId = GroupConstants.DEFAULT_PARENT_GROUP_ID;
-
 	}
 
-	protected class DeleteOrganizationActionableDynamicQuery
-		extends OrganizationActionableDynamicQuery {
+	protected class DeleteOrganizationActionableDynamicQuery {
 
-		public DeleteOrganizationActionableDynamicQuery()
+		protected DeleteOrganizationActionableDynamicQuery()
 			throws SystemException {
+
+			_actionableDynamicQuery =
+				organizationLocalService.getActionableDynamicQuery();
+
+			_actionableDynamicQuery.setAddCriteriaMethod(
+				new ActionableDynamicQuery.AddCriteriaMethod() {
+
+					@Override
+					public void addCriteria(DynamicQuery dynamicQuery) {
+						Property property = PropertyFactoryUtil.forName(
+							"parentOrganizationId");
+
+						dynamicQuery.add(property.eq(_parentOrganizationId));
+					}
+
+				});
+			_actionableDynamicQuery.setPerformActionMethod(
+				new ActionableDynamicQuery.PerformActionMethod() {
+
+					@Override
+					public void performAction(Object object)
+						throws PortalException {
+
+						Organization organization = (Organization)object;
+
+						deleteOrganization(organization);
+					}
+
+				});
 		}
 
-		public void deleteOrganization(Organization organization)
-			throws PortalException, SystemException {
+		protected void deleteOrganization(Organization organization)
+			throws PortalException {
 
 			DeleteOrganizationActionableDynamicQuery
 				deleteOrganizationActionableDynamicQuery =
@@ -1673,27 +1678,19 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			organizationLocalService.deleteOrganization(organization);
 		}
 
+		protected void performActions() throws PortalException {
+			_actionableDynamicQuery.performActions();
+		}
+
+		protected void setCompanyId(long companyId) {
+			_actionableDynamicQuery.setCompanyId(companyId);
+		}
+
 		public void setParentOrganizationId(long parentOrganizationId) {
 			_parentOrganizationId = parentOrganizationId;
 		}
 
-		@Override
-		protected void addCriteria(DynamicQuery dynamicQuery) {
-			Property property = PropertyFactoryUtil.forName(
-				"parentOrganizationId");
-
-			dynamicQuery.add(property.eq(_parentOrganizationId));
-		}
-
-		@Override
-		protected void performAction(Object object)
-			throws PortalException, SystemException {
-
-			Organization organization = (Organization)object;
-
-			deleteOrganization(organization);
-		}
-
+		private ActionableDynamicQuery _actionableDynamicQuery;
 		private long _parentOrganizationId =
 			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID;
 

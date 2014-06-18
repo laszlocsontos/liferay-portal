@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.wiki.workflow;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -34,7 +33,7 @@ import java.util.Map;
  * @author Jorge Ferrer
  * @author Julio Camarero
  */
-public class WikiPageWorkflowHandler extends BaseWorkflowHandler {
+public class WikiPageWorkflowHandler extends BaseWorkflowHandler<WikiPage> {
 
 	@Override
 	public String getClassName() {
@@ -49,7 +48,7 @@ public class WikiPageWorkflowHandler extends BaseWorkflowHandler {
 	@Override
 	public WikiPage updateStatus(
 			int status, Map<String, Serializable> workflowContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long userId = GetterUtil.getLong(
 			(String)workflowContext.get(WorkflowConstants.CONTEXT_USER_ID));
@@ -63,7 +62,7 @@ public class WikiPageWorkflowHandler extends BaseWorkflowHandler {
 		WikiPage page = WikiPageLocalServiceUtil.getPageByPageId(classPK);
 
 		return WikiPageLocalServiceUtil.updateStatus(
-			userId, page, status, serviceContext);
+			userId, page, status, serviceContext, workflowContext);
 	}
 
 	@Override

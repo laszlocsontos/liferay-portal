@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.servlet;
+
+import static org.mockito.Mockito.verify;
 
 import com.liferay.portal.cache.SingleVMPoolImpl;
 import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
@@ -42,8 +44,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
-
-import static org.mockito.Mockito.verify;
 
 /**
  * @author Carlos Sierra Andrés
@@ -117,7 +117,7 @@ public class ComboServletTest extends PowerMockito {
 		_pluginServletContext.getResource("/js/javascript.js");
 	}
 
-	@Test
+	@Test(expected = ServletException.class)
 	public void testGetResourceFromPluginContextWithInitialSlash()
 		throws Exception {
 

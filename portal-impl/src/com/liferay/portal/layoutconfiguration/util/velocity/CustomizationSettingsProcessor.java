@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,12 +24,15 @@ import com.liferay.taglib.aui.InputTag;
 
 import java.io.Writer;
 
+import java.util.Map;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 
 /**
  * @author Raymond Augé
+ * @author Oliver Teichmann
  */
 public class CustomizationSettingsProcessor implements ColumnProcessor {
 
@@ -124,6 +127,14 @@ public class CustomizationSettingsProcessor implements ColumnProcessor {
 		_writer.append("</div>");
 
 		return StringPool.BLANK;
+	}
+
+	@Override
+	public String processPortlet(
+			String portletId, Map<String, ?> defaultSettingsMap)
+		throws Exception {
+
+		return processPortlet(portletId);
 	}
 
 	private boolean _customizationEnabled;

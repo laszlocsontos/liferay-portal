@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,6 @@
 
 package com.liferay.portal.theme;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -23,8 +21,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portlet.PortletSettings;
-import com.liferay.portlet.PortletSettingsFactoryUtil;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -188,11 +184,6 @@ public class PortletDisplay implements Serializable {
 		return _columnPos;
 	}
 
-	public PortletSettings getCompanyPortletSettings() throws SystemException {
-		return PortletSettingsFactoryUtil.getCompanyPortletSettings(
-			_themeDisplay.getCompanyId(), _id);
-	}
-
 	public StringBundler getContent() {
 		return _content;
 	}
@@ -209,19 +200,6 @@ public class PortletDisplay implements Serializable {
 		return _description;
 	}
 
-	public PortletSettings getGroupPortletSettings()
-		throws PortalException, SystemException {
-
-		String portletId = _id;
-
-		if (Validator.isNotNull(_portletResource)) {
-			portletId = _portletResource;
-		}
-
-		return PortletSettingsFactoryUtil.getGroupPortletSettings(
-			_themeDisplay.getSiteGroupId(), portletId);
-	}
-
 	public String getId() {
 		return _id;
 	}
@@ -232,13 +210,6 @@ public class PortletDisplay implements Serializable {
 
 	public String getNamespace() {
 		return _namespace;
-	}
-
-	public PortletSettings getPortletInstancePortletSettings()
-		throws SystemException {
-
-		return PortletSettingsFactoryUtil.getPortletInstancePortletSettings(
-			_themeDisplay.getLayout(), _id);
 	}
 
 	public String getPortletName() {
@@ -340,7 +311,7 @@ public class PortletDisplay implements Serializable {
 	}
 
 	/**
-	 * @deprecated As of 6.2.0 with no direct replacement
+	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
 	@Deprecated
 	public boolean isAccess() {
@@ -548,7 +519,7 @@ public class PortletDisplay implements Serializable {
 	}
 
 	/**
-	 * @deprecated As of 6.2.0 with no direct replacement
+	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
 	@Deprecated
 	public void setAccess(boolean access) {
@@ -750,8 +721,6 @@ public class PortletDisplay implements Serializable {
 	}
 
 	public void setTitle(String title) {
-		title = HtmlUtil.escape(title);
-
 		_title = title;
 
 		// LEP-5317

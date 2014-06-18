@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.template.BaseTemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
 import com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateUtil;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -26,6 +27,10 @@ import java.util.Map;
  */
 public abstract class BasePortletDisplayTemplateHandler
 	extends BaseTemplateHandler {
+
+	public Map<String, Object> getCustomContextObjects() {
+		return Collections.emptyMap();
+	}
 
 	@Override
 	public Map<String, TemplateVariableGroup> getTemplateVariableGroups(

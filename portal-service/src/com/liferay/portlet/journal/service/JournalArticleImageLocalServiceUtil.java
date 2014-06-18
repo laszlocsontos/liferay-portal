@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,11 +46,9 @@ public class JournalArticleImageLocalServiceUtil {
 	*
 	* @param journalArticleImage the journal article image
 	* @return the journal article image that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.journal.model.JournalArticleImage addJournalArticleImage(
-		com.liferay.portlet.journal.model.JournalArticleImage journalArticleImage)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.journal.model.JournalArticleImage journalArticleImage) {
 		return getService().addJournalArticleImage(journalArticleImage);
 	}
 
@@ -71,12 +69,10 @@ public class JournalArticleImageLocalServiceUtil {
 	* @param articleImageId the primary key of the journal article image
 	* @return the journal article image that was removed
 	* @throws PortalException if a journal article image with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.journal.model.JournalArticleImage deleteJournalArticleImage(
 		long articleImageId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteJournalArticleImage(articleImageId);
 	}
 
@@ -85,11 +81,9 @@ public class JournalArticleImageLocalServiceUtil {
 	*
 	* @param journalArticleImage the journal article image
 	* @return the journal article image that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.journal.model.JournalArticleImage deleteJournalArticleImage(
-		com.liferay.portlet.journal.model.JournalArticleImage journalArticleImage)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.journal.model.JournalArticleImage journalArticleImage) {
 		return getService().deleteJournalArticleImage(journalArticleImage);
 	}
 
@@ -102,12 +96,10 @@ public class JournalArticleImageLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -122,12 +114,11 @@ public class JournalArticleImageLocalServiceUtil {
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,14 +134,12 @@ public class JournalArticleImageLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -160,11 +149,9 @@ public class JournalArticleImageLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -174,18 +161,15 @@ public class JournalArticleImageLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
 	public static com.liferay.portlet.journal.model.JournalArticleImage fetchJournalArticleImage(
-		long articleImageId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long articleImageId) {
 		return getService().fetchJournalArticleImage(articleImageId);
 	}
 
@@ -195,19 +179,29 @@ public class JournalArticleImageLocalServiceUtil {
 	* @param articleImageId the primary key of the journal article image
 	* @return the journal article image
 	* @throws PortalException if a journal article image with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.journal.model.JournalArticleImage getJournalArticleImage(
 		long articleImageId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getJournalArticleImage(articleImageId);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
@@ -221,11 +215,9 @@ public class JournalArticleImageLocalServiceUtil {
 	* @param start the lower bound of the range of journal article images
 	* @param end the upper bound of the range of journal article images (not inclusive)
 	* @return the range of journal article images
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portlet.journal.model.JournalArticleImage> getJournalArticleImages(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return getService().getJournalArticleImages(start, end);
 	}
 
@@ -233,10 +225,8 @@ public class JournalArticleImageLocalServiceUtil {
 	* Returns the number of journal article images.
 	*
 	* @return the number of journal article images
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getJournalArticleImagesCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getJournalArticleImagesCount() {
 		return getService().getJournalArticleImagesCount();
 	}
 
@@ -245,11 +235,9 @@ public class JournalArticleImageLocalServiceUtil {
 	*
 	* @param journalArticleImage the journal article image
 	* @return the journal article image that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.journal.model.JournalArticleImage updateJournalArticleImage(
-		com.liferay.portlet.journal.model.JournalArticleImage journalArticleImage)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.journal.model.JournalArticleImage journalArticleImage) {
 		return getService().updateJournalArticleImage(journalArticleImage);
 	}
 
@@ -275,52 +263,45 @@ public class JournalArticleImageLocalServiceUtil {
 		java.lang.String articleId, double version,
 		java.lang.String elInstanceId, java.lang.String elName,
 		java.lang.String languageId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
 			.addArticleImageId(articleImageId, groupId, articleId, version,
 			elInstanceId, elName, languageId);
 	}
 
 	public static void deleteArticleImage(
-		com.liferay.portlet.journal.model.JournalArticleImage articleImage)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.journal.model.JournalArticleImage articleImage) {
 		getService().deleteArticleImage(articleImage);
 	}
 
-	public static void deleteArticleImage(long articleImageId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void deleteArticleImage(long articleImageId) {
 		getService().deleteArticleImage(articleImageId);
 	}
 
 	public static void deleteArticleImage(long groupId,
 		java.lang.String articleId, double version,
 		java.lang.String elInstanceId, java.lang.String elName,
-		java.lang.String languageId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String languageId) {
 		getService()
 			.deleteArticleImage(groupId, articleId, version, elInstanceId,
 			elName, languageId);
 	}
 
 	public static void deleteImages(long groupId, java.lang.String articleId,
-		double version)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		double version) {
 		getService().deleteImages(groupId, articleId, version);
 	}
 
 	public static com.liferay.portlet.journal.model.JournalArticleImage getArticleImage(
 		long articleImageId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getArticleImage(articleImageId);
 	}
 
 	public static long getArticleImageId(long groupId,
 		java.lang.String articleId, double version,
 		java.lang.String elInstanceId, java.lang.String elName,
-		java.lang.String languageId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String languageId) {
 		return getService()
 				   .getArticleImageId(groupId, articleId, version,
 			elInstanceId, elName, languageId);
@@ -329,27 +310,23 @@ public class JournalArticleImageLocalServiceUtil {
 	public static long getArticleImageId(long groupId,
 		java.lang.String articleId, double version,
 		java.lang.String elInstanceId, java.lang.String elName,
-		java.lang.String languageId, boolean tempImage)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String languageId, boolean tempImage) {
 		return getService()
 				   .getArticleImageId(groupId, articleId, version,
 			elInstanceId, elName, languageId, tempImage);
 	}
 
 	public static java.util.List<com.liferay.portlet.journal.model.JournalArticleImage> getArticleImages(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId) {
 		return getService().getArticleImages(groupId);
 	}
 
 	public static java.util.List<com.liferay.portlet.journal.model.JournalArticleImage> getArticleImages(
-		long groupId, java.lang.String articleId, double version)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, java.lang.String articleId, double version) {
 		return getService().getArticleImages(groupId, articleId, version);
 	}
 
-	public static int getArticleImagesCount(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getArticleImagesCount(long groupId) {
 		return getService().getArticleImagesCount(groupId);
 	}
 

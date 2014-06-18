@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,16 +68,9 @@ List groupNames = (List)objArray[8];
 	%>
 
 	<c:if test="<%= supportsFilterByGroup %>">
-		<portlet:renderURL var="selectCommunityURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-			<portlet:param name="struts_action" value="/roles_admin/select_site" />
-			<portlet:param name="includeCompany" value="<%= Boolean.TRUE.toString() %>" />
-			<portlet:param name="includeUserPersonalSite" value="<%= Boolean.TRUE.toString() %>" />
-			<portlet:param name="target" value="<%= target %>" />
-		</portlet:renderURL>
-
 		<liferay-ui:icon
+			iconCssClass="icon-cog"
 			id="<%= HtmlUtil.escapeAttribute(targetId) %>"
-			image="configuration"
 			label="<%= true %>"
 			message="change"
 			url="javascript:;"
@@ -96,6 +89,14 @@ List groupNames = (List)objArray[8];
 							},
 							id: '<portlet:namespace />selectGroup<%= HtmlUtil.escapeJS(targetId) %>',
 							title: '<liferay-ui:message arguments="site" key="select-x" />',
+
+							<portlet:renderURL var="selectCommunityURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+								<portlet:param name="struts_action" value="/roles_admin/select_site" />
+								<portlet:param name="includeCompany" value="<%= Boolean.TRUE.toString() %>" />
+								<portlet:param name="includeUserPersonalSite" value="<%= Boolean.TRUE.toString() %>" />
+								<portlet:param name="target" value="<%= target %>" />
+							</portlet:renderURL>
+
 							uri: '<%= selectCommunityURL.toString() %>'
 						}
 					);

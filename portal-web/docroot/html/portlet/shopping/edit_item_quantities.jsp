@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -102,7 +102,7 @@ for (String[] vArray : values) {
 				%>
 
 				<td>
-					<aui:input label="" name='<%= "fieldsQuantity" + i %>' size="4" type="text" value="<%= fieldsQuantity %>" />
+					<aui:input label="" name='<%= "fieldsQuantity" + i %>' size="4" title="quantity" type="text" value="<%= fieldsQuantity %>" />
 				</td>
 			</tr>
 
@@ -122,13 +122,13 @@ for (String[] vArray : values) {
 
 <aui:script>
 	function <portlet:namespace />updateItemQuantities() {
-		var itemQuantities = "";
+		var itemQuantities = '';
 
 		<%
 		for (int i = 0; i < rowsCount; i++) {
 		%>
 
-			itemQuantities = itemQuantities + document.<portlet:namespace />fm.<portlet:namespace />fieldsQuantity<%= i %>.value + ",";
+			itemQuantities = itemQuantities + document.<portlet:namespace />fm.<portlet:namespace />fieldsQuantity<%= i %>.value + ',';
 
 		<%
 		}

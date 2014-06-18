@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -509,7 +509,6 @@ public class ModifiableEhcacheWrapper implements Ehcache {
 
 	@Override
 	public void registerCacheExtension(CacheExtension cacheExtension) {
-
 		_ehcache.registerCacheExtension(cacheExtension);
 	}
 
@@ -520,7 +519,6 @@ public class ModifiableEhcacheWrapper implements Ehcache {
 
 	@Override
 	public void registerCacheWriter(CacheWriter cacheWriter) {
-
 		_ehcache.registerCacheWriter(cacheWriter);
 	}
 

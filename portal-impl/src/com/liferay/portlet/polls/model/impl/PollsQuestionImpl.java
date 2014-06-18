@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.polls.model.impl;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.polls.model.PollsChoice;
 import com.liferay.portlet.polls.model.PollsVote;
@@ -34,24 +33,24 @@ public class PollsQuestionImpl extends PollsQuestionBaseImpl {
 	}
 
 	@Override
-	public List<PollsChoice> getChoices() throws SystemException {
+	public List<PollsChoice> getChoices() {
 		return PollsChoiceLocalServiceUtil.getChoices(getQuestionId());
 	}
 
 	@Override
-	public List<PollsVote> getVotes() throws SystemException {
+	public List<PollsVote> getVotes() {
 		return PollsVoteLocalServiceUtil.getQuestionVotes(
 			getQuestionId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 	}
 
 	@Override
-	public List<PollsVote> getVotes(int start, int end) throws SystemException {
+	public List<PollsVote> getVotes(int start, int end) {
 		return PollsVoteLocalServiceUtil.getQuestionVotes(
 			getQuestionId(), start, end);
 	}
 
 	@Override
-	public int getVotesCount() throws SystemException {
+	public int getVotesCount() {
 		return PollsVoteLocalServiceUtil.getQuestionVotesCount(getQuestionId());
 	}
 

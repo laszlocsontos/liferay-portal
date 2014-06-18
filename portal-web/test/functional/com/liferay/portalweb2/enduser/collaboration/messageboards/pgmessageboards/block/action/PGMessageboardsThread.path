@@ -19,8 +19,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EXTEND_ACTION_PATH</td>
+	<td>BasePortlet</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
 	<td>TITLE_HEADER</td>
 	<td>//h3[@class='header-title']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUCCESS_MESSAGE</td>
+	<td>//div[contains(@class,'alert') and contains(@class,'alert-success')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -56,6 +71,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>THREAD_ACTIONS_LOCK_THREAD</td>
+	<td>//div[@class='thread-actions']/ul/li/a/span[contains(.,'Lock Thread')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>THREAD_ACTIONS_UNLOCK_THREAD</td>
+	<td>//div[@class='thread-actions']/ul/li/a/span[contains(.,'Unlock Thread')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -74,6 +99,11 @@
 <tr>
 	<td>THREAD_TABLE_SUBJECT_3</td>
 	<td>xpath=(//div[@id='toggle_id_message_boards_view_message_thread']/table/tbody/tr/td[1]/a)[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>THREAD_TABLE_SUBJECT_4</td>
+	<td>xpath=(//div[@id='toggle_id_message_boards_view_message_thread']/table/tbody/tr/td[1]/a)[4]</td>
 	<td></td>
 </tr>
 <tr>
@@ -98,6 +128,11 @@
 </tr>
 <!--MESSAGE-->
 <tr>
+	<td>MESSAGE_BAN_THIS_USER</td>
+	<td>//div[contains(.,'${key_userName}')]/div/span/a/span[contains(.,'Ban This User')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MESSAGE_SUBJECT_1</td>
 	<td>xpath=(//div[@class='subject']/a)[1]</td>
 	<td></td>
@@ -113,6 +148,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGE_SUBJECT_4</td>
+	<td>xpath=(//div[@class='subject']/a)[4]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MESSAGE_WORKFLOW_STATUS_1</td>
 	<td>xpath=(//span[@class='taglib-workflow-status']/span/strong)[1]</td>
 	<td></td>
@@ -123,13 +163,38 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGE_BODY_1_BLOCK_QUOTE</td>
+	<td>xpath=(//div[@class='thread-body'])[1]//div[@class='quote-content']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MESSAGE_BODY_2</td>
 	<td>xpath=(//div[@class='thread-body'])[2]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGE_BODY_2_BLOCK_QUOTE</td>
+	<td>xpath=(//div[@class='thread-body'])[2]//div[@class='quote-content']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MESSAGE_BODY_3</td>
 	<td>xpath=(//div[@class='thread-body'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_BODY_3_BLOCK_QUOTE</td>
+	<td>xpath=(//div[@class='thread-body'])[3]//div[@class='quote-content']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_BODY_4</td>
+	<td>xpath=(//div[@class='thread-body'])[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_BODY_4_BLOCK_QUOTE</td>
+	<td>xpath=(//div[@class='thread-body'])[4]//div[@class='quote-content']</td>
 	<td></td>
 </tr>
 <tr>
@@ -148,6 +213,46 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGE_USERNAME_4</td>
+	<td>xpath=(//span[@class='user-name'])[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_MARK_AS_AN_ANSWER_1</td>
+	<td>xpath=(//span[.='Mark as an Answer'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_MARK_AS_AN_ANSWER_2</td>
+	<td>xpath=(//span[.='Mark as an Answer'])[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_ANSWER_1</td>
+	<td>xpath=(//span[.='Answer'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_ANSWER_2</td>
+	<td>xpath=(//span[.='Answer'])[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_TAG_1</td>
+	<td>xpath=(//div[@class='tags'])[1]//span[contains(.,'${key_tagName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_TAG_2</td>
+	<td>xpath=(//div[@class='tags'])[2]//span[contains(.,'${key_tagName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_TAG_3</td>
+	<td>xpath=(//div[@class='tags'])[3]//span[contains(.,'${key_tagName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MESSAGE_REPLY_1</td>
 	<td>xpath=(//span[.='Reply'])[1]</td>
 	<td></td>
@@ -160,6 +265,36 @@
 <tr>
 	<td>MESSAGE_REPLY_3</td>
 	<td>xpath=(//span[.='Reply'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_QUICK_REPLY_1</td>
+	<td>xpath=(//span[.='Quick Reply'])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_QUICK_REPLY_2</td>
+	<td>xpath=(//span[.='Quick Reply'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_QUICK_REPLY_3</td>
+	<td>xpath=(//span[.='Quick Reply'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_REPLY_WITH_QUOTE_1</td>
+	<td>xpath=(//span[.='Reply with Quote'])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_REPLY_WITH_QUOTE_2</td>
+	<td>xpath=(//span[.='Reply with Quote'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_REPLY_WITH_QUOTE_3</td>
+	<td>xpath=(//span[.='Reply with Quote'])[3]</td>
 	<td></td>
 </tr>
 <tr>
@@ -178,6 +313,41 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGE_RATING_4</td>
+	<td>xpath=(//div[contains(@id,'ratingThumbContent')]/div)[7]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_RATING_1_UPVOTE</td>
+	<td>xpath=(//div[contains(@id,'ratingThumbContent')]/a[contains(@class,'rating-thumb-up')])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_RATING_1_DOWNVOTE</td>
+	<td>xpath=(//div[contains(@id,'ratingThumbContent')]/a[contains(@class,'rating-thumb-down')])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_RATING_2_UPVOTE</td>
+	<td>xpath=(//div[contains(@id,'ratingThumbContent')]/a[contains(@class,'rating-thumb-up')])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_RATING_2_DOWNVOTE</td>
+	<td>xpath=(//div[contains(@id,'ratingThumbContent')]/a[contains(@class,'rating-thumb-down')])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_RATING_3_UPVOTE</td>
+	<td>xpath=(//div[contains(@id,'ratingThumbContent')]/a[contains(@class,'rating-thumb-up')])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_RATING_3_DOWNVOTE</td>
+	<td>xpath=(//div[contains(@id,'ratingThumbContent')]/a[contains(@class,'rating-thumb-down')])[3]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MESSAGE_EDIT_1</td>
 	<td>xpath=(//td/ul/li[2]/span/a/span)[1]</td>
 	<td></td>
@@ -193,8 +363,49 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGE_REPLY_PERMISSIONS_1</td>
+	<td>xpath=(//table[contains(@class,'thread-message-view')]//td//a/span[contains(.,'Permissions')])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_REPLY_PERMISSIONS_2</td>
+	<td>xpath=(//table[contains(@class,'thread-message-view')]//td//a/span[contains(.,'Permissions')])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_REPLY_PERMISSIONS_3</td>
+	<td>xpath=(//table[contains(@class,'thread-message-view')]//td//a/span[contains(.,'Permissions')])[3]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MESSAGE_SPLIT_THREAD</td>
 	<td>//table[contains(.,'${key_threadBody}')]/tbody/tr/td[@class='thread-bottom']/ul//a[contains(.,'Split Thread')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MESSAGE_ATTACHMENT_IMAGE</td>
+	<td>//div[@class='message-attachments']/div/img[contains(@src,'${key_mbThreadAttachment}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--QUICK_REPLY-->
+<tr>
+	<td>QUICK_REPLY_BODY_FIELD</td>
+	<td>//iframe[contains(@title,'Rich Text Editor')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>QUICK_REPLY_PUBLISH_BUTTON</td>
+	<td>//button[@id='_19_publishButton' and contains(.,'Publish')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>QUICK_REPLY_CANCEL_BUTTON</td>
+	<td>//button[@type='button' and contains(.,'Cancel')]</td>
 	<td></td>
 </tr>
 </tbody>

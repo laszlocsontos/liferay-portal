@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.poller.PollerProcessor;
 import com.liferay.portal.kernel.poller.PollerRequest;
 import com.liferay.portal.kernel.poller.PollerResponse;
 import com.liferay.portal.poller.PollerProcessorUtil;
-import com.liferay.portal.poller.PollerRequestResponsePair;
 
 /**
  * @author Michael C. Han
@@ -33,14 +32,7 @@ public class PollerRequestMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		PollerRequestResponsePair pollerRequestResponsePair =
-			(PollerRequestResponsePair)message.getPayload();
-
-		PollerRequest pollerRequest =
-			pollerRequestResponsePair.getPollerRequest();
-
-		PollerResponse pollerResponse =
-			pollerRequestResponsePair.getPollerResponse();
+		PollerRequest pollerRequest = (PollerRequest)message.getPayload();
 
 		String portletId = pollerRequest.getPortletId();
 
@@ -48,19 +40,27 @@ public class PollerRequestMessageListener extends BaseMessageListener {
 			PollerProcessorUtil.getPollerProcessor(portletId);
 
 		if (pollerRequest.isReceiveRequest()) {
-			pollerResponse.createResponseMessage(message);
+			PollerResponse pollerResponse = null;
 
 			try {
-				pollerProcessor.receive(pollerRequest, pollerResponse);
+				pollerResponse = pollerProcessor.receive(pollerRequest);
 			}
 			catch (PollerException pe) {
 				_log.error(
 					"Unable to receive poller request " + pollerRequest, pe);
 
+				pollerResponse = pollerRequest.createPollerResponse();
+
 				pollerResponse.setParameter("pollerException", pe.getMessage());
 			}
 			finally {
-				pollerResponse.close();
+				if (pollerResponse == null) {
+					pollerResponse = pollerRequest.createPollerResponse();
+				}
+
+				pollerResponse.close(
+					message, pollerRequest.getPollerHeader(),
+					pollerRequest.getPortletId(), pollerRequest.getChunkId());
 			}
 		}
 		else {

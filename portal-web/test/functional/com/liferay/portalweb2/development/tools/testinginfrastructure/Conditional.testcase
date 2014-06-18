@@ -1,4 +1,6 @@
 <definition component-name="portal-tools">
+	<property name="testray.main.component.name" value="Tools" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -207,6 +209,18 @@
 			</then>
 			<else>
 				<execute macro="TestUtils#pass" />
+			</else>
+		</if>
+
+		<var name="validWithLineSeparator" value="${validVar1}${line.separator}" />
+
+		<if>
+			<isset var="validWithLineSeparator" />
+			<then>
+				<execute macro="TestUtils#pass" />
+			</then>
+			<else>
+				<execute macro="TestUtils#fail" />
 			</else>
 		</if>
 	</command>

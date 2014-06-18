@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,7 +66,7 @@ public class EditPagesAction extends PortletAction {
 			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
 			false, 0, 1);
 
-		if (layouts.size() > 0) {
+		if (!layouts.isEmpty()) {
 			layout = layouts.get(0);
 		}
 		else {

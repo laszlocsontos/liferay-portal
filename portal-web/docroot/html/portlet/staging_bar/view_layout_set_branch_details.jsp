@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,7 @@ String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriend
 %>
 
 <c:if test="<%= (layoutSetBranches != null) && (layoutSetBranches.size() >= 1) %>">
-	<div class="site-pages-variation-options span5">
+	<div class="col-md-5 site-pages-variation-options">
 		<div class="variations-options">
 			<liferay-util:buffer var="taglibMessage">
 				<liferay-ui:message key="<%= HtmlUtil.escape(layoutSetBranch.getName()) %>" />
@@ -73,8 +73,8 @@ String stagingFriendlyURL = (String)request.getAttribute("view.jsp-stagingFriend
 
 			<div class="manage-layout-set-branches page-variations">
 				<liferay-ui:icon
+					iconCssClass="icon-cog"
 					id="manageLayoutSetBranches"
-					image="../aui/cog"
 					message="manage-site-pages-variations"
 					url="<%= layoutSetBranchesURL %>"
 				/>

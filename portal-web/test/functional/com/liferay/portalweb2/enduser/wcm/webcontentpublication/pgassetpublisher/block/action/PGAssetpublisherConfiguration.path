@@ -30,22 +30,22 @@
 </tr>
 <tr>
 	<td>SETUP_LINK</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'nav-tabs')]/li[contains(.,'Setup')]/a</td>
+	<td>//ul[contains(@class,'nav') and contains(@class,'nav-pills')]/li[contains(.,'Setup')]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PERMISSIONS_LINK</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'nav-tabs')]/li[contains(.,'Permissions')]/a</td>
+	<td>//ul[contains(@class,'nav') and contains(@class,'nav-pills')]/li[contains(.,'Permissions')]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>COMMUNICATION_LINK</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'nav-tabs')]/li[contains(.,'Communication')]/a</td>
+	<td>//ul[contains(@class,'nav') and contains(@class,'nav-pills')]/li[contains(.,'Communication')]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SHARING_LINK</td>
-	<td>//ul[contains(@class,'nav') and contains(@class,'nav-tabs')]/li[contains(.,'Sharing')]/a</td>
+	<td>//ul[contains(@class,'nav') and contains(@class,'nav-pills')]/li[contains(.,'Sharing')]/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -100,6 +100,16 @@
 	<td></td>
 </tr>
 <!--SOURCE_SCOPE-->
+<tr>
+	<td>SOURCE_DROPDOWN</td>
+	<td>//div[contains(@class,'header') and contains(@class,'expanded') and contains(.,'Source')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SOURCE_DROPDOWN_COLLAPSED</td>
+	<td>//div[contains(@class,'header') and contains(@class,'collapsed') and contains(.,'Source')]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>SOURCE_CURRENT_SCOPE_NAME</td>
 	<td>//div[@id='_86_groupsSearchContainer']//tr[contains(.,'Current Site (${key_siteName})')]/td[1]/span/span</td>
@@ -210,6 +220,36 @@
 </tr>
 <!--FILTER-->
 <tr>
+	<td>FILTER_DROPDOWN</td>
+	<td>//div[contains(@class,'header') and contains(@class,'expanded') and contains(.,'Filter')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_DROPDOWN_COLLAPSED</td>
+	<td>//div[contains(@class,'header') and contains(@class,'collapsed') and contains(.,'Filter')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_CATEGORIZATION_SELECT</td>
+	<td>//select[contains(@class,'select asset')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_CATEGORIES_SELECT_BUTTON</td>
+	<td>//button[@title='Select Categories']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_CATEGORIES_CATEGORY_CHECKBOX</td>
+	<td>//div[contains(.,'${key_categoryName}')]/i[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_CATEGORIES_CATEGORY_CLOSE_BUTTON</td>
+	<td>//div[contains(@class,'selector-popup')]//button[contains(@class,'close-content')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FILTER_TAGS_FIELD</td>
 	<td>//input[@title='Add Tags']</td>
 	<td></td>
@@ -241,11 +281,31 @@
 </tr>
 <!--CUSTOM_USER_ATTRIBUTES-->
 <tr>
+	<td>CUSTOM_USER_DROPDOWN</td>
+	<td>//div[contains(@class,'header') and contains(@class,'expanded') and contains(.,'Custom User Attributes')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_USER_DROPDOWN_COLLAPSED</td>
+	<td>//div[contains(@class,'header') and contains(@class,'collapsed') and contains(.,'Custom User Attributes')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
 <!--ORDERING_AND_GROUPING-->
+<tr>
+	<td>ORDERING_AND_GROUPING_DROPDOWN</td>
+	<td>//div[contains(@class,'header') and contains(@class,'expanded') and contains(.,'Ordering and Grouping')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ORDERING_AND_GROUPING_DROPDOWN_COLLAPSED</td>
+	<td>//div[contains(@class,'header') and contains(@class,'collapsed') and contains(.,'Ordering and Grouping')]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>ORDERING_AND_GROUPING_SECTION_COLLAPSED</td>
 	<td>//div[contains(@class,'toggler-header-collapsed')]/div/span[contains(.,'Ordering and Grouping')]</td>
@@ -264,6 +324,32 @@
 <tr>
 	<td>ORDERING_AND_GROUPING_ORDER_DIRECTION</td>
 	<td>//select[@id='_86_orderByType1']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--ASSET_SELECTION_MANUAL_ASSET_ENTRIES-->
+<tr>
+	<td>ASSET_SELECTION_MANUAL_ASSET_ENTRIES_SELECT_BUTTON</td>
+	<td>//legend[contains(.,'Asset Entries')]/following-sibling::*//a[@title='Select']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSET_SELECTION_MANUAL_ASSET_ENTRIES_ASSET</td>
+	<td>//a[@data-title='Select ${key_assetType}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSET_SELECTION_MANUAL_ASSET_ENTRIES_SELECT_CONTENT_CHOOSE_BUTTON</td>
+	<td>//tr[contains(.,'${key_assetTitle}')]//button[contains(.,'Choose')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSET_SELECTION_MANUAL_ASSET_ENTRIES_SELECT_CONTENT_CHOOSE_BUTTON</td>
+	<td>//tr//td[6]/button[contains(.,'Choose')]</td>
 	<td></td>
 </tr>
 </tbody>

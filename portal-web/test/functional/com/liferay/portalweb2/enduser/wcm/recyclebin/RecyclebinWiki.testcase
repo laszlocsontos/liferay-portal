@@ -1,4 +1,6 @@
 <definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="WCM" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -58,7 +60,7 @@
 		</execute>
 	</command>
 
-	<command name="RestoreDeleteWikiFrontpage" priority="5">
+	<command known-issues="LIFERAYQA-7755" name="RestoreDeleteWikiFrontpage" priority="5">
 		<var name="assetName" value="${wikiPageTitle}" />
 		<var name="assetRestoreLocation" value="Main" />
 		<var name="assetType" value="Wiki Page" />

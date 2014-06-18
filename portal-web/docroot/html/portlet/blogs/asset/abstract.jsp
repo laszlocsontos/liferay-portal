@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,7 @@ BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
 
 <c:if test="<%= entry.isSmallImage() %>">
 	<div class="asset-small-image">
-		<img alt="" class="asset-small-image" src="<%= HtmlUtil.escape(entry.getEntryImageURL(themeDisplay)) %>" width="150" />
+		<img alt="" class="asset-small-image img-thumbnail" src="<%= HtmlUtil.escape(entry.getEntryImageURL(themeDisplay)) %>" width="150" />
 	</div>
 </c:if>
 
@@ -32,6 +32,11 @@ BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
 String summary = HtmlUtil.escape(entry.getDescription());
 
 summary = HtmlUtil.replaceNewLine(summary);
+
+if (Validator.isNull(summary)) {
+	summary = HtmlUtil.escape(entry.getDeckTitle());
+	summary = HtmlUtil.replaceNewLine(summary);
+}
 
 if (Validator.isNull(summary)) {
 	summary = HtmlUtil.stripHtml(entry.getContent());

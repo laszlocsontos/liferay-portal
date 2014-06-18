@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.polls.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -45,9 +44,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
  */
 public class PollsUtil {
 
-	public static CategoryDataset getVotesDataset(long questionId)
-		throws SystemException {
-
+	public static CategoryDataset getVotesDataset(long questionId) {
 		DefaultCategoryDataset defaultCategoryDataset =
 			new DefaultCategoryDataset();
 
@@ -66,7 +63,7 @@ public class PollsUtil {
 	}
 
 	public static boolean hasVoted(HttpServletRequest request, long questionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);

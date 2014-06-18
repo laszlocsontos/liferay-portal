@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -75,12 +77,10 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 *
 	 * @param expandoColumn the expando column
 	 * @return the expando column that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public ExpandoColumn addExpandoColumn(ExpandoColumn expandoColumn)
-		throws SystemException {
+	public ExpandoColumn addExpandoColumn(ExpandoColumn expandoColumn) {
 		expandoColumn.setNew(true);
 
 		return expandoColumnPersistence.update(expandoColumn);
@@ -103,12 +103,11 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 * @param columnId the primary key of the expando column
 	 * @return the expando column that was removed
 	 * @throws PortalException if a expando column with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public ExpandoColumn deleteExpandoColumn(long columnId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return expandoColumnPersistence.remove(columnId);
 	}
 
@@ -117,12 +116,10 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 *
 	 * @param expandoColumn the expando column
 	 * @return the expando column that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public ExpandoColumn deleteExpandoColumn(ExpandoColumn expandoColumn)
-		throws SystemException {
+	public ExpandoColumn deleteExpandoColumn(ExpandoColumn expandoColumn) {
 		return expandoColumnPersistence.remove(expandoColumn);
 	}
 
@@ -139,12 +136,10 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return expandoColumnPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -159,12 +154,10 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return expandoColumnPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -181,12 +174,11 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return expandoColumnPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -196,11 +188,9 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return expandoColumnPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -210,18 +200,16 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return expandoColumnPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public ExpandoColumn fetchExpandoColumn(long columnId)
-		throws SystemException {
+	public ExpandoColumn fetchExpandoColumn(long columnId) {
 		return expandoColumnPersistence.fetchByPrimaryKey(columnId);
 	}
 
@@ -231,17 +219,47 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 * @param columnId the primary key of the expando column
 	 * @return the expando column
 	 * @throws PortalException if a expando column with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ExpandoColumn getExpandoColumn(long columnId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return expandoColumnPersistence.findByPrimaryKey(columnId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(ExpandoColumn.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("columnId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(ExpandoColumn.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("columnId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteExpandoColumn((ExpandoColumn)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return expandoColumnPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -255,11 +273,9 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 * @param start the lower bound of the range of expando columns
 	 * @param end the upper bound of the range of expando columns (not inclusive)
 	 * @return the range of expando columns
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<ExpandoColumn> getExpandoColumns(int start, int end)
-		throws SystemException {
+	public List<ExpandoColumn> getExpandoColumns(int start, int end) {
 		return expandoColumnPersistence.findAll(start, end);
 	}
 
@@ -267,10 +283,9 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 * Returns the number of expando columns.
 	 *
 	 * @return the number of expando columns
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getExpandoColumnsCount() throws SystemException {
+	public int getExpandoColumnsCount() {
 		return expandoColumnPersistence.countAll();
 	}
 
@@ -279,12 +294,10 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 *
 	 * @param expandoColumn the expando column
 	 * @return the expando column that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public ExpandoColumn updateExpandoColumn(ExpandoColumn expandoColumn)
-		throws SystemException {
+	public ExpandoColumn updateExpandoColumn(ExpandoColumn expandoColumn) {
 		return expandoColumnPersistence.update(expandoColumn);
 	}
 
@@ -690,7 +703,7 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = expandoColumnPersistence.getDataSource();
 

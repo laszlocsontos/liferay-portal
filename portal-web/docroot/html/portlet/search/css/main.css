@@ -161,9 +161,9 @@
 				}
 
 				.asset-entry-type {
+					color: #777;
 					float: right;
 					font-size: 0.8em;
-					color: #777;
 				}
 
 				.toggle-details {
@@ -211,8 +211,8 @@
 		}
 
 		.changed-keyword {
-			font-weight: bold;
 			font-style: italic;
+			font-weight: bold;
 		}
 	}
 
@@ -220,11 +220,6 @@
 		font-size: 1.3em;
 		font-weight: bold;
 		margin: 10px 0;
-	}
-
-	.taglib-asset-categories-summary .asset-vocabulary {
-		background: url(@theme_image_path@/common/folder.png) no-repeat 0 50%;
-		padding: 2px 5px 2px 20px;
 	}
 }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -75,12 +77,10 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 *
 	 * @param shoppingCoupon the shopping coupon
 	 * @return the shopping coupon that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public ShoppingCoupon addShoppingCoupon(ShoppingCoupon shoppingCoupon)
-		throws SystemException {
+	public ShoppingCoupon addShoppingCoupon(ShoppingCoupon shoppingCoupon) {
 		shoppingCoupon.setNew(true);
 
 		return shoppingCouponPersistence.update(shoppingCoupon);
@@ -103,12 +103,11 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 * @param couponId the primary key of the shopping coupon
 	 * @return the shopping coupon that was removed
 	 * @throws PortalException if a shopping coupon with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public ShoppingCoupon deleteShoppingCoupon(long couponId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingCouponPersistence.remove(couponId);
 	}
 
@@ -117,12 +116,10 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 *
 	 * @param shoppingCoupon the shopping coupon
 	 * @return the shopping coupon that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public ShoppingCoupon deleteShoppingCoupon(ShoppingCoupon shoppingCoupon)
-		throws SystemException {
+	public ShoppingCoupon deleteShoppingCoupon(ShoppingCoupon shoppingCoupon) {
 		return shoppingCouponPersistence.remove(shoppingCoupon);
 	}
 
@@ -139,12 +136,10 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return shoppingCouponPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -159,12 +154,10 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return shoppingCouponPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -181,12 +174,11 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return shoppingCouponPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -196,11 +188,9 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return shoppingCouponPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -210,18 +200,16 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return shoppingCouponPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public ShoppingCoupon fetchShoppingCoupon(long couponId)
-		throws SystemException {
+	public ShoppingCoupon fetchShoppingCoupon(long couponId) {
 		return shoppingCouponPersistence.fetchByPrimaryKey(couponId);
 	}
 
@@ -231,17 +219,47 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 * @param couponId the primary key of the shopping coupon
 	 * @return the shopping coupon
 	 * @throws PortalException if a shopping coupon with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ShoppingCoupon getShoppingCoupon(long couponId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingCouponPersistence.findByPrimaryKey(couponId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.shopping.service.ShoppingCouponLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(ShoppingCoupon.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("couponId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.shopping.service.ShoppingCouponLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(ShoppingCoupon.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("couponId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteShoppingCoupon((ShoppingCoupon)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingCouponPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -255,11 +273,9 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 * @param start the lower bound of the range of shopping coupons
 	 * @param end the upper bound of the range of shopping coupons (not inclusive)
 	 * @return the range of shopping coupons
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<ShoppingCoupon> getShoppingCoupons(int start, int end)
-		throws SystemException {
+	public List<ShoppingCoupon> getShoppingCoupons(int start, int end) {
 		return shoppingCouponPersistence.findAll(start, end);
 	}
 
@@ -267,10 +283,9 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 * Returns the number of shopping coupons.
 	 *
 	 * @return the number of shopping coupons
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getShoppingCouponsCount() throws SystemException {
+	public int getShoppingCouponsCount() {
 		return shoppingCouponPersistence.countAll();
 	}
 
@@ -279,12 +294,10 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 *
 	 * @param shoppingCoupon the shopping coupon
 	 * @return the shopping coupon that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public ShoppingCoupon updateShoppingCoupon(ShoppingCoupon shoppingCoupon)
-		throws SystemException {
+	public ShoppingCoupon updateShoppingCoupon(ShoppingCoupon shoppingCoupon) {
 		return shoppingCouponPersistence.update(shoppingCoupon);
 	}
 
@@ -632,7 +645,7 @@ public abstract class ShoppingCouponLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = shoppingCouponPersistence.getDataSource();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -82,12 +84,10 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 *
 	 * @param scProductEntry the s c product entry
 	 * @return the s c product entry that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public SCProductEntry addSCProductEntry(SCProductEntry scProductEntry)
-		throws SystemException {
+	public SCProductEntry addSCProductEntry(SCProductEntry scProductEntry) {
 		scProductEntry.setNew(true);
 
 		return scProductEntryPersistence.update(scProductEntry);
@@ -110,12 +110,11 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 * @param productEntryId the primary key of the s c product entry
 	 * @return the s c product entry that was removed
 	 * @throws PortalException if a s c product entry with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SCProductEntry deleteSCProductEntry(long productEntryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scProductEntryPersistence.remove(productEntryId);
 	}
 
@@ -124,12 +123,10 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 *
 	 * @param scProductEntry the s c product entry
 	 * @return the s c product entry that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public SCProductEntry deleteSCProductEntry(SCProductEntry scProductEntry)
-		throws SystemException {
+	public SCProductEntry deleteSCProductEntry(SCProductEntry scProductEntry) {
 		return scProductEntryPersistence.remove(scProductEntry);
 	}
 
@@ -146,12 +143,10 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return scProductEntryPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -166,12 +161,10 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return scProductEntryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -188,12 +181,11 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return scProductEntryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -203,11 +195,9 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return scProductEntryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -217,18 +207,16 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return scProductEntryPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public SCProductEntry fetchSCProductEntry(long productEntryId)
-		throws SystemException {
+	public SCProductEntry fetchSCProductEntry(long productEntryId) {
 		return scProductEntryPersistence.fetchByPrimaryKey(productEntryId);
 	}
 
@@ -238,17 +226,47 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 * @param productEntryId the primary key of the s c product entry
 	 * @return the s c product entry
 	 * @throws PortalException if a s c product entry with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public SCProductEntry getSCProductEntry(long productEntryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scProductEntryPersistence.findByPrimaryKey(productEntryId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.softwarecatalog.service.SCProductEntryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SCProductEntry.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("productEntryId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.softwarecatalog.service.SCProductEntryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SCProductEntry.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("productEntryId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteSCProductEntry((SCProductEntry)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scProductEntryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -262,11 +280,9 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of s c product entries
 	 * @param end the upper bound of the range of s c product entries (not inclusive)
 	 * @return the range of s c product entries
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<SCProductEntry> getSCProductEntries(int start, int end)
-		throws SystemException {
+	public List<SCProductEntry> getSCProductEntries(int start, int end) {
 		return scProductEntryPersistence.findAll(start, end);
 	}
 
@@ -274,10 +290,9 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 * Returns the number of s c product entries.
 	 *
 	 * @return the number of s c product entries
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSCProductEntriesCount() throws SystemException {
+	public int getSCProductEntriesCount() {
 		return scProductEntryPersistence.countAll();
 	}
 
@@ -286,159 +301,146 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 *
 	 * @param scProductEntry the s c product entry
 	 * @return the s c product entry that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public SCProductEntry updateSCProductEntry(SCProductEntry scProductEntry)
-		throws SystemException {
+	public SCProductEntry updateSCProductEntry(SCProductEntry scProductEntry) {
 		return scProductEntryPersistence.update(scProductEntry);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addSCLicenseSCProductEntry(long licenseId, long productEntryId)
-		throws SystemException {
+	public void addSCLicenseSCProductEntry(long licenseId, long productEntryId) {
 		scLicensePersistence.addSCProductEntry(licenseId, productEntryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCLicenseSCProductEntry(long licenseId,
-		SCProductEntry scProductEntry) throws SystemException {
+		SCProductEntry scProductEntry) {
 		scLicensePersistence.addSCProductEntry(licenseId, scProductEntry);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCLicenseSCProductEntries(long licenseId,
-		long[] productEntryIds) throws SystemException {
+		long[] productEntryIds) {
 		scLicensePersistence.addSCProductEntries(licenseId, productEntryIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCLicenseSCProductEntries(long licenseId,
-		List<SCProductEntry> SCProductEntries) throws SystemException {
+		List<SCProductEntry> SCProductEntries) {
 		scLicensePersistence.addSCProductEntries(licenseId, SCProductEntries);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearSCLicenseSCProductEntries(long licenseId)
-		throws SystemException {
+	public void clearSCLicenseSCProductEntries(long licenseId) {
 		scLicensePersistence.clearSCProductEntries(licenseId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCLicenseSCProductEntry(long licenseId,
-		long productEntryId) throws SystemException {
+		long productEntryId) {
 		scLicensePersistence.removeSCProductEntry(licenseId, productEntryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCLicenseSCProductEntry(long licenseId,
-		SCProductEntry scProductEntry) throws SystemException {
+		SCProductEntry scProductEntry) {
 		scLicensePersistence.removeSCProductEntry(licenseId, scProductEntry);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCLicenseSCProductEntries(long licenseId,
-		long[] productEntryIds) throws SystemException {
+		long[] productEntryIds) {
 		scLicensePersistence.removeSCProductEntries(licenseId, productEntryIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCLicenseSCProductEntries(long licenseId,
-		List<SCProductEntry> SCProductEntries) throws SystemException {
+		List<SCProductEntry> SCProductEntries) {
 		scLicensePersistence.removeSCProductEntries(licenseId, SCProductEntries);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the licenseIds of the s c licenses associated with the s c product entry.
+	 *
+	 * @param productEntryId the productEntryId of the s c product entry
+	 * @return long[] the licenseIds of s c licenses associated with the s c product entry
 	 */
 	@Override
-	public List<SCProductEntry> getSCLicenseSCProductEntries(long licenseId)
-		throws SystemException {
+	public long[] getSCLicensePrimaryKeys(long productEntryId) {
+		return scProductEntryPersistence.getSCLicensePrimaryKeys(productEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<SCProductEntry> getSCLicenseSCProductEntries(long licenseId) {
 		return scLicensePersistence.getSCProductEntries(licenseId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<SCProductEntry> getSCLicenseSCProductEntries(long licenseId,
-		int start, int end) throws SystemException {
+		int start, int end) {
 		return scLicensePersistence.getSCProductEntries(licenseId, start, end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<SCProductEntry> getSCLicenseSCProductEntries(long licenseId,
-		int start, int end, OrderByComparator orderByComparator)
-		throws SystemException {
+		int start, int end, OrderByComparator orderByComparator) {
 		return scLicensePersistence.getSCProductEntries(licenseId, start, end,
 			orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSCLicenseSCProductEntriesCount(long licenseId)
-		throws SystemException {
+	public int getSCLicenseSCProductEntriesCount(long licenseId) {
 		return scLicensePersistence.getSCProductEntriesSize(licenseId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public boolean hasSCLicenseSCProductEntry(long licenseId,
-		long productEntryId) throws SystemException {
+		long productEntryId) {
 		return scLicensePersistence.containsSCProductEntry(licenseId,
 			productEntryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasSCLicenseSCProductEntries(long licenseId)
-		throws SystemException {
+	public boolean hasSCLicenseSCProductEntries(long licenseId) {
 		return scLicensePersistence.containsSCProductEntries(licenseId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void setSCLicenseSCProductEntries(long licenseId,
-		long[] productEntryIds) throws SystemException {
+		long[] productEntryIds) {
 		scLicensePersistence.setSCProductEntries(licenseId, productEntryIds);
 	}
 
@@ -1105,7 +1107,7 @@ public abstract class SCProductEntryLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = scProductEntryPersistence.getDataSource();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,8 +40,9 @@ public class PortletBeanFactoryPostProcessor
 		ChainableMethodAdviceInjectorCollector.collect(
 			configurableListableBeanFactory);
 
-		configurableListableBeanFactory.setBeanClassLoader(
-			PortletApplicationContext.getBeanClassLoader());
+		ClassLoader classLoader = getClassLoader();
+
+		configurableListableBeanFactory.setBeanClassLoader(classLoader);
 
 		ListableBeanFactory parentListableBeanFactory =
 			(ListableBeanFactory)
@@ -69,8 +70,7 @@ public class PortletBeanFactoryPostProcessor
 					AbstractAutoProxyCreator abstractAutoProxyCreator =
 						(AbstractAutoProxyCreator)beanPostProcessor;
 
-					abstractAutoProxyCreator.setProxyClassLoader(
-						PortletApplicationContext.getBeanClassLoader());
+					abstractAutoProxyCreator.setProxyClassLoader(classLoader);
 				}
 
 				configurableListableBeanFactory.addBeanPostProcessor(
@@ -98,6 +98,10 @@ public class PortletBeanFactoryPostProcessor
 				continue;
 			}
 		}
+	}
+
+	protected ClassLoader getClassLoader() {
+		return PortletApplicationContext.getBeanClassLoader();
 	}
 
 }

@@ -12,7 +12,7 @@ AUI.add(
 
 		var STR_LAYOUT_ID = 'layoutId';
 
-		var TPL_EDITOR = '<div class="add-page-editor"><div class="input-append"></div></div>';
+		var TPL_EDITOR = '<div class="add-page-editor"><div class="input-group"></div></div>';
 
 		var TPL_FIELD_INPUT = '<input class="add-page-editor-input" type="text" value="{0}" />';
 
@@ -109,6 +109,8 @@ AUI.add(
 
 							var navItemSelector = Liferay.Data.NAV_ITEM_SELECTOR || navListSelector + '> li';
 
+							var navItemChildToggleSelector = Liferay.Data.NAV_ITEM_CHILD_TOGGLE_SELECTOR || '> span';
+
 							var navList = navBlock.one(navListSelector);
 
 							var items = navBlock.all(navItemSelector);
@@ -118,7 +120,7 @@ AUI.add(
 							var cssClassBuffer = [];
 
 							items.each(
-								function(item, index, collection) {
+								function(item, index) {
 									var layoutConfig = layoutIds[index];
 
 									if (layoutConfig) {
@@ -145,6 +147,7 @@ AUI.add(
 								}
 							);
 
+							instance._navItemChildToggleSelector = navItemChildToggleSelector;
 							instance._navItemSelector = navItemSelector;
 							instance._navListSelector = navListSelector;
 
@@ -165,6 +168,12 @@ AUI.add(
 
 							navBlock.delegate('keypress', A.bind('_onKeypress', instance), 'input');
 						}
+					},
+
+					_afterMakeSortable: function(sortable) {
+						var instance = this;
+
+						sortable.delegate.dd.removeInvalid('a');
 					},
 
 					_cancelPage: function(event) {
@@ -213,8 +222,8 @@ AUI.add(
 						var tempLink = Lang.sub(
 							tpl,
 							{
-								url: '#',
-								pageTitle: STR_EMPTY
+								pageTitle: STR_EMPTY,
+								url: '#'
 							}
 						);
 
@@ -233,7 +242,7 @@ AUI.add(
 						}
 
 						obj.each(
-							function(item, index, collection) {
+							function(item, index) {
 								if (item.hasClass('lfr-nav-deletable')) {
 									instance._createDeleteButton(item);
 								}
@@ -278,7 +287,7 @@ AUI.add(
 							var navItemSelector = instance._navItemSelector;
 
 							var navItems = navBlock.all(navItemSelector).filter(
-								function(item, index, collection) {
+								function(item, index) {
 									return !item.hasClass('selected');
 								}
 							);
@@ -326,7 +335,7 @@ AUI.add(
 										currentSpan.on(
 											'click',
 											function(event) {
-												if (themeDisplay.isStateMaximized() && !event.shiftKey) {
+												if ((themeDisplay.isStateMaximized() && !event.shiftKey) || event.target.ancestor('.lfr-nav-child-toggle', true, '.lfr-nav-updateable')) {
 													return;
 												}
 
@@ -532,7 +541,7 @@ AUI.add(
 					}
 				);
 
-				var toolbarBoundingBox = editorContainer.one('.input-append');
+				var toolbarBoundingBox = editorContainer.one('.input-group');
 
 				var toolbar = new A.Toolbar(
 					{
@@ -563,10 +572,10 @@ AUI.add(
 
 				var optionsPopover = new A.Popover(
 					{
-						bodyContent: prototypeTemplate,
 						align: {
 							points: ['tc', 'bc']
 						},
+						bodyContent: prototypeTemplate,
 						on: {
 							visibleChange: function(event) {
 								var instance = this;
@@ -638,8 +647,6 @@ AUI.add(
 				var instance = this;
 
 				if (instance.get('isSortable')) {
-					var navBlock = instance.get('navBlock');
-
 					var sortable = new A.Sortable(
 						{
 							container: instance._navList,
@@ -672,7 +679,7 @@ AUI.add(
 						}
 					);
 
-					sortable.delegate.dd.removeInvalid('a');
+					instance._afterMakeSortable(sortable);
 				}
 			},
 			['dd-constrain', 'sortable'],
@@ -724,7 +731,7 @@ AUI.add(
 						instance._updateURL,
 						{
 							data: data,
-							dataType: 'json',
+							dataType: 'JSON',
 							on: {
 								failure: function() {
 									processRemovePageFailure(
@@ -792,7 +799,11 @@ AUI.add(
 							onSuccess = function(event, id, obj) {
 								var doc = A.getDoc();
 
+								var navChildToggle = textNode.all(instance._navItemChildToggleSelector);
+
 								textNode.text(pageTitle);
+
+								textNode.append(navChildToggle);
 
 								actionNode.show();
 
@@ -802,7 +813,7 @@ AUI.add(
 
 								var regex = new RegExp(prevVal, 'g');
 
-								newTitle = oldTitle.replace(regex, pageTitle);
+								var newTitle = oldTitle.replace(regex, pageTitle);
 
 								doc.set('title', newTitle);
 							};
@@ -819,7 +830,7 @@ AUI.add(
 							instance._updateURL,
 							{
 								data: data,
-								dataType: 'json',
+								dataType: 'JSON',
 								on: {
 									success: onSuccess
 								}
@@ -885,7 +896,7 @@ AUI.add(
 					instance._updateURL,
 					{
 						data: data,
-						dataType: 'json',
+						dataType: 'JSON',
 						on: {
 							failure: function() {
 								processMovePageFailure(
@@ -918,6 +929,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-component']
+		requires: ['aui-component', 'event-mouseenter']
 	}
 );

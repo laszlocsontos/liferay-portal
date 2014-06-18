@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -187,6 +187,36 @@ public class EditPermissionsAction extends PortletAction {
 		return actionIds;
 	}
 
+	protected void updateLayoutModifiedDate(
+			String selResource, String resourcePrimKey)
+		throws Exception {
+
+		long plid = 0;
+
+		int pos = resourcePrimKey.indexOf(PortletConstants.LAYOUT_SEPARATOR);
+
+		if (pos != -1) {
+			plid = GetterUtil.getLong(resourcePrimKey.substring(0, pos));
+		}
+		else if (selResource.equals(Layout.class.getName())) {
+			plid = GetterUtil.getLong(resourcePrimKey);
+		}
+
+		if (plid <= 0) {
+			return;
+		}
+
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
+		if (layout != null) {
+			layout.setModifiedDate(new Date());
+
+			LayoutLocalServiceUtil.updateLayout(layout);
+
+			CacheUtil.clearCache(layout.getCompanyId());
+		}
+	}
+
 	protected void updateRolePermissions(ActionRequest actionRequest)
 		throws Exception {
 
@@ -239,21 +269,7 @@ public class EditPermissionsAction extends PortletAction {
 				resourcePrimKey, roleIdsToActionIds);
 		}
 
-		int pos = resourcePrimKey.indexOf(PortletConstants.LAYOUT_SEPARATOR);
-
-		if (pos != -1) {
-			long plid = GetterUtil.getLong(resourcePrimKey.substring(0, pos));
-
-			Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
-
-			if (layout != null) {
-				layout.setModifiedDate(new Date());
-
-				LayoutLocalServiceUtil.updateLayout(layout);
-
-				CacheUtil.clearCache(layout.getCompanyId());
-			}
-		}
+		updateLayoutModifiedDate(selResource, resourcePrimKey);
 
 		if (PropsValues.PERMISSIONS_PROPAGATION_ENABLED) {
 			Portlet portlet = PortletLocalServiceUtil.getPortletById(

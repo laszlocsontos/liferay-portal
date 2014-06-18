@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -69,12 +71,10 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 *
 	 * @param ddmStorageLink the d d m storage link
 	 * @return the d d m storage link that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public DDMStorageLink addDDMStorageLink(DDMStorageLink ddmStorageLink)
-		throws SystemException {
+	public DDMStorageLink addDDMStorageLink(DDMStorageLink ddmStorageLink) {
 		ddmStorageLink.setNew(true);
 
 		return ddmStorageLinkPersistence.update(ddmStorageLink);
@@ -97,12 +97,11 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 * @param storageLinkId the primary key of the d d m storage link
 	 * @return the d d m storage link that was removed
 	 * @throws PortalException if a d d m storage link with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DDMStorageLink deleteDDMStorageLink(long storageLinkId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ddmStorageLinkPersistence.remove(storageLinkId);
 	}
 
@@ -111,12 +110,10 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 *
 	 * @param ddmStorageLink the d d m storage link
 	 * @return the d d m storage link that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public DDMStorageLink deleteDDMStorageLink(DDMStorageLink ddmStorageLink)
-		throws SystemException {
+	public DDMStorageLink deleteDDMStorageLink(DDMStorageLink ddmStorageLink) {
 		return ddmStorageLinkPersistence.remove(ddmStorageLink);
 	}
 
@@ -133,12 +130,10 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return ddmStorageLinkPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -153,12 +148,10 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return ddmStorageLinkPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -175,12 +168,11 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return ddmStorageLinkPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -190,11 +182,9 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return ddmStorageLinkPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -204,18 +194,16 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return ddmStorageLinkPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public DDMStorageLink fetchDDMStorageLink(long storageLinkId)
-		throws SystemException {
+	public DDMStorageLink fetchDDMStorageLink(long storageLinkId) {
 		return ddmStorageLinkPersistence.fetchByPrimaryKey(storageLinkId);
 	}
 
@@ -225,17 +213,47 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 * @param storageLinkId the primary key of the d d m storage link
 	 * @return the d d m storage link
 	 * @throws PortalException if a d d m storage link with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DDMStorageLink getDDMStorageLink(long storageLinkId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ddmStorageLinkPersistence.findByPrimaryKey(storageLinkId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(DDMStorageLink.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("storageLinkId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(DDMStorageLink.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("storageLinkId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteDDMStorageLink((DDMStorageLink)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ddmStorageLinkPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -249,11 +267,9 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 * @param start the lower bound of the range of d d m storage links
 	 * @param end the upper bound of the range of d d m storage links (not inclusive)
 	 * @return the range of d d m storage links
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<DDMStorageLink> getDDMStorageLinks(int start, int end)
-		throws SystemException {
+	public List<DDMStorageLink> getDDMStorageLinks(int start, int end) {
 		return ddmStorageLinkPersistence.findAll(start, end);
 	}
 
@@ -261,10 +277,9 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 * Returns the number of d d m storage links.
 	 *
 	 * @return the number of d d m storage links
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getDDMStorageLinksCount() throws SystemException {
+	public int getDDMStorageLinksCount() {
 		return ddmStorageLinkPersistence.countAll();
 	}
 
@@ -273,12 +288,10 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 *
 	 * @param ddmStorageLink the d d m storage link
 	 * @return the d d m storage link that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public DDMStorageLink updateDDMStorageLink(DDMStorageLink ddmStorageLink)
-		throws SystemException {
+	public DDMStorageLink updateDDMStorageLink(DDMStorageLink ddmStorageLink) {
 		return ddmStorageLinkPersistence.update(ddmStorageLink);
 	}
 
@@ -382,7 +395,7 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = ddmStorageLinkPersistence.getDataSource();
 

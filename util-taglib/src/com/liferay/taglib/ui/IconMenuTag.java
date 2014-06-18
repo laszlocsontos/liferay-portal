@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -125,7 +125,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 		}
 
 		if (_icon == null) {
-			_icon = themeDisplay.getPathThemeImages() + "/common/tool.png";
+			_icon = "../aui/cog";
 		}
 
 		if (Validator.isNull(_id)) {
@@ -278,7 +278,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 
 					if (Validator.isNotNull(_cssClass)) {
 						jspWriter.write(StringPool.SPACE);
-						jspWriter.print(_cssClass);
+						jspWriter.write(_cssClass);
 					}
 
 					jspWriter.write("\" id=\"");
@@ -290,7 +290,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 
 					if (Validator.isNotNull(_cssClass)) {
 						jspWriter.write(StringPool.SPACE);
-						jspWriter.print(_cssClass);
+						jspWriter.write(_cssClass);
 					}
 
 					if (_direction.equals("up")) {
@@ -307,7 +307,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 					}
 
 					if (_extended) {
-						jspWriter.write(" btn");
+						jspWriter.write(" btn btn-default");
 					}
 
 					if (_select) {
@@ -432,7 +432,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 	private static final String _AUI_PATH = "../aui/";
 
 	private static final int _DEFAULT_MAX_DISPLAY_ITEMS = GetterUtil.getInteger(
-		PropsUtil.get(PropsKeys.ICON_MENU_MAX_DISPLAY_ITEMS));
+		PropsUtil.get(PropsKeys.MENU_MAX_DISPLAY_ITEMS));
 
 	private static final String _END_PAGE = "/html/taglib/ui/icon_menu/end.jsp";
 

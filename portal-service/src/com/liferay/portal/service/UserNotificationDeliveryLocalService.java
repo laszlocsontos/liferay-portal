@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,11 +50,9 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	*
 	* @param userNotificationDelivery the user notification delivery
 	* @return the user notification delivery that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.UserNotificationDelivery addUserNotificationDelivery(
-		com.liferay.portal.model.UserNotificationDelivery userNotificationDelivery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.model.UserNotificationDelivery userNotificationDelivery);
 
 	/**
 	* Creates a new user notification delivery with the primary key. Does not add the user notification delivery to the database.
@@ -71,23 +69,19 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	* @param userNotificationDeliveryId the primary key of the user notification delivery
 	* @return the user notification delivery that was removed
 	* @throws PortalException if a user notification delivery with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.UserNotificationDelivery deleteUserNotificationDelivery(
 		long userNotificationDeliveryId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes the user notification delivery from the database. Also notifies the appropriate model listeners.
 	*
 	* @param userNotificationDelivery the user notification delivery
 	* @return the user notification delivery that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.UserNotificationDelivery deleteUserNotificationDelivery(
-		com.liferay.portal.model.UserNotificationDelivery userNotificationDelivery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.model.UserNotificationDelivery userNotificationDelivery);
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -96,12 +90,10 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
 
 	/**
 	* Performs a dynamic query on the database and returns a range of the matching rows.
@@ -114,12 +106,11 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException;
+		int end);
 
 	/**
 	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
@@ -133,25 +124,21 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator);
 
 	/**
 	* Returns the number of rows that match the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
 
 	/**
 	* Returns the number of rows that match the dynamic query.
@@ -159,17 +146,14 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.UserNotificationDelivery fetchUserNotificationDelivery(
-		long userNotificationDeliveryId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long userNotificationDeliveryId);
 
 	/**
 	* Returns the user notification delivery with the primary key.
@@ -177,20 +161,28 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	* @param userNotificationDeliveryId the primary key of the user notification delivery
 	* @return the user notification delivery
 	* @throws PortalException if a user notification delivery with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.UserNotificationDelivery getUserNotificationDelivery(
 		long userNotificationDeliveryId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Returns a range of all the user notification deliveries.
@@ -202,33 +194,27 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	* @param start the lower bound of the range of user notification deliveries
 	* @param end the upper bound of the range of user notification deliveries (not inclusive)
 	* @return the range of user notification deliveries
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portal.model.UserNotificationDelivery> getUserNotificationDeliveries(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		int start, int end);
 
 	/**
 	* Returns the number of user notification deliveries.
 	*
 	* @return the number of user notification deliveries
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getUserNotificationDeliveriesCount()
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public int getUserNotificationDeliveriesCount();
 
 	/**
 	* Updates the user notification delivery in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param userNotificationDelivery the user notification delivery
 	* @return the user notification delivery that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.UserNotificationDelivery updateUserNotificationDelivery(
-		com.liferay.portal.model.UserNotificationDelivery userNotificationDelivery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.model.UserNotificationDelivery userNotificationDelivery);
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -247,31 +233,25 @@ public interface UserNotificationDeliveryLocalService extends BaseLocalService,
 	public com.liferay.portal.model.UserNotificationDelivery addUserNotificationDelivery(
 		long userId, java.lang.String portletId, long classNameId,
 		int notificationType, int deliveryType, boolean deliver)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public void deleteUserNotificationDeliveries(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public void deleteUserNotificationDeliveries(long userId);
 
 	public void deleteUserNotificationDelivery(long userId,
 		java.lang.String portletId, long classNameId, int notificationType,
-		int deliveryType)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		int deliveryType);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.UserNotificationDelivery fetchUserNotificationDelivery(
 		long userId, java.lang.String portletId, long classNameId,
-		int notificationType, int deliveryType)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		int notificationType, int deliveryType);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.UserNotificationDelivery getUserNotificationDelivery(
 		long userId, java.lang.String portletId, long classNameId,
 		int notificationType, int deliveryType, boolean deliver)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public com.liferay.portal.model.UserNotificationDelivery updateUserNotificationDelivery(
-		long userNotificationDeliveryId, boolean deliver)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long userNotificationDeliveryId, boolean deliver);
 }

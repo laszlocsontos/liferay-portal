@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,25 +30,29 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.journal.NoSuchFolderException;
 import com.liferay.portlet.journal.model.JournalFolder;
 import com.liferay.portlet.journal.model.impl.JournalFolderModelImpl;
+import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +64,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class JournalFolderPersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<JournalFolder> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -81,11 +94,15 @@ public class JournalFolderPersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<JournalFolder> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalFolder journalFolder = _persistence.create(pk);
 
@@ -112,39 +129,41 @@ public class JournalFolderPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalFolder newJournalFolder = _persistence.create(pk);
 
-		newJournalFolder.setUuid(ServiceTestUtil.randomString());
+		newJournalFolder.setUuid(RandomTestUtil.randomString());
 
-		newJournalFolder.setGroupId(ServiceTestUtil.nextLong());
+		newJournalFolder.setGroupId(RandomTestUtil.nextLong());
 
-		newJournalFolder.setCompanyId(ServiceTestUtil.nextLong());
+		newJournalFolder.setCompanyId(RandomTestUtil.nextLong());
 
-		newJournalFolder.setUserId(ServiceTestUtil.nextLong());
+		newJournalFolder.setUserId(RandomTestUtil.nextLong());
 
-		newJournalFolder.setUserName(ServiceTestUtil.randomString());
+		newJournalFolder.setUserName(RandomTestUtil.randomString());
 
-		newJournalFolder.setCreateDate(ServiceTestUtil.nextDate());
+		newJournalFolder.setCreateDate(RandomTestUtil.nextDate());
 
-		newJournalFolder.setModifiedDate(ServiceTestUtil.nextDate());
+		newJournalFolder.setModifiedDate(RandomTestUtil.nextDate());
 
-		newJournalFolder.setParentFolderId(ServiceTestUtil.nextLong());
+		newJournalFolder.setParentFolderId(RandomTestUtil.nextLong());
 
-		newJournalFolder.setTreePath(ServiceTestUtil.randomString());
+		newJournalFolder.setTreePath(RandomTestUtil.randomString());
 
-		newJournalFolder.setName(ServiceTestUtil.randomString());
+		newJournalFolder.setName(RandomTestUtil.randomString());
 
-		newJournalFolder.setDescription(ServiceTestUtil.randomString());
+		newJournalFolder.setDescription(RandomTestUtil.randomString());
 
-		newJournalFolder.setStatus(ServiceTestUtil.nextInt());
+		newJournalFolder.setRestrictionType(RandomTestUtil.nextInt());
 
-		newJournalFolder.setStatusByUserId(ServiceTestUtil.nextLong());
+		newJournalFolder.setStatus(RandomTestUtil.nextInt());
 
-		newJournalFolder.setStatusByUserName(ServiceTestUtil.randomString());
+		newJournalFolder.setStatusByUserId(RandomTestUtil.nextLong());
 
-		newJournalFolder.setStatusDate(ServiceTestUtil.nextDate());
+		newJournalFolder.setStatusByUserName(RandomTestUtil.randomString());
+
+		newJournalFolder.setStatusDate(RandomTestUtil.nextDate());
 
 		_persistence.update(newJournalFolder);
 
@@ -176,6 +195,8 @@ public class JournalFolderPersistenceTest {
 			newJournalFolder.getName());
 		Assert.assertEquals(existingJournalFolder.getDescription(),
 			newJournalFolder.getDescription());
+		Assert.assertEquals(existingJournalFolder.getRestrictionType(),
+			newJournalFolder.getRestrictionType());
 		Assert.assertEquals(existingJournalFolder.getStatus(),
 			newJournalFolder.getStatus());
 		Assert.assertEquals(existingJournalFolder.getStatusByUserId(),
@@ -205,7 +226,7 @@ public class JournalFolderPersistenceTest {
 	public void testCountByUUID_G() {
 		try {
 			_persistence.countByUUID_G(StringPool.BLANK,
-				ServiceTestUtil.nextLong());
+				RandomTestUtil.nextLong());
 
 			_persistence.countByUUID_G(StringPool.NULL, 0L);
 
@@ -220,7 +241,7 @@ public class JournalFolderPersistenceTest {
 	public void testCountByUuid_C() {
 		try {
 			_persistence.countByUuid_C(StringPool.BLANK,
-				ServiceTestUtil.nextLong());
+				RandomTestUtil.nextLong());
 
 			_persistence.countByUuid_C(StringPool.NULL, 0L);
 
@@ -234,7 +255,7 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByGroupId() {
 		try {
-			_persistence.countByGroupId(ServiceTestUtil.nextLong());
+			_persistence.countByGroupId(RandomTestUtil.nextLong());
 
 			_persistence.countByGroupId(0L);
 		}
@@ -246,7 +267,7 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByCompanyId() {
 		try {
-			_persistence.countByCompanyId(ServiceTestUtil.nextLong());
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
 
 			_persistence.countByCompanyId(0L);
 		}
@@ -258,8 +279,8 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByG_P() {
 		try {
-			_persistence.countByG_P(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong());
+			_persistence.countByG_P(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
 
 			_persistence.countByG_P(0L, 0L);
 		}
@@ -271,7 +292,7 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByG_N() {
 		try {
-			_persistence.countByG_N(ServiceTestUtil.nextLong(), StringPool.BLANK);
+			_persistence.countByG_N(RandomTestUtil.nextLong(), StringPool.BLANK);
 
 			_persistence.countByG_N(0L, StringPool.NULL);
 
@@ -285,8 +306,8 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByC_NotS() {
 		try {
-			_persistence.countByC_NotS(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextInt());
+			_persistence.countByC_NotS(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextInt());
 
 			_persistence.countByC_NotS(0L, 0);
 		}
@@ -298,9 +319,9 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByF_C_P_NotS() {
 		try {
-			_persistence.countByF_C_P_NotS(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong(), ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextInt());
+			_persistence.countByF_C_P_NotS(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+				RandomTestUtil.nextInt());
 
 			_persistence.countByF_C_P_NotS(0L, 0L, 0L, 0);
 		}
@@ -312,8 +333,8 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByG_P_N() {
 		try {
-			_persistence.countByG_P_N(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong(), StringPool.BLANK);
+			_persistence.countByG_P_N(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), StringPool.BLANK);
 
 			_persistence.countByG_P_N(0L, 0L, StringPool.NULL);
 
@@ -327,8 +348,8 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByG_P_S() {
 		try {
-			_persistence.countByG_P_S(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong(), ServiceTestUtil.nextInt());
+			_persistence.countByG_P_S(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
 
 			_persistence.countByG_P_S(0L, 0L, 0);
 		}
@@ -340,8 +361,8 @@ public class JournalFolderPersistenceTest {
 	@Test
 	public void testCountByG_P_NotS() {
 		try {
-			_persistence.countByG_P_NotS(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong(), ServiceTestUtil.nextInt());
+			_persistence.countByG_P_NotS(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
 
 			_persistence.countByG_P_NotS(0L, 0L, 0);
 		}
@@ -361,7 +382,7 @@ public class JournalFolderPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -399,8 +420,9 @@ public class JournalFolderPersistenceTest {
 			true, "folderId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "parentFolderId", true, "treePath", true,
-			"name", true, "description", true, "status", true,
-			"statusByUserId", true, "statusByUserName", true, "statusDate", true);
+			"name", true, "description", true, "restrictionType", true,
+			"status", true, "statusByUserId", true, "statusByUserName", true,
+			"statusDate", true);
 	}
 
 	@Test
@@ -414,7 +436,7 @@ public class JournalFolderPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalFolder missingJournalFolder = _persistence.fetchByPrimaryKey(pk);
 
@@ -422,19 +444,103 @@ public class JournalFolderPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		JournalFolder newJournalFolder1 = addJournalFolder();
+		JournalFolder newJournalFolder2 = addJournalFolder();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalFolder1.getPrimaryKey());
+		primaryKeys.add(newJournalFolder2.getPrimaryKey());
+
+		Map<Serializable, JournalFolder> journalFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, journalFolders.size());
+		Assert.assertEquals(newJournalFolder1,
+			journalFolders.get(newJournalFolder1.getPrimaryKey()));
+		Assert.assertEquals(newJournalFolder2,
+			journalFolders.get(newJournalFolder2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, JournalFolder> journalFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(journalFolders.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		JournalFolder newJournalFolder = addJournalFolder();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalFolder.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, JournalFolder> journalFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, journalFolders.size());
+		Assert.assertEquals(newJournalFolder,
+			journalFolders.get(newJournalFolder.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, JournalFolder> journalFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(journalFolders.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		JournalFolder newJournalFolder = addJournalFolder();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalFolder.getPrimaryKey());
+
+		Map<Serializable, JournalFolder> journalFolders = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, journalFolders.size());
+		Assert.assertEquals(newJournalFolder,
+			journalFolders.get(newJournalFolder.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new JournalFolderActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = JournalFolderLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					JournalFolder journalFolder = (JournalFolder)object;
 
 					Assert.assertNotNull(journalFolder);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -467,7 +573,7 @@ public class JournalFolderPersistenceTest {
 				JournalFolder.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("folderId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<JournalFolder> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -506,7 +612,7 @@ public class JournalFolderPersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("folderId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("folderId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -547,39 +653,41 @@ public class JournalFolderPersistenceTest {
 	}
 
 	protected JournalFolder addJournalFolder() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		JournalFolder journalFolder = _persistence.create(pk);
 
-		journalFolder.setUuid(ServiceTestUtil.randomString());
+		journalFolder.setUuid(RandomTestUtil.randomString());
 
-		journalFolder.setGroupId(ServiceTestUtil.nextLong());
+		journalFolder.setGroupId(RandomTestUtil.nextLong());
 
-		journalFolder.setCompanyId(ServiceTestUtil.nextLong());
+		journalFolder.setCompanyId(RandomTestUtil.nextLong());
 
-		journalFolder.setUserId(ServiceTestUtil.nextLong());
+		journalFolder.setUserId(RandomTestUtil.nextLong());
 
-		journalFolder.setUserName(ServiceTestUtil.randomString());
+		journalFolder.setUserName(RandomTestUtil.randomString());
 
-		journalFolder.setCreateDate(ServiceTestUtil.nextDate());
+		journalFolder.setCreateDate(RandomTestUtil.nextDate());
 
-		journalFolder.setModifiedDate(ServiceTestUtil.nextDate());
+		journalFolder.setModifiedDate(RandomTestUtil.nextDate());
 
-		journalFolder.setParentFolderId(ServiceTestUtil.nextLong());
+		journalFolder.setParentFolderId(RandomTestUtil.nextLong());
 
-		journalFolder.setTreePath(ServiceTestUtil.randomString());
+		journalFolder.setTreePath(RandomTestUtil.randomString());
 
-		journalFolder.setName(ServiceTestUtil.randomString());
+		journalFolder.setName(RandomTestUtil.randomString());
 
-		journalFolder.setDescription(ServiceTestUtil.randomString());
+		journalFolder.setDescription(RandomTestUtil.randomString());
 
-		journalFolder.setStatus(ServiceTestUtil.nextInt());
+		journalFolder.setRestrictionType(RandomTestUtil.nextInt());
 
-		journalFolder.setStatusByUserId(ServiceTestUtil.nextLong());
+		journalFolder.setStatus(RandomTestUtil.nextInt());
 
-		journalFolder.setStatusByUserName(ServiceTestUtil.randomString());
+		journalFolder.setStatusByUserId(RandomTestUtil.nextLong());
 
-		journalFolder.setStatusDate(ServiceTestUtil.nextDate());
+		journalFolder.setStatusByUserName(RandomTestUtil.randomString());
+
+		journalFolder.setStatusDate(RandomTestUtil.nextDate());
 
 		_persistence.update(journalFolder);
 
@@ -587,6 +695,7 @@ public class JournalFolderPersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(JournalFolderPersistenceTest.class);
+	private ModelListener<JournalFolder>[] _modelListeners;
 	private JournalFolderPersistence _persistence = (JournalFolderPersistence)PortalBeanLocatorUtil.locate(JournalFolderPersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

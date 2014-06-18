@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,8 +64,7 @@ public class LayoutTemplateLocalServiceImpl
 
 	@Override
 	public String getContent(
-			String layoutTemplateId, boolean standard, String themeId)
-		throws SystemException {
+		String layoutTemplateId, boolean standard, String themeId) {
 
 		LayoutTemplate layoutTemplate = getLayoutTemplate(
 			layoutTemplateId, standard, themeId);
@@ -218,8 +217,7 @@ public class LayoutTemplateLocalServiceImpl
 
 	@Override
 	public String getWapContent(
-			String layoutTemplateId, boolean standard, String themeId)
-		throws SystemException {
+		String layoutTemplateId, boolean standard, String themeId) {
 
 		LayoutTemplate layoutTemplate = getLayoutTemplate(
 			layoutTemplateId, standard, themeId);

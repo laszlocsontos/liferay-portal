@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,7 +58,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 			A.io.request(
 				uri,
 				{
-					dataType: 'json',
+					dataType: 'JSON',
 					form: {
 						id: form
 					},
@@ -115,7 +115,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 			Liferay.fire(
 				'closeWindow',
 				{
-					id: namespace + "signInDialog"
+					id: namespace + 'signInDialog'
 				}
 			);
 		},
@@ -130,7 +130,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 
 			var messageContainer = A.one('#<portlet:namespace />login-status-messages');
 
-			messageContainer.removeClass('alert-error').removeClass('alert-success');
+			messageContainer.removeClass('alert-danger').removeClass('alert-success');
 
 			messageContainer.addClass('alert alert-' + type);
 
@@ -160,7 +160,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 				window.opener.parent.Liferay.fire(
 					'closeWindow',
 					{
-						id: namespace + "signInDialog"
+						id: namespace + 'signInDialog'
 					}
 				);
 
@@ -185,7 +185,7 @@ boolean anonymousAccount = ParamUtil.getBoolean(request, "anonymousUser");
 			Liferay.fire(
 				'closeWindow',
 				{
-					id: namespace + "signInDialog"
+					id: namespace + 'signInDialog'
 				}
 			);
 		}

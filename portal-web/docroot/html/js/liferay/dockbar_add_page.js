@@ -22,7 +22,7 @@ AUI.add(
 
 		var STR_CANCEL_ADD_OPERATION = 'cancelAddOperation';
 
-		var STR_HIDDEN_CHECKBOX = 'addLayoutHiddenCheckbox';
+		var STR_HIDDEN_CHECKBOX = 'addLayoutHidden';
 
 		var STR_ID = 'id';
 
@@ -40,25 +40,23 @@ AUI.add(
 
 		var AddPage = A.Component.create(
 			{
-				AUGMENTS: [Liferay.PortletBase],
-
-				EXTENDS: Dockbar.AddBase,
-
-				NAME: 'addpage',
-
 				ATTRS: {
 					createPageMessage: {
 						validator: Lang.isString
 					},
+
 					parentLayoutId: {
 						validator: Lang.isNumber
 					},
+
 					refresh: {
 						validator: Lang.isBoolean
 					},
+
 					toggleOnCancel: {
 						validator: Lang.isBoolean
 					},
+
 					transition: {
 						validator: Lang.isObject,
 						value: {
@@ -66,6 +64,12 @@ AUI.add(
 						}
 					}
 				},
+
+				AUGMENTS: [Liferay.PortletBase],
+
+				EXTENDS: Dockbar.AddBase,
+
+				NAME: 'addpage',
 
 				prototype: {
 					initializer: function(config) {
@@ -124,10 +128,6 @@ AUI.add(
 								A.io.request(
 									addForm.get('action'),
 									{
-										dataType: 'json',
-										form: {
-											id: addForm.get(STR_ID)
-										},
 										after: {
 											success: function(event, id, obj) {
 												var responseData = this.get(STR_RESPONSE_DATA);
@@ -142,6 +142,10 @@ AUI.add(
 
 												panel.setContent(responseData);
 											}
+										},
+										dataType: 'JSON',
+										form: {
+											id: addForm.get(STR_ID)
 										}
 									}
 								);
@@ -152,7 +156,7 @@ AUI.add(
 						else {
 							AObject.some(
 								formValidator.errors,
-								function(item, index, collection) {
+								function(item, index) {
 									var field = formValidator.getField(index);
 
 									field.scrollIntoView();
@@ -167,15 +171,13 @@ AUI.add(
 					_bindUI: function() {
 						var instance = this;
 
-						instance._addForm.on('submit', instance._addPage, instance);
-
-						instance._cancelButton.on('click', instance._cancelAction, instance);
-
-						instance._hiddenCheckbox.on('change', instance._updateNavigationProxy, instance);
-
-						instance._nameInput.on('valuechange', instance._updateNavigationProxy, instance);
-
-						instance._togglerDelegate.on('toggler:expandedChange', instance._updateActivePage, instance);
+						instance._eventHandles.push(
+							instance._addForm.on('submit', instance._addPage, instance),
+							instance._cancelButton.on('click', instance._cancelAction, instance),
+							instance._hiddenCheckbox.on('change', instance._updateNavigationProxy, instance),
+							instance._nameInput.on('valuechange', instance._updateNavigationProxy, instance),
+							instance._togglerDelegate.on('toggler:expandedChange', instance._updateActivePage, instance)
+						);
 					},
 
 					_cancelAction: function(event) {
@@ -194,7 +196,7 @@ AUI.add(
 						var nodes = instance.get(STR_NODES);
 
 						nodes.each(
-							function(item, index, collection) {
+							function(item, index) {
 								var header = item.one(SELECTOR_TOGGLER_HEADER);
 
 								var active = header.hasClass(CSS_ACTIVE);

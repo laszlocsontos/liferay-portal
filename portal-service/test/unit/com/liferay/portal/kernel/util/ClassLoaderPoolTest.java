@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,8 +15,7 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-
-import java.lang.reflect.Field;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -43,19 +42,22 @@ public class ClassLoaderPoolTest {
 
 		PortalClassLoaderUtil.setClassLoader(clazz.getClassLoader());
 
-		Field classLoadersField = ReflectionUtil.getDeclaredField(
-			ClassLoaderPool.class, "_classLoaders");
-
-		_classLoaders = (Map<String, ClassLoader>)classLoadersField.get(null);
+		_classLoaders =
+			(Map<String, ClassLoader>)ReflectionTestUtil.getFieldValue(
+				ClassLoaderPool.class, "_classLoaders");
 
 		_classLoaders.clear();
 
-		Field contextNamesField = ReflectionUtil.getDeclaredField(
-			ClassLoaderPool.class, "_contextNames");
-
-		_contextNames = (Map<ClassLoader, String>)contextNamesField.get(null);
+		_contextNames =
+			(Map<ClassLoader, String>)ReflectionTestUtil.getFieldValue(
+				ClassLoaderPool.class, "_contextNames");
 
 		_contextNames.clear();
+	}
+
+	@Test
+	public void testConstructor() {
+		new ClassLoaderPool();
 	}
 
 	@Test

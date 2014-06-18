@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,8 +26,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
 public class MBCategoryFinderUtil {
 	public static int countByS_G_U_P(long groupId, long userId,
 		long[] parentCategoryIds,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
 		return getFinder()
 				   .countByS_G_U_P(groupId, userId, parentCategoryIds,
 			queryDefinition);
@@ -35,8 +34,7 @@ public class MBCategoryFinderUtil {
 
 	public static int filterCountByS_G_U_P(long groupId, long userId,
 		long[] parentCategoryIds,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
 		return getFinder()
 				   .filterCountByS_G_U_P(groupId, userId, parentCategoryIds,
 			queryDefinition);
@@ -44,8 +42,7 @@ public class MBCategoryFinderUtil {
 
 	public static java.util.List<com.liferay.portlet.messageboards.model.MBCategory> filterFindByS_G_U_P(
 		long groupId, long userId, long[] parentCategoryIds,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
 		return getFinder()
 				   .filterFindByS_G_U_P(groupId, userId, parentCategoryIds,
 			queryDefinition);
@@ -53,8 +50,7 @@ public class MBCategoryFinderUtil {
 
 	public static java.util.List<com.liferay.portlet.messageboards.model.MBCategory> findByS_G_U_P(
 		long groupId, long userId, long[] parentCategoryIds,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition) {
 		return getFinder()
 				   .findByS_G_U_P(groupId, userId, parentCategoryIds,
 			queryDefinition);

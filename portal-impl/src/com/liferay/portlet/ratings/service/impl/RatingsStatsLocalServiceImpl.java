@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,9 +31,7 @@ public class RatingsStatsLocalServiceImpl
 	extends RatingsStatsLocalServiceBaseImpl {
 
 	@Override
-	public RatingsStats addStats(long classNameId, long classPK)
-		throws SystemException {
-
+	public RatingsStats addStats(long classNameId, long classPK) {
 		long statsId = counterLocalService.increment();
 
 		RatingsStats stats = ratingsStatsPersistence.create(statsId);
@@ -66,9 +64,7 @@ public class RatingsStatsLocalServiceImpl
 	}
 
 	@Override
-	public void deleteStats(String className, long classPK)
-		throws SystemException {
-
+	public void deleteStats(String className, long classPK) {
 		long classNameId = classNameLocalService.getClassNameId(className);
 
 		try {
@@ -84,25 +80,19 @@ public class RatingsStatsLocalServiceImpl
 	}
 
 	@Override
-	public RatingsStats getStats(long statsId)
-		throws PortalException, SystemException {
-
+	public RatingsStats getStats(long statsId) throws PortalException {
 		return ratingsStatsPersistence.findByPrimaryKey(statsId);
 	}
 
 	@Override
-	public List<RatingsStats> getStats(String className, List<Long> classPKs)
-		throws SystemException {
-
+	public List<RatingsStats> getStats(String className, List<Long> classPKs) {
 		long classNameId = classNameLocalService.getClassNameId(className);
 
 		return ratingsStatsFinder.findByC_C(classNameId, classPKs);
 	}
 
 	@Override
-	public RatingsStats getStats(String className, long classPK)
-		throws SystemException {
-
+	public RatingsStats getStats(String className, long classPK) {
 		long classNameId = classNameLocalService.getClassNameId(className);
 
 		RatingsStats stats = ratingsStatsPersistence.fetchByC_C(

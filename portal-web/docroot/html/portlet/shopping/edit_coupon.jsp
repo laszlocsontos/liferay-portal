@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,9 +72,7 @@ String discountType = BeanParamUtil.getString(coupon, request, "discountType");
 				<aui:input label="autogenerate-code" name="autoCode" type="checkbox" />
 			</c:when>
 			<c:otherwise>
-				<aui:field-wrapper label="code">
-					<liferay-ui:input-resource url="<%= code %>" />
-				</aui:field-wrapper>
+				<aui:input name="code" type="resource" value="<%= code %>" />
 			</c:otherwise>
 		</c:choose>
 
@@ -158,10 +156,10 @@ String discountType = BeanParamUtil.getString(coupon, request, "discountType");
 
 <aui:script>
 	function <portlet:namespace />saveCoupon() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (coupon == null) ? Constants.ADD : Constants.UPDATE %>";
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (coupon == null) ? Constants.ADD : Constants.UPDATE %>';
 
 		submitForm(document.<portlet:namespace />fm);
 	}
 
-	Liferay.Util.disableToggleBoxes('<portlet:namespace />autoCodeCheckbox', '<portlet:namespace />code', true);
+	Liferay.Util.disableToggleBoxes('<portlet:namespace />autoCode', '<portlet:namespace />code', true);
 </aui:script>

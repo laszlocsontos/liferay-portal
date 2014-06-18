@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,12 +15,12 @@
 package com.liferay.portlet.messageboards.action;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
+import com.liferay.portal.kernel.portlet.SettingsConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.NumericalStringComparator;
+import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -41,7 +41,7 @@ import javax.portlet.PortletConfig;
 /**
  * @author Brian Wing Shun Chan
  */
-public class ConfigurationActionImpl extends DefaultConfigurationAction {
+public class ConfigurationActionImpl extends SettingsConfigurationAction {
 
 	@Override
 	public void processAction(
@@ -49,23 +49,12 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			ActionResponse actionResponse)
 		throws Exception {
 
-		String tabs2 = ParamUtil.getString(actionRequest, "tabs2");
+		validateEmail(actionRequest, "emailMessageAdded");
+		validateEmail(actionRequest, "emailMessageUpdated");
+		validateEmailFrom(actionRequest);
 
-		if (tabs2.equals("email-from")) {
-			validateEmailFrom(actionRequest);
-		}
-		else if (tabs2.equals("message-added-email")) {
-			validateEmailMessageAdded(actionRequest);
-		}
-		else if (tabs2.equals("message-updated-email")) {
-			validateEmailMessageUpdated(actionRequest);
-		}
-		else if (tabs2.equals("thread-priorities")) {
-			updateThreadPriorities(actionRequest);
-		}
-		else if (tabs2.equals("user-ranks")) {
-			updateUserRanks(actionRequest);
-		}
+		updateThreadPriorities(actionRequest);
+		updateUserRanks(actionRequest);
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
@@ -107,7 +96,7 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 					(value != 0.0)) {
 
 					priorities.add(
-						name + StringPool.COMMA + image + StringPool.COMMA +
+						name + StringPool.PIPE + image + StringPool.PIPE +
 							value);
 				}
 			}
@@ -137,7 +126,7 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 				ParamUtil.getString(actionRequest, "ranks_" + languageId));
 
 			Map<String, String> map = new TreeMap<String, String>(
-				new NumericalStringComparator());
+				new NaturalOrderStringComparator());
 
 			for (String rank : ranks) {
 				if (!isValidUserRank(rank)) {
@@ -169,55 +158,6 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 				"ranks", languageId);
 
 			setPreference(actionRequest, preferenceName, ranks);
-		}
-	}
-
-	protected void validateEmailFrom(ActionRequest actionRequest)
-		throws Exception {
-
-		String emailFromName = getParameter(actionRequest, "emailFromName");
-		String emailFromAddress = getParameter(
-			actionRequest, "emailFromAddress");
-
-		if (Validator.isNull(emailFromName)) {
-			SessionErrors.add(actionRequest, "emailFromName");
-		}
-		else if (!Validator.isEmailAddress(emailFromAddress) &&
-				 !Validator.isVariableTerm(emailFromAddress)) {
-
-			SessionErrors.add(actionRequest, "emailFromAddress");
-		}
-	}
-
-	protected void validateEmailMessageAdded(ActionRequest actionRequest)
-		throws Exception {
-
-		String emailMessageAddedSubject = getParameter(
-			actionRequest, "emailMessageAddedSubject");
-		String emailMessageAddedBody = getParameter(
-			actionRequest, "emailMessageAddedBody");
-
-		if (Validator.isNull(emailMessageAddedSubject)) {
-			SessionErrors.add(actionRequest, "emailMessageAddedSubject");
-		}
-		else if (Validator.isNull(emailMessageAddedBody)) {
-			SessionErrors.add(actionRequest, "emailMessageAddedBody");
-		}
-	}
-
-	protected void validateEmailMessageUpdated(ActionRequest actionRequest)
-		throws Exception {
-
-		String emailMessageUpdatedSubject = getParameter(
-			actionRequest, "emailMessageUpdatedSubject");
-		String emailMessageUpdatedBody = getParameter(
-			actionRequest, "emailMessageUpdatedBody");
-
-		if (Validator.isNull(emailMessageUpdatedSubject)) {
-			SessionErrors.add(actionRequest, "emailMessageUpdatedSubject");
-		}
-		else if (Validator.isNull(emailMessageUpdatedBody)) {
-			SessionErrors.add(actionRequest, "emailMessageUpdatedBody");
 		}
 	}
 

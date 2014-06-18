@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,12 +38,10 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	*
 	* @param mdrRuleGroup the m d r rule group
 	* @return the m d r rule group that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup addMDRRuleGroup(
-		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup) {
 		return _mdrRuleGroupLocalService.addMDRRuleGroup(mdrRuleGroup);
 	}
 
@@ -65,13 +63,11 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param ruleGroupId the primary key of the m d r rule group
 	* @return the m d r rule group that was removed
 	* @throws PortalException if a m d r rule group with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup deleteMDRRuleGroup(
 		long ruleGroupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.deleteMDRRuleGroup(ruleGroupId);
 	}
 
@@ -80,12 +76,10 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	*
 	* @param mdrRuleGroup the m d r rule group
 	* @return the m d r rule group that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup deleteMDRRuleGroup(
-		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup) {
 		return _mdrRuleGroupLocalService.deleteMDRRuleGroup(mdrRuleGroup);
 	}
 
@@ -99,13 +93,11 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _mdrRuleGroupLocalService.dynamicQuery(dynamicQuery);
 	}
 
@@ -120,13 +112,12 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return _mdrRuleGroupLocalService.dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -142,15 +133,13 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return _mdrRuleGroupLocalService.dynamicQuery(dynamicQuery, start, end,
 			orderByComparator);
 	}
@@ -160,12 +149,10 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _mdrRuleGroupLocalService.dynamicQueryCount(dynamicQuery);
 	}
 
@@ -175,21 +162,18 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return _mdrRuleGroupLocalService.dynamicQueryCount(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup fetchMDRRuleGroup(
-		long ruleGroupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long ruleGroupId) {
 		return _mdrRuleGroupLocalService.fetchMDRRuleGroup(ruleGroupId);
 	}
 
@@ -199,12 +183,10 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param uuid the m d r rule group's UUID
 	* @param companyId the primary key of the company
 	* @return the matching m d r rule group, or <code>null</code> if a matching m d r rule group could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup fetchMDRRuleGroupByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long companyId) {
 		return _mdrRuleGroupLocalService.fetchMDRRuleGroupByUuidAndCompanyId(uuid,
 			companyId);
 	}
@@ -215,12 +197,10 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param uuid the m d r rule group's UUID
 	* @param groupId the primary key of the group
 	* @return the matching m d r rule group, or <code>null</code> if a matching m d r rule group could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup fetchMDRRuleGroupByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long groupId) {
 		return _mdrRuleGroupLocalService.fetchMDRRuleGroupByUuidAndGroupId(uuid,
 			groupId);
 	}
@@ -231,21 +211,39 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param ruleGroupId the primary key of the m d r rule group
 	* @return the m d r rule group
 	* @throws PortalException if a m d r rule group with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup getMDRRuleGroup(
 		long ruleGroupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.getMDRRuleGroup(ruleGroupId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _mdrRuleGroupLocalService.getActionableDynamicQuery();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		return _mdrRuleGroupLocalService.getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _mdrRuleGroupLocalService.deletePersistedModel(persistedModel);
 	}
 
 	@Override
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.getPersistedModel(primaryKeyObj);
 	}
 
@@ -256,13 +254,11 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param companyId the primary key of the company
 	* @return the matching m d r rule group
 	* @throws PortalException if a matching m d r rule group could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup getMDRRuleGroupByUuidAndCompanyId(
 		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.getMDRRuleGroupByUuidAndCompanyId(uuid,
 			companyId);
 	}
@@ -274,13 +270,11 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param groupId the primary key of the group
 	* @return the matching m d r rule group
 	* @throws PortalException if a matching m d r rule group could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup getMDRRuleGroupByUuidAndGroupId(
 		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.getMDRRuleGroupByUuidAndGroupId(uuid,
 			groupId);
 	}
@@ -295,12 +289,10 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* @param start the lower bound of the range of m d r rule groups
 	* @param end the upper bound of the range of m d r rule groups (not inclusive)
 	* @return the range of m d r rule groups
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> getMDRRuleGroups(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _mdrRuleGroupLocalService.getMDRRuleGroups(start, end);
 	}
 
@@ -308,11 +300,9 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	* Returns the number of m d r rule groups.
 	*
 	* @return the number of m d r rule groups
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getMDRRuleGroupsCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getMDRRuleGroupsCount() {
 		return _mdrRuleGroupLocalService.getMDRRuleGroupsCount();
 	}
 
@@ -321,12 +311,10 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	*
 	* @param mdrRuleGroup the m d r rule group
 	* @return the m d r rule group that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup updateMDRRuleGroup(
-		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup mdrRuleGroup) {
 		return _mdrRuleGroupLocalService.updateMDRRuleGroup(mdrRuleGroup);
 	}
 
@@ -356,8 +344,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.addRuleGroup(groupId, nameMap,
 			descriptionMap, serviceContext);
 	}
@@ -366,8 +353,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup copyRuleGroup(
 		long ruleGroupId, long groupId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.copyRuleGroup(ruleGroupId, groupId,
 			serviceContext);
 	}
@@ -376,63 +362,54 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup copyRuleGroup(
 		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup ruleGroup,
 		long groupId, com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.copyRuleGroup(ruleGroup, groupId,
 			serviceContext);
 	}
 
 	@Override
-	public void deleteRuleGroup(long ruleGroupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void deleteRuleGroup(long ruleGroupId) {
 		_mdrRuleGroupLocalService.deleteRuleGroup(ruleGroupId);
 	}
 
 	@Override
 	public void deleteRuleGroup(
-		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup ruleGroup)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup ruleGroup) {
 		_mdrRuleGroupLocalService.deleteRuleGroup(ruleGroup);
 	}
 
 	@Override
-	public void deleteRuleGroups(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void deleteRuleGroups(long groupId) {
 		_mdrRuleGroupLocalService.deleteRuleGroups(groupId);
 	}
 
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup fetchRuleGroup(
-		long ruleGroupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long ruleGroupId) {
 		return _mdrRuleGroupLocalService.fetchRuleGroup(ruleGroupId);
 	}
 
 	@Override
 	public com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup getRuleGroup(
 		long ruleGroupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.getRuleGroup(ruleGroupId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> getRuleGroups(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId) {
 		return _mdrRuleGroupLocalService.getRuleGroups(groupId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> getRuleGroups(
-		long groupId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, int start, int end) {
 		return _mdrRuleGroupLocalService.getRuleGroups(groupId, start, end);
 	}
 
 	@Override
-	public int getRuleGroupsCount(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getRuleGroupsCount(long groupId) {
 		return _mdrRuleGroupLocalService.getRuleGroupsCount(groupId);
 	}
 
@@ -444,7 +421,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	@Override
 	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> search(
 		long groupId, java.lang.String name, boolean andOperator, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return _mdrRuleGroupLocalService.search(groupId, name, andOperator,
 			start, end);
 	}
@@ -453,8 +430,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> search(
 		long groupId, java.lang.String name,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		boolean andOperator, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean andOperator, int start, int end) {
 		return _mdrRuleGroupLocalService.search(groupId, name, params,
 			andOperator, start, end);
 	}
@@ -467,8 +443,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	@Override
 	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> searchByKeywords(
 		long groupId, java.lang.String keywords, boolean andOperator,
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _mdrRuleGroupLocalService.searchByKeywords(groupId, keywords,
 			andOperator, start, end);
 	}
@@ -477,8 +452,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	public java.util.List<com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup> searchByKeywords(
 		long groupId, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		boolean andOperator, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean andOperator, int start, int end) {
 		return _mdrRuleGroupLocalService.searchByKeywords(groupId, keywords,
 			params, andOperator, start, end);
 	}
@@ -490,8 +464,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	@Deprecated
 	@Override
 	public int searchByKeywordsCount(long groupId, java.lang.String keywords,
-		boolean andOperator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean andOperator) {
 		return _mdrRuleGroupLocalService.searchByKeywordsCount(groupId,
 			keywords, andOperator);
 	}
@@ -499,8 +472,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	@Override
 	public int searchByKeywordsCount(long groupId, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		boolean andOperator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean andOperator) {
 		return _mdrRuleGroupLocalService.searchByKeywordsCount(groupId,
 			keywords, params, andOperator);
 	}
@@ -512,16 +484,14 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 	@Deprecated
 	@Override
 	public int searchCount(long groupId, java.lang.String name,
-		boolean andOperator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean andOperator) {
 		return _mdrRuleGroupLocalService.searchCount(groupId, name, andOperator);
 	}
 
 	@Override
 	public int searchCount(long groupId, java.lang.String name,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		boolean andOperator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean andOperator) {
 		return _mdrRuleGroupLocalService.searchCount(groupId, name, params,
 			andOperator);
 	}
@@ -532,8 +502,7 @@ public class MDRRuleGroupLocalServiceWrapper implements MDRRuleGroupLocalService
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mdrRuleGroupLocalService.updateRuleGroup(ruleGroupId, nameMap,
 			descriptionMap, serviceContext);
 	}

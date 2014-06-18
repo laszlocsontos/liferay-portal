@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +32,7 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 
 	@Override
 	public String onScript(
-		String script, String xml, String languageId,
+		String script, Document document, String languageId,
 		Map<String, String> tokens) {
 
 		if (_log.isDebugEnabled()) {
@@ -45,17 +43,55 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 	}
 
 	@Override
-	public String onXml(
-		String xml, String languageId, Map<String, String> tokens) {
+	public Document onXml(
+		Document document, String languageId, Map<String, String> tokens) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("onXml");
 		}
 
-		return replace(xml, languageId);
+		filterByLanguage(document, languageId);
+
+		return document;
 	}
 
-	protected void replace(Element root, String languageId) {
+	protected void filterByLanguage(Document document, String languageId) {
+		Element rootElement = document.getRootElement();
+
+		String defaultLanguageId = LocaleUtil.toLanguageId(
+			LocaleUtil.getSiteDefault());
+
+		String[] availableLocales = StringUtil.split(
+			rootElement.attributeValue("available-locales", defaultLanguageId));
+
+		String defaultLocale = rootElement.attributeValue(
+			"default-locale", defaultLanguageId);
+
+		boolean supportedLocale = false;
+
+		for (String availableLocale : availableLocales) {
+			if (StringUtil.equalsIgnoreCase(availableLocale, languageId)) {
+				supportedLocale = true;
+
+				break;
+			}
+		}
+
+		if (!supportedLocale) {
+			filterByLanguage(rootElement, defaultLocale, defaultLanguageId);
+		}
+		else {
+			filterByLanguage(rootElement, languageId, defaultLanguageId);
+		}
+	}
+
+	protected void filterByLanguage(
+		Element root, String languageId, String defaultLanguageId) {
+
+		Element defaultLanguageElement = null;
+
+		boolean hasLanguageIdElement = false;
+
 		List<Element> elements = root.elements();
 
 		int listIndex = elements.size() - 1;
@@ -66,61 +102,30 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 			String tempLanguageId = element.attributeValue(
 				"language-id", languageId);
 
-			if (!StringUtil.equalsIgnoreCase(tempLanguageId, languageId)) {
-				root.remove(element);
+			if (StringUtil.equalsIgnoreCase(tempLanguageId, languageId)) {
+				hasLanguageIdElement = true;
+
+				filterByLanguage(element, languageId, defaultLanguageId);
 			}
 			else {
-				replace(element, languageId);
+				if (StringUtil.equalsIgnoreCase(
+						tempLanguageId, defaultLanguageId)) {
+
+					defaultLanguageElement = element;
+				}
+
+				root.remove(element);
 			}
 
 			listIndex--;
 		}
-	}
 
-	protected String replace(String xml, String languageId) {
-		if (xml == null) {
-			return xml;
+		if (!hasLanguageIdElement && (defaultLanguageElement != null)) {
+			root.add(defaultLanguageElement);
+
+			filterByLanguage(
+				defaultLanguageElement, languageId, defaultLanguageId);
 		}
-
-		try {
-			Document document = SAXReaderUtil.read(xml);
-
-			Element rootElement = document.getRootElement();
-
-			String defaultLanguageId = LocaleUtil.toLanguageId(
-				LocaleUtil.getSiteDefault());
-
-			String[] availableLocales = StringUtil.split(
-				rootElement.attributeValue(
-					"available-locales", defaultLanguageId));
-
-			String defaultLocale = rootElement.attributeValue(
-				"default-locale", defaultLanguageId);
-
-			boolean supportedLocale = false;
-
-			for (String availableLocale : availableLocales) {
-				if (StringUtil.equalsIgnoreCase(availableLocale, languageId)) {
-					supportedLocale = true;
-
-					break;
-				}
-			}
-
-			if (!supportedLocale) {
-				replace(rootElement, defaultLocale);
-			}
-			else {
-				replace(rootElement, languageId);
-			}
-
-			xml = DDMXMLUtil.formatXML(document);
-		}
-		catch (Exception e) {
-			_log.error(e);
-		}
-
-		return xml;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,7 +42,7 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 
 	<aui:field-wrapper cssClass='<%= randomNamespace + "calendar calendar_" %>' label="" name="<%= HtmlUtil.escapeAttribute(facet.getFieldId()) %>">
 		<ul class="modified nav nav-pills nav-stacked">
-			<li class="facet-value default<%= (fieldParamSelection.equals("0") ? " active" : StringPool.BLANK) %>">
+			<li class="default<%= (fieldParamSelection.equals("0") ? " active" : StringPool.BLANK) %> facet-value">
 
 				<%
 				String taglibClearFacet = "window['" + renderResponse.getNamespace() + HtmlUtil.escapeJS(facet.getFieldId()) + "clearFacet'](0);";
@@ -215,6 +215,8 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 <aui:script use="aui-datepicker-deprecated,aui-form-validator">
 	var Util = Liferay.Util;
 
+	var DATE_FORMAT = '%Y-%m-%d';
+
 	var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
 	var REGEX_DATE = /^\d{4}(-)(0[1-9]|1[012])\1(0[1-9]|[12][0-9]|3[01])$/;
@@ -242,22 +244,30 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 			<portlet:namespace />dateFormat: function(val, fieldNode, ruleValue) {
 				var validDate = (REGEX_DATE.test(val) === true);
 
-				if (validDate) {
-					var dateValue = A.Date.parse(val);
+				var dateValue = null;
 
-					if (fieldNode === customRangeFrom) {
-						dateFrom = dateValue;
-					}
-					else if (fieldNode === customRangeTo) {
-						dateTo = dateValue;
-					}
+				if (validDate) {
+					dateValue = A.Date.parse(DATE_FORMAT, val);
+				}
+
+				if (fieldNode === customRangeFrom) {
+					dateFrom = dateValue;
+				}
+				else if (fieldNode === customRangeTo) {
+					dateTo = dateValue;
 				}
 
 				return validDate;
 			},
 
 			<portlet:namespace />dateRange: function(val, fieldNode, ruleValue) {
-				return A.Date.isGreaterOrEqual(dateTo, dateFrom);
+				var greaterOrEqual = true;
+
+				if (dateTo && dateFrom) {
+					greaterOrEqual = A.Date.isGreaterOrEqual(dateTo, dateFrom);
+				}
+
+				return greaterOrEqual;
 			}
 		},
 		true
@@ -269,15 +279,6 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 			fieldContainer: 'div',
 			on: {
 				errorField: function(event) {
-					var field = event.validator.field;
-
-					if (field === customRangeFrom) {
-						dateFrom = null;
-					}
-					else if (field === customRangeTo) {
-						dateTo = null;
-					}
-
 					Util.toggleDisabled(searchButton, true);
 				},
 				validField: function(event) {
@@ -303,10 +304,11 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 			after: {
 				'calendar:dateChange': function(e) {
 					customRangeValidator.validateField(customRangeFrom);
+					customRangeValidator.validateField(customRangeTo);
 				}
 			},
 			calendar: {
-				dateFormat: '%Y-%m-%d',
+				dateFormat: DATE_FORMAT,
 				firstDayOfWeek: <%= firstDayOfWeek %>,
 				locale: '<%= locale %>',
 
@@ -342,7 +344,7 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 				}
 			},
 			calendar: {
-				dateFormat: '%Y-%m-%d',
+				dateFormat: DATE_FORMAT,
 				firstDayOfWeek: <%= firstDayOfWeek %>,
 				locale: '<%= locale %>',
 

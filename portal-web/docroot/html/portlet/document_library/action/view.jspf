@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,7 @@
 --%>
 
 <c:if test="<%= (fileShortcut == null) %>">
-	<c:if test="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.VIEW) %>">
+	<c:if test="<%= dlFileEntryActionsDisplayContext.isViewButtonVisible() %>">
 		<portlet:renderURL var="viewFileEntryURL">
 			<portlet:param name="struts_action" value="/document_library/view_file_entry" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -23,7 +23,7 @@
 		</portlet:renderURL>
 
 		<liferay-ui:icon
-			image="view"
+			iconCssClass="icon-search"
 			message="view[action]"
 			url="<%= viewFileEntryURL %>"
 		/>

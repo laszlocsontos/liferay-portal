@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,26 +87,21 @@ request.setAttribute("view_layout_set_branches.jsp-currentLayoutSetBranchId", St
 		>
 
 			<liferay-ui:search-container-column-text
-				buffer="buffer"
 				name="name"
 			>
+				<c:if test="<%= currentLayoutSetBranch.equals(curLayoutSetBranch) %>">
+					<strong>
+				</c:if>
 
-				<%
-				if (currentLayoutSetBranch.equals(curLayoutSetBranch)) {
-					buffer.append("<strong>");
-				}
+				<liferay-ui:message key="<%= curLayoutSetBranch.getName() %>" />
 
-				buffer.append(LanguageUtil.get(pageContext, curLayoutSetBranch.getName()));
+				<c:if test="<%= curLayoutSetBranch.isMaster() %>">
+					<i class="icon-asterisk"></i>
+				</c:if>
 
-				if (curLayoutSetBranch.isMaster()) {
-					buffer.append(" (*)");
-				}
-
-				if (currentLayoutSetBranch.equals(curLayoutSetBranch)) {
-					buffer.append("</strong>");
-				}
-				%>
-
+				<c:if test="<%= currentLayoutSetBranch.equals(curLayoutSetBranch) %>">
+					</strong>
+				</c:if>
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
@@ -114,6 +109,7 @@ request.setAttribute("view_layout_set_branches.jsp-currentLayoutSetBranchId", St
 			/>
 
 			<liferay-ui:search-container-column-jsp
+				cssClass="entry-action"
 				path="/html/portlet/staging_bar/layout_set_branch_action.jsp"
 			/>
 		</liferay-ui:search-container-row>

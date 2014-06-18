@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,13 +61,11 @@ boolean splitThread = false;
 	%>
 
 	<aui:fieldset>
-		<aui:field-wrapper label="category[message-board]">
-			<div class="input-append">
-				<liferay-ui:input-resource id="categoryName" url='<%= ((categoryId != MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) && (categoryId != MBCategoryConstants.DISCUSSION_CATEGORY_ID)) ? category.getName() : LanguageUtil.get(pageContext, "message-boards-home") %>' />
+		<div class="form-group">
+			<aui:input label="category[message-board]" name="categoryName" type="resource" value='<%= ((categoryId != MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) && (categoryId != MBCategoryConstants.DISCUSSION_CATEGORY_ID)) ? category.getName() : LanguageUtil.get(pageContext, "message-boards-home") %>' />
 
-				<aui:button name="selectCategoryButton" value="select" />
-			</div>
-		</aui:field-wrapper>
+			<aui:button name="selectCategoryButton" value="select" />
+		</div>
 
 		<aui:input disabled="<%= thread.isLocked() %>" helpMessage='<%= thread.isLocked() ? LanguageUtil.get(pageContext, "unlock-thread-to-add-an-explanation-post") : StringPool.BLANK %>' label="add-explanation-post" name="addExplanationPost" onClick='<%= renderResponse.getNamespace() + "toggleExplanationPost();" %>' type="checkbox" />
 
@@ -75,7 +73,7 @@ boolean splitThread = false;
 			<aui:input maxlength="75" name="subject" style="width: 350px;" value="">
 				<aui:validator name="required">
 					function() {
-						return A.one('#<portlet:namespace />addExplanationPostCheckbox').get('checked');
+						return A.one('#<portlet:namespace />addExplanationPost').get('checked');
 					}
 				</aui:validator>
 			</aui:input>
@@ -103,11 +101,11 @@ boolean splitThread = false;
 	}
 
 	function <portlet:namespace />toggleExplanationPost() {
-		if (document.getElementById('<portlet:namespace />addExplanationPostCheckbox').checked) {
-			document.getElementById('<portlet:namespace />explanationPost').style.display = "";
+		if (document.getElementById('<portlet:namespace />addExplanationPost').checked) {
+			document.getElementById('<portlet:namespace />explanationPost').style.display = '';
 		}
 		else {
-			document.getElementById('<portlet:namespace />explanationPost').style.display = "none";
+			document.getElementById('<portlet:namespace />explanationPost').style.display = 'none';
 		}
 	}
 </aui:script>

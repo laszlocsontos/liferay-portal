@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.OrganizationConstants;
@@ -35,7 +34,7 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 	public void check(
 			PermissionChecker permissionChecker, long organizationId,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!contains(permissionChecker, organizationId, actionId)) {
 			throw new PrincipalException();
@@ -46,7 +45,7 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 	public void check(
 			PermissionChecker permissionChecker, Organization organization,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!contains(permissionChecker, organization, actionId)) {
 			throw new PrincipalException();
@@ -57,7 +56,7 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 	public boolean contains(
 			PermissionChecker permissionChecker, long organizationId,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (organizationId > 0) {
 			Organization organization =
@@ -74,7 +73,7 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 	public boolean contains(
 			PermissionChecker permissionChecker, long[] organizationIds,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (ArrayUtil.isEmpty(organizationIds)) {
 			return true;
@@ -91,7 +90,7 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 	public boolean contains(
 			PermissionChecker permissionChecker, Organization organization,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long groupId = organization.getGroupId();
 
@@ -121,7 +120,7 @@ public class OrganizationPermissionImpl implements OrganizationPermission {
 	protected boolean contains(
 			PermissionChecker permissionChecker, long groupId,
 			Organization organization, String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		while ((organization != null) &&
 			   (organization.getOrganizationId() !=

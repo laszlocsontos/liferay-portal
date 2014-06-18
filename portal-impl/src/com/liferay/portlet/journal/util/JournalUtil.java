@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,13 +14,23 @@
 
 package com.liferay.portlet.journal.util;
 
+import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.configuration.Filter;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.diff.CompareVersionsException;
+import com.liferay.portal.kernel.diff.DiffHtmlUtil;
+import com.liferay.portal.kernel.diff.DiffVersion;
+import com.liferay.portal.kernel.diff.DiffVersionsInfo;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.portlet.PortletRequestModel;
+import com.liferay.portal.kernel.portlet.ThemeDisplayModel;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
@@ -28,12 +38,14 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.templateparser.TransformerListener;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -41,7 +53,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Attribute;
@@ -50,6 +61,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
@@ -58,6 +70,7 @@ import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.templateparser.Transformer;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -74,14 +87,12 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.model.JournalArticleDisplay;
 import com.liferay.portlet.journal.model.JournalFolder;
 import com.liferay.portlet.journal.model.JournalFolderConstants;
-import com.liferay.portlet.journal.model.JournalStructure;
-import com.liferay.portlet.journal.model.JournalStructureAdapter;
 import com.liferay.portlet.journal.model.JournalStructureConstants;
-import com.liferay.portlet.journal.model.JournalTemplate;
-import com.liferay.portlet.journal.model.JournalTemplateAdapter;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
+import com.liferay.portlet.journal.service.JournalArticleServiceUtil;
 import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portlet.journal.util.comparator.ArticleCreateDateComparator;
 import com.liferay.portlet.journal.util.comparator.ArticleDisplayDateComparator;
@@ -90,7 +101,6 @@ import com.liferay.portlet.journal.util.comparator.ArticleModifiedDateComparator
 import com.liferay.portlet.journal.util.comparator.ArticleReviewDateComparator;
 import com.liferay.portlet.journal.util.comparator.ArticleTitleComparator;
 import com.liferay.portlet.journal.util.comparator.ArticleVersionComparator;
-import com.liferay.util.ContentUtil;
 import com.liferay.util.FiniteUniqueStack;
 
 import java.util.ArrayList;
@@ -98,7 +108,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 import java.util.regex.Pattern;
@@ -123,52 +135,52 @@ public class JournalUtil {
 	public static final int MAX_STACK_SIZE = 20;
 
 	public static final String[] SELECTED_FIELD_NAMES =
-		{Field.COMPANY_ID, Field.GROUP_ID, Field.UID, "articleId"};
+		{Field.ARTICLE_ID, Field.COMPANY_ID, Field.GROUP_ID, Field.UID};
 
 	public static void addAllReservedEls(
 		Element rootElement, Map<String, String> tokens, JournalArticle article,
 		String languageId, ThemeDisplay themeDisplay) {
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens, JournalStructureConstants.RESERVED_ARTICLE_ID,
 			article.getArticleId());
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_VERSION,
 			article.getVersion());
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_TITLE,
 			article.getTitle(languageId));
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_URL_TITLE,
 			article.getUrlTitle());
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_DESCRIPTION,
 			article.getDescription(languageId));
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_TYPE, article.getType());
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_CREATE_DATE,
 			article.getCreateDate());
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_MODIFIED_DATE,
 			article.getModifiedDate());
 
 		if (article.getDisplayDate() != null) {
-			JournalUtil.addReservedEl(
+			addReservedEl(
 				rootElement, tokens,
 				JournalStructureConstants.RESERVED_ARTICLE_DISPLAY_DATE,
 				article.getDisplayDate());
@@ -192,7 +204,7 @@ public class JournalUtil {
 			smallImageURL = sb.toString();
 		}
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_SMALL_IMAGE_URL,
 			smallImageURL);
@@ -206,12 +218,12 @@ public class JournalUtil {
 		catch (SystemException se) {
 		}
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_ASSET_TAG_NAMES,
 			StringUtil.merge(assetTagNames));
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_AUTHOR_ID,
 			String.valueOf(article.getUserId()));
@@ -221,36 +233,34 @@ public class JournalUtil {
 		String userComments = StringPool.BLANK;
 		String userJobTitle = StringPool.BLANK;
 
-		User user = null;
-
 		try {
-			user = UserLocalServiceUtil.getUserById(article.getUserId());
+			User user = UserLocalServiceUtil.fetchUserById(article.getUserId());
 
-			userName = user.getFullName();
-			userEmailAddress = user.getEmailAddress();
-			userComments = user.getComments();
-			userJobTitle = user.getJobTitle();
-		}
-		catch (PortalException pe) {
+			if (user != null) {
+				userName = user.getFullName();
+				userEmailAddress = user.getEmailAddress();
+				userComments = user.getComments();
+				userJobTitle = user.getJobTitle();
+			}
 		}
 		catch (SystemException se) {
 		}
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_AUTHOR_NAME, userName);
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_AUTHOR_EMAIL_ADDRESS,
 			userEmailAddress);
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_AUTHOR_COMMENTS,
 			userComments);
 
-		JournalUtil.addReservedEl(
+		addReservedEl(
 			rootElement, tokens,
 			JournalStructureConstants.RESERVED_ARTICLE_AUTHOR_JOB_TITLE,
 			userJobTitle);
@@ -433,28 +443,18 @@ public class JournalUtil {
 		// XML
 
 		if (rootElement != null) {
-			Element dynamicElementElement = SAXReaderUtil.createElement(
+			Element dynamicElementElement = rootElement.addElement(
 				"dynamic-element");
 
-			Attribute nameAttribute = SAXReaderUtil.createAttribute(
-				dynamicElementElement, "name", name);
+			dynamicElementElement.addAttribute("name", name);
 
-			dynamicElementElement.add(nameAttribute);
+			dynamicElementElement.addAttribute("type", "text");
 
-			Attribute typeAttribute = SAXReaderUtil.createAttribute(
-				dynamicElementElement, "type", "text");
-
-			dynamicElementElement.add(typeAttribute);
-
-			Element dynamicContentElement = SAXReaderUtil.createElement(
+			Element dynamicContentElement = dynamicElementElement.addElement(
 				"dynamic-content");
 
 			//dynamicContentElement.setText("<![CDATA[" + value + "]]>");
 			dynamicContentElement.setText(value);
-
-			dynamicElementElement.add(dynamicContentElement);
-
-			rootElement.add(dynamicElementElement);
 		}
 
 		// Tokens
@@ -463,13 +463,66 @@ public class JournalUtil {
 			StringUtil.replace(name, CharPool.DASH, CharPool.UNDERLINE), value);
 	}
 
+	public static String diffHtml(
+			long groupId, String articleId, double sourceVersion,
+			double targetVersion, String languageId,
+			PortletRequestModel portletRequestModel, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		JournalArticle sourceArticle =
+			JournalArticleLocalServiceUtil.getArticle(
+				groupId, articleId, sourceVersion);
+
+		if (!JournalArticleLocalServiceUtil.isRenderable(
+				sourceArticle, portletRequestModel, themeDisplay)) {
+
+			throw new CompareVersionsException(sourceVersion);
+		}
+
+		JournalArticleDisplay sourceArticleDisplay =
+			JournalArticleLocalServiceUtil.getArticleDisplay(
+				sourceArticle, null, Constants.VIEW, languageId, 1,
+				portletRequestModel, themeDisplay);
+
+		JournalArticle targetArticle =
+			JournalArticleLocalServiceUtil.getArticle(
+				groupId, articleId, targetVersion);
+
+		if (!JournalArticleLocalServiceUtil.isRenderable(
+				targetArticle, portletRequestModel, themeDisplay)) {
+
+			throw new CompareVersionsException(targetVersion);
+		}
+
+		JournalArticleDisplay targetArticleDisplay =
+			JournalArticleLocalServiceUtil.getArticleDisplay(
+				targetArticle, null, Constants.VIEW, languageId, 1,
+				portletRequestModel, themeDisplay);
+
+		return DiffHtmlUtil.diff(
+			new UnsyncStringReader(sourceArticleDisplay.getContent()),
+			new UnsyncStringReader(targetArticleDisplay.getContent()));
+	}
+
+	public static String doTransform(
+			ThemeDisplay themeDisplay, Map<String, String> tokens,
+			String viewMode, String languageId, Document document,
+			PortletRequestModel portletRequestModel, String script,
+			String langType)
+		throws Exception {
+
+		return _transformer.doTransform(
+			themeDisplay, tokens, viewMode, languageId, document,
+			portletRequestModel, script, langType);
+	}
+
 	public static String formatVM(String vm) {
 		return vm;
 	}
 
 	public static String getAbsolutePath(
 			PortletRequest portletRequest, long folderId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -540,7 +593,7 @@ public class JournalUtil {
 	}
 
 	public static List<JournalArticle> getArticles(Hits hits)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<com.liferay.portal.kernel.search.Document> documents =
 			hits.toList();
@@ -549,8 +602,8 @@ public class JournalUtil {
 			documents.size());
 
 		for (com.liferay.portal.kernel.search.Document document : documents) {
+			String articleId = document.get(Field.ARTICLE_ID);
 			long groupId = GetterUtil.getLong(document.get(Field.GROUP_ID));
-			String articleId = document.get("articleId");
 
 			JournalArticle article =
 				JournalArticleLocalServiceUtil.fetchLatestArticle(
@@ -575,19 +628,51 @@ public class JournalUtil {
 		return articles;
 	}
 
-	public static String getEmailArticleAddedBody(
+	public static DiffVersionsInfo getDiffVersionsInfo(
+		long groupId, String articleId, double sourceVersion,
+		double targetVersion) {
+
+		double previousVersion = 0;
+		double nextVersion = 0;
+
+		List<JournalArticle> articles =
+			JournalArticleServiceUtil.getArticlesByArticleId(
+				groupId, articleId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new ArticleVersionComparator(true));
+
+		for (JournalArticle article : articles) {
+			if ((article.getVersion() < sourceVersion) &&
+				(article.getVersion() > previousVersion)) {
+
+				previousVersion = article.getVersion();
+			}
+
+			if ((article.getVersion() > targetVersion) &&
+				((article.getVersion() < nextVersion) || (nextVersion == 0))) {
+
+				nextVersion = article.getVersion();
+			}
+		}
+
+		List<DiffVersion> diffVersions = new ArrayList<DiffVersion>();
+
+		for (JournalArticle article : articles) {
+			DiffVersion diffVersion = new DiffVersion(
+				article.getUserId(), article.getVersion(),
+				article.getModifiedDate());
+
+			diffVersions.add(diffVersion);
+		}
+
+		return new DiffVersionsInfo(diffVersions, nextVersion, previousVersion);
+	}
+
+	public static Map<Locale, String> getEmailArticleAddedBodyMap(
 		PortletPreferences preferences) {
 
-		String emailArticleAddedBody = preferences.getValue(
-			"emailArticleAddedBody", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleAddedBody)) {
-			return emailArticleAddedBody;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_ADDED_BODY));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleAddedBody",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_ADDED_BODY);
 	}
 
 	public static boolean getEmailArticleAddedEnabled(
@@ -605,35 +690,36 @@ public class JournalUtil {
 		}
 	}
 
-	public static String getEmailArticleAddedSubject(
+	public static Map<Locale, String> getEmailArticleAddedSubjectMap(
 		PortletPreferences preferences) {
 
-		String emailArticleAddedSubject = preferences.getValue(
-			"emailArticleAddedSubject", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleAddedSubject)) {
-			return emailArticleAddedSubject;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_ADDED_SUBJECT));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleAddedSubject",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_ADDED_SUBJECT);
 	}
 
-	public static String getEmailArticleApprovalDeniedBody(
+	public static boolean getEmailArticleAnyEventEnabled(
 		PortletPreferences preferences) {
 
-		String emailArticleApprovalDeniedBody = preferences.getValue(
-			"emailArticleApprovalDeniedBody", StringPool.BLANK);
+		if (getEmailArticleAddedEnabled(preferences) ||
+			getEmailArticleApprovalDeniedEnabled(preferences) ||
+			getEmailArticleApprovalGrantedEnabled(preferences) ||
+			getEmailArticleApprovalRequestedEnabled(preferences) ||
+			getEmailArticleReviewEnabled(preferences) ||
+			getEmailArticleUpdatedEnabled(preferences)) {
 
-		if (Validator.isNotNull(emailArticleApprovalDeniedBody)) {
-			return emailArticleApprovalDeniedBody;
+			return true;
 		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(
-					PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_BODY));
-		}
+
+		return false;
+	}
+
+	public static Map<Locale, String> getEmailArticleApprovalDeniedBodyMap(
+		PortletPreferences preferences) {
+
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleApprovalDeniedBody",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_BODY);
 	}
 
 	public static boolean getEmailArticleApprovalDeniedEnabled(
@@ -652,36 +738,20 @@ public class JournalUtil {
 		}
 	}
 
-	public static String getEmailArticleApprovalDeniedSubject(
+	public static Map<Locale, String> getEmailArticleApprovalDeniedSubjectMap(
 		PortletPreferences preferences) {
 
-		String emailArticleApprovalDeniedSubject = preferences.getValue(
-			"emailArticleApprovalDeniedSubject", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleApprovalDeniedSubject)) {
-			return emailArticleApprovalDeniedSubject;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(
-					PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_SUBJECT));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleApprovalDeniedSubject",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_DENIED_SUBJECT);
 	}
 
-	public static String getEmailArticleApprovalGrantedBody(
+	public static Map<Locale, String> getEmailArticleApprovalGrantedBodyMap(
 		PortletPreferences preferences) {
 
-		String emailArticleApprovalGrantedBody = preferences.getValue(
-			"emailArticleApprovalGrantedBody", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleApprovalGrantedBody)) {
-			return emailArticleApprovalGrantedBody;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(
-					PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_BODY));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleApprovalGrantedBody",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_BODY);
 	}
 
 	public static boolean getEmailArticleApprovalGrantedEnabled(
@@ -700,36 +770,20 @@ public class JournalUtil {
 		}
 	}
 
-	public static String getEmailArticleApprovalGrantedSubject(
+	public static Map<Locale, String> getEmailArticleApprovalGrantedSubjectMap(
 		PortletPreferences preferences) {
 
-		String emailArticleApprovalGrantedSubject = preferences.getValue(
-			"emailArticleApprovalGrantedSubject", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleApprovalGrantedSubject)) {
-			return emailArticleApprovalGrantedSubject;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(
-					PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_SUBJECT));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleApprovalGrantedSubject",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_GRANTED_SUBJECT);
 	}
 
-	public static String getEmailArticleApprovalRequestedBody(
+	public static Map<Locale, String> getEmailArticleApprovalRequestedBodyMap(
 		PortletPreferences preferences) {
 
-		String emailArticleApprovalRequestedBody = preferences.getValue(
-			"emailArticleApprovalRequestedBody", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleApprovalRequestedBody)) {
-			return emailArticleApprovalRequestedBody;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(
-					PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_BODY));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleApprovalRequestedBody",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_BODY);
 	}
 
 	public static boolean getEmailArticleApprovalRequestedEnabled(
@@ -749,36 +803,20 @@ public class JournalUtil {
 		}
 	}
 
-	public static String getEmailArticleApprovalRequestedSubject(
+	public static Map<Locale, String> getEmailArticleApprovalRequestedSubjectMap(
 		PortletPreferences preferences) {
 
-		String emailArticleApprovalRequestedSubject = preferences.getValue(
-			"emailArticleApprovalRequestedSubject", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleApprovalRequestedSubject)) {
-			return emailArticleApprovalRequestedSubject;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(
-					PropsKeys.
-						JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_SUBJECT));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleApprovalRequestedSubject",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_APPROVAL_REQUESTED_SUBJECT);
 	}
 
-	public static String getEmailArticleReviewBody(
+	public static Map<Locale, String> getEmailArticleReviewBodyMap(
 		PortletPreferences preferences) {
 
-		String emailArticleReviewBody = preferences.getValue(
-			"emailArticleReviewBody", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleReviewBody)) {
-			return emailArticleReviewBody;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_REVIEW_BODY));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleReviewBody",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_REVIEW_BODY);
 	}
 
 	public static boolean getEmailArticleReviewEnabled(
@@ -796,34 +834,20 @@ public class JournalUtil {
 		}
 	}
 
-	public static String getEmailArticleReviewSubject(
+	public static Map<Locale, String> getEmailArticleReviewSubjectMap(
 		PortletPreferences preferences) {
 
-		String emailArticleReviewSubject = preferences.getValue(
-			"emailArticleReviewSubject", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleReviewSubject)) {
-			return emailArticleReviewSubject;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_REVIEW_SUBJECT));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleReviewSubject",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_REVIEW_SUBJECT);
 	}
 
-	public static String getEmailArticleUpdatedBody(
+	public static Map<Locale, String> getEmailArticleUpdatedBodyMap(
 		PortletPreferences preferences) {
 
-		String emailArticleUpdatedBody = preferences.getValue(
-			"emailArticleUpdatedBody", StringPool.BLANK);
-
-		if (Validator.isNotNull(emailArticleUpdatedBody)) {
-			return emailArticleUpdatedBody;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_UPDATED_BODY));
-		}
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleUpdatedBody",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_UPDATED_BODY);
 	}
 
 	public static boolean getEmailArticleUpdatedEnabled(
@@ -841,32 +865,79 @@ public class JournalUtil {
 		}
 	}
 
-	public static String getEmailArticleUpdatedSubject(
+	public static Map<Locale, String> getEmailArticleUpdatedSubjectMap(
 		PortletPreferences preferences) {
 
-		String emailArticleUpdatedSubject = preferences.getValue(
-			"emailArticleUpdatedSubject", StringPool.BLANK);
+		return LocalizationUtil.getLocalizationMap(
+			preferences, "emailArticleUpdatedSubject",
+			PropsKeys.JOURNAL_EMAIL_ARTICLE_UPDATED_SUBJECT);
+	}
 
-		if (Validator.isNotNull(emailArticleUpdatedSubject)) {
-			return emailArticleUpdatedSubject;
-		}
-		else {
-			return ContentUtil.get(
-				PropsUtil.get(PropsKeys.JOURNAL_EMAIL_ARTICLE_UPDATED_SUBJECT));
-		}
+	public static Map<String, String> getEmailDefinitionTerms(
+		PortletRequest portletRequest, String emailFromAddress,
+		String emailFromName) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Map<String, String> definitionTerms =
+			new LinkedHashMap<String, String>();
+
+		definitionTerms.put(
+			"[$ARTICLE_CONTENT]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-web-content"));
+		definitionTerms.put(
+			"[$ARTICLE_DIFFS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-web-content-compared-with-the-previous-version-web-" +
+					"content"));
+		definitionTerms.put(
+			"[$ARTICLE_ID$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-web-content-id"));
+		definitionTerms.put(
+			"[$ARTICLE_TITLE$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-web-content-title"));
+		definitionTerms.put(
+			"[$ARTICLE_URL$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-web-content-url"));
+		definitionTerms.put(
+			"[$ARTICLE_VERSION$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-web-content-version"));
+		definitionTerms.put(
+			"[$FROM_ADDRESS$]", HtmlUtil.escape(emailFromAddress));
+		definitionTerms.put("[$FROM_NAME$]", HtmlUtil.escape(emailFromName));
+
+		Company company = themeDisplay.getCompany();
+
+		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
+
+		definitionTerms.put(
+			"[$PORTLET_NAME$]", PortalUtil.getPortletTitle(portletRequest));
+		definitionTerms.put(
+			"[$TO_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-address-of-the-email-recipient"));
+		definitionTerms.put(
+			"[$TO_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-name-of-the-email-recipient"));
+
+		return definitionTerms;
 	}
 
 	public static String getEmailFromAddress(
-			PortletPreferences preferences, long companyId)
-		throws SystemException {
+		PortletPreferences preferences, long companyId) {
 
 		return PortalUtil.getEmailFromAddress(
 			preferences, companyId, PropsValues.JOURNAL_EMAIL_FROM_ADDRESS);
 	}
 
 	public static String getEmailFromName(
-			PortletPreferences preferences, long companyId)
-		throws SystemException {
+		PortletPreferences preferences, long companyId) {
 
 		return PortalUtil.getEmailFromName(
 			preferences, companyId, PropsValues.JOURNAL_EMAIL_FROM_NAME);
@@ -874,7 +945,7 @@ public class JournalUtil {
 
 	public static String getJournalControlPanelLink(
 			PortletRequest portletRequest, long folderId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -981,25 +1052,17 @@ public class JournalUtil {
 		return recentDDMTemplates;
 	}
 
-	public static long[] getStructureClassPKs(
-			long[] groupIds, String structureId)
-		throws SystemException {
+	public static int getRestrictionType(long folderId) {
+		int restrictionType = JournalFolderConstants.RESTRICTION_TYPE_INHERIT;
 
-		List<Long> classPKs = new ArrayList<Long>();
+		JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(
+			folderId);
 
-		for (long groupId : groupIds) {
-			@SuppressWarnings("deprecation")
-			JournalStructure structure =
-				com.liferay.portlet.journal.service.
-					JournalStructureLocalServiceUtil.fetchStructure(
-						groupId, structureId);
-
-			if (structure != null) {
-				classPKs.add(structure.getId());
-			}
+		if (folder != null) {
+			restrictionType = folder.getRestrictionType();
 		}
 
-		return ArrayUtil.toLongArray(classPKs);
+		return restrictionType;
 	}
 
 	public static String getTemplateScript(
@@ -1032,7 +1095,7 @@ public class JournalUtil {
 			}
 
 			script = transformerListener.onScript(
-				script, null, languageId, tokens);
+				script, (Document)null, languageId, tokens);
 		}
 
 		return script;
@@ -1041,7 +1104,7 @@ public class JournalUtil {
 	public static String getTemplateScript(
 			long groupId, String ddmTemplateKey, Map<String, String> tokens,
 			String languageId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getTemplateScript(
 			groupId, ddmTemplateKey, tokens, languageId, true);
@@ -1050,7 +1113,7 @@ public class JournalUtil {
 	public static String getTemplateScript(
 			long groupId, String ddmTemplateKey, Map<String, String> tokens,
 			String languageId, boolean transform)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		DDMTemplate ddmTemplate = DDMTemplateLocalServiceUtil.getTemplate(
 			groupId, PortalUtil.getClassNameId(DDMStructure.class),
@@ -1060,33 +1123,40 @@ public class JournalUtil {
 	}
 
 	public static Map<String, String> getTokens(
-			long articleGroupId, ThemeDisplay themeDisplay)
-		throws PortalException, SystemException {
-
-		return getTokens(articleGroupId, themeDisplay, null);
-	}
-
-	public static Map<String, String> getTokens(
-			long articleGroupId, ThemeDisplay themeDisplay, String xmlRequest)
-		throws PortalException, SystemException {
+			long articleGroupId, PortletRequestModel portletRequestModel,
+			ThemeDisplay themeDisplay)
+		throws PortalException {
 
 		Map<String, String> tokens = new HashMap<String, String>();
 
 		if (themeDisplay != null) {
 			_populateTokens(tokens, articleGroupId, themeDisplay);
 		}
-		else if (Validator.isNotNull(xmlRequest)) {
-			try {
-				_populateTokens(tokens, articleGroupId, xmlRequest);
-			}
-			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(e, e);
+		else if (portletRequestModel != null) {
+			ThemeDisplayModel themeDisplayModel =
+				portletRequestModel.getThemeDisplayModel();
+
+			if (themeDisplayModel != null) {
+				try {
+					_populateTokens(tokens, articleGroupId, themeDisplayModel);
+				}
+				catch (Exception e) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(e, e);
+					}
 				}
 			}
 		}
 
 		return tokens;
+	}
+
+	public static Map<String, String> getTokens(
+			long articleGroupId, ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		return getTokens(
+			articleGroupId, (PortletRequestModel)null, themeDisplay);
 	}
 
 	public static String getUrlTitle(long id, String title) {
@@ -1108,6 +1178,48 @@ public class JournalUtil {
 
 		return ModelHintsUtil.trimString(
 			JournalArticle.class.getName(), "urlTitle", title);
+	}
+
+	public static boolean isSubscribedToFolder(
+			long companyId, long groupId, long userId, long folderId)
+		throws PortalException {
+
+		return isSubscribedToFolder(companyId, groupId, userId, folderId, true);
+	}
+
+	public static boolean isSubscribedToFolder(
+			long companyId, long groupId, long userId, long folderId,
+			boolean recursive)
+		throws PortalException {
+
+		List<Long> ancestorFolderIds = new ArrayList<Long>();
+
+		if (folderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			JournalFolder folder = JournalFolderLocalServiceUtil.getFolder(
+				folderId);
+
+			ancestorFolderIds.add(folderId);
+
+			if (recursive) {
+				ancestorFolderIds.addAll(folder.getAncestorFolderIds());
+
+				ancestorFolderIds.add(groupId);
+			}
+		}
+		else {
+			ancestorFolderIds.add(groupId);
+		}
+
+		return SubscriptionLocalServiceUtil.isSubscribed(
+			companyId, userId, JournalFolder.class.getName(),
+			ArrayUtil.toLongArray(ancestorFolderIds));
+	}
+
+	public static boolean isSubscribedToStructure(
+		long companyId, long groupId, long userId, long ddmStructureId) {
+
+		return SubscriptionLocalServiceUtil.isSubscribed(
+			companyId, userId, DDMStructure.class.getName(), ddmStructureId);
 	}
 
 	public static String mergeArticleContent(
@@ -1144,40 +1256,63 @@ public class JournalUtil {
 		return curContent;
 	}
 
-	public static void removeArticleLocale(Element element, String languageId)
-		throws PortalException, SystemException {
+	public static String prepareLocalizedContentForImport(
+			String content, Locale defaultImportLocale)
+		throws LocaleException {
 
-		for (Element dynamicElementElement :
-				element.elements("dynamic-element")) {
+		try {
+			Document oldDocument = SAXReaderUtil.read(content);
 
-			for (Element dynamicContentElement :
-					dynamicElementElement.elements("dynamic-content")) {
+			Document newDocument = SAXReaderUtil.read(content);
 
-				String curLanguageId = GetterUtil.getString(
-					dynamicContentElement.attributeValue("language-id"));
+			Element newRootElement = newDocument.getRootElement();
 
-				if (curLanguageId.equals(languageId)) {
-					long id = GetterUtil.getLong(
-						dynamicContentElement.attributeValue("id"));
+			Attribute availableLocalesAttribute = newRootElement.attribute(
+				"available-locales");
 
-					if (id > 0) {
-						ImageLocalServiceUtil.deleteImage(id);
-					}
+			String defaultImportLanguageId = LocaleUtil.toLanguageId(
+				defaultImportLocale);
 
-					dynamicContentElement.detach();
-				}
+			if (!StringUtil.contains(
+					availableLocalesAttribute.getValue(),
+					defaultImportLanguageId)) {
+
+				availableLocalesAttribute.setValue(
+					availableLocalesAttribute.getValue() + StringPool.COMMA +
+						defaultImportLanguageId);
+
+				_mergeArticleContentUpdate(
+					oldDocument, newRootElement,
+					LocaleUtil.toLanguageId(defaultImportLocale));
+
+				content = DDMXMLUtil.formatXML(newDocument);
 			}
 
-			removeArticleLocale(dynamicElementElement, languageId);
+			Attribute defaultLocaleAttribute = newRootElement.attribute(
+				"default-locale");
+
+			Locale defaultContentLocale = LocaleUtil.fromLanguageId(
+				defaultLocaleAttribute.getValue());
+
+			if (!LocaleUtil.equals(defaultContentLocale, defaultImportLocale)) {
+				defaultLocaleAttribute.setValue(defaultImportLanguageId);
+
+				content = DDMXMLUtil.formatXML(newDocument);
+			}
 		}
+		catch (Exception e) {
+			throw new LocaleException(
+				LocaleException.TYPE_CONTENT,
+				"The locale " + defaultImportLocale + " is not available");
+		}
+
+		return content;
 	}
 
 	public static String removeArticleLocale(
-		String content, String languageId) {
+		Document document, String content, String languageId) {
 
 		try {
-			Document document = SAXReaderUtil.read(content);
-
 			Element rootElement = document.getRootElement();
 
 			String availableLocales = rootElement.attributeValue(
@@ -1206,6 +1341,34 @@ public class JournalUtil {
 		}
 
 		return content;
+	}
+
+	public static void removeArticleLocale(Element element, String languageId)
+		throws PortalException {
+
+		for (Element dynamicElementElement :
+				element.elements("dynamic-element")) {
+
+			for (Element dynamicContentElement :
+					dynamicElementElement.elements("dynamic-content")) {
+
+				String curLanguageId = GetterUtil.getString(
+					dynamicContentElement.attributeValue("language-id"));
+
+				if (curLanguageId.equals(languageId)) {
+					long id = GetterUtil.getLong(
+						dynamicContentElement.attributeValue("id"));
+
+					if (id > 0) {
+						ImageLocalServiceUtil.deleteImage(id);
+					}
+
+					dynamicContentElement.detach();
+				}
+			}
+
+			removeArticleLocale(dynamicElementElement, languageId);
+		}
 	}
 
 	public static String removeOldContent(String content, String xsd) {
@@ -1291,44 +1454,16 @@ public class JournalUtil {
 		}
 	}
 
-	public static List<JournalStructure> toJournalStructures(
-			List<DDMStructure> ddmStructures)
-		throws SystemException {
-
-		List<JournalStructure> structures = new ArrayList<JournalStructure>();
-
-		for (DDMStructure ddmStructure : ddmStructures) {
-			JournalStructure structure = new JournalStructureAdapter(
-				ddmStructure);
-
-			structures.add(structure);
-		}
-
-		return new UnmodifiableList<JournalStructure>(structures);
-	}
-
-	public static List<JournalTemplate> toJournalTemplates(
-		List<DDMTemplate> ddmTemplates) {
-
-		List<JournalTemplate> templates = new ArrayList<JournalTemplate>();
-
-		for (DDMTemplate ddmTemplate : ddmTemplates) {
-			JournalTemplate template = new JournalTemplateAdapter(ddmTemplate);
-
-			templates.add(template);
-		}
-
-		return new UnmodifiableList<JournalTemplate>(templates);
-	}
-
 	public static String transform(
 			ThemeDisplay themeDisplay, Map<String, String> tokens,
-			String viewMode, String languageId, String xml, String script,
+			String viewMode, String languageId, Document document,
+			PortletRequestModel portletRequestModel, String script,
 			String langType)
 		throws Exception {
 
 		return _transformer.transform(
-			themeDisplay, tokens, viewMode, languageId, xml, script, langType);
+			themeDisplay, tokens, viewMode, languageId, document,
+			portletRequestModel, script, langType);
 	}
 
 	private static void _addElementOptions(
@@ -1347,6 +1482,10 @@ public class JournalUtil {
 
 	private static Element _getElementByInstanceId(
 		Document document, String instanceId) {
+
+		if (Validator.isNull(instanceId)) {
+			return null;
+		}
 
 		XPath xPathSelector = SAXReaderUtil.createXPath(
 			"//dynamic-element[@instance-id=" +
@@ -1574,107 +1713,9 @@ public class JournalUtil {
 	}
 
 	private static void _populateTokens(
-			Map<String, String> tokens, long articleGroupId, String xmlRequest)
-		throws Exception {
-
-		Document requestDocument = SAXReaderUtil.read(xmlRequest);
-
-		Element rootElement = requestDocument.getRootElement();
-
-		Element themeDisplayElement = rootElement.element("theme-display");
-
-		Layout layout = LayoutLocalServiceUtil.getLayout(
-			GetterUtil.getLong(themeDisplayElement.elementText("plid")));
-
-		Group group = layout.getGroup();
-
-		LayoutSet layoutSet = layout.getLayoutSet();
-
-		String friendlyUrlCurrent = null;
-
-		if (layout.isPublicLayout()) {
-			friendlyUrlCurrent = themeDisplayElement.elementText(
-				"path-friendly-url-public");
-		}
-		else if (group.isUserGroup()) {
-			friendlyUrlCurrent = themeDisplayElement.elementText(
-				"path-friendly-url-private-user");
-		}
-		else {
-			friendlyUrlCurrent = themeDisplayElement.elementText(
-				"path-friendly-url-private-group");
-		}
-
-		String layoutSetFriendlyUrl = themeDisplayElement.elementText(
-			"i18n-path");
-
-		String virtualHostname = layoutSet.getVirtualHostname();
-
-		if (Validator.isNull(virtualHostname) ||
-			!virtualHostname.equals(
-				themeDisplayElement.elementText("server-name"))) {
-
-			layoutSetFriendlyUrl = friendlyUrlCurrent + group.getFriendlyURL();
-		}
-
-		tokens.put("article_group_id", String.valueOf(articleGroupId));
-		tokens.put("cdn_host", themeDisplayElement.elementText("cdn-host"));
-		tokens.put("company_id", themeDisplayElement.elementText("company-id"));
-		tokens.put("friendly_url_current", friendlyUrlCurrent);
-		tokens.put(
-			"friendly_url_private_group",
-			themeDisplayElement.elementText("path-friendly-url-private-group"));
-		tokens.put(
-			"friendly_url_private_user",
-			themeDisplayElement.elementText("path-friendly-url-private-user"));
-		tokens.put(
-			"friendly_url_public",
-			themeDisplayElement.elementText("path-friendly-url-public"));
-		tokens.put("group_friendly_url", group.getFriendlyURL());
-		tokens.put("image_path", themeDisplayElement.elementText("path-image"));
-		tokens.put("layout_set_friendly_url", layoutSetFriendlyUrl);
-		tokens.put("main_path", themeDisplayElement.elementText("path-main"));
-		tokens.put(
-			"portal_ctx", themeDisplayElement.elementText("path-context"));
-		tokens.put(
-			"portal_url",
-			HttpUtil.removeProtocol(
-				themeDisplayElement.elementText("url-portal")));
-		tokens.put(
-			"protocol",
-			HttpUtil.getProtocol(
-				themeDisplayElement.elementText("url-portal")));
-		tokens.put(
-			"root_path", themeDisplayElement.elementText("path-context"));
-		tokens.put(
-			"scope_group_id",
-			themeDisplayElement.elementText("scope-group-id"));
-		tokens.put(
-			"site_group_id", themeDisplayElement.elementText("site-group-id"));
-		tokens.put(
-			"theme_image_path",
-			themeDisplayElement.elementText("path-theme-images"));
-
-		_populateCustomTokens(tokens);
-
-		// Deprecated tokens
-
-		tokens.put(
-			"friendly_url",
-			themeDisplayElement.elementText("path-friendly-url-public"));
-		tokens.put(
-			"friendly_url_private",
-			themeDisplayElement.elementText("path-friendly-url-private-group"));
-		tokens.put("group_id", String.valueOf(articleGroupId));
-		tokens.put(
-			"page_url",
-			themeDisplayElement.elementText("path-friendly-url-public"));
-	}
-
-	private static void _populateTokens(
 			Map<String, String> tokens, long articleGroupId,
 			ThemeDisplay themeDisplay)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Layout layout = themeDisplay.getLayout();
 
@@ -1744,9 +1785,87 @@ public class JournalUtil {
 		tokens.put("page_url", themeDisplay.getPathFriendlyURLPublic());
 	}
 
+	private static void _populateTokens(
+			Map<String, String> tokens, long articleGroupId,
+			ThemeDisplayModel themeDisplayModel)
+		throws Exception {
+
+		Layout layout = LayoutLocalServiceUtil.getLayout(
+			themeDisplayModel.getPlid());
+
+		Group group = layout.getGroup();
+
+		LayoutSet layoutSet = layout.getLayoutSet();
+
+		String friendlyUrlCurrent = null;
+
+		if (layout.isPublicLayout()) {
+			friendlyUrlCurrent = themeDisplayModel.getPathFriendlyURLPublic();
+		}
+		else if (group.isUserGroup()) {
+			friendlyUrlCurrent =
+				themeDisplayModel.getPathFriendlyURLPrivateUser();
+		}
+		else {
+			friendlyUrlCurrent =
+				themeDisplayModel.getPathFriendlyURLPrivateGroup();
+		}
+
+		String layoutSetFriendlyUrl = themeDisplayModel.getI18nPath();
+
+		String virtualHostname = layoutSet.getVirtualHostname();
+
+		if (Validator.isNull(virtualHostname) ||
+			!virtualHostname.equals(themeDisplayModel.getServerName())) {
+
+			layoutSetFriendlyUrl = friendlyUrlCurrent + group.getFriendlyURL();
+		}
+
+		tokens.put("article_group_id", String.valueOf(articleGroupId));
+		tokens.put("cdn_host", themeDisplayModel.getCdnHost());
+		tokens.put(
+			"company_id", String.valueOf(themeDisplayModel.getCompanyId()));
+		tokens.put("friendly_url_current", friendlyUrlCurrent);
+		tokens.put(
+			"friendly_url_private_group",
+			themeDisplayModel.getPathFriendlyURLPrivateGroup());
+		tokens.put(
+			"friendly_url_private_user",
+			themeDisplayModel.getPathFriendlyURLPrivateUser());
+		tokens.put(
+			"friendly_url_public",
+			themeDisplayModel.getPathFriendlyURLPublic());
+		tokens.put("group_friendly_url", group.getFriendlyURL());
+		tokens.put("image_path", themeDisplayModel.getPathImage());
+		tokens.put("layout_set_friendly_url", layoutSetFriendlyUrl);
+		tokens.put("main_path", themeDisplayModel.getPathMain());
+		tokens.put("portal_ctx", themeDisplayModel.getPathContext());
+		tokens.put(
+			"portal_url",
+			HttpUtil.removeProtocol(themeDisplayModel.getURLPortal()));
+		tokens.put(
+			"protocol", HttpUtil.getProtocol(themeDisplayModel.getURLPortal()));
+		tokens.put("root_path", themeDisplayModel.getPathContext());
+		tokens.put(
+			"scope_group_id",
+			String.valueOf(themeDisplayModel.getScopeGroupId()));
+		tokens.put("theme_image_path", themeDisplayModel.getPathThemeImages());
+
+		_populateCustomTokens(tokens);
+
+		// Deprecated tokens
+
+		tokens.put(
+			"friendly_url", themeDisplayModel.getPathFriendlyURLPublic());
+		tokens.put(
+			"friendly_url_private",
+			themeDisplayModel.getPathFriendlyURLPrivateGroup());
+		tokens.put("group_id", String.valueOf(articleGroupId));
+		tokens.put("page_url", themeDisplayModel.getPathFriendlyURLPublic());
+	}
+
 	private static void _removeOldContent(
-			Stack<String> path, Element contentElement, Document xsdDocument)
-		throws SystemException {
+		Stack<String> path, Element contentElement, Document xsdDocument) {
 
 		String elementPath = "";
 
@@ -1765,9 +1884,8 @@ public class JournalUtil {
 	}
 
 	private static void _removeOldContent(
-			Stack<String> path, Element contentElement, Document xsdDocument,
-			String elementPath)
-		throws SystemException {
+		Stack<String> path, Element contentElement, Document xsdDocument,
+		String elementPath) {
 
 		String name = contentElement.attributeValue("name");
 
@@ -1785,7 +1903,7 @@ public class JournalUtil {
 
 		List<Node> curNodes = xPathSelector.selectNodes(xsdDocument);
 
-		if (curNodes.size() == 0) {
+		if (curNodes.isEmpty()) {
 			contentElement.detach();
 		}
 

@@ -31,6 +31,7 @@ AUI.add(
 					deleteMissingLayoutsNode: defaultConfig,
 					deletePortletDataNode: defaultConfig,
 					deletionsNode: defaultConfig,
+					exportLAR: defaultConfig,
 					form: defaultConfig,
 					incompleteProcessMessageNode: defaultConfig,
 					layoutSetSettingsNode: defaultConfig,
@@ -64,6 +65,7 @@ AUI.add(
 
 						instance._bindUI();
 
+						instance._exportLAR = config.exportLAR;
 						instance._layoutsExportTreeOutput = instance.byId(config.pageTreeId + 'Output');
 
 						instance._initLabels();
@@ -855,6 +857,51 @@ AUI.add(
 
 						var cmdNode = instance.byId('cmd');
 
+						if ((cmdNode.val() === 'add') || (cmdNode.val() === 'update')) {
+							var redirectNode = instance.byId('redirect');
+
+							var portletURL = Liferay.PortletURL.createURL(redirectNode.val());
+
+							portletURL.setParameter("cmd", cmdNode.val());
+
+							if (instance._exportLAR) {
+								portletURL.setParameter("struts_action", "/group_pages/edit_export_configuration");
+								portletURL.setParameter("tabs2", "new-export-process");
+								portletURL.setParameter("exportConfigurationButtons", "custom");
+							}
+							else {
+								portletURL.setParameter("struts_action", "/layouts_admin/edit_publish_configuration");
+								portletURL.setParameter("tabs2", "new-publication-process");
+								portletURL.setParameter("publishConfigurationButtons", "custom");
+							}
+
+							var groupIdNode = instance.byId('groupId');
+
+							if (groupIdNode) {
+								portletURL.setParameter("groupId", groupIdNode.val());
+							}
+
+							var liveGroupIdNode = instance.byId('liveGroupId');
+
+							if (liveGroupIdNode) {
+								portletURL.setParameter("liveGroupId", liveGroupIdNode.val());
+							}
+
+							var privateLayoutNode = instance.byId('privateLayout');
+
+							if (privateLayoutNode) {
+								portletURL.setParameter("privateLayout", privateLayoutNode.val());
+							}
+
+							var rootNodeNameNode = instance.byId('rootNodeName');
+
+							if (rootNodeNameNode) {
+								portletURL.setParameter("rootNodeName", rootNodeNameNode.val());
+							}
+
+							redirectNode.val(portletURL.toString());
+						}
+
 						if (cmdNode) {
 							cmdNode.val(STR_EMPTY);
 
@@ -963,7 +1010,7 @@ AUI.add(
 						);
 
 						if (selectedConfiguration.length === 0) {
-							instance.byId('PORTLET_CONFIGURATION_' + portletId + 'Checkbox').set('checked', false);
+							instance.byId('PORTLET_CONFIGURATION_' + portletId).set('checked', false);
 
 							instance.byId('showChangeConfiguration_' + portletId).hide();
 						}
@@ -991,7 +1038,7 @@ AUI.add(
 						);
 
 						if (selectedContent.length === 0) {
-							instance.byId('PORTLET_DATA_' + portletId + 'Checkbox').set('checked', false);
+							instance.byId('PORTLET_DATA_' + portletId).set('checked', false);
 
 							instance.byId('showChangeContent_' + portletId).hide();
 						}
@@ -1253,6 +1300,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-dialog-iframe-deprecated', 'aui-io-request', 'aui-modal', 'aui-parse-content', 'aui-toggler', 'aui-tree-view', 'liferay-notice', 'liferay-portlet-base', 'liferay-store', 'liferay-util-window']
+		requires: ['aui-dialog-iframe-deprecated', 'aui-io-request', 'aui-modal', 'aui-parse-content', 'aui-toggler', 'aui-tree-view', 'liferay-notice', 'liferay-portlet-base', 'liferay-portlet-url', 'liferay-store', 'liferay-util-window']
 	}
 );

@@ -1,7 +1,15 @@
 <definition>
 	<command name="assertClick">
+		<case locator-key1="MENU_CONTENT">
+			<execute function="AssertClick#assertPartialTextClickAt" />
+		</case>
+
 		<case locator-key1="PUBLISH_BUTTON">
 			<execute function="AssertClick#assertTextClickAtAndWait" />
+		</case>
+
+		<case locator-key1="RELATED_ASSETS_MENULIST_SELECTION">
+			<execute function="AssertClick#assertTextClickAndWait" />
 		</case>
 
 		<case locator-key1="SAVE_AS_DRAFT_BUTTON">
@@ -13,8 +21,18 @@
 		</case>
 	</command>
 
+	<command name="assertTextEquals">
+		<case locator-key1="CONTENT_FIELD">
+			<execute function="AssertTextEquals#assertCKEditorText" />
+		</case>
+	</command>
+
 	<command name="type">
 		<case locator-key1="CONTENT_FIELD">
+			<execute function="Type#typeFrame" />
+		</case>
+
+		<case locator-key1="HTML_FIELD">
 			<execute function="Type#typeFrame" />
 		</case>
 	</command>

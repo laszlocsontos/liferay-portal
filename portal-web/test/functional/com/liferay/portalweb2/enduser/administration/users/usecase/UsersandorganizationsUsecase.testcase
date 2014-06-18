@@ -1,10 +1,19 @@
 <definition component-name="portal-administration">
+	<property name="testray.main.component.name" value="Administration" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
 
 	<tear-down>
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="test@liferay.com" />
+			<var name="userLoginFullName" value="Test Test" />
+		</execute>
+
 		<execute macro="User#tearDownCP" />
+
+		<execute macro="Role#tearDownCP" />
 
 		<execute macro="Site#tearDownCP" />
 
@@ -12,6 +21,248 @@
 
 		<execute macro="Organization#tearDownCP" />
 	</tear-down>
+
+	<command name="AddOrganizationName50Characters" priority="3">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addCP">
+			<var name="orgName" value="Organization Staging Organization Web Content Display" />
+			<var name="orgType" value="Regular Organization" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#viewCP">
+			<var name="orgName" value="Organization Staging Organization Web Content Display" />
+			<var name="orgType" value="Regular Organization" />
+		</execute>
+	</command>
+
+	<command name="AddUserSpecialCharacters" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="&lt;userfn&gt;" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#viewCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="&lt;userfn&gt;" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#assignRegularRoleCP">
+			<var name="roleName" value="Administrator" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginUserPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Page#gotoPagesCP">
+			<var name="portletName" value="Site Pages" />
+			<var name="siteScopeName" value="&lt;userfn&gt; userln" />
+		</execute>
+	</command>
+
+	<command name="CannotViewSiteSettingsInUserPersonalSite" priority="4">
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="siteScopeName" value="Test Test" />
+		</execute>
+
+		<execute action="Home#assertElementNotPresent" locator-key1="SITE_ADMINISTRATION_CONFIGURATION_SITE_SETTINGS" value1="Site Settings" />
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+		</execute>
+
+		<execute action="Home#click" locator-key1="SCOPE_SELECTOR" />
+
+		<var name="key_siteScopeName" value="Test Test" />
+
+		<execute action="Home#click" locator-key1="SCOPE_SELECTOR_MENULIST_ITEM" />
+		<execute action="Home#assertElementNotPresent" locator-key1="SITE_ADMINISTRATION_CONFIGURATION_SITE_SETTINGS" value1="Site Settings" />
+	</command>
+
+	<command name="ImpersonatingAdministratorandOwner" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#addCP">
+			<var name="roleName" value="Impersonating Role Name" />
+		</execute>
+
+		<execute macro="Role#editPermissionCmdCP">
+			<var name="define" value="true" />
+			<var name="permissionDefinitionKey" value="CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS_GENERAL_PERMISSIONS_ACCESS_IN_CONTROL_PANEL_CHECKBOX,CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS_GENERAL_PERMISSIONS_VIEW_CHECKBOX,CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS_RESOURCE_PERMISSIONS_USER_IMPERSONATE_CHECKBOX,CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS_RESOURCE_PERMISSIONS_USER_VIEW_CHECKBOX" />
+			<var name="roleName" value="Impersonating Role Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea1@liferay.com" />
+			<var name="userFirstName" value="userfn1" />
+			<var name="userLastName" value="userln1" />
+			<var name="userScreenName" value="usersn1" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea2@liferay.com" />
+			<var name="userFirstName" value="userfn2" />
+			<var name="userLastName" value="userln2" />
+			<var name="userScreenName" value="usersn2" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea3@liferay.com" />
+			<var name="userFirstName" value="userfn3" />
+			<var name="userLastName" value="userln3" />
+			<var name="userScreenName" value="usersn3" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea1@liferay.com" />
+			<var name="userScreenName" value="usersn1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="Impersonating Role Name" />
+			<var name="userScreenName" value="usersn1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="Administrator" />
+			<var name="userScreenName" value="usersn3" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="userea1@liferay.com" />
+			<var name="userLoginFullName" value="userfn1 userln1" />
+		</execute>
+
+		<execute macro="Page#gotoCP" />
+
+		<execute macro="User#impersonateCP">
+			<var name="notAdmin" value="true" />
+			<var name="userScreenName" value="usersn2" />
+		</execute>
+
+		<execute action="CPUsersandorganizationsViewusers#close" locator1="title=Welcome - Liferay" />
+		<execute action="CPUsersandorganizationsViewusers#selectWindow" locator1="title=Users and Organizations - Liferay" />
+
+		<execute macro="Page#gotoCP" />
+
+		<execute macro="User#attemptImpersonateCP">
+			<var name="notAdmin" value="true" />
+			<var name="userScreenName" value="usersn3" />
+		</execute>
+
+		<execute macro="Page#gotoCP" />
+
+		<execute macro="User#attemptImpersonateCP">
+			<var name="notAdmin" value="true" />
+			<var name="userScreenName" value="test" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="test@liferay.com" />
+			<var name="userLoginFullName" value="Test Test" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="Administrator" />
+			<var name="userScreenName" value="usersn1" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="userea1@liferay.com" />
+			<var name="userLoginFullName" value="userfn1 userln1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#impersonateCP">
+			<var name="userScreenName" value="usersn2" />
+		</execute>
+
+		<execute action="CPUsersandorganizationsViewusers#close" locator1="title=Welcome - Liferay" />
+		<execute action="CPUsersandorganizationsViewusers#selectWindow" locator1="title=Users and Organizations - Liferay" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#impersonateCP">
+			<var name="userScreenName" value="usersn3" />
+		</execute>
+
+		<execute action="CPUsersandorganizationsViewusers#close" locator1="title=Welcome - Liferay" />
+		<execute action="CPUsersandorganizationsViewusers#selectWindow" locator1="title=Users and Organizations - Liferay" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#impersonateCP">
+			<var name="userScreenName" value="test" />
+		</execute>
+
+		<execute action="CPUsersandorganizationsViewusers#close" locator1="title=Welcome - Liferay" />
+		<execute action="CPUsersandorganizationsViewusers#selectWindow" locator1="title=Users and Organizations - Liferay" />
+	</command>
 
 	<command name="MultipleUsersandOrganizations" priority="4">
 		<var name="orgName" value="Organization Name 2" />
@@ -229,7 +480,7 @@
 
 		<execute macro="Page#openURL" />
 
-		<execute action="Dockbar#click" locator-key1="MY_SITES" />
+		<execute action="Dockbar#assertClick" locator-key1="MY_SITES" value1="My Sites" />
 		<execute action="Dockbar#assertTextNotPresent" locator-key1="MY_SITES_SITE_NAME" value1="Organization Name 1" />
 		<execute action="Dockbar#assertTextNotPresent" locator-key1="MY_SITES_SITE_NAME" value1="Organization Name 2" />
 
@@ -244,13 +495,12 @@
 			<var name="userScreenName" value="test" />
 		</execute>
 
-		<execute action="Dockbar#click" locator-key1="MY_SITES" />
+		<execute action="Dockbar#assertClick" locator-key1="MY_SITES" value1="My Sites" />
 		<execute action="Dockbar#assertTextNotPresent" locator-key1="MY_SITES_SITE_NAME" value1="Organization Name 1" />
 		<execute action="Dockbar#assertTextPresent" locator-key1="MY_SITES_SITE_NAME" value1="Organization Name 2" />
 
 		<var name="key_siteName" value="${siteName}" />
 
-		<execute action="Dockbar#click" locator-key1="MY_SITES" />
 		<execute action="Dockbar#assertClick" locator-key1="MY_SITES_PUBLIC_SITE" value1="${siteName}" />
 
 		<execute action="Home#click" locator-key1="PAGE_NAVIGATION_BAR" />
@@ -333,7 +583,7 @@
 		</execute>
 
 		<execute macro="Role#definePermissionCP">
-			<var name="permissionDefinitionKey" value="CONTROL_PANEL_GENERAL_PERMISSIONS_GO_TO_CONTROL_PANEL" />
+			<var name="permissionDefinitionKey" value="CONTROL_PANEL_GENERAL_PERMISSIONS_GO_TO_CONTROL_PANEL_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Go to Control Panel" />
 			<var name="permissionNavigationKey" value="CONTROL_PANEL_GENERAL_PERMISSIONS" />
 			<var name="permissionNavigationValue" value="General Permissions" />
@@ -518,7 +768,7 @@
 			<var name="siteName" value="Site Name I" />
 		</execute>
 
-		<execute action="Dockbar#click" locator-key1="MY_SITES" />
+		<execute action="Dockbar#assertClick" locator-key1="MY_SITES" value1="My Sites" />
 		<execute action="Dockbar#assertTextPresent" locator-key1="MY_SITES_SITE_NAME" value1="Site Name A" />
 		<execute action="Dockbar#assertTextPresent" locator-key1="MY_SITES_SITE_NAME" value1="Site Name B" />
 		<execute action="Dockbar#assertTextPresent" locator-key1="MY_SITES_SITE_NAME" value1="Site Name C" />
@@ -549,7 +799,7 @@
 			<var name="userScreenName" value="test" />
 		</execute>
 
-		<execute action="Dockbar#click" locator-key1="MY_SITES" />
+		<execute action="Dockbar#assertClick" locator-key1="MY_SITES" value1="My Sites" />
 		<execute action="Dockbar#assertTextPresent" locator-key1="MY_SITES_SITE_NAME" value1="Site Name I" />
 	</command>
 
@@ -706,6 +956,154 @@
 			<var name="orgName" value="Organization Name" />
 			<var name="orgReminderQueriesDefaultLanguage" value="This is just a test" />
 			<var name="orgReminderQuery" value="Nihongo" />
+		</execute>
+	</command>
+
+	<command name="ValidateRegExPasswordPolicyCP" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userFirstName" value="test1" />
+			<var name="userLastName" value="test1" />
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Password Policies" />
+		</execute>
+
+		<execute action="CPPasswordpolicies#assertClick" locator-key1="DEFAULT_PASSWORD_POLICY_TABLE_ACTIONS_BUTTON" value1="Actions" />
+		<execute action="CPPasswordpolicies#assertClick" locator-key1="ACTIONS_MENULIST_EDIT" value1="Edit" />
+
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#check" locator-key1="SYNTAX_CHECKING_ENABLED_CHECKBOX" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#uncheck" locator-key1="ALLOW_DICTIONARY_WORDS_CHECKBOX" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="MINIMUM_ALPHA_NUMERIC_FIELD" value1="0" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="MINIMUM_LENGTH_FIELD" value1="0" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="MINIMUM_LOWER_CASE_FIELD" value1="0" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="MINIMUM_NUMBERS_FIELD" value1="0" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="MINIMUM_SYMBOLS_FIELD" value1="0" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="MINIMUM_UPPER_CASE_FIELD" value1="0" />
+
+		<var name="atLeastFourCharNoNumbers">
+			<![CDATA[(?=.{4})(?:[a-zA-Z]*)
+			]]>
+		</var>
+
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="REGULAR_EXPRESSION_FIELD" value1="${atLeastFourCharNoNumbers}" /> -->
+
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordInvalidCP">
+			<var name="newPassword" value="NO1else" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="newPassword" value="tryingHARD" />
+			<var name="syntaxCheckingEnabled" value="true" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Password Policies" />
+		</execute>
+
+		<execute action="CPPasswordpolicies#assertClick" locator-key1="DEFAULT_PASSWORD_POLICY_TABLE_ACTIONS_BUTTON" value1="Actions" />
+		<execute action="CPPasswordpolicies#assertClick" locator-key1="ACTIONS_MENULIST_EDIT" value1="Edit" />
+
+		<var name="atLeastSixCharNumbersPermitted">
+			<![CDATA[(?=.{6})(?:[a-zA-Z0-9]*)
+			]]>
+		</var>
+
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="REGULAR_EXPRESSION_FIELD" value1="${atLeastSixCharNumbersPermitted}" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="newPassword" value="abcABC" />
+			<var name="syntaxCheckingEnabled" value="true" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="newPassword" value="123ABC" />
+			<var name="syntaxCheckingEnabled" value="true" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordInvalidCP">
+			<var name="newPassword" value="1-2-3ABC" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Password Policies" />
+		</execute>
+
+		<execute action="CPPasswordpolicies#assertClick" locator-key1="DEFAULT_PASSWORD_POLICY_TABLE_ACTIONS_BUTTON" value1="Actions" />
+		<execute action="CPPasswordpolicies#assertClick" locator-key1="ACTIONS_MENULIST_EDIT" value1="Edit" />
+
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#type" locator-key1="MINIMUM_NUMBERS_FIELD" value1="2" />
+		<execute action="CPPasswordpoliciesDefaultpasswordpolicy#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordInvalidCP">
+			<var name="newPassword" value="abcABC" />
+			<var name="trivialPassword" value="true" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordInvalidCP">
+			<var name="newPassword" value="12AB" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userScreenName" value="test1" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="newPassword" value="12ABcd" />
+			<var name="syntaxCheckingEnabled" value="true" />
+			<var name="userEmailAddress" value="test1@liferay.com" />
+			<var name="userScreenName" value="test1" />
 		</execute>
 	</command>
 </definition>

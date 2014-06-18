@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -158,10 +159,9 @@ public class SetUtil {
 		return set;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static <E> Set<E> fromCollection(Collection<E> c) {
+	public static <E> Set<E> fromCollection(Collection<? extends E> c) {
 		if ((c != null) && Set.class.isAssignableFrom(c.getClass())) {
-			return (Set)c;
+			return (Set<E>)c;
 		}
 
 		if ((c == null) || (c.size() == 0)) {
@@ -171,7 +171,7 @@ public class SetUtil {
 		return new HashSet<E>(c);
 	}
 
-	public static <E> Set<E> fromEnumeration(Enumeration<E> enu) {
+	public static <E> Set<E> fromEnumeration(Enumeration<? extends E> enu) {
 		Set<E> set = new HashSet<E>();
 
 		while (enu.hasMoreElements()) {
@@ -212,8 +212,8 @@ public class SetUtil {
 		return set;
 	}
 
-	public static <E> Set<E> fromList(List<E> array) {
-		if ((array == null) || (array.size() == 0)) {
+	public static <E> Set<E> fromList(List<? extends E> array) {
+		if (ListUtil.isEmpty(array)) {
 			return new HashSet<E>();
 		}
 
@@ -222,6 +222,46 @@ public class SetUtil {
 
 	public static Set<String> fromString(String s) {
 		return fromArray(StringUtil.splitLines(s));
+	}
+
+	public static <T> Set<T> intersect(
+		Collection<T> collection1, Collection<T> collection2) {
+
+		if (collection1.isEmpty() || collection2.isEmpty()) {
+			return Collections.emptySet();
+		}
+
+		Set<T> set1 = null;
+
+		if (collection1 instanceof Set) {
+			set1 = (Set<T>)collection1;
+		}
+		else {
+			set1 = new HashSet<T>(collection1);
+		}
+
+		Set<T> set2 = null;
+
+		if (collection2 instanceof Set) {
+			set2 = (Set<T>)collection2;
+		}
+		else {
+			set2 = new HashSet<T>(collection2);
+		}
+
+		if (set1.size() > set2.size()) {
+			set2.retainAll(set1);
+
+			return set2;
+		}
+
+		set1.retainAll(set2);
+
+		return set1;
+	}
+
+	public static Set<Long> intersect(long[] array1, long[] array2) {
+		return intersect(fromArray(array1), fromArray(array2));
 	}
 
 }

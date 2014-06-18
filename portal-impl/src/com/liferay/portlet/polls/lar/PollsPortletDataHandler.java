@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,11 +25,10 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portlet.polls.model.PollsChoice;
 import com.liferay.portlet.polls.model.PollsQuestion;
 import com.liferay.portlet.polls.model.PollsVote;
+import com.liferay.portlet.polls.service.PollsChoiceLocalServiceUtil;
 import com.liferay.portlet.polls.service.PollsQuestionLocalServiceUtil;
+import com.liferay.portlet.polls.service.PollsVoteLocalServiceUtil;
 import com.liferay.portlet.polls.service.permission.PollsPermission;
-import com.liferay.portlet.polls.service.persistence.PollsChoiceExportActionableDynamicQuery;
-import com.liferay.portlet.polls.service.persistence.PollsQuestionExportActionableDynamicQuery;
-import com.liferay.portlet.polls.service.persistence.PollsVoteExportActionableDynamicQuery;
 
 import java.util.List;
 
@@ -95,13 +94,14 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 				PollsPortletDataHandler.NAMESPACE, "questions")) {
 
 			ActionableDynamicQuery questionActionableDynamicQuery =
-				new PollsQuestionExportActionableDynamicQuery(
+				PollsQuestionLocalServiceUtil.getExportActionableDynamicQuery(
 					portletDataContext);
 
 			questionActionableDynamicQuery.performActions();
 
 			ActionableDynamicQuery choiceActionableDynamicQuery =
-				new PollsChoiceExportActionableDynamicQuery(portletDataContext);
+				PollsChoiceLocalServiceUtil.getExportActionableDynamicQuery(
+					portletDataContext);
 
 			choiceActionableDynamicQuery.performActions();
 
@@ -109,7 +109,7 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 					PollsPortletDataHandler.NAMESPACE, "votes")) {
 
 				ActionableDynamicQuery voteActionableDynamicQuery =
-					new PollsVoteExportActionableDynamicQuery(
+					PollsVoteLocalServiceUtil.getExportActionableDynamicQuery(
 						portletDataContext);
 
 				voteActionableDynamicQuery.performActions();
@@ -174,17 +174,20 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 		throws Exception {
 
 		ActionableDynamicQuery choiceActionableDynamicQuery =
-			new PollsChoiceExportActionableDynamicQuery(portletDataContext);
+			PollsChoiceLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
 		choiceActionableDynamicQuery.performCount();
 
 		ActionableDynamicQuery questionActionableDynamicQuery =
-			new PollsQuestionExportActionableDynamicQuery(portletDataContext);
+			PollsQuestionLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
 		questionActionableDynamicQuery.performCount();
 
 		ActionableDynamicQuery voteActionableDynamicQuery =
-			new PollsVoteExportActionableDynamicQuery(portletDataContext);
+			PollsVoteLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
 		voteActionableDynamicQuery.performCount();
 	}

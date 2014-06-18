@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,9 +32,7 @@ public class CyrusVirtualUtil {
 		return getPersistence().findByPrimaryKey(emailAddress);
 	}
 
-	public static List<CyrusVirtual> findByUserId(long userId)
-		throws SystemException {
-
+	public static List<CyrusVirtual> findByUserId(long userId) {
 		return getPersistence().findByUserId(userId);
 	}
 
@@ -54,11 +52,11 @@ public class CyrusVirtualUtil {
 		getPersistence().remove(emailAddress);
 	}
 
-	public static void removeByUserId(long userId) throws SystemException {
+	public static void removeByUserId(long userId) {
 		getPersistence().removeByUserId(userId);
 	}
 
-	public static void update(CyrusVirtual user) throws SystemException {
+	public static void update(CyrusVirtual user) {
 		getPersistence().update(user);
 	}
 

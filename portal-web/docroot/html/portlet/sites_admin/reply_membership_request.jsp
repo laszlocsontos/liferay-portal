@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -85,9 +85,7 @@ MembershipRequest membershipRequest = (MembershipRequest)request.getAttribute(We
 	</c:if>
 
 	<aui:fieldset>
-		<aui:field-wrapper label="user-name">
-			<liferay-ui:input-resource url="<%= PortalUtil.getUserName(membershipRequest.getUserId(), StringPool.BLANK) %>" />
-		</aui:field-wrapper>
+		<aui:input name="userName" type="resource" value="<%= PortalUtil.getUserName(membershipRequest.getUserId(), StringPool.BLANK) %>" />
 
 		<aui:input name="userComments" readonly="<%= true %>" type="textarea" value="<%= HtmlUtil.escape(membershipRequest.getComments()) %>" />
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,12 +37,16 @@ if (Validator.isNull(url) && (userDisplay != null)) {
 
 	<aui:a href="<%= url %>">
 		<span class="user-profile-image">
-			<img alt="" class="avatar" src="<%= HtmlUtil.escape(taglibSrc) %>" width="65" />
+			<img alt="" class="avatar <%= imageCssClass %>" src="<%= HtmlUtil.escape(taglibSrc) %>" />
 		</span>
 
-		<span class="user-name">
-			<%= (userDisplay != null) ? HtmlUtil.escape(userDisplay.getFullName()) : HtmlUtil.escape(userName) %>
-		</span>
+		<c:if test="<%= showUserName %>">
+			<span class="user-name">
+				<%= (userDisplay != null) ? HtmlUtil.escape(userDisplay.getFullName()) : HtmlUtil.escape(userName) %>
+			</span>
+		</c:if>
 	</aui:a>
 
-	<div class="user-details">
+	<c:if test="<%= showUserDetails %>">
+		<div class="user-details">
+	</c:if>

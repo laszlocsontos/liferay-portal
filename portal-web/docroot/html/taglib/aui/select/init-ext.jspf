@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,16 +38,7 @@ else if (Validator.isNotNull(title)) {
 	title = LanguageUtil.get(pageContext, title);
 }
 
-String controlGroupCss = "control-group";
-
-if (inlineField) {
-	controlGroupCss = controlGroupCss.concat(" control-group-inline");
-}
-
-if (Validator.isNotNull(inlineLabel)) {
-	controlGroupCss = controlGroupCss.concat(" form-inline");
-}
-
+String controlGroupCssClass = AUIUtil.buildControlGroupCss(inlineField, inlineLabel, wrapperCssClass, "select");
 String fieldCss = AUIUtil.buildCss("aui-field-select", disabled, first, last, cssClass);
 
 boolean numericValue = false;

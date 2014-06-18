@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -115,22 +115,24 @@ boolean showAddAction = ParamUtil.getBoolean(request, "showAddAction", true);
 	</div>
 </c:if>
 
-<aui:nav-bar>
-	<aui:nav id="layoutsNav">
-		<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.ADD_LAYOUT) && showAddAction && PortalUtil.isLayoutParentable(selLayout) %>">
-			<aui:nav-item data-value="add-child-page" iconCssClass="icon-plus" label="add-child-page" />
-		</c:if>
-		<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.PERMISSIONS) %>">
-			<aui:nav-item data-value="permissions" iconCssClass="icon-lock" label="permissions" />
-		</c:if>
-		<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.DELETE) %>">
-			<aui:nav-item data-value="delete" iconCssClass="icon-remove" label="delete" />
-		</c:if>
-		<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.UPDATE) %>">
-			<aui:nav-item data-value="copy-applications" iconCssClass="icon-list-alt" label="copy-applications" />
-		</c:if>
-	</aui:nav>
-</aui:nav-bar>
+<c:if test="<%= !group.isLayoutPrototype() && (selLayout != null) %>">
+	<aui:nav-bar>
+		<aui:nav cssClass="navbar-nav" id="layoutsNav">
+			<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.ADD_LAYOUT) && showAddAction && PortalUtil.isLayoutParentable(selLayout) %>">
+				<aui:nav-item data-value="add-child-page" iconCssClass="icon-plus" label="add-child-page" />
+			</c:if>
+			<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.PERMISSIONS) %>">
+				<aui:nav-item data-value="permissions" iconCssClass="icon-lock" label="permissions" />
+			</c:if>
+			<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.DELETE) %>">
+				<aui:nav-item data-value="delete" iconCssClass="icon-remove" label="delete" />
+			</c:if>
+			<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, selLayout, ActionKeys.UPDATE) %>">
+				<aui:nav-item data-value="copy-applications" iconCssClass="icon-list-alt" label="copy-applications" />
+			</c:if>
+		</aui:nav>
+	</aui:nav-bar>
+</c:if>
 
 <portlet:actionURL var="editLayoutURL">
 	<portlet:param name="struts_action" value="/layouts_admin/edit_layouts" />
@@ -187,14 +189,6 @@ boolean showAddAction = ParamUtil.getBoolean(request, "showAddAction", true);
 						<liferay-ui:message key="changes-are-immediately-available-to-end-users" />
 					</div>
 				</c:if>
-
-				<liferay-security:permissionsURL
-					modelResource="<%= Layout.class.getName() %>"
-					modelResourceDescription="<%= selLayout.getName(locale) %>"
-					resourcePrimKey="<%= String.valueOf(selLayout.getPlid()) %>"
-					var="permissionURL"
-					windowState="<%= LiferayWindowState.POP_UP.toString() %>"
-				/>
 
 				<%
 				Group selLayoutGroup = selLayout.getGroup();
@@ -269,19 +263,20 @@ boolean showAddAction = ParamUtil.getBoolean(request, "showAddAction", true);
 							Liferay.Util.focusFormField(content.one('input:text'));
 						}
 						else if (dataValue === 'permissions') {
-							<liferay-security:permissionsURL
-								modelResource="<%= Layout.class.getName() %>"
-								modelResourceDescription="<%= selLayout.getName(locale) %>"
-								resourcePrimKey="<%= String.valueOf(selLayout.getPlid()) %>"
-								var="permissionURL"
-								windowState="<%= LiferayWindowState.POP_UP.toString() %>"
-							/>
-
 							Liferay.Util.openWindow(
 								{
 									cache: false,
 									id: '<portlet:namespace /><%= HtmlUtil.escapeJS(selLayout.getFriendlyURL().substring(1)) %>_permissions',
 									title: '<%= UnicodeLanguageUtil.get(pageContext, "permissions") %>',
+
+									<liferay-security:permissionsURL
+										modelResource="<%= Layout.class.getName() %>"
+										modelResourceDescription="<%= selLayout.getName(locale) %>"
+										resourcePrimKey="<%= String.valueOf(selLayout.getPlid()) %>"
+										var="permissionURL"
+										windowState="<%= LiferayWindowState.POP_UP.toString() %>"
+									/>
+
 									uri: '<%= permissionURL %>'
 								}
 							);

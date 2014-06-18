@@ -5,7 +5,6 @@
 		<if>
 			<equals arg1="${enableAcrossSite}" arg2="true" />
 			<then>
-				if
 				<execute action="CPPortalsettingsContentsharing#check" locator-key1="CONTENT_SHARING_CHECKBOX" />
 				<execute action="CPPortalsettingsContentsharing#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 				<execute action="CPPortalsettingsContentsharing#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
@@ -53,6 +52,93 @@
 				</then>
 			</elseif>
 		</if>
+	</command>
+
+	<command name="configureCurrentLanguagesCP">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_MISCELLANEOUS_DISPLAY_SETTINGS" value1="Display Settings" />
+
+		<if>
+			<isset var="defaultPortalLanguage" />
+			<then>
+				<var name="defaultPortalLanguage" value="${defaultPortalLanguage}" />
+
+				<execute action="CPSitesettingsDisplaysettings#select" locator-key1="DEFAULT_LANGUAGE_SELECT" value1="${defaultPortalLanguage}" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="currentPortalLanguages" />
+			<then>
+				<while>
+					<condition action="CPPortalsettingsDisplaysettings#isElementPresent" locator-key1="AVAILABLE_LANGUAGES_CURRENT_PRESENT" />
+					<then>
+						<execute action="CPPortalsettingsDisplaysettings#click" locator-key1="AVAILABLE_LANGUAGES_CURRENT_PRESENT" />
+						<execute action="CPPortalsettingsDisplaysettings#click" locator-key1="MOVE_CURRENT_TO_AVAILABLE_BUTTON" />
+					</then>
+				</while>
+
+				<for list="${currentPortalLanguages}" param="currentPortalLanguage">
+					<var name="currentPortalLanguage" value="${currentPortalLanguage}" />
+
+					<execute action="CPPortalsettingsDisplaysettings#select" locator-key1="AVAILABLE_LANGUAGES_AVAILABLE_SELECT" value1="${currentPortalLanguage}" />
+					<execute action="CPPortalsettingsDisplaysettings#click" locator-key1="MOVE_AVAILABLE_TO_CURRENT_BUTTON" />
+					<execute action="CPPortalsettingsDisplaysettings#assertTextEquals" locator-key1="AVAILABLE_LANGUAGES_CURRENT_SELECT" value1="${currentPortalLanguage}" />
+				</for>
+			</then>
+		</if>
+
+		<execute action="CPPortalsettingsDisplaysettings#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettingsDisplaysettings#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
+	<command name="disableLDAPCP">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_AUTHENTICATION" value1="Authentication" />
+
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="NAVIGATION_LDAP" value1="LDAP" />
+		<execute action="CPPortalsettingsAuthentication#uncheck" locator-key1="AUTHENTICATION_LDAP_ENABLED_CHECKBOX" />
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettingsAuthentication#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="NAVIGATION_LDAP" value1="LDAP" />
+		<execute action="CPPortalsettingsAuthentication#assertNotChecked" locator-key1="AUTHENTICATION_LDAP_ENABLED_CHECKBOX" />
+	</command>
+
+	<command name="disableRecycleBinCP">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_RECYCLE_BIN" value1="Recycle Bin" />
+
+		<execute action="CPPortalsettingsRecyclebin#click" locator-key1="ENABLE_REYCLE_BIN_CHECKBOX" />
+
+		<execute action="CPPortalsettingsRecyclebin#confirm" locator-key1="CONFIRM" value1="Disabling the Recycle Bin will prevent the restoring of content that has been moved to the Recycle Bin." />
+
+		<execute action="CPPortalsettings#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettings#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
+	<command name="editConfigurationAuthenticationCAS">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_AUTHENTICATION" value1="Authentication" />
+
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="NAVIGATION_CAS" value1="CAS" />
+		<execute action="CPPortalsettingsAuthentication#check" locator-key1="AUTHENTICATION_CAS_ENABLED_CHECKBOX" />
+		<execute action="CPPortalsettingsAuthentication#type" locator-key1="AUTHENTICATION_CAS_LOGIN_URL_FIELD" value1="${casLoginURL}" />
+		<execute action="CPPortalsettingsAuthentication#type" locator-key1="AUTHENTICATION_CAS_LOGOUT_URL_FIELD" value1="${casLogoutURL}" />
+		<execute action="CPPortalsettingsAuthentication#type" locator-key1="AUTHENTICATION_CAS_SERVER_URL_FIELD" value1="${casServerURL}" />
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="AUTHENTICATION_CAS_TEST_CAS_CONFIGURATION_BUTTON" value1="Test CAS Configuration" />
+
+		<execute action="CPPortalsettingsAuthenticationTestcasconfiguration#assertTextEquals" locator-key1="LOGIN_URL_SUCCESS_MESSAGE" value1="Pass" />
+		<execute action="CPPortalsettingsAuthenticationTestcasconfiguration#assertTextEquals" locator-key1="LOGOUT_URL_SUCCESS_MESSAGE" value1="Pass" />
+		<execute action="CPPortalsettingsAuthenticationTestcasconfiguration#assertTextEquals" locator-key1="SERVER_URL_SUCCESS_MESSAGE" value1="Pass" />
+		<execute action="CPPortalsettingsAuthenticationTestcasconfiguration#click" locator-key1="CLOSE_ICON_BUTTON" />
+
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettingsAuthentication#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
+	<command name="editConfigurationAuthenticationGeneral">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_AUTHENTICATION" value1="Authentication" />
+
+		<execute action="CPPortalsettingsAuthentication#select" locator-key1="AUTHENTICATION_GENERAL_HOW_DO_USERS_AUTHENTICATE_SELECT" value1="${authenticationMethod}" />
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettingsAuthentication#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="editConfigurationUsersDefaultUserAssociationsOrganizationSitesCP">
@@ -103,6 +189,27 @@
 		<execute action="CPPortalsettingsUsers#assertTextEquals" locator-key1="DEFAULT_USER_ASSOCIATIONS_USER_GROUPS_FIELD" value1="${userGroupName}" />
 	</command>
 
+	<command name="enableLDAPCP">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_AUTHENTICATION" value1="Authentication" />
+
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="NAVIGATION_LDAP" value1="LDAP" />
+		<execute action="CPPortalsettingsAuthentication#check" locator-key1="AUTHENTICATION_LDAP_ENABLED_CHECKBOX" />
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettingsAuthentication#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="NAVIGATION_LDAP" value1="LDAP" />
+		<execute action="CPPortalsettingsAuthentication#assertChecked" locator-key1="AUTHENTICATION_LDAP_ENABLED_CHECKBOX" />
+	</command>
+
+	<command name="enableRecycleBinCP">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_RECYCLE_BIN" value1="Recycle Bin" />
+
+		<execute action="CPPortalsettingsRecyclebin#check" locator-key1="ENABLE_REYCLE_BIN_CHECKBOX" />
+
+		<execute action="CPPortalsettings#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettings#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
 	<command name="enterReservedEmailAddressCP">
 		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_USERS" value1="Users" />
 
@@ -125,6 +232,28 @@
 		<execute action="CPPortalsettingsUsers#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 		<execute action="CPPortalsettingsUsers#assertClick" locator-key1="RESERVED_CREDENTIALS_TAB" value1="Reserved Credentials" />
 		<execute action="CPPortalsettingsUsers#assertTextEquals" locator-key1="RESERVED_CREDENTIALS_SCREEN_NAMES_FIELD" value1="${userScreenName}" />
+	</command>
+
+	<command name="tearDownAuthenticationCP">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Portal Settings" />
+		</execute>
+
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_AUTHENTICATION" value1="Authentication" />
+
+		<execute action="CPPortalsettingsAuthentication#select" locator-key1="AUTHENTICATION_GENERAL_HOW_DO_USERS_AUTHENTICATE_SELECT" value1="By Email Address" />
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettingsAuthentication#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_CONFIGURATION_AUTHENTICATION" value1="Authentication" />
+
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="NAVIGATION_CAS" value1="CAS" />
+		<execute action="CPPortalsettingsAuthentication#uncheck" locator-key1="AUTHENTICATION_CAS_ENABLED_CHECKBOX" />
+		<execute action="CPPortalsettingsAuthentication#type" locator-key1="AUTHENTICATION_CAS_LOGIN_URL_FIELD" value1="https://localhost:8443/cas-web/login" />
+		<execute action="CPPortalsettingsAuthentication#type" locator-key1="AUTHENTICATION_CAS_LOGOUT_URL_FIELD" value1="https://localhost:8443/cas-web/logout" />
+		<execute action="CPPortalsettingsAuthentication#type" locator-key1="AUTHENTICATION_CAS_SERVER_URL_FIELD" value1="https://localhost:8443/cas-web" />
+		<execute action="CPPortalsettingsAuthentication#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPPortalsettingsAuthentication#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="tearDownCP">
@@ -293,6 +422,18 @@
 
 		<execute action="CPPortalsettingsUsers#assertClick" locator-key1="DEFAULT_USER_ASSOCIATIONS_TAB" value1="Default User Associations" />
 		<execute action="CPPortalsettingsUsers#assertTextEquals" locator-key1="DEFAULT_USER_ASSOCIATIONS_USER_GROUPS_FIELD" value1="${userGroupName}" />
+	</command>
+
+	<command name="viewCurrentDefaultPortalLanguageCP">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_MISCELLANEOUS_DISPLAY_SETTINGS" value1="${displaySettings}" />
+
+		<execute action="CPPortalsettingsDisplaysettings#assertSelectedLabel" locator-key1="DEFAULT_LANGUAGE_SELECT" value1="${defaultPortalLanguage}" />
+	</command>
+
+	<command name="viewDefaultLanguageCP">
+		<execute action="CPPortalsettings#assertClick" locator-key1="MENU_MISCELLANEOUS_DISPLAY_SETTINGS" value1="Display Settings" />
+
+		<execute action="CPPortalsettingsDisplaysettings#assertSelectedLabel" locator-key1="DEFAULT_LANGUAGE_SELECT" value1="${defaultPortalLanguage}" />
 	</command>
 
 	<command name="viewDefaultUserAssociationsCP">

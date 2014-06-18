@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,8 +20,8 @@
 page import="com.liferay.portal.kernel.sanitizer.SanitizerException" %><%@
 page import="com.liferay.portal.kernel.sanitizer.SanitizerUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.DuplicateFileException" %><%@
-page import="com.liferay.portlet.documentlibrary.FileExtensionException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileNameException" %><%@
+page import="com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerException" %><%@
 page import="com.liferay.portlet.social.model.SocialActivity" %><%@
 page import="com.liferay.portlet.social.model.SocialActivityConstants" %><%@
 page import="com.liferay.portlet.social.service.SocialActivityLocalServiceUtil" %><%@
@@ -37,6 +37,9 @@ page import="com.liferay.portlet.wiki.PageTitleException" %><%@
 page import="com.liferay.portlet.wiki.PageVersionException" %><%@
 page import="com.liferay.portlet.wiki.RequiredNodeException" %><%@
 page import="com.liferay.portlet.wiki.WikiFormatException" %><%@
+page import="com.liferay.portlet.wiki.WikiPortletInstanceSettings" %><%@
+page import="com.liferay.portlet.wiki.WikiSettings" %><%@
+page import="com.liferay.portlet.wiki.context.WikiConfigurationDisplayContext" %><%@
 page import="com.liferay.portlet.wiki.importers.WikiImporterKeys" %><%@
 page import="com.liferay.portlet.wiki.model.WikiNode" %><%@
 page import="com.liferay.portlet.wiki.model.WikiPage" %><%@
@@ -53,41 +56,22 @@ page import="com.liferay.portlet.wiki.service.permission.WikiPagePermission" %><
 page import="com.liferay.portlet.wiki.service.permission.WikiPermission" %><%@
 page import="com.liferay.portlet.wiki.social.WikiActivityKeys" %><%@
 page import="com.liferay.portlet.wiki.util.WikiCacheUtil" %><%@
+page import="com.liferay.portlet.wiki.util.WikiConstants" %><%@
 page import="com.liferay.portlet.wiki.util.WikiPageAttachmentsUtil" %><%@
 page import="com.liferay.portlet.wiki.util.WikiUtil" %><%@
-page import="com.liferay.portlet.wiki.util.comparator.PageVersionComparator" %><%@
-page import="com.liferay.util.RSSUtil" %>
+page import="com.liferay.portlet.wiki.util.comparator.PageVersionComparator" %>
 
 <%
-String displayStyle = portletPreferences.getValue("displayStyle", StringPool.BLANK);
-long displayStyleGroupId = GetterUtil.getLong(portletPreferences.getValue("displayStyleGroupId", null), themeDisplay.getScopeGroupId());
-boolean enableRelatedAssets = GetterUtil.getBoolean(portletPreferences.getValue("enableRelatedAssets", null), true);
-boolean enablePageRatings = PropsValues.WIKI_PAGE_RATINGS_ENABLED && GetterUtil.getBoolean(portletPreferences.getValue("enablePageRatings", null), true);
-boolean enableComments = PropsValues.WIKI_PAGE_COMMENTS_ENABLED && GetterUtil.getBoolean(portletPreferences.getValue("enableComments", null), true);
-boolean enableCommentRatings = GetterUtil.getBoolean(portletPreferences.getValue("enableCommentRatings", null), true);
+String portletId = portletDisplay.getId();
 
-List<WikiNode> allNodes = WikiNodeServiceUtil.getNodes(scopeGroupId);
-List<String> allNodeNames = WikiUtil.getNodeNames(allNodes);
-
-String[] visibleNodes = null;
-
-String visibleNodesPreference = portletPreferences.getValue("visibleNodes", null);
-
-if (visibleNodesPreference != null) {
-	visibleNodes = StringUtil.split(visibleNodesPreference);
-
-	allNodes = WikiUtil.orderNodes(allNodes, visibleNodes);
-}
-else {
-	visibleNodes = allNodeNames.toArray(new String[allNodeNames.size()]);
+if (portletId.equals(PortletKeys.PORTLET_CONFIGURATION)) {
+	 portletId = ParamUtil.getString(request, "portletResource");
 }
 
-String[] hiddenNodes = StringUtil.split(portletPreferences.getValue("hiddenNodes", null));
+WikiPortletInstanceSettings wikiPortletInstanceSettings = WikiPortletInstanceSettings.getInstance(layout, portletId);
+WikiSettings wikiSettings = WikiSettings.getInstance(scopeGroupId);
 
-boolean enableRSS = !PortalUtil.isRSSFeedsEnabled() ? false : GetterUtil.getBoolean(portletPreferences.getValue("enableRss", null), true);
-int rssDelta = GetterUtil.getInteger(portletPreferences.getValue("rssDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
-String rssDisplayStyle = portletPreferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_DEFAULT);
-String rssFeedType = portletPreferences.getValue("rssFeedType", RSSUtil.FEED_TYPE_DEFAULT);
+WikiConfigurationDisplayContext wikiConfigurationDisplayContext = new WikiConfigurationDisplayContext(request, wikiPortletInstanceSettings);
 
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>

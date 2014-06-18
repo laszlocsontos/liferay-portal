@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,20 +23,20 @@ import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portal.util.GroupTestUtil;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
-import com.liferay.portlet.bookmarks.util.BookmarksTestUtil;
+import com.liferay.portlet.bookmarks.util.test.BookmarksTestUtil;
 
 import java.util.List;
 
@@ -50,13 +50,11 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		MainServletExecutionTestListener.class,
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-@Transactional
 public class BookmarksFolderServiceTest {
 
 	@Before
@@ -67,23 +65,23 @@ public class BookmarksFolderServiceTest {
 	@Test
 	public void testAddFolder() throws Exception {
 		BookmarksTestUtil.addFolder(
-			_group.getGroupId(), ServiceTestUtil.randomString());
+			_group.getGroupId(), RandomTestUtil.randomString());
 	}
 
 	@Test
 	public void testAddSubfolder() throws Exception {
 		BookmarksFolder folder = BookmarksTestUtil.addFolder(
-			_group.getGroupId(), ServiceTestUtil.randomString());
+			_group.getGroupId(), RandomTestUtil.randomString());
 
 		BookmarksTestUtil.addFolder(
 			_group.getGroupId(), folder.getFolderId(),
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 	}
 
 	@Test
 	public void testDeleteFolder() throws Exception {
 		BookmarksFolder folder = BookmarksTestUtil.addFolder(
-			_group.getGroupId(), ServiceTestUtil.randomString());
+			_group.getGroupId(), RandomTestUtil.randomString());
 
 		BookmarksFolderServiceUtil.deleteFolder(folder.getFolderId());
 	}
@@ -91,18 +89,18 @@ public class BookmarksFolderServiceTest {
 	@Test
 	public void testGetFolder() throws Exception {
 		BookmarksFolder folder = BookmarksTestUtil.addFolder(
-			_group.getGroupId(), ServiceTestUtil.randomString());
+			_group.getGroupId(), RandomTestUtil.randomString());
 
 		BookmarksFolderServiceUtil.getFolder(folder.getFolderId());
 	}
 
 	@Test
 	public void testSearch() throws Exception {
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			_group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		BookmarksFolder folder = BookmarksTestUtil.addFolder(
-			_group.getGroupId(), ServiceTestUtil.randomString());
+			_group.getGroupId(), RandomTestUtil.randomString());
 
 		BookmarksEntry entry = BookmarksTestUtil.addEntry(
 			folder.getFolderId(), true, serviceContext);
@@ -120,11 +118,11 @@ public class BookmarksFolderServiceTest {
 
 	@Test
 	public void testSearchAndDeleteFolderAndSearch() throws Exception {
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			_group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		BookmarksFolder folder = BookmarksTestUtil.addFolder(
-			_group.getGroupId(), ServiceTestUtil.randomString());
+			_group.getGroupId(), RandomTestUtil.randomString());
 
 		BookmarksEntry entry = BookmarksTestUtil.addEntry(
 			folder.getFolderId(), true, serviceContext);
@@ -154,11 +152,11 @@ public class BookmarksFolderServiceTest {
 
 	@Test
 	public void testSearchAndVerifyDocs() throws Exception {
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			_group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		BookmarksFolder folder = BookmarksTestUtil.addFolder(
-			_group.getGroupId(), ServiceTestUtil.randomString());
+			_group.getGroupId(), RandomTestUtil.randomString());
 
 		BookmarksEntry entry = BookmarksTestUtil.addEntry(
 			folder.getFolderId(), true, serviceContext);
@@ -179,19 +177,15 @@ public class BookmarksFolderServiceTest {
 			Assert.assertEquals(
 				entry.getCompanyId(),
 				GetterUtil.getLong(doc.get(Field.COMPANY_ID)));
-			AssertUtils.assertEqualsIgnoreCase(
-				entry.getDescription(), doc.get(Field.DESCRIPTION));
+			Assert.assertEquals(
+				BookmarksEntry.class.getName(),
+				doc.get(Field.ENTRY_CLASS_NAME));
 			Assert.assertEquals(
 				entry.getEntryId(),
 				GetterUtil.getLong(doc.get(Field.ENTRY_CLASS_PK)));
-			Assert.assertEquals(
-				entry.getGroupId(),
-				GetterUtil.getLong(doc.get(Field.GROUP_ID)));
 			AssertUtils.assertEqualsIgnoreCase(
 				entry.getName(), doc.get(Field.TITLE));
 			Assert.assertEquals(entry.getUrl(), doc.get(Field.URL));
-			Assert.assertEquals(
-				entry.getFolderId(), GetterUtil.getLong(doc.get("folderId")));
 		}
 	}
 
@@ -223,6 +217,7 @@ public class BookmarksFolderServiceTest {
 		Assert.assertEquals(2, documents.length);
 	}
 
+	@DeleteAfterTestRun
 	private Group _group;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -169,7 +169,8 @@ public class EditLayoutPrototypeAction extends PortletAction {
 
 		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
-		String description = ParamUtil.getString(actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
@@ -180,14 +181,14 @@ public class EditLayoutPrototypeAction extends PortletAction {
 			// Add layout prototoype
 
 			LayoutPrototypeServiceUtil.addLayoutPrototype(
-				nameMap, description, active, serviceContext);
+				nameMap, descriptionMap, active, serviceContext);
 		}
 		else {
 
 			// Update layout prototoype
 
 			LayoutPrototypeServiceUtil.updateLayoutPrototype(
-				layoutPrototypeId, nameMap, description, active,
+				layoutPrototypeId, nameMap, descriptionMap, active,
 				serviceContext);
 		}
 	}

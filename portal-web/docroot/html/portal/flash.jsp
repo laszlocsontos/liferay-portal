@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,9 +42,9 @@ String movie = ParamUtil.getString(request, "movie");
 	<div id="flashMovie"></div>
 
 	<script type="text/javascript">
-		var so = new SWFObject("<%= HtmlUtil.escapeJS(movie) %>", "flashMovie", "<%= HtmlUtil.escapeJS(width) %>", "<%= HtmlUtil.escapeJS(height) %>", "6", "#FFFFFF");
+		var so = new SWFObject('<%= HtmlUtil.escapeJS(movie) %>', 'flashMovie', '<%= HtmlUtil.escapeJS(width) %>', '<%= HtmlUtil.escapeJS(height) %>', '6', '#FFFFFF');
 
-		so.write("flashMovie");
+		so.write('flashMovie');
 	</script>
 </c:if>
 

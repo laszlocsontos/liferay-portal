@@ -1,11 +1,15 @@
 <definition>
 	<command name="assertClick">
-		<case locator-key1="ASSIGNED_TO_ME_TABLE_ASSET_TITLE">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
+		<case comparator="startsWith" locator-key1="ASSIGNED_TO_ME_MENULIST_">
+			<execute function="AssertClick#pauseAssertTextClickAt" />
 		</case>
 
-		<case locator-key1="ASSIGNED_TO_MY_ROLES_TABLE_ASSET_TITLE">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
+		<case locator-key1="ASSIGNED_TO_ME_TABLE_ACTIONS">
+			<execute function="AssertClick#pauseAssertTextClickAt" />
+		</case>
+
+		<case locator-key1="PANEL_OK_BUTTON">
+			<execute function="AssertClick#pauseAssertTextClickAt" />
 		</case>
 	</command>
 
@@ -22,6 +26,20 @@
 
 		<case locator-key1="ASSIGNED_TO_MY_ROLES_TABLE_ASSET_TITLE">
 			<execute function="AssertTextEquals#assertPartialText" />
+		</case>
+	</command>
+
+	<command name="type">
+		<case locator-key1="PANEL_COMMENT_FIELD">
+			<execute function="Type#clickAtSendKeys" />
+		</case>
+
+		<case locator-key1="PANEL_DUE_DATE">
+			<execute function="Type#clickAtSendKeys" />
+		</case>
+
+		<case locator-key1="PANEL_DUE_DATE_TIME">
+			<execute function="Type#clickAtSendKeys" />
 		</case>
 	</command>
 </definition>

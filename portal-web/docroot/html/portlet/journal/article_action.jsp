@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ else {
 %>
 
 <span class="entry-action overlay">
-	<liferay-ui:icon-menu direction="down" extended="<%= false %>" icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>" triggerCssClass="btn">
+	<liferay-ui:icon-menu direction="down" extended="<%= false %>" icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>" triggerCssClass="btn btn-default">
 		<c:if test="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.UPDATE) %>">
 			<portlet:renderURL var="editURL">
 				<portlet:param name="struts_action" value="/journal/edit_article" />
@@ -46,22 +46,23 @@ else {
 			</portlet:renderURL>
 
 			<liferay-ui:icon
-				image="edit"
+				iconCssClass="icon-edit"
+				message="edit"
 				url="<%= editURL %>"
 			/>
 		</c:if>
 
 		<c:if test="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.UPDATE) %>">
 			<portlet:renderURL var="moveURL">
-				<portlet:param name="struts_action" value="/journal/move_article" />
+				<portlet:param name="struts_action" value="/journal/move_entry" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
 				<portlet:param name="backURL" value="<%= currentURL %>" />
 				<portlet:param name="referringPortletResource" value="<%= referringPortletResource %>" />
-				<portlet:param name="articleId" value="<%= article.getArticleId() %>" />
+				<portlet:param name="articleIds" value="<%= article.getArticleId() %>" />
 			</portlet:renderURL>
 
 			<liferay-ui:icon
-				image="submit"
+				iconCssClass="icon-move"
 				message="move"
 				url="<%= moveURL %>"
 			/>
@@ -77,7 +78,8 @@ else {
 			/>
 
 			<liferay-ui:icon
-				image="permissions"
+				iconCssClass="icon-lock"
+				message="permissions"
 				method="get"
 				url="<%= permissionsURL %>"
 				useDialog="<%= true %>"
@@ -97,7 +99,8 @@ else {
 			%>
 
 			<liferay-ui:icon
-				image="preview"
+				iconCssClass="icon-search"
+				message="preview"
 				onClick="<%= taglibOnClick %>"
 				url="javascript:;"
 			/>
@@ -111,7 +114,7 @@ else {
 				</portlet:renderURL>
 
 				<liferay-ui:icon
-					image="time"
+					iconCssClass="icon-time"
 					message="view-history"
 					url="<%= viewHistoryURL.toString() %>"
 				/>
@@ -127,7 +130,8 @@ else {
 				</portlet:renderURL>
 
 				<liferay-ui:icon
-					image="copy"
+					iconCssClass="icon-copy"
+					message="copy"
 					url="<%= copyURL.toString() %>"
 				/>
 			</c:if>
@@ -143,7 +147,8 @@ else {
 			</portlet:actionURL>
 
 			<liferay-ui:icon
-				image="expire"
+				iconCssClass="icon-time"
+				message="expire"
 				url="<%= expireURL %>"
 			/>
 		</c:if>

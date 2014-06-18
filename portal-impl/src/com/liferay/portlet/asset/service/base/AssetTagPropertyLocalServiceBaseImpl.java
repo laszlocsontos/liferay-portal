@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -73,12 +75,11 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 *
 	 * @param assetTagProperty the asset tag property
 	 * @return the asset tag property that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetTagProperty addAssetTagProperty(
-		AssetTagProperty assetTagProperty) throws SystemException {
+		AssetTagProperty assetTagProperty) {
 		assetTagProperty.setNew(true);
 
 		return assetTagPropertyPersistence.update(assetTagProperty);
@@ -101,12 +102,11 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @param tagPropertyId the primary key of the asset tag property
 	 * @return the asset tag property that was removed
 	 * @throws PortalException if a asset tag property with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public AssetTagProperty deleteAssetTagProperty(long tagPropertyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return assetTagPropertyPersistence.remove(tagPropertyId);
 	}
 
@@ -115,12 +115,11 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 *
 	 * @param assetTagProperty the asset tag property
 	 * @return the asset tag property that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public AssetTagProperty deleteAssetTagProperty(
-		AssetTagProperty assetTagProperty) throws SystemException {
+		AssetTagProperty assetTagProperty) {
 		return assetTagPropertyPersistence.remove(assetTagProperty);
 	}
 
@@ -137,12 +136,10 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return assetTagPropertyPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -157,12 +154,10 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return assetTagPropertyPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -179,12 +174,11 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return assetTagPropertyPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -194,11 +188,9 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return assetTagPropertyPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -208,18 +200,16 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return assetTagPropertyPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public AssetTagProperty fetchAssetTagProperty(long tagPropertyId)
-		throws SystemException {
+	public AssetTagProperty fetchAssetTagProperty(long tagPropertyId) {
 		return assetTagPropertyPersistence.fetchByPrimaryKey(tagPropertyId);
 	}
 
@@ -229,17 +219,47 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @param tagPropertyId the primary key of the asset tag property
 	 * @return the asset tag property
 	 * @throws PortalException if a asset tag property with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public AssetTagProperty getAssetTagProperty(long tagPropertyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return assetTagPropertyPersistence.findByPrimaryKey(tagPropertyId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.asset.service.AssetTagPropertyLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(AssetTagProperty.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("tagPropertyId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.asset.service.AssetTagPropertyLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(AssetTagProperty.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("tagPropertyId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return deleteAssetTagProperty((AssetTagProperty)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return assetTagPropertyPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -253,11 +273,9 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * @param start the lower bound of the range of asset tag properties
 	 * @param end the upper bound of the range of asset tag properties (not inclusive)
 	 * @return the range of asset tag properties
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<AssetTagProperty> getAssetTagProperties(int start, int end)
-		throws SystemException {
+	public List<AssetTagProperty> getAssetTagProperties(int start, int end) {
 		return assetTagPropertyPersistence.findAll(start, end);
 	}
 
@@ -265,10 +283,9 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 * Returns the number of asset tag properties.
 	 *
 	 * @return the number of asset tag properties
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getAssetTagPropertiesCount() throws SystemException {
+	public int getAssetTagPropertiesCount() {
 		return assetTagPropertyPersistence.countAll();
 	}
 
@@ -277,12 +294,11 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 *
 	 * @param assetTagProperty the asset tag property
 	 * @return the asset tag property that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AssetTagProperty updateAssetTagProperty(
-		AssetTagProperty assetTagProperty) throws SystemException {
+		AssetTagProperty assetTagProperty) {
 		return assetTagPropertyPersistence.update(assetTagProperty);
 	}
 
@@ -536,7 +552,7 @@ public abstract class AssetTagPropertyLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = assetTagPropertyPersistence.getDataSource();
 

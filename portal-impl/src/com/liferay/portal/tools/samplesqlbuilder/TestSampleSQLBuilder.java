@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,7 @@ package com.liferay.portal.tools.samplesqlbuilder;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.util.SortedProperties;
 import com.liferay.portal.tools.DBLoader;
-import com.liferay.portal.util.InitUtil;
+import com.liferay.portal.tools.ToolDependencies;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,11 +32,12 @@ import java.util.Properties;
 /**
  * @author Tina Tian
  * @author Shuyang Zhou
+ * @author Raymond Augé
  */
 public class TestSampleSQLBuilder {
 
 	public static void main(String[] args) {
-		InitUtil.initWithSpring();
+		ToolDependencies.wireBasic();
 
 		Reader reader = null;
 

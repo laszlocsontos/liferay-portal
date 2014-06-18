@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,15 +16,15 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
+import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.NewClassLoaderJUnitTestRunner;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
-import java.lang.reflect.Field;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,54 +73,70 @@ public class ThreadLocalDistributorTest {
 		threadLocalDistributor.setClassLoader(getClassLoader());
 		threadLocalDistributor.setThreadLocalSources(_keyValuePairs);
 
-		// With log
+		CaptureHandler captureHandler = null;
 
-		List<LogRecord> logRecords = JDKLoggerTestUtil.configureJDKLogger(
-			ThreadLocalDistributor.class.getName(), Level.WARNING);
+		try {
 
-		threadLocalDistributor.afterPropertiesSet();
+			// With log
 
-		Assert.assertEquals(3, logRecords.size());
+			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+				ThreadLocalDistributor.class.getName(), Level.WARNING);
 
-		LogRecord logRecord1 = logRecords.get(0);
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
-		Assert.assertEquals(
-			"_nonStatic is not a static ThreadLocal", logRecord1.getMessage());
+			threadLocalDistributor.afterPropertiesSet();
 
-		LogRecord logRecord2 = logRecords.get(1);
+			Assert.assertEquals(3, logRecords.size());
 
-		Assert.assertEquals(
-			"_nullValue is not initialized", logRecord2.getMessage());
+			LogRecord logRecord1 = logRecords.get(0);
 
-		LogRecord logRecord3 = logRecords.get(2);
+			Assert.assertEquals(
+				"_nonStatic is not a static ThreadLocal",
+				logRecord1.getMessage());
 
-		Assert.assertEquals(
-			"_object is not of type ThreadLocal", logRecord3.getMessage());
+			LogRecord logRecord2 = logRecords.get(1);
 
-		List<ThreadLocal<Serializable>> threadLocals = getThreadLocals(
-			threadLocalDistributor);
+			Assert.assertEquals(
+				"_nullValue is not initialized", logRecord2.getMessage());
 
-		Assert.assertEquals(1, threadLocals.size());
-		Assert.assertSame(TestClass._threadLocal, threadLocals.get(0));
+			LogRecord logRecord3 = logRecords.get(2);
 
-		// Without log
+			Assert.assertEquals(
+				"_object is not of type ThreadLocal", logRecord3.getMessage());
 
-		logRecords = JDKLoggerTestUtil.configureJDKLogger(
-			ThreadLocalDistributor.class.getName(), Level.OFF);
+			List<ThreadLocal<Serializable>> threadLocals =
+				(List<ThreadLocal<Serializable>>)
+					ReflectionTestUtil.getFieldValue(
+						threadLocalDistributor, "_threadLocals");
 
-		threadLocalDistributor = new ThreadLocalDistributor();
+			Assert.assertEquals(1, threadLocals.size());
+			Assert.assertSame(TestClass._threadLocal, threadLocals.get(0));
 
-		threadLocalDistributor.setClassLoader(getClassLoader());
-		threadLocalDistributor.setThreadLocalSources(_keyValuePairs);
+			// Without log
 
-		threadLocalDistributor.afterPropertiesSet();
+			logRecords = captureHandler.resetLogLevel(Level.OFF);
 
-		Assert.assertTrue(logRecords.isEmpty());
+			threadLocalDistributor = new ThreadLocalDistributor();
 
-		threadLocals = getThreadLocals(threadLocalDistributor);
+			threadLocalDistributor.setClassLoader(getClassLoader());
+			threadLocalDistributor.setThreadLocalSources(_keyValuePairs);
 
-		Assert.assertEquals(1, threadLocals.size());
-		Assert.assertSame(TestClass._threadLocal, threadLocals.get(0));
+			threadLocalDistributor.afterPropertiesSet();
+
+			Assert.assertTrue(logRecords.isEmpty());
+
+			threadLocals = (List<ThreadLocal<Serializable>>)
+				ReflectionTestUtil.getFieldValue(
+					threadLocalDistributor, "_threadLocals");
+
+			Assert.assertEquals(1, threadLocals.size());
+			Assert.assertSame(TestClass._threadLocal, threadLocals.get(0));
+		}
+		finally {
+			if (captureHandler != null) {
+				captureHandler.close();
+			}
+		}
 	}
 
 	@Test
@@ -152,8 +168,9 @@ public class ThreadLocalDistributorTest {
 
 		threadLocalDistributor.capture();
 
-		Serializable[] threadLocalValues = getThreadLocalValues(
-			threadLocalDistributor);
+		Serializable[] threadLocalValues =
+			(Serializable[])ReflectionTestUtil.getFieldValue(
+				threadLocalDistributor, "_threadLocalValues");
 
 		Assert.assertEquals(1, threadLocalValues.length);
 		Assert.assertSame(testValue, threadLocalValues[0]);
@@ -200,28 +217,6 @@ public class ThreadLocalDistributorTest {
 		Class<?> clazz = getClass();
 
 		return clazz.getClassLoader();
-	}
-
-	protected List<ThreadLocal<Serializable>> getThreadLocals(
-			ThreadLocalDistributor threadLocalDistributor)
-		throws Exception {
-
-		Field threadLocalsField = ReflectionUtil.getDeclaredField(
-			ThreadLocalDistributor.class, "_threadLocals");
-
-		return (List<ThreadLocal<Serializable>>)threadLocalsField.get(
-			threadLocalDistributor);
-	}
-
-	protected Serializable[] getThreadLocalValues(
-			ThreadLocalDistributor threadLocalDistributor)
-		throws Exception {
-
-		Field threadLocalValuesField = ReflectionUtil.getDeclaredField(
-			ThreadLocalDistributor.class, "_threadLocalValues");
-
-		return (Serializable[])threadLocalValuesField.get(
-			threadLocalDistributor);
 	}
 
 	private List<KeyValuePair> _keyValuePairs = new ArrayList<KeyValuePair>();

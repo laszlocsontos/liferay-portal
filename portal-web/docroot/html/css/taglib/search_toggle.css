@@ -1,3 +1,52 @@
-.taglib-search-toggle .popover .arrow {
-	left: 70%;
+.taglib-search-toggle .toggle-advanced {
+	margin-left: 10px;
+	position: absolute;
+	top: 8px;
+}
+
+.taglib-search-toggle-advanced-wrapper {
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 100%;
+	z-index: 1;
+
+	.taglib-search-toggle-advanced {
+		border: 1px solid transparent;
+		margin-top: 5px;
+		padding: 20px;
+	}
+}
+
+/*Skin*/
+
+.taglib-search-toggle .toggle-advanced {
+	color: inherit;
+
+	&, &:hover, &:focus {
+		text-decoration: none;
+	}
+}
+
+.taglib-search-toggle-advanced-wrapper .taglib-search-toggle-advanced {
+	background-color: #FCFCFC;
+	border-color: #DDD;
+
+	.btn.close {
+		margin-right: 5px;
+	}
+
+	.taglib-search-toggle-advanced-content {
+		margin: 20px;
+		position: relative;
+
+		.match-fields {
+			margin-bottom: 0;
+		}
+
+		.match-fields-legend {
+			color: #999;
+			font-size: 13px;
+		}
+	}
 }

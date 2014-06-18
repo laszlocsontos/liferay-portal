@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,17 @@
 		'<%= namespace + id %>',
 		function() {
 			if (!togglerDelegate) {
+				var data = {};
+
+				var sendData = A.debounce(
+					function() {
+						Liferay.Store(data);
+
+						data = {};
+					},
+					100
+				);
+
 				togglerDelegate = new A.TogglerDelegate(
 					{
 						animated: true,
@@ -35,16 +46,14 @@
 								var persistId = header.getData('persist-id');
 
 								if (persistId && !event.silent) {
-									var data = {};
-
 									data[persistId] = event.newVal ? 'open' : 'closed';
-
-									Liferay.Store(data);
 								}
+
+								sendData();
 							}
 						},
 						transition: {
-							duration: .3
+							duration: 0.3
 						}
 					}
 				);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,29 +19,25 @@ package com.liferay.portal.tools.sourceformatter.dependencies;
  */
 public class IncorrectTabs {
 
-	public void method1() {
+	public void method() {
 	return;
 	}
 
-	public void method2() {
-			return;
-	}
-
 	public void methodWithLongNameInOrderToHaveThrowsExceptionOnNextLine1()
-	throws Exception() {
+	throws Exception {
 
 		return;
 	}
 
 	public void methodWithLongNameInOrderToHaveThrowsExceptionOnNextLine2()
-			throws Exception() {
+			throws Exception {
 
 		return;
 	}
 
 	public void methodWithLongNameInOrderToHaveThrowsExceptionOnNextLine3(
 		String s)
-		throws Exception() {
+		throws Exception {
 
 		return;
 	}

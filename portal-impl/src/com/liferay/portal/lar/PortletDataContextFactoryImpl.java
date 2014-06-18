@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,11 @@ import com.liferay.portal.kernel.lar.PortletDataContextFactory;
 import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.model.Group;
@@ -60,12 +64,18 @@ public class PortletDataContextFactoryImpl
 		clonePortletDataContext.setManifestSummary(
 			(ManifestSummary)manifestSummary.clone());
 
-		clonePortletDataContext.setNewLayouts(
-			portletDataContext.getNewLayouts());
 		clonePortletDataContext.setParameterMap(
 			portletDataContext.getParameterMap());
 		clonePortletDataContext.setScopeGroupId(
 			portletDataContext.getScopeGroupId());
+		clonePortletDataContext.setSourceCompanyId(
+			portletDataContext.getSourceCompanyId());
+		clonePortletDataContext.setSourceCompanyGroupId(
+			portletDataContext.getSourceCompanyGroupId());
+		clonePortletDataContext.setSourceGroupId(
+			portletDataContext.getSourceGroupId());
+		clonePortletDataContext.setSourceUserPersonalSiteGroupId(
+			portletDataContext.getSourceUserPersonalSiteGroupId());
 		clonePortletDataContext.setStartDate(portletDataContext.getStartDate());
 		clonePortletDataContext.setUserIdStrategy(
 			portletDataContext.getUserIdStrategy());
@@ -96,8 +106,9 @@ public class PortletDataContextFactoryImpl
 
 	@Override
 	public PortletDataContext createImportPortletDataContext(
-		long companyId, long groupId, Map<String, String[]> parameterMap,
-		UserIdStrategy userIdStrategy, ZipReader zipReader) {
+			long companyId, long groupId, Map<String, String[]> parameterMap,
+			UserIdStrategy userIdStrategy, ZipReader zipReader)
+		throws PortletDataException {
 
 		PortletDataContext portletDataContext = createPortletDataContext(
 			companyId, groupId);
@@ -110,8 +121,12 @@ public class PortletDataContextFactoryImpl
 
 		portletDataContext.setNewLayouts(new ArrayList<Layout>());
 		portletDataContext.setParameterMap(parameterMap);
+		portletDataContext.setPortetDataContextListener(
+			new PortletDataContextListenerImpl(portletDataContext));
 		portletDataContext.setUserIdStrategy(userIdStrategy);
 		portletDataContext.setZipReader(zipReader);
+
+		readXML(portletDataContext);
 
 		return portletDataContext;
 	}
@@ -148,10 +163,12 @@ public class PortletDataContextFactoryImpl
 		PortletDataContext portletDataContext = new PortletDataContextImpl();
 
 		try {
-			Group companyGroup = GroupLocalServiceUtil.getCompanyGroup(
+			Group companyGroup = GroupLocalServiceUtil.fetchCompanyGroup(
 				companyId);
 
-			portletDataContext.setCompanyGroupId(companyGroup.getGroupId());
+			if (companyGroup != null) {
+				portletDataContext.setCompanyGroupId(companyGroup.getGroupId());
+			}
 		}
 		catch (Exception e) {
 			if (!CompanyThreadLocal.isDeleteInProcess()) {
@@ -165,10 +182,12 @@ public class PortletDataContextFactoryImpl
 
 		try {
 			Group userPersonalSiteGroup =
-				GroupLocalServiceUtil.getUserPersonalSiteGroup(companyId);
+				GroupLocalServiceUtil.fetchUserPersonalSiteGroup(companyId);
 
-			portletDataContext.setUserPersonalSiteGroupId(
-				userPersonalSiteGroup.getGroupId());
+			if (userPersonalSiteGroup != null) {
+				portletDataContext.setUserPersonalSiteGroupId(
+					userPersonalSiteGroup.getGroupId());
+			}
 		}
 		catch (Exception e) {
 			if (!CompanyThreadLocal.isDeleteInProcess()) {
@@ -177,6 +196,48 @@ public class PortletDataContextFactoryImpl
 		}
 
 		return portletDataContext;
+	}
+
+	protected void readXML(PortletDataContext portletDataContext)
+		throws PortletDataException {
+
+		String xml = portletDataContext.getZipEntryAsString("/manifest.xml");
+
+		Element rootElement = null;
+
+		try {
+			Document document = SAXReaderUtil.read(xml);
+
+			rootElement = document.getRootElement();
+		}
+		catch (Exception e) {
+			throw new PortletDataException(e);
+		}
+
+		portletDataContext.setImportDataRootElement(rootElement);
+
+		Element headerElement = rootElement.element("header");
+
+		long sourceCompanyId = GetterUtil.getLong(
+			headerElement.attributeValue("company-id"));
+
+		portletDataContext.setSourceCompanyId(sourceCompanyId);
+
+		long sourceCompanyGroupId = GetterUtil.getLong(
+			headerElement.attributeValue("company-group-id"));
+
+		portletDataContext.setSourceCompanyGroupId(sourceCompanyGroupId);
+
+		long sourceGroupId = GetterUtil.getLong(
+			headerElement.attributeValue("group-id"));
+
+		portletDataContext.setSourceGroupId(sourceGroupId);
+
+		long sourceUserPersonalSiteGroupId = GetterUtil.getLong(
+			headerElement.attributeValue("user-personal-site-group-id"));
+
+		portletDataContext.setSourceUserPersonalSiteGroupId(
+			sourceUserPersonalSiteGroupId);
 	}
 
 	protected void validateDateRange(Date startDate, Date endDate)

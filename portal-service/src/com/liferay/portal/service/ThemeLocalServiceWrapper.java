@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,32 +66,28 @@ public class ThemeLocalServiceWrapper implements ThemeLocalService,
 	@Override
 	public com.liferay.portal.model.ColorScheme getColorScheme(long companyId,
 		java.lang.String themeId, java.lang.String colorSchemeId,
-		boolean wapTheme)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean wapTheme) {
 		return _themeLocalService.getColorScheme(companyId, themeId,
 			colorSchemeId, wapTheme);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Theme> getControlPanelThemes(
-		long companyId, long userId, boolean wapTheme)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long userId, boolean wapTheme) {
 		return _themeLocalService.getControlPanelThemes(companyId, userId,
 			wapTheme);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Theme> getPageThemes(
-		long companyId, long groupId, long userId, boolean wapTheme)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long groupId, long userId, boolean wapTheme) {
 		return _themeLocalService.getPageThemes(companyId, groupId, userId,
 			wapTheme);
 	}
 
 	@Override
 	public com.liferay.portal.model.Theme getTheme(long companyId,
-		java.lang.String themeId, boolean wapTheme)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String themeId, boolean wapTheme) {
 		return _themeLocalService.getTheme(companyId, themeId, wapTheme);
 	}
 
@@ -107,8 +103,7 @@ public class ThemeLocalServiceWrapper implements ThemeLocalService,
 	@Deprecated
 	@Override
 	public java.util.List<com.liferay.portal.model.Theme> getThemes(
-		long companyId, long groupId, long userId, boolean wapTheme)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long groupId, long userId, boolean wapTheme) {
 		return _themeLocalService.getThemes(companyId, groupId, userId, wapTheme);
 	}
 

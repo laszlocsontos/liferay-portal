@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -110,7 +110,7 @@
 <aui:script use="aui-base">
 	Liferay.Util.toggleRadio('<portlet:namespace />advanced', '<portlet:namespace />advancedConfiguration', '<portlet:namespace />basicConfiguration');
 	Liferay.Util.toggleRadio('<portlet:namespace />basic', '<portlet:namespace />basicConfiguration', '<portlet:namespace />advancedConfiguration');
-	Liferay.Util.toggleBoxes('<portlet:namespace />collatedSpellCheckResultEnabledCheckbox', '<portlet:namespace />collatedSpellCheckResultOptionsContainer');
-	Liferay.Util.toggleBoxes('<portlet:namespace />queryIndexingEnabledCheckbox', '<portlet:namespace />queryIndexingOptionsContainer');
-	Liferay.Util.toggleBoxes('<portlet:namespace />querySuggestionsEnabledCheckbox', '<portlet:namespace />querySuggestionsOptionsContainer');
+	Liferay.Util.toggleBoxes('<portlet:namespace />collatedSpellCheckResultEnabled', '<portlet:namespace />collatedSpellCheckResultOptionsContainer');
+	Liferay.Util.toggleBoxes('<portlet:namespace />queryIndexingEnabled', '<portlet:namespace />queryIndexingOptionsContainer');
+	Liferay.Util.toggleBoxes('<portlet:namespace />querySuggestionsEnabled', '<portlet:namespace />querySuggestionsOptionsContainer');
 </aui:script>

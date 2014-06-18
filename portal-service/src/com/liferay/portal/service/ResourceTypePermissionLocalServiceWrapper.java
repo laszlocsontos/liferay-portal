@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,12 +37,10 @@ public class ResourceTypePermissionLocalServiceWrapper
 	*
 	* @param resourceTypePermission the resource type permission
 	* @return the resource type permission that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.ResourceTypePermission addResourceTypePermission(
-		com.liferay.portal.model.ResourceTypePermission resourceTypePermission)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.ResourceTypePermission resourceTypePermission) {
 		return _resourceTypePermissionLocalService.addResourceTypePermission(resourceTypePermission);
 	}
 
@@ -64,13 +62,11 @@ public class ResourceTypePermissionLocalServiceWrapper
 	* @param resourceTypePermissionId the primary key of the resource type permission
 	* @return the resource type permission that was removed
 	* @throws PortalException if a resource type permission with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.ResourceTypePermission deleteResourceTypePermission(
 		long resourceTypePermissionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _resourceTypePermissionLocalService.deleteResourceTypePermission(resourceTypePermissionId);
 	}
 
@@ -79,12 +75,10 @@ public class ResourceTypePermissionLocalServiceWrapper
 	*
 	* @param resourceTypePermission the resource type permission
 	* @return the resource type permission that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.ResourceTypePermission deleteResourceTypePermission(
-		com.liferay.portal.model.ResourceTypePermission resourceTypePermission)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.ResourceTypePermission resourceTypePermission) {
 		return _resourceTypePermissionLocalService.deleteResourceTypePermission(resourceTypePermission);
 	}
 
@@ -98,13 +92,11 @@ public class ResourceTypePermissionLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _resourceTypePermissionLocalService.dynamicQuery(dynamicQuery);
 	}
 
@@ -119,13 +111,12 @@ public class ResourceTypePermissionLocalServiceWrapper
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return _resourceTypePermissionLocalService.dynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -142,15 +133,13 @@ public class ResourceTypePermissionLocalServiceWrapper
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return _resourceTypePermissionLocalService.dynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -160,12 +149,10 @@ public class ResourceTypePermissionLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _resourceTypePermissionLocalService.dynamicQueryCount(dynamicQuery);
 	}
 
@@ -175,21 +162,18 @@ public class ResourceTypePermissionLocalServiceWrapper
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return _resourceTypePermissionLocalService.dynamicQueryCount(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public com.liferay.portal.model.ResourceTypePermission fetchResourceTypePermission(
-		long resourceTypePermissionId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long resourceTypePermissionId) {
 		return _resourceTypePermissionLocalService.fetchResourceTypePermission(resourceTypePermissionId);
 	}
 
@@ -199,21 +183,33 @@ public class ResourceTypePermissionLocalServiceWrapper
 	* @param resourceTypePermissionId the primary key of the resource type permission
 	* @return the resource type permission
 	* @throws PortalException if a resource type permission with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.ResourceTypePermission getResourceTypePermission(
 		long resourceTypePermissionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _resourceTypePermissionLocalService.getResourceTypePermission(resourceTypePermissionId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _resourceTypePermissionLocalService.getActionableDynamicQuery();
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _resourceTypePermissionLocalService.deletePersistedModel(persistedModel);
 	}
 
 	@Override
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _resourceTypePermissionLocalService.getPersistedModel(primaryKeyObj);
 	}
 
@@ -227,12 +223,10 @@ public class ResourceTypePermissionLocalServiceWrapper
 	* @param start the lower bound of the range of resource type permissions
 	* @param end the upper bound of the range of resource type permissions (not inclusive)
 	* @return the range of resource type permissions
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portal.model.ResourceTypePermission> getResourceTypePermissions(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _resourceTypePermissionLocalService.getResourceTypePermissions(start,
 			end);
 	}
@@ -241,11 +235,9 @@ public class ResourceTypePermissionLocalServiceWrapper
 	* Returns the number of resource type permissions.
 	*
 	* @return the number of resource type permissions
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getResourceTypePermissionsCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getResourceTypePermissionsCount() {
 		return _resourceTypePermissionLocalService.getResourceTypePermissionsCount();
 	}
 
@@ -254,12 +246,10 @@ public class ResourceTypePermissionLocalServiceWrapper
 	*
 	* @param resourceTypePermission the resource type permission
 	* @return the resource type permission that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portal.model.ResourceTypePermission updateResourceTypePermission(
-		com.liferay.portal.model.ResourceTypePermission resourceTypePermission)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.ResourceTypePermission resourceTypePermission) {
 		return _resourceTypePermissionLocalService.updateResourceTypePermission(resourceTypePermission);
 	}
 
@@ -285,46 +275,42 @@ public class ResourceTypePermissionLocalServiceWrapper
 
 	@Override
 	public long getCompanyScopeActionIds(long companyId, java.lang.String name,
-		long roleId) throws com.liferay.portal.kernel.exception.SystemException {
+		long roleId) {
 		return _resourceTypePermissionLocalService.getCompanyScopeActionIds(companyId,
 			name, roleId);
 	}
 
 	@Override
 	public long getGroupScopeActionIds(long companyId, long groupId,
-		java.lang.String name, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String name, long roleId) {
 		return _resourceTypePermissionLocalService.getGroupScopeActionIds(companyId,
 			groupId, name, roleId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.ResourceTypePermission> getGroupScopeResourceTypePermissions(
-		long companyId, java.lang.String name, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, java.lang.String name, long roleId) {
 		return _resourceTypePermissionLocalService.getGroupScopeResourceTypePermissions(companyId,
 			name, roleId);
 	}
 
 	@Override
 	public com.liferay.portal.model.ResourceBlockPermissionsContainer getResourceBlockPermissionsContainer(
-		long companyId, long groupId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long groupId, java.lang.String name) {
 		return _resourceTypePermissionLocalService.getResourceBlockPermissionsContainer(companyId,
 			groupId, name);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.ResourceTypePermission> getRoleResourceTypePermissions(
-		long roleId) throws com.liferay.portal.kernel.exception.SystemException {
+		long roleId) {
 		return _resourceTypePermissionLocalService.getRoleResourceTypePermissions(roleId);
 	}
 
 	@Override
 	public boolean hasCompanyScopePermission(long companyId,
 		java.lang.String name, long roleId, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _resourceTypePermissionLocalService.hasCompanyScopePermission(companyId,
 			name, roleId, actionId);
 	}
@@ -332,8 +318,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	@Override
 	public boolean hasEitherScopePermission(long companyId,
 		java.lang.String name, long roleId, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _resourceTypePermissionLocalService.hasEitherScopePermission(companyId,
 			name, roleId, actionId);
 	}
@@ -341,16 +326,14 @@ public class ResourceTypePermissionLocalServiceWrapper
 	@Override
 	public boolean hasGroupScopePermission(long companyId, long groupId,
 		java.lang.String name, long roleId, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _resourceTypePermissionLocalService.hasGroupScopePermission(companyId,
 			groupId, name, roleId, actionId);
 	}
 
 	@Override
 	public void updateCompanyScopeResourceTypePermissions(long companyId,
-		java.lang.String name, long roleId, long actionIdsLong, long operator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String name, long roleId, long actionIdsLong, long operator) {
 		_resourceTypePermissionLocalService.updateCompanyScopeResourceTypePermissions(companyId,
 			name, roleId, actionIdsLong, operator);
 	}
@@ -358,8 +341,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	@Override
 	public void updateGroupScopeResourceTypePermissions(long companyId,
 		long groupId, java.lang.String name, long roleId, long actionIdsLong,
-		long operator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long operator) {
 		_resourceTypePermissionLocalService.updateGroupScopeResourceTypePermissions(companyId,
 			groupId, name, roleId, actionIdsLong, operator);
 	}

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -119,6 +119,9 @@
 				<c:if test="<%= layout != null %>">
 					getLayoutId: function() {
 						return "<%= layout.getLayoutId() %>";
+					},
+					getLayoutRelativeURL: function() {
+						return "<%= PortalUtil.getLayoutRelativeURL(layout, themeDisplay) %>";
 					},
 					getLayoutURL: function() {
 						return "<%= PortalUtil.getLayoutURL(layout, themeDisplay) %>";
@@ -351,7 +354,7 @@
 		<c:if test="<%= (layoutTypePortlet != null) %>">
 
 			<%
-			List<Portlet> allPortlets = layoutTypePortlet.getAllPortlets(false);
+			List<Portlet> allPortlets = layoutTypePortlet.getAllPortlets(true);
 
 			StringBundler sb = new StringBundler(allPortlets.size() * 2);
 
@@ -367,9 +370,17 @@
 			}
 			%>
 
-			<c:if test="<%= (sb.index() > 0) && !layoutTypePortlet.hasStateMax() %>">
-				Liferay.Portlet.list = ['<%= sb.toString() %>'];
-			</c:if>
+			<c:choose>
+				<c:when test="<%= layoutTypePortlet.hasStateMax() %>">
+					Liferay.Portlet.list = ['<%= layoutTypePortlet.getStateMaxPortletId() %>'];
+				</c:when>
+				<c:when test="<%= themeDisplay.isStatePopUp() %>">
+					Liferay.Portlet.list = ['<%= themeDisplay.getPpid() %>'];
+				</c:when>
+				<c:when test="<%= (sb.index() > 0) && !layoutTypePortlet.hasStateMax() %>">
+					Liferay.Portlet.list = ['<%= sb.toString() %>'];
+				</c:when>
+			</c:choose>
 		</c:if>
 
 		<%

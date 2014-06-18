@@ -13,12 +13,24 @@
 		margin-left: 6px;
 	}
 
-	&.input-localized-editor .input-localized-content {
-		margin-top: 0;
+	&.input-localized-editor {
+		.input-localized-content {
+			margin-top: 0;
+		}
+
+		.language-value {
+			margin-bottom: 7px;
+		}
 	}
 
 	.lfr-input-localized-default a {
 		margin-right: 14px;
+	}
+
+	.palette-items-container {
+		font-size: 0;
+		margin: 0;
+		white-space: normal;
 	}
 
 	.palette-item {
@@ -72,7 +84,7 @@
 	}
 }
 
-.input-prepend, .input-append {
+.input-group {
 	.input-localized .input-localized-content {
 		margin-top: 3px;
 	}

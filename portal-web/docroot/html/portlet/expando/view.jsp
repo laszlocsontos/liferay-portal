@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,34 +43,29 @@ Collections.sort(customAttributesDisplays, new CustomAttributesDisplayComparator
 		modelVar="customAttributesDisplay"
 		stringKey="<%= true %>"
 	>
+		<liferay-ui:search-container-row-parameter
+			name="customAttributesDisplay"
+			value="<%= customAttributesDisplay %>"
+		/>
+
 		<portlet:renderURL var="rowURL">
 			<portlet:param name="struts_action" value="/expando/view_attributes" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="modelResource" value="<%= customAttributesDisplay.getClassName() %>" />
 		</portlet:renderURL>
 
-		<liferay-ui:search-container-row-parameter
-			name="customAttributesDisplay"
-			value="<%= customAttributesDisplay %>"
-		/>
-
 		<liferay-ui:search-container-column-text
-			buffer="buffer"
 			href="<%= rowURL %>"
 			name="resource"
 		>
-
-			<%
-			buffer.append("<img align=\"left\" border=\"0\" src=\"");
-			buffer.append(customAttributesDisplay.getIconPath(themeDisplay));
-			buffer.append("\" style=\"margin-right: 5px;\">");
-			buffer.append(ResourceActionsUtil.getModelResource(locale, customAttributesDisplay.getClassName()));
-			%>
-
+			<liferay-ui:icon
+		   		iconCssClass="<%= customAttributesDisplay.getIconCssClass() %>"
+				label="<%= true %>"
+				message="<%= ResourceActionsUtil.getModelResource(locale, customAttributesDisplay.getClassName()) %>"
+			/>
 		</liferay-ui:search-container-column-text>
 
 		<liferay-ui:search-container-column-text
-			buffer="buffer"
 			href="<%= rowURL %>"
 			name="custom-fields"
 		>
@@ -80,27 +75,27 @@ Collections.sort(customAttributesDisplays, new CustomAttributesDisplayComparator
 
 			List<String> attributeNames = Collections.list(expandoBridge.getAttributeNames());
 
-			for (int i = 0; i < attributeNames.size(); i++) {
-				if (i > 0) {
-					buffer.append(", ");
-				}
+			String[] localizedNames = new String[attributeNames.size()];
 
-				String name = attributeNames.get(i);
+			int i = 0;
 
+			for (String name : attributeNames) {
 				String localizedName = LanguageUtil.get(pageContext, name);
 
 				if (name.equals(localizedName)) {
 					localizedName = TextFormatter.format(name, TextFormatter.J);
 				}
 
-				buffer.append(HtmlUtil.escape(localizedName));
+				localizedNames[i++] = HtmlUtil.escape(localizedName);
 			}
 			%>
 
+			<%= StringUtil.merge(localizedNames, StringPool.COMMA_AND_SPACE) %>
 		</liferay-ui:search-container-column-text>
 
 		<liferay-ui:search-container-column-jsp
 			align="right"
+			cssClass="entry-action"
 			path="/html/portlet/expando/resource_action.jsp"
 		/>
 	</liferay-ui:search-container-row>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,6 +57,10 @@ public class BaseNavTag extends com.liferay.taglib.util.IncludeTag {
 		return _id;
 	}
 
+	public com.liferay.portal.kernel.dao.search.SearchContainer<?> getSearchContainer() {
+		return _searchContainer;
+	}
+
 	public boolean getUseNamespace() {
 		return _useNamespace;
 	}
@@ -97,6 +101,12 @@ public class BaseNavTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("id", id);
 	}
 
+	public void setSearchContainer(com.liferay.portal.kernel.dao.search.SearchContainer<?> searchContainer) {
+		_searchContainer = searchContainer;
+
+		setScopedAttribute("searchContainer", searchContainer);
+	}
+
 	public void setUseNamespace(boolean useNamespace) {
 		_useNamespace = useNamespace;
 
@@ -111,17 +121,13 @@ public class BaseNavTag extends com.liferay.taglib.util.IncludeTag {
 		_cssClass = null;
 		_icon = null;
 		_id = null;
+		_searchContainer = null;
 		_useNamespace = true;
 	}
 
 	@Override
-	protected String getEndPage() {
-		return _END_PAGE;
-	}
-
-	@Override
-	protected String getStartPage() {
-		return _START_PAGE;
+	protected String getPage() {
+		return _PAGE;
 	}
 
 	@Override
@@ -132,16 +138,14 @@ public class BaseNavTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "cssClass", _cssClass);
 		setNamespacedAttribute(request, "icon", _icon);
 		setNamespacedAttribute(request, "id", _id);
+		setNamespacedAttribute(request, "searchContainer", _searchContainer);
 		setNamespacedAttribute(request, "useNamespace", _useNamespace);
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "aui:nav:";
 
-	private static final String _END_PAGE =
-		"/html/taglib/aui/nav/end.jsp";
-
-	private static final String _START_PAGE =
-		"/html/taglib/aui/nav/start.jsp";
+	private static final String _PAGE =
+		"/html/taglib/aui/nav/page.jsp";
 
 	private java.lang.String _ariaLabel = null;
 	private java.lang.String _ariaRole = null;
@@ -149,6 +153,7 @@ public class BaseNavTag extends com.liferay.taglib.util.IncludeTag {
 	private java.lang.String _cssClass = null;
 	private java.lang.String _icon = null;
 	private java.lang.String _id = null;
+	private com.liferay.portal.kernel.dao.search.SearchContainer<?> _searchContainer = null;
 	private boolean _useNamespace = true;
 
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,7 +53,7 @@ if (Validator.isNotNull(script)) {
 			scriptJSONArray = DDMXSDUtil.getJSONArray(structure, script);
 		}
 		catch (Exception e) {
-			scriptJSONArray = DDMXSDUtil.getJSONArray(structure.getDocument());
+			scriptJSONArray = DDMXSDUtil.getJSONArray(structure.getXsd());
 		}
 	}
 	else {
@@ -65,6 +65,14 @@ if (Validator.isNotNull(script)) {
 <portlet:actionURL var="editStructureURL">
 	<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_structure" />
 </portlet:actionURL>
+
+<%
+String requestEditStructureURL = ParamUtil.getString(request, "editStructureURL");
+
+if (Validator.isNotNull(requestEditStructureURL)) {
+	editStructureURL = requestEditStructureURL;
+}
+%>
 
 <aui:form action="<%= editStructureURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveStructure();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (structure != null) ? Constants.UPDATE : Constants.ADD %>" />
@@ -115,7 +123,7 @@ if (Validator.isNotNull(script)) {
 
 	<aui:fieldset>
 		<aui:field-wrapper>
-			<c:if test="<%= (DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(classPK) > 0) || (JournalArticleLocalServiceUtil.getStructureArticlesCount(groupId, structureKey) > 0) %>">
+			<c:if test="<%= (structure != null) && ((DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(classPK) > 0) || (JournalArticleLocalServiceUtil.getStructureArticlesCount(groupId, structureKey) > 0)) %>">
 				<div class="alert alert-warning">
 					<liferay-ui:message key="there-are-content-references-to-this-structure.-you-may-lose-data-if-a-field-name-is-renamed-or-removed" />
 				</div>
@@ -179,23 +187,8 @@ if (Validator.isNotNull(script)) {
 				<aui:field-wrapper label='<%= LanguageUtil.format(pageContext, "parent-x", ddmDisplay.getStructureName(locale), false) %>'>
 					<aui:input name="parentStructureId" type="hidden" value="<%= parentStructureId %>" />
 
-					<div class="input-append">
-						<c:choose>
-							<c:when test="<%= (structure == null) || Validator.isNotNull(parentStructureId) %>">
-								<portlet:renderURL var="parentStructureURL">
-									<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_structure" />
-									<portlet:param name="redirect" value="<%= currentURL %>" />
-									<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
-									<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
-									<portlet:param name="classPK" value="<%= String.valueOf(parentStructureId) %>" />
-								</portlet:renderURL>
-
-								<liferay-ui:input-resource id="parentStructureName" url="<%= HtmlUtil.escape(parentStructureName) %>" />
-							</c:when>
-							<c:otherwise>
-								<liferay-ui:input-resource id="parentStructureName" url="" />
-							</c:otherwise>
-						</c:choose>
+					<div class="input-group">
+						<aui:input label="" name="parentStructureName" type="resource" value="<%= parentStructureName %>" />
 
 						<aui:button onClick='<%= renderResponse.getNamespace() + "openParentStructureSelector();" %>' value="select" />
 
@@ -204,14 +197,10 @@ if (Validator.isNotNull(script)) {
 				</aui:field-wrapper>
 
 				<c:if test="<%= structure != null %>">
-					<aui:field-wrapper label="url">
-						<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathMain() + "/dynamic_data_mapping/get_structure?structureId=" + classPK %>' />
-					</aui:field-wrapper>
+					<aui:input name="url" type="resource" value='<%= themeDisplay.getPortalURL() + themeDisplay.getPathMain() + "/dynamic_data_mapping/get_structure?structureId=" + classPK %>' />
 
 					<c:if test="<%= Validator.isNotNull(refererWebDAVToken) %>">
-						<aui:field-wrapper label="webdav-url">
-							<liferay-ui:input-resource url="<%= structure.getWebDavURL(themeDisplay, refererWebDAVToken) %>" />
-						</aui:field-wrapper>
+						<aui:input name="webDavURL" type="resource" value="<%= structure.getWebDavURL(themeDisplay, refererWebDAVToken) %>" />
 					</c:if>
 				</c:if>
 			</liferay-ui:panel>
@@ -237,7 +226,7 @@ if (Validator.isNotNull(script)) {
 					destroyOnHide: true
 				},
 				eventName: '<portlet:namespace />selectParentStructure',
-				showGlobalScope: true,
+				showAncestorScopes: true,
 				showManageTemplates: false,
 				struts_action: '/dynamic_data_mapping/select_structure',
 				title: '<%= HtmlUtil.escapeJS(scopeTitle) %>'

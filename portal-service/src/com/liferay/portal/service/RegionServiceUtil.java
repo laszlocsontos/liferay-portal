@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,50 +61,46 @@ public class RegionServiceUtil {
 
 	public static com.liferay.portal.model.Region addRegion(long countryId,
 		java.lang.String regionCode, java.lang.String name, boolean active)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().addRegion(countryId, regionCode, name, active);
 	}
 
+	public static com.liferay.portal.model.Region fetchRegion(long regionId) {
+		return getService().fetchRegion(regionId);
+	}
+
 	public static com.liferay.portal.model.Region fetchRegion(long countryId,
-		java.lang.String regionCode)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String regionCode) {
 		return getService().fetchRegion(countryId, regionCode);
 	}
 
 	public static com.liferay.portal.model.Region getRegion(long regionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRegion(regionId);
 	}
 
 	public static com.liferay.portal.model.Region getRegion(long countryId,
 		java.lang.String regionCode)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRegion(countryId, regionCode);
 	}
 
-	public static java.util.List<com.liferay.portal.model.Region> getRegions()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static java.util.List<com.liferay.portal.model.Region> getRegions() {
 		return getService().getRegions();
 	}
 
 	public static java.util.List<com.liferay.portal.model.Region> getRegions(
-		boolean active)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean active) {
 		return getService().getRegions(active);
 	}
 
 	public static java.util.List<com.liferay.portal.model.Region> getRegions(
-		long countryId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long countryId) {
 		return getService().getRegions(countryId);
 	}
 
 	public static java.util.List<com.liferay.portal.model.Region> getRegions(
-		long countryId, boolean active)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long countryId, boolean active) {
 		return getService().getRegions(countryId, active);
 	}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,7 +26,7 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 UserGroup userGroup = (UserGroup)row.getObject();
 %>
 
-<liferay-ui:icon-menu>
+<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
 	<c:if test="<%= UserGroupPermissionUtil.contains(permissionChecker, userGroup.getUserGroupId(), ActionKeys.UPDATE) %>">
 		<portlet:renderURL var="editURL">
 			<portlet:param name="struts_action" value="/users_admin/edit_user_group" />
@@ -35,7 +35,8 @@ UserGroup userGroup = (UserGroup)row.getObject();
 		</portlet:renderURL>
 
 		<liferay-ui:icon
-			image="edit"
+			iconCssClass="icon-edit"
+			message="edit"
 			url="<%= editURL %>"
 		/>
 	</c:if>
@@ -54,7 +55,8 @@ UserGroup userGroup = (UserGroup)row.getObject();
 		/>
 
 		<liferay-ui:icon
-			image="permissions"
+			iconCssClass="icon-lock"
+			message="permissions"
 			method="get"
 			url="<%= permissionsURL %>"
 			useDialog="<%= true %>"
@@ -67,12 +69,15 @@ UserGroup userGroup = (UserGroup)row.getObject();
 			modelResourceDescription='<%= LanguageUtil.format(pageContext, "site-for-user-group-x", userGroup.getName(), false) %>'
 			resourcePrimKey="<%= String.valueOf(userGroup.getGroup().getGroupId()) %>"
 			var="permissionsURL"
+			windowState="<%= LiferayWindowState.POP_UP.toString() %>"
 		/>
 
 		<liferay-ui:icon
-			image="permissions"
+			iconCssClass="icon-lock"
 			message="site-permissions"
+			method="get"
 			url="<%= permissionsURL %>"
+			useDialog="<%= true %>"
 		/>
 	</c:if>
 
@@ -88,7 +93,7 @@ UserGroup userGroup = (UserGroup)row.getObject();
 		</portlet:renderURL>
 
 		<liferay-ui:icon
-			image="pages"
+			iconCssClass="icon-copy"
 			message="manage-site-pages"
 			url="<%= managePagesURL %>"
 		/>
@@ -107,7 +112,7 @@ UserGroup userGroup = (UserGroup)row.getObject();
 		</portlet:actionURL>
 
 		<liferay-ui:icon
-			image="view"
+			iconCssClass="icon-search"
 			message="go-to-the-site's-public-pages"
 			target="_blank"
 			url="<%= viewPublicPagesURL %>"
@@ -123,7 +128,7 @@ UserGroup userGroup = (UserGroup)row.getObject();
 		</portlet:actionURL>
 
 		<liferay-ui:icon
-			image="view"
+			iconCssClass="icon-search"
 			message="go-to-the-site's-private-pages"
 			target="_blank"
 			url="<%= viewPrivatePagesURL %>"
@@ -138,7 +143,7 @@ UserGroup userGroup = (UserGroup)row.getObject();
 		</portlet:renderURL>
 
 		<liferay-ui:icon
-			image="assign"
+			iconCssClass="icon-signin"
 			message="assign-members"
 			url="<%= assignURL %>"
 		/>
@@ -151,7 +156,9 @@ UserGroup userGroup = (UserGroup)row.getObject();
 		%>
 
 		<liferay-ui:icon
-			image="delete"
+			cssClass="item-remove"
+			iconCssClass="icon-remove"
+			message="delete"
 			url="<%= taglibDeleteURL %>"
 		/>
 	</c:if>

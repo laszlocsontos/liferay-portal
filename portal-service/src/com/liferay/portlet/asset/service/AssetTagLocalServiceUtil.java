@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,11 +46,9 @@ public class AssetTagLocalServiceUtil {
 	*
 	* @param assetTag the asset tag
 	* @return the asset tag that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.asset.model.AssetTag addAssetTag(
-		com.liferay.portlet.asset.model.AssetTag assetTag)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.asset.model.AssetTag assetTag) {
 		return getService().addAssetTag(assetTag);
 	}
 
@@ -71,12 +69,9 @@ public class AssetTagLocalServiceUtil {
 	* @param tagId the primary key of the asset tag
 	* @return the asset tag that was removed
 	* @throws PortalException if a asset tag with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.asset.model.AssetTag deleteAssetTag(
-		long tagId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		long tagId) throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteAssetTag(tagId);
 	}
 
@@ -85,11 +80,9 @@ public class AssetTagLocalServiceUtil {
 	*
 	* @param assetTag the asset tag
 	* @return the asset tag that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.asset.model.AssetTag deleteAssetTag(
-		com.liferay.portlet.asset.model.AssetTag assetTag)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.asset.model.AssetTag assetTag) {
 		return getService().deleteAssetTag(assetTag);
 	}
 
@@ -102,12 +95,10 @@ public class AssetTagLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -122,12 +113,11 @@ public class AssetTagLocalServiceUtil {
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,14 +133,12 @@ public class AssetTagLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -160,11 +148,9 @@ public class AssetTagLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -174,17 +160,15 @@ public class AssetTagLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetTag fetchAssetTag(
-		long tagId) throws com.liferay.portal.kernel.exception.SystemException {
+		long tagId) {
 		return getService().fetchAssetTag(tagId);
 	}
 
@@ -194,19 +178,28 @@ public class AssetTagLocalServiceUtil {
 	* @param tagId the primary key of the asset tag
 	* @return the asset tag
 	* @throws PortalException if a asset tag with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.asset.model.AssetTag getAssetTag(
-		long tagId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		long tagId) throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getAssetTag(tagId);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
@@ -220,11 +213,9 @@ public class AssetTagLocalServiceUtil {
 	* @param start the lower bound of the range of asset tags
 	* @param end the upper bound of the range of asset tags (not inclusive)
 	* @return the range of asset tags
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetTags(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return getService().getAssetTags(start, end);
 	}
 
@@ -232,10 +223,8 @@ public class AssetTagLocalServiceUtil {
 	* Returns the number of asset tags.
 	*
 	* @return the number of asset tags
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getAssetTagsCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getAssetTagsCount() {
 		return getService().getAssetTagsCount();
 	}
 
@@ -244,149 +233,93 @@ public class AssetTagLocalServiceUtil {
 	*
 	* @param assetTag the asset tag
 	* @return the asset tag that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.asset.model.AssetTag updateAssetTag(
-		com.liferay.portlet.asset.model.AssetTag assetTag)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.asset.model.AssetTag assetTag) {
 		return getService().updateAssetTag(assetTag);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void addAssetEntryAssetTag(long entryId, long tagId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void addAssetEntryAssetTag(long entryId, long tagId) {
 		getService().addAssetEntryAssetTag(entryId, tagId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void addAssetEntryAssetTag(long entryId,
-		com.liferay.portlet.asset.model.AssetTag assetTag)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.asset.model.AssetTag assetTag) {
 		getService().addAssetEntryAssetTag(entryId, assetTag);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void addAssetEntryAssetTags(long entryId, long[] tagIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void addAssetEntryAssetTags(long entryId, long[] tagIds) {
 		getService().addAssetEntryAssetTags(entryId, tagIds);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void addAssetEntryAssetTags(long entryId,
-		java.util.List<com.liferay.portlet.asset.model.AssetTag> AssetTags)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.List<com.liferay.portlet.asset.model.AssetTag> AssetTags) {
 		getService().addAssetEntryAssetTags(entryId, AssetTags);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void clearAssetEntryAssetTags(long entryId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void clearAssetEntryAssetTags(long entryId) {
 		getService().clearAssetEntryAssetTags(entryId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void deleteAssetEntryAssetTag(long entryId, long tagId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void deleteAssetEntryAssetTag(long entryId, long tagId) {
 		getService().deleteAssetEntryAssetTag(entryId, tagId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void deleteAssetEntryAssetTag(long entryId,
-		com.liferay.portlet.asset.model.AssetTag assetTag)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.asset.model.AssetTag assetTag) {
 		getService().deleteAssetEntryAssetTag(entryId, assetTag);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void deleteAssetEntryAssetTags(long entryId, long[] tagIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void deleteAssetEntryAssetTags(long entryId, long[] tagIds) {
 		getService().deleteAssetEntryAssetTags(entryId, tagIds);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void deleteAssetEntryAssetTags(long entryId,
-		java.util.List<com.liferay.portlet.asset.model.AssetTag> AssetTags)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.List<com.liferay.portlet.asset.model.AssetTag> AssetTags) {
 		getService().deleteAssetEntryAssetTags(entryId, AssetTags);
 	}
 
 	/**
-	* @throws SystemException if a system exception occurred
+	* Returns the entryIds of the asset entries associated with the asset tag.
+	*
+	* @param tagId the tagId of the asset tag
+	* @return long[] the entryIds of asset entries associated with the asset tag
 	*/
+	public static long[] getAssetEntryPrimaryKeys(long tagId) {
+		return getService().getAssetEntryPrimaryKeys(tagId);
+	}
+
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetEntryAssetTags(
-		long entryId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long entryId) {
 		return getService().getAssetEntryAssetTags(entryId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetEntryAssetTags(
-		long entryId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long entryId, int start, int end) {
 		return getService().getAssetEntryAssetTags(entryId, start, end);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getAssetEntryAssetTags(
 		long entryId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService()
 				   .getAssetEntryAssetTags(entryId, start, end,
 			orderByComparator);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static int getAssetEntryAssetTagsCount(long entryId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getAssetEntryAssetTagsCount(long entryId) {
 		return getService().getAssetEntryAssetTagsCount(entryId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static boolean hasAssetEntryAssetTag(long entryId, long tagId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static boolean hasAssetEntryAssetTag(long entryId, long tagId) {
 		return getService().hasAssetEntryAssetTag(entryId, tagId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static boolean hasAssetEntryAssetTags(long entryId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static boolean hasAssetEntryAssetTags(long entryId) {
 		return getService().hasAssetEntryAssetTags(entryId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void setAssetEntryAssetTags(long entryId, long[] tagIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void setAssetEntryAssetTags(long entryId, long[] tagIds) {
 		getService().setAssetEntryAssetTags(entryId, tagIds);
 	}
 
@@ -411,16 +344,14 @@ public class AssetTagLocalServiceUtil {
 	public static com.liferay.portlet.asset.model.AssetTag addTag(long userId,
 		java.lang.String name, java.lang.String[] tagProperties,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().addTag(userId, name, tagProperties, serviceContext);
 	}
 
 	public static void addTagResources(
 		com.liferay.portlet.asset.model.AssetTag tag,
 		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService()
 			.addTagResources(tag, addGroupPermissions, addGuestPermissions);
 	}
@@ -428,8 +359,7 @@ public class AssetTagLocalServiceUtil {
 	public static void addTagResources(
 		com.liferay.portlet.asset.model.AssetTag tag,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().addTagResources(tag, groupPermissions, guestPermissions);
 	}
 
@@ -452,81 +382,68 @@ public class AssetTagLocalServiceUtil {
 	* @throws PortalException if a matching group could not be found, if the
 	tag's key or value were invalid, or if a portal exception
 	occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> checkTags(
 		long userId, com.liferay.portal.model.Group group,
 		java.lang.String[] names)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().checkTags(userId, group, names);
 	}
 
 	public static void checkTags(long userId, long groupId,
 		java.lang.String[] names)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().checkTags(userId, groupId, names);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetTag decrementAssetCount(
 		long tagId, long classNameId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().decrementAssetCount(tagId, classNameId);
 	}
 
 	public static void deleteGroupTags(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteGroupTags(groupId);
 	}
 
 	public static void deleteTag(com.liferay.portlet.asset.model.AssetTag tag)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteTag(tag);
 	}
 
 	public static void deleteTag(long tagId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteTag(tagId);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getEntryTags(
-		long entryId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long entryId) {
 		return getService().getEntryTags(entryId);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getGroupsTags(
-		long[] groupIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long[] groupIds) {
 		return getService().getGroupsTags(groupIds);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getGroupTags(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId) {
 		return getService().getGroupTags(groupId);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getGroupTags(
-		long groupId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, int start, int end) {
 		return getService().getGroupTags(groupId, start, end);
 	}
 
-	public static int getGroupTagsCount(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getGroupTagsCount(long groupId) {
 		return getService().getGroupTagsCount(groupId);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getSocialActivityCounterOffsetTags(
 		long groupId, java.lang.String socialActivityCounterName,
-		int startOffset, int endOffset)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int startOffset, int endOffset) {
 		return getService()
 				   .getSocialActivityCounterOffsetTags(groupId,
 			socialActivityCounterName, startOffset, endOffset);
@@ -534,126 +451,107 @@ public class AssetTagLocalServiceUtil {
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getSocialActivityCounterPeriodTags(
 		long groupId, java.lang.String socialActivityCounterName,
-		int startPeriod, int endPeriod)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int startPeriod, int endPeriod) {
 		return getService()
 				   .getSocialActivityCounterPeriodTags(groupId,
 			socialActivityCounterName, startPeriod, endPeriod);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetTag getTag(long tagId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTag(tagId);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetTag getTag(
 		long groupId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTag(groupId, name);
 	}
 
 	public static long[] getTagIds(long groupId, java.lang.String[] names)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTagIds(groupId, names);
 	}
 
 	public static long[] getTagIds(long[] groupIds, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTagIds(groupIds, name);
 	}
 
 	public static long[] getTagIds(long[] groupIds, java.lang.String[] names)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTagIds(groupIds, names);
 	}
 
-	public static java.lang.String[] getTagNames()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static java.lang.String[] getTagNames() {
 		return getService().getTagNames();
 	}
 
-	public static java.lang.String[] getTagNames(long classNameId, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static java.lang.String[] getTagNames(long classNameId, long classPK) {
 		return getService().getTagNames(classNameId, classPK);
 	}
 
 	public static java.lang.String[] getTagNames(java.lang.String className,
-		long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long classPK) {
 		return getService().getTagNames(className, classPK);
 	}
 
-	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags() {
 		return getService().getTags();
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags(
-		long classNameId, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long classNameId, long classPK) {
 		return getService().getTags(classNameId, classPK);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags(
-		long groupId, long classNameId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, long classNameId, java.lang.String name) {
 		return getService().getTags(groupId, classNameId, name);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags(
 		long groupId, long classNameId, java.lang.String name, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getService().getTags(groupId, classNameId, name, start, end);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> getTags(
-		java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String className, long classPK) {
 		return getService().getTags(className, classPK);
 	}
 
 	public static int getTagsSize(long groupId, long classNameId,
-		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String name) {
 		return getService().getTagsSize(groupId, classNameId, name);
 	}
 
 	public static boolean hasTag(long groupId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().hasTag(groupId, name);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetTag incrementAssetCount(
 		long tagId, long classNameId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().incrementAssetCount(tagId, classNameId);
 	}
 
 	public static void mergeTags(long fromTagId, long toTagId,
 		boolean overrideProperties)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().mergeTags(fromTagId, toTagId, overrideProperties);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> search(
 		long groupId, java.lang.String name, java.lang.String[] tagProperties,
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return getService().search(groupId, name, tagProperties, start, end);
 	}
 
 	public static java.util.List<com.liferay.portlet.asset.model.AssetTag> search(
 		long[] groupIds, java.lang.String name,
-		java.lang.String[] tagProperties, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String[] tagProperties, int start, int end) {
 		return getService().search(groupIds, name, tagProperties, start, end);
 	}
 
@@ -661,8 +559,7 @@ public class AssetTagLocalServiceUtil {
 		long userId, long tagId, java.lang.String name,
 		java.lang.String[] tagProperties,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateTag(userId, tagId, name, tagProperties, serviceContext);
 	}

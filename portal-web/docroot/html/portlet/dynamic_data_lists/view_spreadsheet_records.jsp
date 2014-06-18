@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,8 +30,8 @@ DDMStructure ddmStructure = recordSet.getDDMStructure();
 
 <div class="lfr-spreadsheet-container">
 	<div id="<portlet:namespace />spreadsheet">
-		<div class="table-striped yui3-widget yui3-datatable" id="<portlet:namespace />dataTable">
-			<div class="yui3-datatable-scrollable yui3-datatable-content" id="<portlet:namespace />dataTableContent"></div>
+		<div class="table-striped yui3-datatable yui3-widget" id="<portlet:namespace />dataTable">
+			<div class="yui3-datatable-content yui3-datatable-scrollable" id="<portlet:namespace />dataTableContent"></div>
 		</div>
 	</div>
 
@@ -97,7 +97,7 @@ DDMStructure ddmStructure = recordSet.getDDMStructure();
 
 	var keys = A.Array.map(
 		columns,
-		function(item, index, collection) {
+		function(item, index) {
 			var key = item.key;
 
 			if (!item.sortFn) {
@@ -135,7 +135,7 @@ DDMStructure ddmStructure = recordSet.getDDMStructure();
 
 	A.Array.each(
 		records,
-		function(item, index, collection) {
+		function(item, index) {
 			data.splice(item.displayIndex, 0, item);
 		}
 	);
@@ -156,6 +156,12 @@ DDMStructure ddmStructure = recordSet.getDDMStructure();
 				}
 			],
 			recordsetId: <%= recordSet.getRecordSetId() %>,
+			strings: {
+				asc: '<liferay-ui:message key="ascending" />',
+				desc: '<liferay-ui:message key="descending" />',
+				reverseSortBy: '<liferay-ui:message arguments="{column}" key="reverse-sort-by-x" />',
+				sortBy: '<liferay-ui:message arguments="{column}" key="sort-by-x" />'
+			},
 			structure: structure,
 			width: '100%'
 		}

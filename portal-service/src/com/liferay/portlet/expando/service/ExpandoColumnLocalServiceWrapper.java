@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,12 +39,10 @@ public class ExpandoColumnLocalServiceWrapper
 	*
 	* @param expandoColumn the expando column
 	* @return the expando column that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn addExpandoColumn(
-		com.liferay.portlet.expando.model.ExpandoColumn expandoColumn)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.expando.model.ExpandoColumn expandoColumn) {
 		return _expandoColumnLocalService.addExpandoColumn(expandoColumn);
 	}
 
@@ -66,13 +64,11 @@ public class ExpandoColumnLocalServiceWrapper
 	* @param columnId the primary key of the expando column
 	* @return the expando column that was removed
 	* @throws PortalException if a expando column with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn deleteExpandoColumn(
 		long columnId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.deleteExpandoColumn(columnId);
 	}
 
@@ -81,12 +77,10 @@ public class ExpandoColumnLocalServiceWrapper
 	*
 	* @param expandoColumn the expando column
 	* @return the expando column that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn deleteExpandoColumn(
-		com.liferay.portlet.expando.model.ExpandoColumn expandoColumn)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.expando.model.ExpandoColumn expandoColumn) {
 		return _expandoColumnLocalService.deleteExpandoColumn(expandoColumn);
 	}
 
@@ -100,13 +94,11 @@ public class ExpandoColumnLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _expandoColumnLocalService.dynamicQuery(dynamicQuery);
 	}
 
@@ -121,13 +113,12 @@ public class ExpandoColumnLocalServiceWrapper
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return _expandoColumnLocalService.dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,15 +134,13 @@ public class ExpandoColumnLocalServiceWrapper
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return _expandoColumnLocalService.dynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -161,12 +150,10 @@ public class ExpandoColumnLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _expandoColumnLocalService.dynamicQueryCount(dynamicQuery);
 	}
 
@@ -176,21 +163,18 @@ public class ExpandoColumnLocalServiceWrapper
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return _expandoColumnLocalService.dynamicQueryCount(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn fetchExpandoColumn(
-		long columnId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long columnId) {
 		return _expandoColumnLocalService.fetchExpandoColumn(columnId);
 	}
 
@@ -200,21 +184,33 @@ public class ExpandoColumnLocalServiceWrapper
 	* @param columnId the primary key of the expando column
 	* @return the expando column
 	* @throws PortalException if a expando column with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn getExpandoColumn(
 		long columnId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.getExpandoColumn(columnId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _expandoColumnLocalService.getActionableDynamicQuery();
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _expandoColumnLocalService.deletePersistedModel(persistedModel);
 	}
 
 	@Override
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.getPersistedModel(primaryKeyObj);
 	}
 
@@ -228,12 +224,10 @@ public class ExpandoColumnLocalServiceWrapper
 	* @param start the lower bound of the range of expando columns
 	* @param end the upper bound of the range of expando columns (not inclusive)
 	* @return the range of expando columns
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getExpandoColumns(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _expandoColumnLocalService.getExpandoColumns(start, end);
 	}
 
@@ -241,11 +235,9 @@ public class ExpandoColumnLocalServiceWrapper
 	* Returns the number of expando columns.
 	*
 	* @return the number of expando columns
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getExpandoColumnsCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getExpandoColumnsCount() {
 		return _expandoColumnLocalService.getExpandoColumnsCount();
 	}
 
@@ -254,12 +246,10 @@ public class ExpandoColumnLocalServiceWrapper
 	*
 	* @param expandoColumn the expando column
 	* @return the expando column that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn updateExpandoColumn(
-		com.liferay.portlet.expando.model.ExpandoColumn expandoColumn)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.expando.model.ExpandoColumn expandoColumn) {
 		return _expandoColumnLocalService.updateExpandoColumn(expandoColumn);
 	}
 
@@ -286,8 +276,7 @@ public class ExpandoColumnLocalServiceWrapper
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn addColumn(
 		long tableId, java.lang.String name, int type)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.addColumn(tableId, name, type);
 	}
 
@@ -295,61 +284,53 @@ public class ExpandoColumnLocalServiceWrapper
 	public com.liferay.portlet.expando.model.ExpandoColumn addColumn(
 		long tableId, java.lang.String name, int type,
 		java.lang.Object defaultData)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.addColumn(tableId, name, type,
 			defaultData);
 	}
 
 	@Override
 	public void deleteColumn(
-		com.liferay.portlet.expando.model.ExpandoColumn column)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.expando.model.ExpandoColumn column) {
 		_expandoColumnLocalService.deleteColumn(column);
 	}
 
 	@Override
 	public void deleteColumn(long columnId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_expandoColumnLocalService.deleteColumn(columnId);
 	}
 
 	@Override
 	public void deleteColumn(long companyId, long classNameId,
 		java.lang.String tableName, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_expandoColumnLocalService.deleteColumn(companyId, classNameId,
 			tableName, name);
 	}
 
 	@Override
-	public void deleteColumn(long tableId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void deleteColumn(long tableId, java.lang.String name) {
 		_expandoColumnLocalService.deleteColumn(tableId, name);
 	}
 
 	@Override
 	public void deleteColumn(long companyId, java.lang.String className,
 		java.lang.String tableName, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_expandoColumnLocalService.deleteColumn(companyId, className,
 			tableName, name);
 	}
 
 	@Override
-	public void deleteColumns(long tableId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void deleteColumns(long tableId) {
 		_expandoColumnLocalService.deleteColumns(tableId);
 	}
 
 	@Override
 	public void deleteColumns(long companyId, long classNameId,
 		java.lang.String tableName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_expandoColumnLocalService.deleteColumns(companyId, classNameId,
 			tableName);
 	}
@@ -357,62 +338,54 @@ public class ExpandoColumnLocalServiceWrapper
 	@Override
 	public void deleteColumns(long companyId, java.lang.String className,
 		java.lang.String tableName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_expandoColumnLocalService.deleteColumns(companyId, className, tableName);
 	}
 
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn getColumn(
 		long columnId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.getColumn(columnId);
 	}
 
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn getColumn(
 		long companyId, long classNameId, java.lang.String tableName,
-		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String name) {
 		return _expandoColumnLocalService.getColumn(companyId, classNameId,
 			tableName, name);
 	}
 
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn getColumn(
-		long tableId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long tableId, java.lang.String name) {
 		return _expandoColumnLocalService.getColumn(tableId, name);
 	}
 
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn getColumn(
 		long companyId, java.lang.String className, java.lang.String tableName,
-		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String name) {
 		return _expandoColumnLocalService.getColumn(companyId, className,
 			tableName, name);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getColumns(
-		long tableId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long tableId) {
 		return _expandoColumnLocalService.getColumns(tableId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getColumns(
-		long tableId, java.util.Collection<java.lang.String> names)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long tableId, java.util.Collection<java.lang.String> names) {
 		return _expandoColumnLocalService.getColumns(tableId, names);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getColumns(
-		long companyId, long classNameId, java.lang.String tableName)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long classNameId, java.lang.String tableName) {
 		return _expandoColumnLocalService.getColumns(companyId, classNameId,
 			tableName);
 	}
@@ -420,16 +393,14 @@ public class ExpandoColumnLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getColumns(
 		long companyId, long classNameId, java.lang.String tableName,
-		java.util.Collection<java.lang.String> names)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.Collection<java.lang.String> names) {
 		return _expandoColumnLocalService.getColumns(companyId, classNameId,
 			tableName, names);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getColumns(
-		long companyId, java.lang.String className, java.lang.String tableName)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, java.lang.String className, java.lang.String tableName) {
 		return _expandoColumnLocalService.getColumns(companyId, className,
 			tableName);
 	}
@@ -437,77 +408,67 @@ public class ExpandoColumnLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getColumns(
 		long companyId, java.lang.String className, java.lang.String tableName,
-		java.util.Collection<java.lang.String> columnNames)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.Collection<java.lang.String> columnNames) {
 		return _expandoColumnLocalService.getColumns(companyId, className,
 			tableName, columnNames);
 	}
 
 	@Override
-	public int getColumnsCount(long tableId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getColumnsCount(long tableId) {
 		return _expandoColumnLocalService.getColumnsCount(tableId);
 	}
 
 	@Override
 	public int getColumnsCount(long companyId, long classNameId,
-		java.lang.String tableName)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String tableName) {
 		return _expandoColumnLocalService.getColumnsCount(companyId,
 			classNameId, tableName);
 	}
 
 	@Override
 	public int getColumnsCount(long companyId, java.lang.String className,
-		java.lang.String tableName)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String tableName) {
 		return _expandoColumnLocalService.getColumnsCount(companyId, className,
 			tableName);
 	}
 
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn getDefaultTableColumn(
-		long companyId, long classNameId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long classNameId, java.lang.String name) {
 		return _expandoColumnLocalService.getDefaultTableColumn(companyId,
 			classNameId, name);
 	}
 
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn getDefaultTableColumn(
-		long companyId, java.lang.String className, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, java.lang.String className, java.lang.String name) {
 		return _expandoColumnLocalService.getDefaultTableColumn(companyId,
 			className, name);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getDefaultTableColumns(
-		long companyId, long classNameId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long classNameId) {
 		return _expandoColumnLocalService.getDefaultTableColumns(companyId,
 			classNameId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.expando.model.ExpandoColumn> getDefaultTableColumns(
-		long companyId, java.lang.String className)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, java.lang.String className) {
 		return _expandoColumnLocalService.getDefaultTableColumns(companyId,
 			className);
 	}
 
 	@Override
-	public int getDefaultTableColumnsCount(long companyId, long classNameId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getDefaultTableColumnsCount(long companyId, long classNameId) {
 		return _expandoColumnLocalService.getDefaultTableColumnsCount(companyId,
 			classNameId);
 	}
 
 	@Override
 	public int getDefaultTableColumnsCount(long companyId,
-		java.lang.String className)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String className) {
 		return _expandoColumnLocalService.getDefaultTableColumnsCount(companyId,
 			className);
 	}
@@ -515,8 +476,7 @@ public class ExpandoColumnLocalServiceWrapper
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn updateColumn(
 		long columnId, java.lang.String name, int type)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.updateColumn(columnId, name, type);
 	}
 
@@ -524,8 +484,7 @@ public class ExpandoColumnLocalServiceWrapper
 	public com.liferay.portlet.expando.model.ExpandoColumn updateColumn(
 		long columnId, java.lang.String name, int type,
 		java.lang.Object defaultData)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.updateColumn(columnId, name, type,
 			defaultData);
 	}
@@ -533,8 +492,7 @@ public class ExpandoColumnLocalServiceWrapper
 	@Override
 	public com.liferay.portlet.expando.model.ExpandoColumn updateTypeSettings(
 		long columnId, java.lang.String typeSettings)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _expandoColumnLocalService.updateTypeSettings(columnId,
 			typeSettings);
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,6 @@ public interface CyrusUserPersistence extends BasePersistence<Dummy> {
 	public void remove(long userId)
 		throws NoSuchCyrusUserException, SystemException;
 
-	public void update(CyrusUser user) throws SystemException;
+	public void update(CyrusUser user);
 
 }

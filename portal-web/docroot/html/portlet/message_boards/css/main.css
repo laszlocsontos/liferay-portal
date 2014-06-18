@@ -136,6 +136,10 @@
 	.message-container .user-info {
 		border-right: 1px solid #CCC;
 		padding: 5px;
+
+		.user-name {
+			@include hyphenation;
+		}
 	}
 
 	.clear {
@@ -170,8 +174,8 @@
 	}
 
 	.views {
-		color: #999;
 		clear: both;
+		color: #999;
 		float: left;
 		padding: 5px 0;
 		text-align: center;
@@ -290,14 +294,18 @@
 		}
 	}
 
-	.category-title {
-		@include ellipsis;
-
-		font-weight: bold;
+	.category-description, .category-title {
+		display: block;
 	}
 
 	.category-description {
 		@include hyphenation;
+	}
+
+	.category-title {
+		@include ellipsis;
+
+		font-weight: bold;
 	}
 
 	.subcategories {
@@ -306,7 +314,7 @@
 
 	.taglib-flags {
 		float: left;
-		margin-left: 20px;
+		margin: 10px 0 0 20px;
 	}
 
 	.threads-panel {

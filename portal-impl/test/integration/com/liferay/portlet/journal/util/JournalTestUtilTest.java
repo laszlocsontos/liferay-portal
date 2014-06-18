@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,32 +14,36 @@
 
 package com.liferay.portlet.journal.util;
 
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portal.util.CompanyTestUtil;
-import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.CompanyTestUtil;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.StructureNameException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
-import com.liferay.portlet.dynamicdatamapping.util.DDMStructureTestUtil;
-import com.liferay.portlet.dynamicdatamapping.util.DDMTemplateTestUtil;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMTemplateTestUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -52,13 +56,11 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		MainServletExecutionTestListener.class,
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-@Transactional
 public class JournalTestUtilTest {
 
 	@Before
@@ -70,16 +72,7 @@ public class JournalTestUtilTest {
 	public void testAddArticleWithDDMStructureAndDDMTemplate()
 		throws Exception {
 
-		Document document = JournalTestUtil.createDocument("en_US", "en_US");
-
-		Element dynamicElementElement =
-			JournalTestUtil.addDynamicElementElement(
-				document.getRootElement(), "text", "name");
-
-		JournalTestUtil.addDynamicContentElement(
-			dynamicElementElement, "en_US", "Joe Bloggs");
-
-		String xml = document.asXML();
+		String content = DDMStructureTestUtil.getSampleStructuredContent();
 
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
 			JournalArticle.class.getName());
@@ -90,7 +83,7 @@ public class JournalTestUtilTest {
 
 		Assert.assertNotNull(
 			JournalTestUtil.addArticleWithXMLContent(
-				xml, ddmStructure.getStructureKey(),
+				content, ddmStructure.getStructureKey(),
 				ddmTemplate.getTemplateKey()));
 	}
 
@@ -128,9 +121,13 @@ public class JournalTestUtilTest {
 
 	@Test
 	public void testAddDDMStructureWithNonexistingLocale() throws Exception {
+		Locale[] availableLocales = LanguageUtil.getAvailableLocales();
+		Locale defaultLocale = LocaleUtil.getDefault();
+
 		try {
 			CompanyTestUtil.resetCompanyLocales(
-				PortalUtil.getDefaultCompanyId(), "en_US");
+				PortalUtil.getDefaultCompanyId(), new Locale[] {LocaleUtil.US},
+				LocaleUtil.US);
 
 			DDMStructureTestUtil.addStructure(
 				JournalArticle.class.getName(), LocaleUtil.CANADA);
@@ -138,6 +135,11 @@ public class JournalTestUtilTest {
 			Assert.fail();
 		}
 		catch (StructureNameException sne) {
+		}
+		finally {
+			CompanyTestUtil.resetCompanyLocales(
+				PortalUtil.getDefaultCompanyId(), availableLocales,
+				defaultLocale);
 		}
 	}
 
@@ -179,20 +181,17 @@ public class JournalTestUtilTest {
 	@Test
 	public void testAddDynamicContent() {
 		try {
-			Document document = JournalTestUtil.createDocument(
-				"en_US,pt_BR", "en_US");
+			Map<Locale, String> contents = new HashMap<Locale, String>();
 
-			Element dynamicElementElement =
-				JournalTestUtil.addDynamicElementElement(
-					document.getRootElement(), "text", "name");
+			contents.put(LocaleUtil.BRAZIL, "Joe Bloggs");
+			contents.put(LocaleUtil.US, "Joe Bloggs");
 
-			JournalTestUtil.addDynamicContentElement(
-				dynamicElementElement, "en_US", "Joe Bloggs");
-
-			String xml = document.asXML();
+			String xml = DDMStructureTestUtil.getSampleStructuredContent(
+				contents, LanguageUtil.getLanguageId(LocaleUtil.US));
 
 			String content = JournalUtil.transform(
-				null, getTokens(), Constants.VIEW, "en_US", xml,
+				null, getTokens(), Constants.VIEW, "en_US",
+				SAXReaderUtil.read(xml), null,
 				JournalTestUtil.getSampleTemplateXSL(),
 				TemplateConstants.LANG_TYPE_VM);
 
@@ -221,25 +220,13 @@ public class JournalTestUtilTest {
 	}
 
 	@Test
-	public void testCreateDocument() {
-		Assert.assertNotNull(JournalTestUtil.createDocument("en_US", "en_US"));
-	}
-
-	@Test
-	public void testCreateLocalizedContent() {
-		Assert.assertNotNull(
-			JournalTestUtil.createLocalizedContent(
-				"This is localized content.", LocaleUtil.getSiteDefault()));
-	}
-
-	@Test
 	public void testGetSampleStructuredContent() throws Exception {
 		String xml = DDMStructureTestUtil.getSampleStructuredContent(
 			"name", "Joe Bloggs");
 
 		String content = JournalUtil.transform(
-			null, getTokens(), Constants.VIEW, "en_US", xml,
-			JournalTestUtil.getSampleTemplateXSL(),
+			null, getTokens(), Constants.VIEW, "en_US", SAXReaderUtil.read(xml),
+			null, JournalTestUtil.getSampleTemplateXSL(),
 			TemplateConstants.LANG_TYPE_VM);
 
 		Assert.assertEquals("Joe Bloggs", content);
@@ -261,8 +248,16 @@ public class JournalTestUtilTest {
 		JournalArticle article = JournalTestUtil.addArticle(
 			_group.getGroupId(), "Test Article", "This is a test article.");
 
-		String localizedContent = JournalTestUtil.createLocalizedContent(
-			"This is an updated test article.", LocaleUtil.getSiteDefault());
+		Map<Locale, String> contents = new HashMap<Locale, String>();
+
+		contents.put(Locale.US, "This is an updated test article.");
+
+		String defaultLanguageId = LanguageUtil.getLanguageId(
+			LocaleUtil.getSiteDefault());
+
+		String localizedContent =
+			DDMStructureTestUtil.getSampleStructuredContent(
+				contents, defaultLanguageId);
 
 		Assert.assertNotNull(
 			JournalTestUtil.updateArticle(
@@ -271,7 +266,7 @@ public class JournalTestUtilTest {
 
 	protected Map<String, String> getTokens() throws Exception {
 		Map<String, String> tokens = JournalUtil.getTokens(
-			TestPropsValues.getGroupId(), null, null);
+			TestPropsValues.getGroupId(), (PortletRequestModel)null, null);
 
 		tokens.put(
 			"article_group_id", String.valueOf(TestPropsValues.getGroupId()));
@@ -281,6 +276,7 @@ public class JournalTestUtilTest {
 		return tokens;
 	}
 
+	@DeleteAfterTestRun
 	private Group _group;
 
 }

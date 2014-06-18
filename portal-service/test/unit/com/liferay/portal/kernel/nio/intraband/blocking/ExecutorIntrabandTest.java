@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,10 +20,11 @@ import com.liferay.portal.kernel.nio.intraband.CompletionHandler;
 import com.liferay.portal.kernel.nio.intraband.Datagram;
 import com.liferay.portal.kernel.nio.intraband.DatagramHelper;
 import com.liferay.portal.kernel.nio.intraband.IntrabandTestUtil;
-import com.liferay.portal.kernel.nio.intraband.MockRegistrationReference;
 import com.liferay.portal.kernel.nio.intraband.RecordCompletionHandler;
 import com.liferay.portal.kernel.nio.intraband.blocking.ExecutorIntraband.ReadingCallable;
 import com.liferay.portal.kernel.nio.intraband.blocking.ExecutorIntraband.WritingCallable;
+import com.liferay.portal.kernel.nio.intraband.test.MockRegistrationReference;
+import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -490,32 +491,39 @@ public class ExecutorIntrabandTest {
 
 		// Callback timeout, with log
 
-		List<LogRecord> logRecords = JDKLoggerTestUtil.configureJDKLogger(
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
 			BaseIntraband.class.getName(), Level.WARNING);
 
-		recordCompletionHandler = new RecordCompletionHandler<Object>();
+		try {
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
-		_executorIntraband.sendDatagram(
-			futureRegistrationReference,
-			Datagram.createRequestDatagram(_type, _data), attachment,
-			EnumSet.of(CompletionHandler.CompletionType.REPLIED),
-			recordCompletionHandler, 10, TimeUnit.MILLISECONDS);
+			recordCompletionHandler = new RecordCompletionHandler<Object>();
 
-		Thread.sleep(20);
+			_executorIntraband.sendDatagram(
+				futureRegistrationReference,
+				Datagram.createRequestDatagram(_type, _data), attachment,
+				EnumSet.of(CompletionHandler.CompletionType.REPLIED),
+				recordCompletionHandler, 10, TimeUnit.MILLISECONDS);
 
-		_executorIntraband.sendDatagram(
-			futureRegistrationReference,
-			Datagram.createRequestDatagram(_type, _data), attachment,
-			EnumSet.of(CompletionHandler.CompletionType.DELIVERED),
-			recordCompletionHandler, 10, TimeUnit.MILLISECONDS);
+			Thread.sleep(20);
 
-		while (logRecords.isEmpty());
+			_executorIntraband.sendDatagram(
+				futureRegistrationReference,
+				Datagram.createRequestDatagram(_type, _data), attachment,
+				EnumSet.of(CompletionHandler.CompletionType.DELIVERED),
+				recordCompletionHandler, 10, TimeUnit.MILLISECONDS);
 
-		IntrabandTestUtil.assertMessageStartWith(
-			logRecords.get(0), "Removed timeout response waiting datagram");
+			while (logRecords.isEmpty());
 
-		gatheringByteChannel.close();
-		scatteringByteChannel.close();
+			IntrabandTestUtil.assertMessageStartWith(
+				logRecords.get(0), "Removed timeout response waiting datagram");
+
+			gatheringByteChannel.close();
+			scatteringByteChannel.close();
+		}
+		finally {
+			captureHandler.close();
+		}
 	}
 
 	@Test

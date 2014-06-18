@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -113,13 +113,18 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 		</div>
 
 		<div class="move-list">
-			<ul class="unstyled">
+			<ul class="list-unstyled">
 
 				<%
 				for (Folder folder : validMoveFolders) {
+					AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(DLFolder.class.getName());
+
+					AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(folder.getFolderId());
 				%>
 
 					<li class="move-folder">
+						<i class="<%= assetRenderer.getIconCssClass() %>"></i>
+
 						<span class="folder-title">
 							<%= HtmlUtil.escape(folder.getName()) %>
 						</span>
@@ -139,13 +144,18 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 		</div>
 
 		<div class="move-list">
-			<ul class="unstyled">
+			<ul class="list-unstyled">
 
 				<%
 				for (Folder folder : invalidMoveFolders) {
+					AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(DLFolder.class.getName());
+
+					AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(folder.getFolderId());
 				%>
 
-					<li class="move-folder move-error">
+					<li class="icon-warning-sign move-error move-folder">
+						<i class="<%= assetRenderer.getIconCssClass() %>"></i>
+
 						<span class="folder-title">
 							<%= HtmlUtil.escape(folder.getName()) %>
 						</span>
@@ -178,13 +188,18 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 		</div>
 
 		<div class="move-list">
-			<ul class="unstyled">
+			<ul class="list-unstyled">
 
 				<%
 				for (FileEntry validMoveFileEntry : validMoveFileEntries) {
+					AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(DLFileEntry.class.getName());
+
+					AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(validMoveFileEntry.getFileEntryId());
 				%>
 
 					<li class="move-file">
+						<i class="<%= assetRenderer.getIconCssClass() %>"></i>
+
 						<span class="file-title" title="<%= HtmlUtil.escapeAttribute(validMoveFileEntry.getTitle()) %>">
 							<%= HtmlUtil.escape(validMoveFileEntry.getTitle()) %>
 						</span>
@@ -204,14 +219,20 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 		</div>
 
 		<div class="move-list">
-			<ul class="unstyled">
+			<ul class="list-unstyled">
 
 				<%
 				for (FileEntry invalidMoveFileEntry : invalidMoveFileEntries) {
+					AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(DLFileEntry.class.getName());
+
+					AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(invalidMoveFileEntry.getFileEntryId());
+
 					Lock lock = invalidMoveFileEntry.getLock();
 				%>
 
-					<li class="move-file move-error">
+					<li class="icon-warning-sign move-error move-file">
+						<i class="<%= assetRenderer.getIconCssClass() %>"></i>
+
 						<span class="file-title" title="<%= HtmlUtil.escapeAttribute(invalidMoveFileEntry.getTitle()) %>">
 							<%= HtmlUtil.escape(invalidMoveFileEntry.getTitle()) %>
 						</span>
@@ -244,7 +265,7 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 		</div>
 
 		<div class="move-list">
-			<ul class="unstyled">
+			<ul class="list-unstyled">
 
 				<%
 				for (DLFileShortcut fileShortcut : validShortcutEntries) {
@@ -270,13 +291,13 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 		</div>
 
 		<div class="move-list">
-			<ul class="unstyled">
+			<ul class="list-unstyled">
 
 				<%
 				for (DLFileShortcut fileShortcut : invalidShortcutEntries) {
 				%>
 
-					<li class="move-file move-error">
+					<li class="move-error move-file">
 						<span class="file-title">
 							<%= fileShortcut.getToTitle() + " (" + LanguageUtil.get(themeDisplay.getLocale(), "shortcut") + ")" %>
 						</span>
@@ -313,13 +334,11 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 		}
 		%>
 
-		<aui:field-wrapper label="new-folder">
-			<div class="input-append">
-				<liferay-ui:input-resource id="folderName" url="<%= folderName %>" />
+		<div class="form-group">
+			<aui:input label="new-folder" name="folderName" type="resource" value="<%= folderName %>" />
 
-				<aui:button name="selectFolderButton" value="select" />
-			</div>
-		</aui:field-wrapper>
+			<aui:button name="selectFolderButton" value="select" />
+		</div>
 
 		<aui:button-row>
 			<aui:button type="submit" value="move" />
@@ -328,11 +347,6 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 		</aui:button-row>
 	</aui:fieldset>
 </aui:form>
-
-<portlet:renderURL var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-	<portlet:param name="struts_action" value="/document_library/select_folder" />
-	<portlet:param name="folderId" value="<%= String.valueOf(newFolderId) %>" />
-</portlet:renderURL>
 
 <aui:script use="aui-base">
 	A.one('#<portlet:namespace />selectFolderButton').on(
@@ -347,6 +361,12 @@ for (DLFileShortcut curFileShortcut : fileShortcuts) {
 					},
 					id: '<portlet:namespace />selectFolder',
 					title: '<liferay-ui:message arguments="folder" key="select-x" />',
+
+					<portlet:renderURL var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+						<portlet:param name="struts_action" value="/document_library/select_folder" />
+						<portlet:param name="folderId" value="<%= String.valueOf(newFolderId) %>" />
+					</portlet:renderURL>
+
 					uri: '<%= selectFolderURL.toString() %>'
 				},
 				function(event) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,10 +19,11 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.util.GroupTestUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
@@ -82,6 +83,18 @@ public class BaseDDMServiceTestCase {
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE, "xsd", xsd);
 	}
 
+	protected DDMStructure addStructure(
+			long parentStructureId, long classNameId, String structureKey,
+			String name, String xsd, String storageType, int type)
+		throws Exception {
+
+		return DDMStructureLocalServiceUtil.addStructure(
+			TestPropsValues.getUserId(), group.getGroupId(), parentStructureId,
+			classNameId, structureKey, getDefaultLocaleMap(name), null, xsd,
+			storageType, type,
+			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
+	}
+
 	protected DDMStructure addStructure(long classNameId, String name)
 		throws Exception {
 
@@ -97,11 +110,9 @@ public class BaseDDMServiceTestCase {
 			String storageType, int type)
 		throws Exception {
 
-		return DDMStructureLocalServiceUtil.addStructure(
-			TestPropsValues.getUserId(), group.getGroupId(),
+		return addStructure(
 			DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID, classNameId,
-			structureKey, getDefaultLocaleMap(name), null, xsd, storageType,
-			type, ServiceTestUtil.getServiceContext(group.getGroupId()));
+			structureKey, name, xsd, storageType, type);
 	}
 
 	protected DDMTemplate addTemplate(
@@ -134,7 +145,7 @@ public class BaseDDMServiceTestCase {
 			TestPropsValues.getUserId(), group.getGroupId(), classNameId,
 			classPK, templateKey, getDefaultLocaleMap(name), null, type, mode,
 			language, script, cacheable, smallImage, smallImageURL, smallFile,
-			ServiceTestUtil.getServiceContext());
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	protected String getBasePath() {
@@ -183,6 +194,7 @@ public class BaseDDMServiceTestCase {
 		return StringUtil.read(inputStream);
 	}
 
+	@DeleteAfterTestRun
 	protected Group group;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,9 +17,9 @@ package com.liferay.portlet.login.util;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.cluster.ClusterNode;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -56,6 +57,7 @@ import com.liferay.util.Encryptor;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -82,7 +84,7 @@ public class LoginUtil {
 	public static long getAuthenticatedUserId(
 			HttpServletRequest request, String login, String password,
 			String authType)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long userId = GetterUtil.getLong(login);
 
@@ -154,25 +156,86 @@ public class LoginUtil {
 		return userId;
 	}
 
+	public static Map<String, String> getEmailDefinitionTerms(
+		PortletRequest portletRequest, String emailFromAddress,
+		String emailFromName, boolean showPasswordTerms) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Map<String, String> definitionTerms =
+			new LinkedHashMap<String, String>();
+
+		definitionTerms.put(
+			"[$FROM_ADDRESS$]", HtmlUtil.escape(emailFromAddress));
+		definitionTerms.put("[$FROM_NAME$]", HtmlUtil.escape(emailFromName));
+
+		if (showPasswordTerms) {
+			definitionTerms.put(
+				"[$PASSWORD_RESET_URL$]",
+				LanguageUtil.get(
+					themeDisplay.getLocale(), "the-password-reset-url"));
+		}
+
+		Company company = themeDisplay.getCompany();
+
+		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
+
+		definitionTerms.put(
+			"[$REMOTE_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-browser's-remote-address"));
+		definitionTerms.put(
+			"[$REMOTE_HOST$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-browser's-remote-host"));
+		definitionTerms.put(
+			"[$TO_ADDRESS$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				"the-address-of-the-email-recipient"));
+		definitionTerms.put(
+			"[$TO_NAME$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-name-of-the-email-recipient"));
+		definitionTerms.put(
+			"[$USER_AGENT$]",
+			LanguageUtil.get(
+				themeDisplay.getLocale(), "the-browser's-user-agent"));
+		definitionTerms.put(
+			"[$USER_ID$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-user-id"));
+
+		if (showPasswordTerms) {
+			definitionTerms.put(
+				"[$USER_PASSWORD$]",
+				LanguageUtil.get(
+					themeDisplay.getLocale(), "the-user-password"));
+		}
+
+		definitionTerms.put(
+			"[$USER_SCREENNAME$]",
+			LanguageUtil.get(themeDisplay.getLocale(), "the-user-screen-name"));
+
+		return definitionTerms;
+	}
+
 	public static String getEmailFromAddress(
-			PortletPreferences preferences, long companyId)
-		throws SystemException {
+		PortletPreferences preferences, long companyId) {
 
 		return PortalUtil.getEmailFromAddress(
 			preferences, companyId, PropsValues.LOGIN_EMAIL_FROM_ADDRESS);
 	}
 
 	public static String getEmailFromName(
-			PortletPreferences preferences, long companyId)
-		throws SystemException {
+		PortletPreferences preferences, long companyId) {
 
 		return PortalUtil.getEmailFromName(
 			preferences, companyId, PropsValues.LOGIN_EMAIL_FROM_NAME);
 	}
 
 	public static String getLogin(
-			HttpServletRequest request, String paramName, Company company)
-		throws SystemException {
+		HttpServletRequest request, String paramName, Company company) {
 
 		String login = request.getParameter(paramName);
 
@@ -220,39 +283,7 @@ public class LoginUtil {
 			request, login, password, authType);
 
 		if (!PropsValues.AUTH_SIMULTANEOUS_LOGINS) {
-			Map<String, UserTracker> sessionUsers = LiveUsers.getSessionUsers(
-				company.getCompanyId());
-
-			List<UserTracker> userTrackers = new ArrayList<UserTracker>(
-				sessionUsers.values());
-
-			for (UserTracker userTracker : userTrackers) {
-				if (userId != userTracker.getUserId()) {
-					continue;
-				}
-
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-				ClusterNode clusterNode =
-					ClusterExecutorUtil.getLocalClusterNode();
-
-				if (clusterNode != null) {
-					jsonObject.put(
-						"clusterNodeId", clusterNode.getClusterNodeId());
-				}
-
-				jsonObject.put("command", "signOut");
-
-				long companyId = CompanyLocalServiceUtil.getCompanyIdByUserId(
-					userId);
-
-				jsonObject.put("companyId", companyId);
-				jsonObject.put("sessionId", userTracker.getSessionId());
-				jsonObject.put("userId", userId);
-
-				MessageBusUtil.sendMessage(
-					DestinationNames.LIVE_USERS, jsonObject.toString());
-			}
+			signOutSimultaneousLogins(userId);
 		}
 
 		if (PropsValues.SESSION_ENABLE_PHISHING_PROTECTION) {
@@ -492,6 +523,38 @@ public class LoginUtil {
 			body, serviceContext);
 
 		SessionMessages.add(actionRequest, "requestProcessed", toAddress);
+	}
+
+	public static void signOutSimultaneousLogins(long userId) throws Exception {
+		long companyId = CompanyLocalServiceUtil.getCompanyIdByUserId(userId);
+
+		Map<String, UserTracker> sessionUsers = LiveUsers.getSessionUsers(
+			companyId);
+
+		List<UserTracker> userTrackers = new ArrayList<UserTracker>(
+			sessionUsers.values());
+
+		for (UserTracker userTracker : userTrackers) {
+			if (userId != userTracker.getUserId()) {
+				continue;
+			}
+
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+			ClusterNode clusterNode = ClusterExecutorUtil.getLocalClusterNode();
+
+			if (clusterNode != null) {
+				jsonObject.put("clusterNodeId", clusterNode.getClusterNodeId());
+			}
+
+			jsonObject.put("command", "signOut");
+			jsonObject.put("companyId", companyId);
+			jsonObject.put("sessionId", userTracker.getSessionId());
+			jsonObject.put("userId", userId);
+
+			MessageBusUtil.sendMessage(
+				DestinationNames.LIVE_USERS, jsonObject.toString());
+		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(LoginUtil.class);

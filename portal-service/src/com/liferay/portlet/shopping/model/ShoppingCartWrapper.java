@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -241,11 +241,9 @@ public class ShoppingCartWrapper implements ShoppingCart,
 	* Returns the user uuid of this shopping cart.
 	*
 	* @return the user uuid of this shopping cart
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _shoppingCart.getUserUuid();
 	}
 
@@ -509,8 +507,7 @@ public class ShoppingCartWrapper implements ShoppingCart,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_shoppingCart.persist();
 	}
 
@@ -521,14 +518,12 @@ public class ShoppingCartWrapper implements ShoppingCart,
 
 	@Override
 	public com.liferay.portlet.shopping.model.ShoppingCoupon getCoupon()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _shoppingCart.getCoupon();
 	}
 
 	@Override
-	public java.util.Map<com.liferay.portlet.shopping.model.ShoppingCartItem, java.lang.Integer> getItems()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.Map<com.liferay.portlet.shopping.model.ShoppingCartItem, java.lang.Integer> getItems() {
 		return _shoppingCart.getItems();
 	}
 

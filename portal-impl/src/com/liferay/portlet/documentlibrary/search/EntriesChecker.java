@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -70,7 +70,17 @@ public class EntriesChecker extends RowChecker {
 	@Override
 	public String getAllRowsCheckBox() {
 		if (_documentLibraryDisplayPortlet) {
-			return getAllRowsCheckbox(getAllRowIds(), getEntryRowIds());
+			return getAllRowsCheckbox(null, getAllRowIds(), getEntryRowIds());
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getAllRowsCheckBox(HttpServletRequest request) {
+		if (_documentLibraryDisplayPortlet) {
+			return getAllRowsCheckbox(
+				request, getAllRowIds(), getEntryRowIds());
 		}
 
 		return null;
@@ -181,16 +191,15 @@ public class EntriesChecker extends RowChecker {
 			checkBoxAllRowIds = "'" + getAllRowIds() + "'";
 		}
 		else {
-			checkBoxAllRowIds = "'#" + getAllRowIds() + "Checkbox'";
+			checkBoxAllRowIds = "'#" + getAllRowIds() + "'";
 			checkBoxPostOnClick =
 				_liferayPortletResponse.getNamespace() +
 					"toggleActionsButton();";
 		}
 
 		return getRowCheckBox(
-			checked, disabled,
-			_liferayPortletResponse.getNamespace() + RowChecker.ROW_IDS +
-				name + "Checkbox",
+			request, checked, disabled,
+			_liferayPortletResponse.getNamespace() + RowChecker.ROW_IDS + name,
 			primaryKey, checkBoxRowIds, checkBoxAllRowIds, checkBoxPostOnClick);
 	}
 
@@ -201,15 +210,15 @@ public class EntriesChecker extends RowChecker {
 		sb.append(_liferayPortletResponse.getNamespace());
 		sb.append(RowChecker.ROW_IDS);
 		sb.append(Folder.class.getSimpleName());
-		sb.append("Checkbox', '");
+		sb.append("', '");
 		sb.append(_liferayPortletResponse.getNamespace());
 		sb.append(RowChecker.ROW_IDS);
 		sb.append(DLFileShortcut.class.getSimpleName());
-		sb.append("Checkbox', '");
+		sb.append("', '");
 		sb.append(_liferayPortletResponse.getNamespace());
 		sb.append(RowChecker.ROW_IDS);
 		sb.append(FileEntry.class.getSimpleName());
-		sb.append("Checkbox']");
+		sb.append("']");
 
 		return sb.toString();
 	}

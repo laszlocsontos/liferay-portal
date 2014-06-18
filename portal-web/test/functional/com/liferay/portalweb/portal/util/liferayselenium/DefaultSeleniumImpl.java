@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,9 @@ import com.thoughtworks.selenium.DefaultSelenium;
  */
 public class DefaultSeleniumImpl extends BaseSeleniumImpl {
 
-	public DefaultSeleniumImpl(String projectDir, String browserURL) {
+	public DefaultSeleniumImpl(String projectDirName, String browserURL) {
 		super(
-			projectDir,
+			projectDirName,
 			new DefaultSelenium(
 				TestPropsValues.SELENIUM_HOST, TestPropsValues.SELENIUM_PORT,
 				TestPropsValues.BROWSER_TYPE, browserURL));

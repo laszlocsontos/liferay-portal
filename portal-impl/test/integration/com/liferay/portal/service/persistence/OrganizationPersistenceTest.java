@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,23 +31,27 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.impl.OrganizationModelImpl;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +63,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class OrganizationPersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<Organization> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -80,11 +93,15 @@ public class OrganizationPersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<Organization> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Organization organization = _persistence.create(pk);
 
@@ -111,43 +128,43 @@ public class OrganizationPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Organization newOrganization = _persistence.create(pk);
 
-		newOrganization.setMvccVersion(ServiceTestUtil.nextLong());
+		newOrganization.setMvccVersion(RandomTestUtil.nextLong());
 
-		newOrganization.setUuid(ServiceTestUtil.randomString());
+		newOrganization.setUuid(RandomTestUtil.randomString());
 
-		newOrganization.setCompanyId(ServiceTestUtil.nextLong());
+		newOrganization.setCompanyId(RandomTestUtil.nextLong());
 
-		newOrganization.setUserId(ServiceTestUtil.nextLong());
+		newOrganization.setUserId(RandomTestUtil.nextLong());
 
-		newOrganization.setUserName(ServiceTestUtil.randomString());
+		newOrganization.setUserName(RandomTestUtil.randomString());
 
-		newOrganization.setCreateDate(ServiceTestUtil.nextDate());
+		newOrganization.setCreateDate(RandomTestUtil.nextDate());
 
-		newOrganization.setModifiedDate(ServiceTestUtil.nextDate());
+		newOrganization.setModifiedDate(RandomTestUtil.nextDate());
 
-		newOrganization.setParentOrganizationId(ServiceTestUtil.nextLong());
+		newOrganization.setParentOrganizationId(RandomTestUtil.nextLong());
 
-		newOrganization.setTreePath(ServiceTestUtil.randomString());
+		newOrganization.setTreePath(RandomTestUtil.randomString());
 
-		newOrganization.setName(ServiceTestUtil.randomString());
+		newOrganization.setName(RandomTestUtil.randomString());
 
-		newOrganization.setType(ServiceTestUtil.randomString());
+		newOrganization.setType(RandomTestUtil.randomString());
 
-		newOrganization.setRecursable(ServiceTestUtil.randomBoolean());
+		newOrganization.setRecursable(RandomTestUtil.randomBoolean());
 
-		newOrganization.setRegionId(ServiceTestUtil.nextLong());
+		newOrganization.setRegionId(RandomTestUtil.nextLong());
 
-		newOrganization.setCountryId(ServiceTestUtil.nextLong());
+		newOrganization.setCountryId(RandomTestUtil.nextLong());
 
-		newOrganization.setStatusId(ServiceTestUtil.nextInt());
+		newOrganization.setStatusId(RandomTestUtil.nextInt());
 
-		newOrganization.setComments(ServiceTestUtil.randomString());
+		newOrganization.setComments(RandomTestUtil.randomString());
 
-		newOrganization.setLogoId(ServiceTestUtil.nextLong());
+		newOrganization.setLogoId(RandomTestUtil.nextLong());
 
 		_persistence.update(newOrganization);
 
@@ -211,7 +228,7 @@ public class OrganizationPersistenceTest {
 	public void testCountByUuid_C() {
 		try {
 			_persistence.countByUuid_C(StringPool.BLANK,
-				ServiceTestUtil.nextLong());
+				RandomTestUtil.nextLong());
 
 			_persistence.countByUuid_C(StringPool.NULL, 0L);
 
@@ -225,7 +242,7 @@ public class OrganizationPersistenceTest {
 	@Test
 	public void testCountByCompanyId() {
 		try {
-			_persistence.countByCompanyId(ServiceTestUtil.nextLong());
+			_persistence.countByCompanyId(RandomTestUtil.nextLong());
 
 			_persistence.countByCompanyId(0L);
 		}
@@ -237,7 +254,7 @@ public class OrganizationPersistenceTest {
 	@Test
 	public void testCountByLocations() {
 		try {
-			_persistence.countByLocations(ServiceTestUtil.nextLong());
+			_persistence.countByLocations(RandomTestUtil.nextLong());
 
 			_persistence.countByLocations(0L);
 		}
@@ -249,8 +266,8 @@ public class OrganizationPersistenceTest {
 	@Test
 	public void testCountByC_P() {
 		try {
-			_persistence.countByC_P(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong());
+			_persistence.countByC_P(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
 
 			_persistence.countByC_P(0L, 0L);
 		}
@@ -262,7 +279,7 @@ public class OrganizationPersistenceTest {
 	@Test
 	public void testCountByC_T() {
 		try {
-			_persistence.countByC_T(ServiceTestUtil.nextLong(), StringPool.BLANK);
+			_persistence.countByC_T(RandomTestUtil.nextLong(), StringPool.BLANK);
 
 			_persistence.countByC_T(0L, StringPool.NULL);
 
@@ -276,7 +293,7 @@ public class OrganizationPersistenceTest {
 	@Test
 	public void testCountByC_N() {
 		try {
-			_persistence.countByC_N(ServiceTestUtil.nextLong(), StringPool.BLANK);
+			_persistence.countByC_N(RandomTestUtil.nextLong(), StringPool.BLANK);
 
 			_persistence.countByC_N(0L, StringPool.NULL);
 
@@ -290,8 +307,8 @@ public class OrganizationPersistenceTest {
 	@Test
 	public void testCountByO_C_P() {
 		try {
-			_persistence.countByO_C_P(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong(), ServiceTestUtil.nextLong());
+			_persistence.countByO_C_P(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
 			_persistence.countByO_C_P(0L, 0L, 0L);
 		}
@@ -311,7 +328,7 @@ public class OrganizationPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -355,7 +372,7 @@ public class OrganizationPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Organization missingOrganization = _persistence.fetchByPrimaryKey(pk);
 
@@ -363,19 +380,103 @@ public class OrganizationPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Organization newOrganization1 = addOrganization();
+		Organization newOrganization2 = addOrganization();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newOrganization1.getPrimaryKey());
+		primaryKeys.add(newOrganization2.getPrimaryKey());
+
+		Map<Serializable, Organization> organizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, organizations.size());
+		Assert.assertEquals(newOrganization1,
+			organizations.get(newOrganization1.getPrimaryKey()));
+		Assert.assertEquals(newOrganization2,
+			organizations.get(newOrganization2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Organization> organizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(organizations.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Organization newOrganization = addOrganization();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newOrganization.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Organization> organizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, organizations.size());
+		Assert.assertEquals(newOrganization,
+			organizations.get(newOrganization.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Organization> organizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(organizations.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Organization newOrganization = addOrganization();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newOrganization.getPrimaryKey());
+
+		Map<Serializable, Organization> organizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, organizations.size());
+		Assert.assertEquals(newOrganization,
+			organizations.get(newOrganization.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new OrganizationActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = OrganizationLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					Organization organization = (Organization)object;
 
 					Assert.assertNotNull(organization);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -408,7 +509,7 @@ public class OrganizationPersistenceTest {
 				Organization.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("organizationId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<Organization> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -449,7 +550,7 @@ public class OrganizationPersistenceTest {
 				"organizationId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("organizationId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -476,43 +577,43 @@ public class OrganizationPersistenceTest {
 	}
 
 	protected Organization addOrganization() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		Organization organization = _persistence.create(pk);
 
-		organization.setMvccVersion(ServiceTestUtil.nextLong());
+		organization.setMvccVersion(RandomTestUtil.nextLong());
 
-		organization.setUuid(ServiceTestUtil.randomString());
+		organization.setUuid(RandomTestUtil.randomString());
 
-		organization.setCompanyId(ServiceTestUtil.nextLong());
+		organization.setCompanyId(RandomTestUtil.nextLong());
 
-		organization.setUserId(ServiceTestUtil.nextLong());
+		organization.setUserId(RandomTestUtil.nextLong());
 
-		organization.setUserName(ServiceTestUtil.randomString());
+		organization.setUserName(RandomTestUtil.randomString());
 
-		organization.setCreateDate(ServiceTestUtil.nextDate());
+		organization.setCreateDate(RandomTestUtil.nextDate());
 
-		organization.setModifiedDate(ServiceTestUtil.nextDate());
+		organization.setModifiedDate(RandomTestUtil.nextDate());
 
-		organization.setParentOrganizationId(ServiceTestUtil.nextLong());
+		organization.setParentOrganizationId(RandomTestUtil.nextLong());
 
-		organization.setTreePath(ServiceTestUtil.randomString());
+		organization.setTreePath(RandomTestUtil.randomString());
 
-		organization.setName(ServiceTestUtil.randomString());
+		organization.setName(RandomTestUtil.randomString());
 
-		organization.setType(ServiceTestUtil.randomString());
+		organization.setType(RandomTestUtil.randomString());
 
-		organization.setRecursable(ServiceTestUtil.randomBoolean());
+		organization.setRecursable(RandomTestUtil.randomBoolean());
 
-		organization.setRegionId(ServiceTestUtil.nextLong());
+		organization.setRegionId(RandomTestUtil.nextLong());
 
-		organization.setCountryId(ServiceTestUtil.nextLong());
+		organization.setCountryId(RandomTestUtil.nextLong());
 
-		organization.setStatusId(ServiceTestUtil.nextInt());
+		organization.setStatusId(RandomTestUtil.nextInt());
 
-		organization.setComments(ServiceTestUtil.randomString());
+		organization.setComments(RandomTestUtil.randomString());
 
-		organization.setLogoId(ServiceTestUtil.nextLong());
+		organization.setLogoId(RandomTestUtil.nextLong());
 
 		_persistence.update(organization);
 
@@ -520,6 +621,7 @@ public class OrganizationPersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(OrganizationPersistenceTest.class);
+	private ModelListener<Organization>[] _modelListeners;
 	private OrganizationPersistence _persistence = (OrganizationPersistence)PortalBeanLocatorUtil.locate(OrganizationPersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

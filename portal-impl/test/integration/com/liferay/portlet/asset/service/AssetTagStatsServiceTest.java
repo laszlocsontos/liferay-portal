@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,50 +15,51 @@
 package com.liferay.portlet.asset.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.model.AssetTagStats;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
-import com.liferay.portlet.journal.util.JournalTestUtil;
+import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Matthew Kong
  */
-@ExecutionTestListeners(
-	listeners = {
-		EnvironmentExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class AssetTagStatsServiceTest {
 
+	@Before
+	public void setUp() throws Exception {
+		_group = GroupTestUtil.addGroup();
+	}
+
 	@Test
-	@Transactional
 	public void testGetTagStats() throws Exception {
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			TestPropsValues.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		serviceContext.setAssetTagNames(new String[] {"basketball"});
 
 		JournalArticle journalArticle = JournalTestUtil.addArticle(
-			TestPropsValues.getGroupId(), ServiceTestUtil.randomString(),
-			ServiceTestUtil.randomString(100), serviceContext);
+			_group.getGroupId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(100), serviceContext);
 
 		AssetTag tag = AssetTagLocalServiceUtil.getTag(
-			TestPropsValues.getGroupId(), "basketball");
+			_group.getGroupId(), "basketball");
 
 		long classNameId = PortalUtil.getClassNameId(JournalArticle.class);
 
@@ -74,5 +75,8 @@ public class AssetTagStatsServiceTest {
 
 		Assert.assertEquals(0, tagStats.getAssetCount());
 	}
+
+	@DeleteAfterTestRun
+	private Group _group;
 
 }

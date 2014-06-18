@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,6 +40,7 @@ for (int j = 0; j < fileEntryColumns.length; j++) {
 
 			<liferay-ui:search-container-column-jsp
 				align="<%= align %>"
+				cssClass="entry-action"
 				index="<%= j %>"
 				path="/html/portlet/document_library/file_entry_action.jsp"
 			/>
@@ -73,7 +74,7 @@ for (int j = 0; j < fileEntryColumns.length; j++) {
 				%>
 
 				<span class="entry-thumbnail">
-					<img class="thumbnail" src="<%= thumbnailSrc %>" />
+					<img alt="<liferay-ui:message key="thumbnail" />" class="thumbnail" src="<%= thumbnailSrc %>" />
 
 					<c:if test="<%= fileShortcut != null %>">
 						<img alt="<liferay-ui:message key="shortcut" />" class="shortcut-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/large/overlay_link.png" />

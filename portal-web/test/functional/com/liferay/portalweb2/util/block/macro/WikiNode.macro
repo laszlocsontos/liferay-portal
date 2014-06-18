@@ -19,7 +19,7 @@
 		<var name="key_wikiNodeName" value="${wikiNodeName}" />
 
 		<execute action="CPWiki#assertTextEquals" locator-key1="WIKI_NODE_TABLE_WIKI" value1="${wikiNodeName}" />
-		<execute action="CPWiki#assertClick" locator-key1="WIKI_NODE_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPWiki#click" locator-key1="WIKI_NODE_TABLE_ACTIONS" />
 		<execute action="CPWiki#assertClick" locator-key1="WIKI_NODE_MENULIST_RECYCLE_BIN" value1="Move to the Recycle Bin" />
 		<execute action="CPWiki#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="The ${assetType} ${wikiNodeName} was moved to the Recycle Bin. Undo" />
 		<execute action="CPWiki#assertElementNotPresent" locator-key1="WIKI_NODE_TABLE_WIKI" />
@@ -31,7 +31,7 @@
 		<var name="key_wikiNodeName" value="${wikiNodeName}" />
 
 		<execute action="CPWiki#assertTextEquals" locator-key1="WIKI_NODE_TABLE_WIKI" value1="${wikiNodeName}" />
-		<execute action="CPWiki#assertClick" locator-key1="WIKI_NODE_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPWiki#click" locator-key1="WIKI_NODE_TABLE_ACTIONS" />
 		<execute action="CPWiki#assertClick" locator-key1="WIKI_NODE_MENULIST_EDIT" value1="Edit" />
 
 		<execute action="CPWikiAddwiki#type" locator-key1="NAME_FIELD" value1="${wikiNodeNameEdit}" />
@@ -43,6 +43,12 @@
 		<execute action="CPWiki#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 		<execute action="CPWiki#assertTextEquals" locator-key1="WIKI_NODE_TABLE_WIKI" value1="${wikiNodeNameEdit}" />
 		<execute action="CPWiki#assertTextNotEquals" locator-key1="WIKI_NODE_TABLE_WIKI" value1="${wikiNodeName}" />
+	</command>
+
+	<command name="gotoCP">
+		<var name="key_wikiNodeName" value="${wikiNodeName}" />
+
+		<execute action="CPWiki#assertClick" locator-key1="WIKI_NODE_TABLE_WIKI" value1="${wikiNodeName}" />
 	</command>
 
 	<command name="tearDownCP">
@@ -61,5 +67,13 @@
 		</while>
 
 		<execute macro="RecycleBin#emptyCP" />
+	</command>
+
+	<command name="viewCP">
+		<var name="key_wikiNodeName" value="${wikiNodeName}" />
+
+		<execute action="CPWiki#assertTextEquals" locator-key1="WIKI_NODE_TABLE_WIKI" value1="${wikiNodeName}" />
+		<execute action="CPWiki#assertClick" locator-key1="WIKI_NODE_TABLE_WIKI" value1="${wikiNodeName}" />
+		<execute action="CPWiki#assertTextEquals" locator-key1="WIKI_NODE_TITLE" value1="${wikiNodeName}" />
 	</command>
 </definition>

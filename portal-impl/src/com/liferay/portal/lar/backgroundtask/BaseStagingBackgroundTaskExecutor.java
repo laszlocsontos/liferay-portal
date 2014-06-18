@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatus;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistryUtil;
 import com.liferay.portal.kernel.backgroundtask.BaseBackgroundTaskExecutor;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -64,8 +63,7 @@ public abstract class BaseStagingBackgroundTaskExecutor
 	}
 
 	protected void markBackgroundTask(
-			long backgroundTaskId, String backgroundTaskState)
-		throws SystemException {
+		long backgroundTaskId, String backgroundTaskState) {
 
 		BackgroundTask backgroundTask =
 			BackgroundTaskLocalServiceUtil.fetchBackgroundTask(
@@ -91,8 +89,7 @@ public abstract class BaseStagingBackgroundTaskExecutor
 	}
 
 	protected BackgroundTaskResult processMissingReferences(
-			long backgroundTaskId, MissingReferences missingReferences)
-		throws SystemException {
+		long backgroundTaskId, MissingReferences missingReferences) {
 
 		BackgroundTaskResult backgroundTaskResult = new BackgroundTaskResult(
 			BackgroundTaskConstants.STATUS_SUCCESSFUL);

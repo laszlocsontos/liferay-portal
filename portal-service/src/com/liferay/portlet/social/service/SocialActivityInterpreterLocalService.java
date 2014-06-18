@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -101,7 +101,9 @@ public interface SocialActivityInterpreterLocalService extends BaseLocalService 
 	* asset type of the activity.
 	* </p>
 	*
+	* @param selector the context in which the activity interpreter is used
 	* @param activity the activity to be translated to human readable form
+	* @param serviceContext the service context to be applied
 	* @return the activity feed that is a human readable form of the activity
 	record or <code>null</code> if a compatible interpreter is not
 	found
@@ -117,6 +119,5 @@ public interface SocialActivityInterpreterLocalService extends BaseLocalService 
 		com.liferay.portal.service.ServiceContext serviceContext);
 
 	public void updateActivitySet(long activityId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 }

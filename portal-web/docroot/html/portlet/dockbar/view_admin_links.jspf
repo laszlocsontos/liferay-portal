@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,7 @@
 --%>
 
 <c:if test="<%= (themeDisplay.isShowControlPanelIcon() || themeDisplay.isShowSiteAdministrationIcon()) && (!layout.getGroup().isControlPanel() || (Validator.isNotNull(controlPanelCategory) && controlPanelCategory.startsWith(PortletCategoryKeys.CURRENT_SITE))) %>">
-	<aui:nav-item cssClass="admin-links" dropdown="<%= true %>" iconCssClass="icon-cog" id="adminLinks" label="admin">
+	<aui:nav-item cssClass="admin-links" dropdown="<%= true %>" iconCssClass="icon-cog" id="adminLinks" label="admin" toggleTouch="<%= false %>">
 		<c:if test="<%= themeDisplay.isShowSiteAdministrationIcon() %>">
 			<aui:nav-item anchorId="siteAdministrationLink" href="<%= themeDisplay.getURLSiteAdministration() %>" iconCssClass="icon-cog" label="site-administration">
 
@@ -26,7 +26,7 @@
 					String currentSiteCategory = PortletCategoryKeys.CURRENT_SITE.concat(StringPool.PERIOD);
 				%>
 
-					<ul class="unstyled site-administration-menu">
+					<ul class="list-unstyled site-administration-menu">
 
 						<%
 						for (String category : categoriesMap.keySet()) {

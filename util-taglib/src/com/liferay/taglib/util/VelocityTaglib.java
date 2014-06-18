@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.taglib.ui.IconTag;
 import com.liferay.taglib.ui.JournalArticleTag;
 import com.liferay.taglib.ui.MySitesTag;
 import com.liferay.taglib.ui.PngImageTag;
+import com.liferay.taglib.ui.QuickAccessTag;
 import com.liferay.taglib.ui.RatingsTag;
 
 import javax.portlet.PortletURL;
@@ -149,6 +150,8 @@ public interface VelocityTaglib {
 
 	public PngImageTag getPngImageTag() throws Exception;
 
+	public QuickAccessTag getQuickAccessTag() throws Exception;
+
 	public RatingsTag getRatingsTag() throws Exception;
 
 	public String getSetting(String name);
@@ -268,12 +271,13 @@ public interface VelocityTaglib {
 	public void language() throws Exception;
 
 	public void language(
-			String formName, String formAction, String name, int displayStyle)
+			String formName, String formAction, String name,
+			String displayStyle)
 		throws Exception;
 
 	public void language(
 			String formName, String formAction, String name,
-			String[] languageIds, int displayStyle)
+			String[] languageIds, String displayStyle)
 		throws Exception;
 
 	public void layoutIcon(Layout layout) throws Exception;
@@ -343,6 +347,10 @@ public interface VelocityTaglib {
 
 	public void portletIconRefresh() throws Exception;
 
+	public void quickAccess() throws Exception;
+
+	public void quickAccess(String contentId) throws Exception;
+
 	public void ratings(
 			String className, long classPK, int numberOfStars, String type,
 			String url)
@@ -408,6 +416,10 @@ public interface VelocityTaglib {
 			String url)
 		throws Exception;
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public void staging() throws Exception;
 
 	public void toggle(

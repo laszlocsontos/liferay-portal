@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,7 +64,7 @@
 				</h2>
 			</c:when>
 			<c:when test='<%= headerType.equals("portlet-title") %>'>
-				<h2><%= portletDisplay.getTitle() %></h2>
+				<h2><%= HtmlUtil.escape(portletDisplay.getTitle()) %></h2>
 			</c:when>
 			<c:when test='<%= headerType.equals("breadcrumb") %>'>
 				<liferay-ui:breadcrumb />

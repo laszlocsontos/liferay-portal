@@ -71,8 +71,6 @@
 	}
 
 	.tag-item-actions-trigger {
-		background-image: url(@theme_image_path@/common/edit.png);
-		background-repeat: no-repeat;
 		clip: rect(0, 0, 0, 0);
 		display: block;
 		height: 16px;
@@ -154,17 +152,10 @@
 
 		&:after {
 			clear: both;
-			content: "";
+			content: '';
 			display: block;
 			height: 0;
 		}
-	}
-
-	.tags-admin-search {
-		background-image: url(@theme_image_path@/common/search.png);
-		background-position: 5px center;
-		background-repeat: no-repeat;
-		padding-left: 25px;
 	}
 
 	.tags-pagination {
@@ -221,8 +212,8 @@
 .ie6, .ie7, .ie8 {
 	.portlet-asset-tag-admin {
 		.tag-item-merge {
-			font-weight: normal;
 			font-size: 120%;
+			font-weight: normal;
 		}
 	}
 }

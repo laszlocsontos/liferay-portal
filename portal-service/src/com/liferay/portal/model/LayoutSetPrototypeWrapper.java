@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -268,11 +268,9 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	* Returns the user uuid of this layout set prototype.
 	*
 	* @return the user uuid of this layout set prototype
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _layoutSetPrototype.getUserUuid();
 	}
 
@@ -497,6 +495,74 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	/**
+	* Returns the localized description of this layout set prototype in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param locale the locale of the language
+	* @return the localized description of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getDescription(java.util.Locale locale) {
+		return _layoutSetPrototype.getDescription(locale);
+	}
+
+	/**
+	* Returns the localized description of this layout set prototype in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param locale the local of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this layout set prototype. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	*/
+	@Override
+	public java.lang.String getDescription(java.util.Locale locale,
+		boolean useDefault) {
+		return _layoutSetPrototype.getDescription(locale, useDefault);
+	}
+
+	/**
+	* Returns the localized description of this layout set prototype in the language. Uses the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @return the localized description of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getDescription(java.lang.String languageId) {
+		return _layoutSetPrototype.getDescription(languageId);
+	}
+
+	/**
+	* Returns the localized description of this layout set prototype in the language, optionally using the default language if no localization exists for the requested language.
+	*
+	* @param languageId the ID of the language
+	* @param useDefault whether to use the default language if no localization exists for the requested language
+	* @return the localized description of this layout set prototype
+	*/
+	@Override
+	public java.lang.String getDescription(java.lang.String languageId,
+		boolean useDefault) {
+		return _layoutSetPrototype.getDescription(languageId, useDefault);
+	}
+
+	@Override
+	public java.lang.String getDescriptionCurrentLanguageId() {
+		return _layoutSetPrototype.getDescriptionCurrentLanguageId();
+	}
+
+	@Override
+	public java.lang.String getDescriptionCurrentValue() {
+		return _layoutSetPrototype.getDescriptionCurrentValue();
+	}
+
+	/**
+	* Returns a map of the locales and localized descriptions of this layout set prototype.
+	*
+	* @return the locales and localized descriptions of this layout set prototype
+	*/
+	@Override
+	public java.util.Map<java.util.Locale, java.lang.String> getDescriptionMap() {
+		return _layoutSetPrototype.getDescriptionMap();
+	}
+
+	/**
 	* Sets the description of this layout set prototype.
 	*
 	* @param description the description of this layout set prototype
@@ -504,6 +570,60 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	@Override
 	public void setDescription(java.lang.String description) {
 		_layoutSetPrototype.setDescription(description);
+	}
+
+	/**
+	* Sets the localized description of this layout set prototype in the language.
+	*
+	* @param description the localized description of this layout set prototype
+	* @param locale the locale of the language
+	*/
+	@Override
+	public void setDescription(java.lang.String description,
+		java.util.Locale locale) {
+		_layoutSetPrototype.setDescription(description, locale);
+	}
+
+	/**
+	* Sets the localized description of this layout set prototype in the language, and sets the default locale.
+	*
+	* @param description the localized description of this layout set prototype
+	* @param locale the locale of the language
+	* @param defaultLocale the default locale
+	*/
+	@Override
+	public void setDescription(java.lang.String description,
+		java.util.Locale locale, java.util.Locale defaultLocale) {
+		_layoutSetPrototype.setDescription(description, locale, defaultLocale);
+	}
+
+	@Override
+	public void setDescriptionCurrentLanguageId(java.lang.String languageId) {
+		_layoutSetPrototype.setDescriptionCurrentLanguageId(languageId);
+	}
+
+	/**
+	* Sets the localized descriptions of this layout set prototype from the map of locales and localized descriptions.
+	*
+	* @param descriptionMap the locales and localized descriptions of this layout set prototype
+	*/
+	@Override
+	public void setDescriptionMap(
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap) {
+		_layoutSetPrototype.setDescriptionMap(descriptionMap);
+	}
+
+	/**
+	* Sets the localized descriptions of this layout set prototype from the map of locales and localized descriptions, and sets the default locale.
+	*
+	* @param descriptionMap the locales and localized descriptions of this layout set prototype
+	* @param defaultLocale the default locale
+	*/
+	@Override
+	public void setDescriptionMap(
+		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+		java.util.Locale defaultLocale) {
+		_layoutSetPrototype.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
 	/**
@@ -679,29 +799,25 @@ public class LayoutSetPrototypeWrapper implements LayoutSetPrototype,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_layoutSetPrototype.persist();
 	}
 
 	@Override
 	public com.liferay.portal.model.Group getGroup()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutSetPrototype.getGroup();
 	}
 
 	@Override
 	public long getGroupId()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutSetPrototype.getGroupId();
 	}
 
 	@Override
 	public com.liferay.portal.model.LayoutSet getLayoutSet()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutSetPrototype.getLayoutSet();
 	}
 

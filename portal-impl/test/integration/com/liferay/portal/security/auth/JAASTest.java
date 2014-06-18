@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,6 @@ package com.liferay.portal.security.auth;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.events.Action;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.jaas.PortalPrincipal;
 import com.liferay.portal.kernel.security.jaas.PortalRole;
 import com.liferay.portal.kernel.servlet.HttpMethods;
@@ -31,11 +30,10 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.security.jaas.JAASHelper;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.servlet.MainServlet;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.TestPropsValues;
 
 import java.lang.reflect.Field;
 
@@ -77,7 +75,7 @@ import org.springframework.mock.web.MockServletContext;
 /**
  * @author Raymond Augé
  */
-@ExecutionTestListeners(listeners = {EnvironmentExecutionTestListener.class})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class JAASTest extends MainServletExecutionTestListener {
 
@@ -316,7 +314,7 @@ public class JAASTest extends MainServletExecutionTestListener {
 
 				@Override
 				protected long doGetJaasUserId(long companyId, String name)
-					throws PortalException, SystemException {
+					throws PortalException {
 
 					try {
 						return super.doGetJaasUserId(companyId, name);
@@ -329,27 +327,31 @@ public class JAASTest extends MainServletExecutionTestListener {
 			}
 		);
 
-		_mockServletContext = new AutoDeployMockServletContext(
-			getResourceBasePath(), new FileSystemResourceLoader());
+		if (mainServlet == null) {
+			MockServletContext mockServletContext =
+				new AutoDeployMockServletContext(
+					getResourceBasePath(), new FileSystemResourceLoader());
 
-		MockServletConfig mockServletConfig = new MockServletConfig(
-			_mockServletContext);
+			MockServletConfig mockServletConfig = new MockServletConfig(
+				mockServletContext);
 
-		mainServlet = new MainServlet();
+			mainServlet = new MainServlet();
 
-		try {
-			mainServlet.init(mockServletConfig);
-		}
-		catch (ServletException se) {
-			throw new RuntimeException(
-				"The main servlet could not be initialized");
+			try {
+				mainServlet.init(mockServletConfig);
+			}
+			catch (ServletException se) {
+				throw new RuntimeException(
+					"The main servlet could not be initialized");
+			}
 		}
 
 		Date lastLoginDate = _user.getLastLoginDate();
 
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest(
-				_mockServletContext, HttpMethods.GET, StringPool.SLASH);
+				mainServlet.getServletContext(), HttpMethods.GET,
+				StringPool.SLASH);
 
 		mockHttpServletRequest.setRemoteUser(String.valueOf(_user.getUserId()));
 
@@ -421,7 +423,6 @@ public class JAASTest extends MainServletExecutionTestListener {
 	private Field _jaasAuthTypeField;
 	private Boolean _jaasEnabled;
 	private Field _jaasEnabledField;
-	private MockServletContext _mockServletContext;
 	private User _user;
 
 	private class JAASAction extends Action {

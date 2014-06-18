@@ -30,7 +30,7 @@
 </tr>
 <tr>
 	<td>NAVBAR_CONTAINER</td>
-	<td>//div[@class='navbar ']//div[@class='container']</td>
+	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//div[@class='container']</td>
 	<td></td>
 </tr>
 <tr>
@@ -40,7 +40,7 @@
 </tr>
 <tr>
 	<td>SUCCESS_MESSAGE_RECYCLE_BIN</td>
-	<td>//form[@id='_161_undoForm']</td>
+	<td>//form[@id='_182_undoForm']</td>
 	<td></td>
 </tr>
 <tr>
@@ -50,7 +50,7 @@
 </tr>
 <tr>
 	<td>ADD_ENTRY</td>
-	<td>//div[@class='navbar ']//li/a[contains(.,'Add')]</td>
+	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//li/a[contains(.,'Add')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -61,6 +61,11 @@
 <tr>
 	<td>SEARCH_BUTTON</td>
 	<td>//button[contains(.,'Search')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DELETE_BUTTON</td>
+	<td>//button[contains(.,'Delete')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -111,7 +116,7 @@
 </tr>
 <tr>
 	<td>ENTRY_TABLE_ACTIONS</td>
-	<td>//tr[contains(.,'${key_entryTitle}')]/td/div/a[@title='Actions']</td>
+	<td>//tr[contains(.,'${key_entryTitle}')]/td/div/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -138,6 +143,11 @@
 <tr>
 	<td>ENTRY_MENULIST_MOVE_TO_THE_RECYCLE_BIN</td>
 	<td>//a[@role='menuitem' and contains(.,'Move to the Recycle Bin')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_MENULIST_DELETE</td>
+	<td>//a[@role='menuitem' and contains(.,'Delete')]</td>
 	<td></td>
 </tr>
 <tr>

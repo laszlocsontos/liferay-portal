@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,9 +82,8 @@ public class PortletResourceBundles {
 
 		if (resourceBundle == null) {
 			try {
-				resourceBundle = new NullSafeResourceBundle(
-					new PropertyResourceBundle(
-						new UnsyncByteArrayInputStream(new byte[0])));
+				resourceBundle = new PropertyResourceBundle(
+					new UnsyncByteArrayInputStream(new byte[0]));
 
 				resourceBundles.put(languageId, resourceBundle);
 			}
@@ -165,8 +164,6 @@ public class PortletResourceBundles {
 
 		Map<String, ResourceBundle> resourceBundles = _getResourceBundles(
 			servletContextName);
-
-		resourceBundle = new NullSafeResourceBundle(resourceBundle);
 
 		resourceBundles.put(languageId, resourceBundle);
 	}

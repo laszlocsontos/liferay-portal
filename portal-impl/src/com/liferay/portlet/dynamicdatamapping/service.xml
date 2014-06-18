@@ -93,6 +93,7 @@
 		<!-- Relationships -->
 
 		<column name="dlFileEntryTypes" type="Collection" entity="com.liferay.portlet.documentlibrary.DLFileEntryType" mapping-table="DLFileEntryTypes_DDMStructures" />
+		<column name="journalFolders" type="Collection" entity="com.liferay.portlet.journal.JournalFolder" mapping-table="JournalFolders_DDMStructures" />
 
 		<!-- Finder methods -->
 
@@ -141,6 +142,7 @@
 		<reference package-path="com.liferay.portlet.documentlibrary" entity="DLFileEntryType" />
 		<reference package-path="com.liferay.portlet.dynamicdatamapping" entity="DDMStructureLink" />
 		<reference package-path="com.liferay.portlet.dynamicdatamapping" entity="DDMTemplate" />
+		<reference package-path="com.liferay.portlet.journal" entity="JournalFolder" />
 	</entity>
 	<entity name="DDMStructureLink" local-service="true" remote-service="false">
 
@@ -229,7 +231,7 @@
 			<finder-column name="classPK" />
 		</finder>
 		<finder name="G_C_C" return-type="Collection">
-			<finder-column name="groupId" />
+			<finder-column name="groupId" arrayable-operator="OR" />
 			<finder-column name="classNameId" />
 			<finder-column name="classPK" />
 		</finder>

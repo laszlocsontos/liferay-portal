@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,18 +16,17 @@ package com.liferay.portlet.bookmarks.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
-import com.liferay.portlet.bookmarks.util.BookmarksTestUtil;
+import com.liferay.portlet.bookmarks.util.test.BookmarksTestUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -39,16 +38,6 @@ import org.testng.Assert;
 @ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class BookmarksEntryLocalServiceTreeTest {
-
-	@After
-	public void tearDown() throws Exception {
-		for (int i = _entries.size() - 1; i >= 0; i--) {
-			BookmarksEntryLocalServiceUtil.deleteBookmarksEntry(
-				_entries.get(i));
-		}
-
-		BookmarksFolderLocalServiceUtil.deleteBookmarksFolder(_folder);
-	}
 
 	@Test
 	public void testRebuildTree() throws Exception {
@@ -77,8 +66,9 @@ public class BookmarksEntryLocalServiceTreeTest {
 
 		_folder = BookmarksTestUtil.addFolder("Folder A");
 
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			TestPropsValues.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId());
 
 		BookmarksEntry entryAA = BookmarksTestUtil.addEntry(
 			_folder.getFolderId(), true, serviceContext);

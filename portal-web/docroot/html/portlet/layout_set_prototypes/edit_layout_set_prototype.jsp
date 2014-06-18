@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,8 @@ boolean layoutsUpdateable = GetterUtil.getBoolean(layoutSetPrototype.getSettings
 
 Group group = themeDisplay.getSiteGroup();
 %>
+
+<liferay-ui:success key='<%= PortletKeys.SITE_TEMPLATE_SETTINGS + "requestProcessed" %>' message="site-template-was-added" />
 
 <c:if test="<%= !group.isLayoutSetPrototype() %>">
 	<liferay-util:include page="/html/portlet/layout_set_prototypes/toolbar.jsp">
@@ -110,9 +112,9 @@ request.setAttribute("edit_layout_set_prototype.jsp-redirect", currentURL);
 
 <aui:script>
 	function <portlet:namespace />saveLayoutSetPrototype() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (layoutSetPrototype.isNew()) ? Constants.ADD : Constants.UPDATE %>";
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (layoutSetPrototype.isNew()) ? Constants.ADD : Constants.UPDATE %>';
 
-		submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/layout_set_prototypes/edit_layout_set_prototype" /></portlet:actionURL>");
+		submitForm(document.<portlet:namespace />fm, '<portlet:actionURL><portlet:param name="struts_action" value="/layout_set_prototypes/edit_layout_set_prototype" /></portlet:actionURL>');
 	}
 </aui:script>
 

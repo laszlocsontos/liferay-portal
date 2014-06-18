@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -159,7 +159,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 					/>
 				</c:if>
 
-				<c:if test="<%= MBCategoryPermission.contains(permissionChecker, category, ActionKeys.SUBSCRIBE) && (MBUtil.getEmailMessageAddedEnabled(groupPortletSettings) || MBUtil.getEmailMessageUpdatedEnabled(groupPortletSettings)) %>">
+				<c:if test="<%= MBCategoryPermission.contains(permissionChecker, category, ActionKeys.SUBSCRIBE) && (mbSettings.isEmailMessageAddedEnabled() || mbSettings.isEmailMessageUpdatedEnabled()) %>">
 					<c:choose>
 						<c:when test="<%= (categorySubscriptionClassPKs != null) && categorySubscriptionClassPKs.contains(category.getCategoryId()) %>">
 							<portlet:actionURL var="unsubscribeURL">
@@ -170,8 +170,9 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 							</portlet:actionURL>
 
 							<liferay-ui:icon
-								image="unsubscribe"
+								iconCssClass="icon-remove-sign"
 								label="<%= true %>"
+								message="unsubscribe"
 								url="<%= unsubscribeURL %>"
 							/>
 						</c:when>
@@ -184,8 +185,9 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 							</portlet:actionURL>
 
 							<liferay-ui:icon
-								image="subscribe"
+								iconCssClass="icon-ok-sign"
 								label="<%= true %>"
+								message="subscribe"
 								url="<%= subscribeURL %>"
 							/>
 						</c:otherwise>
@@ -437,6 +439,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 				<liferay-ui:search-container-column-jsp
 					align="right"
+					cssClass="entry-action"
 					path="/html/portlet/message_boards/ban_user_action.jsp"
 				/>
 			</liferay-ui:search-container-row>

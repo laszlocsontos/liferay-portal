@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -109,7 +109,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 			sb.append("<br />");
 			sb.append("<img alt=\"");
 			sb.append(item.getSku());
-			sb.append("\" border=\"0\" src=\"");
+			sb.append("\" src=\"");
 
 			if (Validator.isNotNull(item.getSmallImageURL())) {
 				sb.append(item.getSmallImageURL());
@@ -174,7 +174,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 
 		// Action
 
-		row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/shopping/item_action.jsp");
+		row.addJSP("/html/portlet/shopping/item_action.jsp", "entry-action");
 
 		// Add result row
 

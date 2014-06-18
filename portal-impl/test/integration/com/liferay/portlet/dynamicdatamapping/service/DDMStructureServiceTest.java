@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,14 +15,13 @@
 package com.liferay.portlet.dynamicdatamapping.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatamapping.RequiredStructureException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateElementException;
@@ -43,18 +42,13 @@ import org.junit.runner.RunWith;
 /**
  * @author Eduardo Garcia
  */
-@ExecutionTestListeners(
-	listeners = {
-		EnvironmentExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class DDMStructureServiceTest extends BaseDDMServiceTestCase {
 
 	@Test
 	public void testAddStructureWithDuplicateKey() throws Exception {
-		String structureKey = ServiceTestUtil.randomString();
+		String structureKey = RandomTestUtil.randomString();
 		String storageType = StorageType.XML.getValue();
 
 		try {
@@ -112,6 +106,30 @@ public class DDMStructureServiceTest extends BaseDDMServiceTestCase {
 		try {
 			addStructure(
 				_classNameId, null, "Test Structure",
+				readText("ddm-structure-duplicate-element-name.xsd"),
+				storageType, DDMStructureConstants.TYPE_DEFAULT);
+
+			Assert.fail();
+		}
+		catch (StructureDuplicateElementException sdee) {
+		}
+	}
+
+	@Test
+	public void testAddStructureWithXsdContainingDuplicateElementNameInParent()
+		throws Exception {
+
+		String storageType = StorageType.XML.getValue();
+
+		try {
+			DDMStructure parentStructure = addStructure(
+				_classNameId, null, "Test Parent Structure",
+				readText("ddm-structure-duplicate-element-name.xsd"),
+				storageType, DDMStructureConstants.TYPE_DEFAULT);
+
+			addStructure(
+				parentStructure.getStructureId(), _classNameId, null,
+				"Test Structure",
 				readText("ddm-structure-duplicate-element-name.xsd"),
 				storageType, DDMStructureConstants.TYPE_DEFAULT);
 
@@ -296,7 +314,7 @@ public class DDMStructureServiceTest extends BaseDDMServiceTestCase {
 		return DDMStructureLocalServiceUtil.copyStructure(
 			structure.getUserId(), structure.getStructureId(),
 			structure.getNameMap(), structure.getDescriptionMap(),
-			ServiceTestUtil.getServiceContext(group.getGroupId()));
+			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
 	}
 
 	protected DDMStructure updateStructure(DDMStructure structure)
@@ -306,7 +324,7 @@ public class DDMStructureServiceTest extends BaseDDMServiceTestCase {
 			structure.getStructureId(), structure.getParentStructureId(),
 			structure.getNameMap(), structure.getDescriptionMap(),
 			structure.getXsd(),
-			ServiceTestUtil.getServiceContext(group.getGroupId()));
+			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
 	}
 
 	private long _classNameId = PortalUtil.getClassNameId(DDLRecord.class);

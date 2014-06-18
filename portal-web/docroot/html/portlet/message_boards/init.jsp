@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,14 +16,14 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil" %><%@
-page import="com.liferay.portal.kernel.util.MimeTypesUtil" %><%@
+<%@ page import="com.liferay.portal.kernel.util.MimeTypesUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.DuplicateFileException" %><%@
-page import="com.liferay.portlet.documentlibrary.FileExtensionException" %><%@
 page import="com.liferay.portlet.documentlibrary.FileNameException" %><%@
+page import="com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerException" %><%@
 page import="com.liferay.portlet.messageboards.BannedUserException" %><%@
 page import="com.liferay.portlet.messageboards.CategoryNameException" %><%@
 page import="com.liferay.portlet.messageboards.LockedThreadException" %><%@
+page import="com.liferay.portlet.messageboards.MBSettings" %><%@
 page import="com.liferay.portlet.messageboards.MailingListEmailAddressException" %><%@
 page import="com.liferay.portlet.messageboards.MailingListInServerNameException" %><%@
 page import="com.liferay.portlet.messageboards.MailingListInUserNameException" %><%@
@@ -63,13 +63,12 @@ page import="com.liferay.portlet.messageboards.service.MBThreadServiceUtil" %><%
 page import="com.liferay.portlet.messageboards.service.permission.MBCategoryPermission" %><%@
 page import="com.liferay.portlet.messageboards.service.permission.MBMessagePermission" %><%@
 page import="com.liferay.portlet.messageboards.service.permission.MBPermission" %><%@
+page import="com.liferay.portlet.messageboards.util.MBConstants" %><%@
 page import="com.liferay.portlet.messageboards.util.MBMessageAttachmentsUtil" %><%@
-page import="com.liferay.portlet.messageboards.util.MBUtil" %><%@
 page import="com.liferay.portlet.messageboards.util.comparator.MessageCreateDateComparator" %><%@
 page import="com.liferay.portlet.ratings.model.RatingsStats" %><%@
 page import="com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil" %><%@
-page import="com.liferay.portlet.trash.service.TrashEntryLocalServiceUtil" %><%@
-page import="com.liferay.util.RSSUtil" %>
+page import="com.liferay.portlet.trash.service.TrashEntryLocalServiceUtil" %>
 
 <%
 String currentLanguageId = LanguageUtil.getLanguageId(request);
@@ -79,22 +78,22 @@ String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
 Locale[] locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
 
-PortletSettings groupPortletSettings = portletDisplay.getGroupPortletSettings();
+MBSettings mbSettings = MBSettings.getInstance(themeDisplay.getSiteGroupId());
 
-String[] priorities = LocalizationUtil.getPortletSettingsValues(groupPortletSettings, "priorities", currentLanguageId);
+String[] priorities = mbSettings.getPriorities(currentLanguageId);
 
-boolean allowAnonymousPosting = MBUtil.isAllowAnonymousPosting(groupPortletSettings);
-boolean subscribeByDefault = GetterUtil.getBoolean(groupPortletSettings.getValue("subscribeByDefault", null), PropsValues.MESSAGE_BOARDS_SUBSCRIBE_BY_DEFAULT);
-String messageFormat = MBUtil.getMessageFormat(groupPortletSettings);
-boolean enableFlags = GetterUtil.getBoolean(groupPortletSettings.getValue("enableFlags", null), true);
-boolean enableRatings = GetterUtil.getBoolean(groupPortletSettings.getValue("enableRatings", null), true);
-boolean threadAsQuestionByDefault = GetterUtil.getBoolean(groupPortletSettings.getValue("threadAsQuestionByDefault", null));
-String recentPostsDateOffset = groupPortletSettings.getValue("recentPostsDateOffset", "7");
+boolean allowAnonymousPosting = mbSettings.isAllowAnonymousPosting();
+boolean enableFlags = mbSettings.isEnableFlags();
+boolean enableRatings = mbSettings.isEnableRatings();
+String messageFormat = mbSettings.getMessageFormat();
+String recentPostsDateOffset = mbSettings.getRecentPostsDateOffset();
+boolean subscribeByDefault = mbSettings.isSubscribeByDefault();
+boolean threadAsQuestionByDefault = mbSettings.isThreadAsQuestionByDefault();
 
-boolean enableRSS = !PortalUtil.isRSSFeedsEnabled() ? false : GetterUtil.getBoolean(groupPortletSettings.getValue("enableRss", null), true);
-int rssDelta = GetterUtil.getInteger(groupPortletSettings.getValue("rssDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
-String rssDisplayStyle = groupPortletSettings.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_DEFAULT);
-String rssFeedType = groupPortletSettings.getValue("rssFeedType", RSSUtil.FEED_TYPE_DEFAULT);
+boolean enableRSS = mbSettings.isEnableRSS();
+int rssDelta = mbSettings.getRSSDelta();
+String rssDisplayStyle = mbSettings.getRSSDisplayStyle();
+String rssFeedType = mbSettings.getRSSFeedType();
 
 ResourceURL rssURL = liferayPortletResponse.createResourceURL();
 

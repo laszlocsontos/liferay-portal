@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,29 +20,17 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Role;
 
-import java.io.Serializable;
-
 import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @ProviderType
-public interface PermissionCheckerBag extends Serializable {
-
-	public List<Group> getGroups();
+public interface PermissionCheckerBag extends UserPermissionCheckerBag {
 
 	public long[] getRoleIds();
 
 	public List<Role> getRoles();
-
-	public List<Group> getUserGroups();
-
-	public List<Group> getUserOrgGroups();
-
-	public List<Organization> getUserOrgs();
-
-	public List<Group> getUserUserGroupGroups();
 
 	/**
 	 * @deprecated As of 6.1.0, renamed to {@link

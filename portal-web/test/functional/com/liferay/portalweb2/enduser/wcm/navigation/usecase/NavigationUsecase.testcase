@@ -1,11 +1,23 @@
 <definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="WCM" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
 
 	<tear-down>
+		<execute macro="User#tearDownCP" />
+
+		<execute macro="UserGroup#tearDownCP" />
+
 		<execute macro="Page#tearDownPG" />
 	</tear-down>
+
+	<command name="AddPageNameApostrophe" priority="5">
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Tester&apos;s Page" />
+		</execute>
+	</command>
 
 	<command name="AutomaticChangesToDisplayStyle" priority="3">
 		<property name="custom.properties" value="navigation.display.style.options=from-level-1-to-all-sublevels$${line.separator}navigation.display.style[from-level-1-with-title]=root-layout,absolute,1,auto,true$${line.separator}navigation.display.style.default=" />
@@ -69,6 +81,81 @@
 		<execute action="PGNavigation#assertTextEquals" locator-key1="BREADCRUMB_HEADER2_ENTRY" value1="${pageName}" />
 	</command>
 
+	<command name="UserPersonalSiteUserGroupPrivatePage" priority="5">
+		<property name="custom.properties" value="layout.user.private.layouts.enabled=false$${line.separator}layout.user.private.layouts.auto.create=false" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="User Groups" />
+		</execute>
+
+		<execute macro="UserGroup#addCP">
+			<var name="userGroupName" value="UG UserGroup Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="User Groups" />
+		</execute>
+
+		<execute macro="UserGroup#addPageCP">
+			<var name="sitePageName" value="Test User Group Private Page" />
+			<var name="sitePagePrivacy" value="Private" />
+			<var name="userGroupName" value="UG UserGroup Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="User Groups" />
+		</execute>
+
+		<execute macro="UserGroup#assignMemberCP">
+			<var name="userGroupName" value="UG UserGroup Name" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginUserPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Page#gotoMyDashboard" />
+
+		<execute action="Home#assertTextNotPresent" locator-key1="ERROR_MESSAGE_ALERT_ERROR" value1="Not Found" />
+
+		<var name="key_pageName" value="Test User Group Private Page" />
+
+		<execute action="Home#assertTextEquals" locator-key1="PAGE" value1="Test User Group Private Page" />
+		<execute action="Home#assertTextEquals" locator-key1="BREADCRUMB_1" value1="userfn userln" />
+		<execute action="Home#assertTextEquals" locator-key1="BREADCRUMB_2" value1="Test User Group Private Page" />
+
+		<execute macro="User#logoutUserPG" />
+
+		<execute macro="User#loginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+	</command>
+
 	<command name="ValidateReturnToDefaultStyle" priority="3">
 		<property name="custom.properties" value="navigation.display.style.default=from-level-1-with-title$${line.separator}navigation.display.style[from-level-1-with-title]=root-layout,absolute,1,auto,true" />
 
@@ -104,5 +191,62 @@
 		</execute>
 
 		<execute action="PGNavigation#assertTextEquals" locator-key1="BREADCRUMB_ENTRY" value1="${pageName}" />
+	</command>
+
+	<command name="ViewNoAddPagePermissionsPG" priority="5">
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Navigation Page" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Navigation Page" />
+		</execute>
+
+		<execute macro="PermissionsInline#gotoPagePG">
+			<var name="pageName" value="Navigation Page" />
+		</execute>
+
+		<for list="CONTENT_PERMISSIONS_ADD_DISCUSSION_CHECKBOX,CONTENT_PERMISSIONS_CONFIGURE_APPLICATIONS_CHECKBOX,CONTENT_PERMISSIONS_CUSTOMIZE_CHECKBOX,CONTENT_PERMISSIONS_DELETE_CHECKBOX,CONTENT_PERMISSIONS_DELETE_DISCUSSION_CHECKBOX,CONTENT_PERMISSIONS_PERMISSIONS_CHECKBOX,CONTENT_PERMISSIONS_UPDATE_CHECKBOX,CONTENT_PERMISSIONS_UPDATE_DISCUSSION_CHECKBOX,CONTENT_PERMISSIONS_VIEW_CHECKBOX" param="permissionDefinitionKey">
+			<execute macro="Role#definePermissionPG">
+				<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
+				<var name="roleName" value="Power User" />
+			</execute>
+		</for>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginUserPG">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Navigation Page" />
+		</execute>
+
+		<execute macro="Dockbar#viewAddTabsWithNoAddPagePermission" />
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginUserPG" />
 	</command>
 </definition>

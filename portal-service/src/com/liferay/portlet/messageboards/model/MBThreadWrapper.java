@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -331,11 +331,9 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	* Returns the user uuid of this message boards thread.
 	*
 	* @return the user uuid of this message boards thread
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _mbThread.getUserUuid();
 	}
 
@@ -473,11 +471,9 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	* Returns the root message user uuid of this message boards thread.
 	*
 	* @return the root message user uuid of this message boards thread
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getRootMessageUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getRootMessageUserUuid() {
 		return _mbThread.getRootMessageUserUuid();
 	}
 
@@ -555,11 +551,9 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	* Returns the last post by user uuid of this message boards thread.
 	*
 	* @return the last post by user uuid of this message boards thread
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getLastPostByUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getLastPostByUserUuid() {
 		return _mbThread.getLastPostByUserUuid();
 	}
 
@@ -687,11 +681,9 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	* Returns the status by user uuid of this message boards thread.
 	*
 	* @return the status by user uuid of this message boards thread
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getStatusByUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getStatusByUserUuid() {
 		return _mbThread.getStatusByUserUuid();
 	}
 
@@ -749,12 +741,10 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	* Returns the trash entry created when this message boards thread was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this message boards thread.
 	*
 	* @return the trash entry created when this message boards thread was moved to the Recycle Bin
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.trash.model.TrashEntry getTrashEntry()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mbThread.getTrashEntry();
 	}
 
@@ -792,7 +782,6 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	* Returns <code>true</code> if the parent of this message boards thread is in the Recycle Bin.
 	*
 	* @return <code>true</code> if the parent of this message boards thread is in the Recycle Bin; <code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean isInTrashContainer() {
@@ -800,9 +789,13 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	}
 
 	@Override
-	public boolean isInTrashExplicitly()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public boolean isInTrashExplicitly() {
 		return _mbThread.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return _mbThread.isInTrashImplicitly();
 	}
 
 	/**
@@ -1044,28 +1037,24 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_mbThread.persist();
 	}
 
 	@Override
 	public com.liferay.portal.kernel.repository.model.Folder addAttachmentsFolder()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mbThread.addAttachmentsFolder();
 	}
 
 	@Override
-	public long getAttachmentsFolderId()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public long getAttachmentsFolderId() {
 		return _mbThread.getAttachmentsFolderId();
 	}
 
 	@Override
 	public com.liferay.portlet.messageboards.model.MBCategory getCategory()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mbThread.getCategory();
 	}
 
@@ -1075,8 +1064,7 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	}
 
 	@Override
-	public long[] getParticipantUserIds()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public long[] getParticipantUserIds() {
 		return _mbThread.getParticipantUserIds();
 	}
 

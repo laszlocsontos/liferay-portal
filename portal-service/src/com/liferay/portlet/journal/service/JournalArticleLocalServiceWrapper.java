@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,12 +39,10 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param journalArticle the journal article
 	* @return the journal article that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle addJournalArticle(
-		com.liferay.portlet.journal.model.JournalArticle journalArticle)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.journal.model.JournalArticle journalArticle) {
 		return _journalArticleLocalService.addJournalArticle(journalArticle);
 	}
 
@@ -66,13 +64,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param id the primary key of the journal article
 	* @return the journal article that was removed
 	* @throws PortalException if a journal article with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle deleteJournalArticle(
-		long id)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		long id) throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.deleteJournalArticle(id);
 	}
 
@@ -81,12 +76,10 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param journalArticle the journal article
 	* @return the journal article that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle deleteJournalArticle(
-		com.liferay.portlet.journal.model.JournalArticle journalArticle)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.journal.model.JournalArticle journalArticle) {
 		return _journalArticleLocalService.deleteJournalArticle(journalArticle);
 	}
 
@@ -100,13 +93,11 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _journalArticleLocalService.dynamicQuery(dynamicQuery);
 	}
 
@@ -121,13 +112,12 @@ public class JournalArticleLocalServiceWrapper
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return _journalArticleLocalService.dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,15 +133,13 @@ public class JournalArticleLocalServiceWrapper
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return _journalArticleLocalService.dynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -161,12 +149,10 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _journalArticleLocalService.dynamicQueryCount(dynamicQuery);
 	}
 
@@ -176,20 +162,18 @@ public class JournalArticleLocalServiceWrapper
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return _journalArticleLocalService.dynamicQueryCount(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle fetchJournalArticle(
-		long id) throws com.liferay.portal.kernel.exception.SystemException {
+		long id) {
 		return _journalArticleLocalService.fetchJournalArticle(id);
 	}
 
@@ -199,12 +183,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param uuid the journal article's UUID
 	* @param companyId the primary key of the company
 	* @return the matching journal article, or <code>null</code> if a matching journal article could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle fetchJournalArticleByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long companyId) {
 		return _journalArticleLocalService.fetchJournalArticleByUuidAndCompanyId(uuid,
 			companyId);
 	}
@@ -215,12 +197,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param uuid the journal article's UUID
 	* @param groupId the primary key of the group
 	* @return the matching journal article, or <code>null</code> if a matching journal article could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle fetchJournalArticleByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long groupId) {
 		return _journalArticleLocalService.fetchJournalArticleByUuidAndGroupId(uuid,
 			groupId);
 	}
@@ -231,21 +211,38 @@ public class JournalArticleLocalServiceWrapper
 	* @param id the primary key of the journal article
 	* @return the journal article
 	* @throws PortalException if a journal article with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getJournalArticle(
-		long id)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		long id) throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getJournalArticle(id);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _journalArticleLocalService.getActionableDynamicQuery();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		return _journalArticleLocalService.getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _journalArticleLocalService.deletePersistedModel(persistedModel);
 	}
 
 	@Override
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getPersistedModel(primaryKeyObj);
 	}
 
@@ -256,13 +253,11 @@ public class JournalArticleLocalServiceWrapper
 	* @param companyId the primary key of the company
 	* @return the matching journal article
 	* @throws PortalException if a matching journal article could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getJournalArticleByUuidAndCompanyId(
 		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getJournalArticleByUuidAndCompanyId(uuid,
 			companyId);
 	}
@@ -274,13 +269,11 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupId the primary key of the group
 	* @return the matching journal article
 	* @throws PortalException if a matching journal article could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getJournalArticleByUuidAndGroupId(
 		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getJournalArticleByUuidAndGroupId(uuid,
 			groupId);
 	}
@@ -295,12 +288,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param start the lower bound of the range of journal articles
 	* @param end the upper bound of the range of journal articles (not inclusive)
 	* @return the range of journal articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getJournalArticles(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _journalArticleLocalService.getJournalArticles(start, end);
 	}
 
@@ -308,11 +299,9 @@ public class JournalArticleLocalServiceWrapper
 	* Returns the number of journal articles.
 	*
 	* @return the number of journal articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getJournalArticlesCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getJournalArticlesCount() {
 		return _journalArticleLocalService.getJournalArticlesCount();
 	}
 
@@ -321,12 +310,10 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param journalArticle the journal article
 	* @return the journal article that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateJournalArticle(
-		com.liferay.portlet.journal.model.JournalArticle journalArticle)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.journal.model.JournalArticle journalArticle) {
 		return _journalArticleLocalService.updateJournalArticle(journalArticle);
 	}
 
@@ -381,9 +368,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param layoutUuid the unique string identifying the web content
 	article's display page
 	* @param displayDateMonth the month the web content article is set to
@@ -431,7 +416,6 @@ public class JournalArticleLocalServiceWrapper
 	also set whether to add the default guest and group permissions.
 	* @return the web content article
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle addArticle(
@@ -453,8 +437,7 @@ public class JournalArticleLocalServiceWrapper
 		java.util.Map<java.lang.String, byte[]> images,
 		java.lang.String articleURL,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.addArticle(userId, groupId,
 			folderId, classNameId, classPK, articleId, autoArticleId, version,
 			titleMap, descriptionMap, content, type, ddmStructureKey,
@@ -483,9 +466,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param serviceContext the service context to be applied. Can set the
 	UUID, creation date, modification date, expando bridge
 	attributes, guest permissions, group permissions, asset category
@@ -494,7 +475,6 @@ public class JournalArticleLocalServiceWrapper
 	also set whether to add the default guest and group permissions.
 	* @return the web content article
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle addArticle(
@@ -504,8 +484,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String content, java.lang.String ddmStructureKey,
 		java.lang.String ddmTemplateKey,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.addArticle(userId, groupId,
 			folderId, titleMap, descriptionMap, content, ddmStructureKey,
 			ddmTemplateKey, serviceContext);
@@ -519,14 +498,12 @@ public class JournalArticleLocalServiceWrapper
 	* @param addGuestPermissions whether to add guest permissions
 	* @throws PortalException if no portal actions could be found associated
 	with the web content article or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void addArticleResources(
 		com.liferay.portlet.journal.model.JournalArticle article,
 		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.addArticleResources(article,
 			addGroupPermissions, addGuestPermissions);
 	}
@@ -538,14 +515,12 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupPermissions the group permissions to be added
 	* @param guestPermissions the guest permissions to be added
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void addArticleResources(
 		com.liferay.portlet.journal.model.JournalArticle article,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.addArticleResources(article,
 			groupPermissions, guestPermissions);
 	}
@@ -558,13 +533,11 @@ public class JournalArticleLocalServiceWrapper
 	* @param addGroupPermissions whether to add group permissions
 	* @param addGuestPermissions whether to add guest permissions
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void addArticleResources(long groupId, java.lang.String articleId,
 		boolean addGroupPermissions, boolean addGuestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.addArticleResources(groupId, articleId,
 			addGroupPermissions, addGuestPermissions);
 	}
@@ -578,13 +551,11 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupPermissions the group permissions to be added
 	* @param guestPermissions the guest permissions to be added
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void addArticleResources(long groupId, java.lang.String articleId,
 		java.lang.String[] groupPermissions, java.lang.String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.addArticleResources(groupId, articleId,
 			groupPermissions, guestPermissions);
 	}
@@ -600,13 +571,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the matching web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle checkArticleResourcePrimKey(
 		long groupId, java.lang.String articleId, double version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.checkArticleResourcePrimKey(groupId,
 			articleId, version);
 	}
@@ -616,12 +585,10 @@ public class JournalArticleLocalServiceWrapper
 	* review notifications based on their current workflow.
 	*
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void checkArticles()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.checkArticles();
 	}
 
@@ -635,13 +602,11 @@ public class JournalArticleLocalServiceWrapper
 	* @param version the web content article's version
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void checkNewLine(long groupId, java.lang.String articleId,
 		double version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.checkNewLine(groupId, articleId, version);
 	}
 
@@ -656,13 +621,11 @@ public class JournalArticleLocalServiceWrapper
 	* @throws PortalException if a matching web content article could not be
 	found, if the article's structure does not match it, or if a
 	portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void checkStructure(long groupId, java.lang.String articleId,
 		double version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.checkStructure(groupId, articleId, version);
 	}
 
@@ -680,14 +643,12 @@ public class JournalArticleLocalServiceWrapper
 	* @return the new web content article
 	* @throws PortalException if a matching web content article could not be
 	found or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle copyArticle(
 		long userId, long groupId, java.lang.String oldArticleId,
 		java.lang.String newArticleId, boolean autoArticleId, double version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.copyArticle(userId, groupId,
 			oldArticleId, newArticleId, autoArticleId, version);
 	}
@@ -696,14 +657,13 @@ public class JournalArticleLocalServiceWrapper
 	* Deletes the web content article and its resources.
 	*
 	* @param article the web content article
+	* @return the deleted web content article
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle deleteArticle(
 		com.liferay.portlet.journal.model.JournalArticle article)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.deleteArticle(article);
 	}
 
@@ -718,16 +678,15 @@ public class JournalArticleLocalServiceWrapper
 	<code>null</code>). Can set the portlet preferences that include
 	email information to notify recipients of the unapproved web
 	content's denial.
+	* @return the deleted web content article
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle deleteArticle(
 		com.liferay.portlet.journal.model.JournalArticle article,
 		java.lang.String articleURL,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.deleteArticle(article, articleURL,
 			serviceContext);
 	}
@@ -744,17 +703,16 @@ public class JournalArticleLocalServiceWrapper
 	* @param serviceContext the service context to be applied. Can set the
 	portlet preferences that include email information to notify
 	recipients of the unapproved web content article's denial.
+	* @return the deleted web content article
 	* @throws PortalException if a matching web content article could not be
 	found or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle deleteArticle(
 		long groupId, java.lang.String articleId, double version,
 		java.lang.String articleURL,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.deleteArticle(groupId, articleId,
 			version, articleURL, serviceContext);
 	}
@@ -770,13 +728,11 @@ public class JournalArticleLocalServiceWrapper
 	portlet preferences that include email information to notify
 	recipients of the unapproved web content article's denial.
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void deleteArticle(long groupId, java.lang.String articleId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.deleteArticle(groupId, articleId,
 			serviceContext);
 	}
@@ -786,12 +742,10 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param groupId the primary key of the web content article's group
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void deleteArticles(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.deleteArticles(groupId);
 	}
 
@@ -802,12 +756,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupId the primary key of the web content article's group
 	* @param folderId the primary key of the web content article folder
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void deleteArticles(long groupId, long folderId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.deleteArticles(groupId, folderId);
 	}
 
@@ -820,13 +772,11 @@ public class JournalArticleLocalServiceWrapper
 	* @param includeTrashedEntries whether to include recycled web content
 	articles
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void deleteArticles(long groupId, long folderId,
 		boolean includeTrashedEntries)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.deleteArticles(groupId, folderId,
 			includeTrashedEntries);
 	}
@@ -838,12 +788,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupId the primary key of the web content article's group
 	* @param layoutUuid the unique string identifying the web content
 	article's display page
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void deleteLayoutArticleReferences(long groupId,
-		java.lang.String layoutUuid)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String layoutUuid) {
 		_journalArticleLocalService.deleteLayoutArticleReferences(groupId,
 			layoutUuid);
 	}
@@ -869,15 +817,13 @@ public class JournalArticleLocalServiceWrapper
 	* @return the web content article
 	* @throws PortalException if a matching web content article could not be
 	found or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle expireArticle(
 		long userId, long groupId, java.lang.String articleId, double version,
 		java.lang.String articleURL,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.expireArticle(userId, groupId,
 			articleId, version, articleURL, serviceContext);
 	}
@@ -903,46 +849,40 @@ public class JournalArticleLocalServiceWrapper
 	considered a web content add activity.
 	* @throws PortalException if a matching web content article could not be
 	found or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void expireArticle(long userId, long groupId,
 		java.lang.String articleId, java.lang.String articleURL,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.expireArticle(userId, groupId, articleId,
 			articleURL, serviceContext);
 	}
 
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle fetchArticle(
-		long groupId, java.lang.String articleId, double version)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, java.lang.String articleId, double version) {
 		return _journalArticleLocalService.fetchArticle(groupId, articleId,
 			version);
 	}
 
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle fetchLatestArticle(
-		long resourcePrimKey, int status, boolean preferApproved)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long resourcePrimKey, int status, boolean preferApproved) {
 		return _journalArticleLocalService.fetchLatestArticle(resourcePrimKey,
 			status, preferApproved);
 	}
 
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle fetchLatestArticle(
-		long groupId, java.lang.String articleId, int status)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, java.lang.String articleId, int status) {
 		return _journalArticleLocalService.fetchLatestArticle(groupId,
 			articleId, status);
 	}
 
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle fetchLatestIndexableArticle(
-		long resourcePrimKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long resourcePrimKey) {
 		return _journalArticleLocalService.fetchLatestIndexableArticle(resourcePrimKey);
 	}
 
@@ -953,12 +893,10 @@ public class JournalArticleLocalServiceWrapper
 	* @return the web content article with the ID
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getArticle(long id)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticle(id);
 	}
 
@@ -972,13 +910,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the matching web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getArticle(
 		long groupId, java.lang.String articleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticle(groupId, articleId);
 	}
 
@@ -992,13 +928,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the matching web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getArticle(
 		long groupId, java.lang.String articleId, double version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticle(groupId, articleId,
 			version);
 	}
@@ -1019,13 +953,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the matching web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getArticle(
 		long groupId, java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticle(groupId, className,
 			classPK);
 	}
@@ -1039,79 +971,140 @@ public class JournalArticleLocalServiceWrapper
 	* @param urlTitle the web content article's accessible URL title
 	* @return the matching web content article
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getArticleByUrlTitle(
 		long groupId, java.lang.String urlTitle)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleByUrlTitle(groupId,
 			urlTitle);
 	}
 
 	/**
-	* Returns the web content associated with the web content article and DDM
-	* template.
+	* Returns the web content from the web content article associated with the
+	* portlet request model and the DDM template.
 	*
 	* @param article the web content article
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param viewMode the mode in which the web content is being viewed
 	* @param languageId the primary key of the language translation to get
+	* @param portletRequestModel the portlet request model
 	* @param themeDisplay the theme display
-	* @return the web content associated with the DDM template
-	* @throws PortalException if a matching DDM template could not be found or
+	* @return the web content from the web content article associated with the
+	portlet request model and the DDM template
+	* @throws PortalException if a matching DDM template could not be found, or
 	if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.lang.String getArticleContent(
 		com.liferay.portlet.journal.model.JournalArticle article,
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
 		java.lang.String languageId,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _journalArticleLocalService.getArticleContent(article,
+			ddmTemplateKey, viewMode, languageId, portletRequestModel,
+			themeDisplay);
+	}
+
+	/**
+	* Returns the web content from the web content article associated with the
+	* DDM template.
+	*
+	* @param article the web content article
+	* @param ddmTemplateKey the primary key of the web content article's
+	DDM template
+	* @param viewMode the mode in which the web content is being viewed
+	* @param languageId the primary key of the language translation to get
+	* @param themeDisplay the theme display
+	* @return the web content from the matching web content article
+	* @throws PortalException if a matching DDM template could not be
+	found, or if a portal exception occurred
+	* @deprecated As of 7.0.0, replaced by {@link
+	#getArticleContent(JournalArticle, String, String, String,
+	PortletRequestModel,ThemeDisplay)}
+	*/
+	@Deprecated
+	@Override
+	public java.lang.String getArticleContent(
+		com.liferay.portlet.journal.model.JournalArticle article,
+		java.lang.String ddmTemplateKey, java.lang.String viewMode,
+		java.lang.String languageId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleContent(article,
 			ddmTemplateKey, viewMode, languageId, themeDisplay);
 	}
 
 	/**
-	* Returns the web content matching the group, article ID, and version, and
-	* associated with the DDM template.
+	* Returns the web content from the web content article matching the group,
+	* article ID, and version, and associated with the portlet request model
+	* and the DDM template.
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param articleId the primary key of the web content article
 	* @param version the web content article's version
 	* @param viewMode the mode in which the web content is being viewed
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param languageId the primary key of the language translation to get
+	* @param portletRequestModel the portlet request model
 	* @param themeDisplay the theme display
-	* @return the matching web content
+	* @return the web content from the matching web content article
 	* @throws PortalException if a matching web content article or DDM template
 	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.lang.String getArticleContent(long groupId,
 		java.lang.String articleId, double version, java.lang.String viewMode,
 		java.lang.String ddmTemplateKey, java.lang.String languageId,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _journalArticleLocalService.getArticleContent(groupId,
+			articleId, version, viewMode, ddmTemplateKey, languageId,
+			portletRequestModel, themeDisplay);
+	}
+
+	/**
+	* Returns the web content from the web content article matching the group,
+	* article ID, and version, and associated with the DDM template.
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param articleId the primary key of the web content article
+	* @param version the web content article's version
+	* @param viewMode the mode in which the web content is being viewed
+	* @param ddmTemplateKey the primary key of the web content article's
+	DDM template (optionally <code>null</code>). If the article
+	is related to a DDM structure, the template's structure must
+	match it.
+	* @param languageId the primary key of the language translation to get
+	* @param themeDisplay the theme display
+	* @return the web content from the matching web content article
+	* @throws PortalException if a matching web content article or DDM
+	template could not be found, or if a portal exception
+	occurred
+	* @deprecated As of 7.0.0, replaced by {@link #getArticleContent(long,
+	String, double, String, String, String, PortletRequestModel,
+	ThemeDisplay)}
+	*/
+	@Deprecated
+	@Override
+	public java.lang.String getArticleContent(long groupId,
+		java.lang.String articleId, double version, java.lang.String viewMode,
+		java.lang.String ddmTemplateKey, java.lang.String languageId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleContent(groupId,
 			articleId, version, viewMode, ddmTemplateKey, languageId,
 			themeDisplay);
 	}
 
 	/**
-	* Returns the web content matching the group, article ID, and version.
+	* Returns the web content from the web content article matching the group,
+	* article ID, and version.
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param articleId the primary key of the web content article
@@ -1119,149 +1112,137 @@ public class JournalArticleLocalServiceWrapper
 	* @param viewMode the mode in which the web content is being viewed
 	* @param languageId the primary key of the language translation to get
 	* @param themeDisplay the theme display
-	* @return the matching web content
-	* @throws PortalException if a matching web content article or DDM template
-	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
+	* @return the web content from the matching web content article
+	* @throws PortalException if a matching web content article or DDM
+	template could not be found, or if a portal exception
+	occurred
+	* @deprecated As of 7.0.0, replaced by {@link #getArticleContent(long,
+	String, double, String, String, String, PortletRequestModel,
+	ThemeDisplay)}
 	*/
+	@Deprecated
 	@Override
 	public java.lang.String getArticleContent(long groupId,
 		java.lang.String articleId, double version, java.lang.String viewMode,
 		java.lang.String languageId,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleContent(groupId,
 			articleId, version, viewMode, languageId, themeDisplay);
 	}
 
 	/**
-	* Returns the latest web content matching the group and article ID, and
-	* associated with DDM template key.
+	* Returns the latest web content from the web content article matching the
+	* group and article ID, and associated with the portlet request model and
+	* the DDM template.
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param articleId the primary key of the web content article
 	* @param viewMode the mode in which the web content is being viewed
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param languageId the primary key of the language translation to get
+	* @param portletRequestModel the portlet request model
 	* @param themeDisplay the theme display
-	* @return the matching web content
+	* @return the latest web content from the matching web content article
 	* @throws PortalException if a matching web content article or DDM template
 	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.lang.String getArticleContent(long groupId,
 		java.lang.String articleId, java.lang.String viewMode,
 		java.lang.String ddmTemplateKey, java.lang.String languageId,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _journalArticleLocalService.getArticleContent(groupId,
+			articleId, viewMode, ddmTemplateKey, languageId,
+			portletRequestModel, themeDisplay);
+	}
+
+	/**
+	* Returns the latest web content from the web content article matching the
+	* group and article ID, and associated with the DDM template.
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param articleId the primary key of the web content article
+	* @param viewMode the mode in which the web content is being viewed
+	* @param ddmTemplateKey the primary key of the web content article's
+	DDM template
+	* @param languageId the primary key of the language translation to get
+	* @param themeDisplay the theme display
+	* @return the latest web content from the matching web content article
+	* @throws PortalException if a matching web content article or DDM
+	template could not be found, or if a portal exception
+	occurred
+	* @deprecated As of 7.0.0, replaced by {@link #getArticleContent(long,
+	String, String, String, String, PortletRequestModel,
+	ThemeDisplay)}
+	*/
+	@Deprecated
+	@Override
+	public java.lang.String getArticleContent(long groupId,
+		java.lang.String articleId, java.lang.String viewMode,
+		java.lang.String ddmTemplateKey, java.lang.String languageId,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleContent(groupId,
 			articleId, viewMode, ddmTemplateKey, languageId, themeDisplay);
 	}
 
 	/**
-	* Returns the latest web content matching the group and article ID.
+	* Returns the latest web content from the web content article matching the
+	* group and article ID.
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param articleId the primary key of the web content article
 	* @param viewMode the mode in which the web content is being viewed
 	* @param languageId the primary key of the language translation to get
 	* @param themeDisplay the theme display
-	* @return the matching web content
-	* @throws PortalException if a matching web content article or DDM template
-	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
+	* @return the latest web content from the matching web content article
+	* @throws PortalException if a matching web content article or DDM
+	template could not be found, or if a portal exception
+	occurred
+	* @deprecated As of 7.0.0, replaced by {@link #getArticleContent(long,
+	String, String, String, String, PortletRequestModel,
+	ThemeDisplay)}
 	*/
+	@Deprecated
 	@Override
 	public java.lang.String getArticleContent(long groupId,
 		java.lang.String articleId, java.lang.String viewMode,
 		java.lang.String languageId,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleContent(groupId,
 			articleId, viewMode, languageId, themeDisplay);
 	}
 
-	/**
-	* Returns a web content article display for the specified page of the
-	* latest version of the web content article, optionally based on the DDM
-	* template if the article is template driven. If the article is template
-	* driven, web content transformation tokens are added from the theme
-	* display (if not <code>null</code>) or the XML request otherwise.
-	*
-	* @param article the web content article
-	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
-	* @param viewMode the mode in which the web content is being viewed
-	* @param languageId the primary key of the language translation to get
-	* @param page the web content's page number. Page numbers start at
-	<code>1</code>.
-	* @param xmlRequest the request that serializes the web content into a
-	hierarchical hash map (optionally <code>null</code>)
-	* @param themeDisplay the theme display
-	* @return the web content article display
-	* @throws PortalException if a matching DDM template could not be found or
-	if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		com.liferay.portlet.journal.model.JournalArticle article,
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
-		java.lang.String languageId, int page, java.lang.String xmlRequest,
+		java.lang.String languageId, int page,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _journalArticleLocalService.getArticleDisplay(article,
-			ddmTemplateKey, viewMode, languageId, page, xmlRequest, themeDisplay);
+			ddmTemplateKey, viewMode, languageId, page, portletRequestModel,
+			themeDisplay);
 	}
 
-	/**
-	* Returns a web content article display for the first page of the specified
-	* version of the web content article, optionally based on the DDM template
-	* if the article is template driven. If the article is template driven, web
-	* content transformation tokens are added from the theme display (if not
-	* <code>null</code>) or the XML request otherwise.
-	*
-	* @param groupId the primary key of the web content article's group
-	* @param articleId the primary key of the web content article
-	* @param version the web content article's version
-	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
-	* @param viewMode the mode in which the web content is being viewed
-	* @param languageId the primary key of the language translation to get
-	* @param page the web content's page number
-	* @param xmlRequest the request that serializes the web content into a
-	hierarchical hash map
-	* @param themeDisplay the theme display
-	* @return the web content article display, or <code>null</code> if the
-	article has expired or if article's display date/time is after
-	the current date/time
-	* @throws PortalException if a matching web content article or DDM template
-	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		long groupId, java.lang.String articleId, double version,
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
-		java.lang.String languageId, int page, java.lang.String xmlRequest,
+		java.lang.String languageId, int page,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleDisplay(groupId,
 			articleId, version, ddmTemplateKey, viewMode, languageId, page,
-			xmlRequest, themeDisplay);
+			portletRequestModel, themeDisplay);
 	}
 
 	/**
@@ -1275,9 +1256,7 @@ public class JournalArticleLocalServiceWrapper
 	* @param articleId the primary key of the web content article
 	* @param version the web content article's version
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param viewMode the mode in which the web content is being viewed
 	* @param languageId the primary key of the language translation to get
 	* @param themeDisplay the theme display
@@ -1286,7 +1265,6 @@ public class JournalArticleLocalServiceWrapper
 	the current date/time
 	* @throws PortalException if a matching web content article or DDM template
 	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
@@ -1294,84 +1272,35 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
 		java.lang.String languageId,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleDisplay(groupId,
 			articleId, version, ddmTemplateKey, viewMode, languageId,
 			themeDisplay);
 	}
 
-	/**
-	* Returns a web content article display for the first page of the latest
-	* version of the web content article matching the group and article ID. If
-	* the article is template driven, web content transformation tokens are
-	* added from the theme display (if not <code>null</code>) or the XML
-	* request otherwise.
-	*
-	* @param groupId the primary key of the web content article's group
-	* @param articleId the primary key of the web content article
-	* @param viewMode the mode in which the web content is being viewed
-	* @param languageId the primary key of the language translation to get
-	* @param page the web content's page number
-	* @param xmlRequest the request that serializes the web content into a
-	hierarchical hash map
-	* @param themeDisplay the theme display
-	* @return the web content article display, or <code>null</code> if the
-	article has expired or if article's display date/time is after
-	the current date/time
-	* @throws PortalException if a matching web content article or DDM template
-	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		long groupId, java.lang.String articleId, java.lang.String viewMode,
-		java.lang.String languageId, int page, java.lang.String xmlRequest,
+		java.lang.String languageId, int page,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleDisplay(groupId,
-			articleId, viewMode, languageId, page, xmlRequest, themeDisplay);
+			articleId, viewMode, languageId, page, portletRequestModel,
+			themeDisplay);
 	}
 
-	/**
-	* Returns a web content article display for the specified page of the
-	* latest version of the web content article matching the group and article
-	* ID, optionally based on the DDM template if the article is template
-	* driven. If the article is template driven, web content transformation
-	* tokens are added from the theme display (if not <code>null</code>) or the
-	* XML request otherwise.
-	*
-	* @param groupId the primary key of the web content article's group
-	* @param articleId the primary key of the web content article
-	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
-	* @param viewMode the mode in which the web content is being viewed
-	* @param languageId the primary key of the language translation to get
-	* @param page the web content's page number
-	* @param xmlRequest the request that serializes the web content into a
-	hierarchical hash map
-	* @param themeDisplay the theme display
-	* @return the web content article display, or <code>null</code> if the
-	article has expired or if article's display date/time is after
-	the current date/time
-	* @throws PortalException if a matching web content article or DDM template
-	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		long groupId, java.lang.String articleId,
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
-		java.lang.String languageId, int page, java.lang.String xmlRequest,
+		java.lang.String languageId, int page,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleDisplay(groupId,
-			articleId, ddmTemplateKey, viewMode, languageId, page, xmlRequest,
-			themeDisplay);
+			articleId, ddmTemplateKey, viewMode, languageId, page,
+			portletRequestModel, themeDisplay);
 	}
 
 	/**
@@ -1384,9 +1313,7 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupId the primary key of the web content article's group
 	* @param articleId the primary key of the web content article
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param viewMode the mode in which the web content is being viewed
 	* @param languageId the primary key of the language translation to get
 	* @param themeDisplay the theme display
@@ -1395,7 +1322,6 @@ public class JournalArticleLocalServiceWrapper
 	the current date/time
 	* @throws PortalException if a matching web content article or DDM template
 	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
@@ -1403,8 +1329,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String ddmTemplateKey, java.lang.String viewMode,
 		java.lang.String languageId,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleDisplay(groupId,
 			articleId, ddmTemplateKey, viewMode, languageId, themeDisplay);
 	}
@@ -1425,15 +1350,13 @@ public class JournalArticleLocalServiceWrapper
 	the current date/time
 	* @throws PortalException if a matching web content article or DDM template
 	could not be found, or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticleDisplay getArticleDisplay(
 		long groupId, java.lang.String articleId, java.lang.String viewMode,
 		java.lang.String languageId,
 		com.liferay.portal.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getArticleDisplay(groupId,
 			articleId, viewMode, languageId, themeDisplay);
 	}
@@ -1442,11 +1365,9 @@ public class JournalArticleLocalServiceWrapper
 	* Returns all the web content articles present in the system.
 	*
 	* @return the web content articles present in the system
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles() {
 		return _journalArticleLocalService.getArticles();
 	}
 
@@ -1455,12 +1376,10 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param groupId the primary key of the web content article's group
 	* @return the web content articles belonging to the group
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId) {
 		return _journalArticleLocalService.getArticles(groupId);
 	}
 
@@ -1482,12 +1401,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param end the upper bound of the range of web content articles to
 	return (not inclusive)
 	* @return the range of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
-		long groupId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, int start, int end) {
 		return _journalArticleLocalService.getArticles(groupId, start, end);
 	}
 
@@ -1512,13 +1429,11 @@ public class JournalArticleLocalServiceWrapper
 	* @param obc the comparator to order the web content articles
 	* @return the range of matching web content articles ordered by the
 	comparator
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _journalArticleLocalService.getArticles(groupId, start, end, obc);
 	}
 
@@ -1528,12 +1443,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupId the primary key of the web content article's group
 	* @param folderId the primary key of the web content article folder
 	* @return the matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
-		long groupId, long folderId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, long folderId) {
 		return _journalArticleLocalService.getArticles(groupId, folderId);
 	}
 
@@ -1557,20 +1470,17 @@ public class JournalArticleLocalServiceWrapper
 	* @param end the upper bound of the range of web content articles to
 	return (not inclusive)
 	* @return the range of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
-		long groupId, long folderId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, long folderId, int start, int end) {
 		return _journalArticleLocalService.getArticles(groupId, folderId,
 			start, end);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
-		long groupId, long folderId, int status, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, long folderId, int status, int start, int end) {
 		return _journalArticleLocalService.getArticles(groupId, folderId,
 			status, start, end);
 	}
@@ -1598,13 +1508,11 @@ public class JournalArticleLocalServiceWrapper
 	articles
 	* @return the range of matching web content articles ordered by the
 	comparator
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
 		long groupId, long folderId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return _journalArticleLocalService.getArticles(groupId, folderId,
 			start, end, orderByComparator);
 	}
@@ -1615,19 +1523,24 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupId the primary key of the web content article's group
 	* @param articleId the primary key of the web content article
 	* @return the matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
-		long groupId, java.lang.String articleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, java.lang.String articleId) {
 		return _journalArticleLocalService.getArticles(groupId, articleId);
 	}
 
 	@Override
+	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticles(
+		long groupId, java.lang.String articleId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
+		return _journalArticleLocalService.getArticles(groupId, articleId,
+			start, end, orderByComparator);
+	}
+
+	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticlesByResourcePrimKey(
-		long resourcePrimKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long resourcePrimKey) {
 		return _journalArticleLocalService.getArticlesByResourcePrimKey(resourcePrimKey);
 	}
 
@@ -1637,12 +1550,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param smallImageId the primary key of the web content article's small
 	image
 	* @return the web content articles matching the small image ID
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getArticlesBySmallImageId(
-		long smallImageId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long smallImageId) {
 		return _journalArticleLocalService.getArticlesBySmallImageId(smallImageId);
 	}
 
@@ -1651,11 +1562,9 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param groupId the primary key of the web content article's group
 	* @return the number of web content articles belonging to the group
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getArticlesCount(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getArticlesCount(long groupId) {
 		return _journalArticleLocalService.getArticlesCount(groupId);
 	}
 
@@ -1665,19 +1574,21 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupId the primary key of the web content article's group
 	* @param folderId the primary key of the web content article's folder
 	* @return the number of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getArticlesCount(long groupId, long folderId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getArticlesCount(long groupId, long folderId) {
 		return _journalArticleLocalService.getArticlesCount(groupId, folderId);
 	}
 
 	@Override
-	public int getArticlesCount(long groupId, long folderId, int status)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getArticlesCount(long groupId, long folderId, int status) {
 		return _journalArticleLocalService.getArticlesCount(groupId, folderId,
 			status);
+	}
+
+	@Override
+	public int getArticlesCount(long groupId, java.lang.String articleId) {
+		return _journalArticleLocalService.getArticlesCount(groupId, articleId);
 	}
 
 	/**
@@ -1703,12 +1614,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param end the upper bound of the range of web content articles to
 	return (not inclusive)
 	* @return the range of matching web content articles ordered by article ID
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getCompanyArticles(
-		long companyId, double version, int status, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, double version, int status, int start, int end) {
 		return _journalArticleLocalService.getCompanyArticles(companyId,
 			version, status, start, end);
 	}
@@ -1735,12 +1644,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param end the upper bound of the range of web content articles to
 	return (not inclusive)
 	* @return the range of matching web content articles ordered by article ID
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getCompanyArticles(
-		long companyId, int status, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, int status, int start, int end) {
 		return _journalArticleLocalService.getCompanyArticles(companyId,
 			status, start, end);
 	}
@@ -1768,12 +1675,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param end the upper bound of the range of web content articles to
 	return (not inclusive)
 	* @return the number of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public int getCompanyArticlesCount(long companyId, double version,
-		int status, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int status, int start, int end) {
 		return _journalArticleLocalService.getCompanyArticlesCount(companyId,
 			version, status, start, end);
 	}
@@ -1787,11 +1692,9 @@ public class JournalArticleLocalServiceWrapper
 	information see {@link WorkflowConstants} for constants starting
 	with the "STATUS_" prefix.
 	* @return the number of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getCompanyArticlesCount(long companyId, int status)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getCompanyArticlesCount(long companyId, int status) {
 		return _journalArticleLocalService.getCompanyArticlesCount(companyId,
 			status);
 	}
@@ -1807,13 +1710,11 @@ public class JournalArticleLocalServiceWrapper
 	displayed
 	* @throws PortalException if no approved matching web content articles
 	could be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getDisplayArticle(
 		long groupId, java.lang.String articleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getDisplayArticle(groupId, articleId);
 	}
 
@@ -1828,21 +1729,18 @@ public class JournalArticleLocalServiceWrapper
 	article is currently displayed
 	* @throws PortalException if no approved matching web content articles
 	could be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getDisplayArticleByUrlTitle(
 		long groupId, java.lang.String urlTitle)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getDisplayArticleByUrlTitle(groupId,
 			urlTitle);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getIndexableArticlesByResourcePrimKey(
-		long resourcePrimKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long resourcePrimKey) {
 		return _journalArticleLocalService.getIndexableArticlesByResourcePrimKey(resourcePrimKey);
 	}
 
@@ -1855,13 +1753,11 @@ public class JournalArticleLocalServiceWrapper
 	preferring articles with approved workflow status
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getLatestArticle(
 		long resourcePrimKey)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestArticle(resourcePrimKey);
 	}
 
@@ -1878,13 +1774,11 @@ public class JournalArticleLocalServiceWrapper
 	status
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getLatestArticle(
 		long resourcePrimKey, int status)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestArticle(resourcePrimKey,
 			status);
 	}
@@ -1907,13 +1801,11 @@ public class JournalArticleLocalServiceWrapper
 	workflow status
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getLatestArticle(
 		long resourcePrimKey, int status, boolean preferApproved)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestArticle(resourcePrimKey,
 			status, preferApproved);
 	}
@@ -1926,13 +1818,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the latest matching web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getLatestArticle(
 		long groupId, java.lang.String articleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestArticle(groupId, articleId);
 	}
 
@@ -1948,13 +1838,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the latest matching web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getLatestArticle(
 		long groupId, java.lang.String articleId, int status)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestArticle(groupId, articleId,
 			status);
 	}
@@ -1975,13 +1863,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the latest matching web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getLatestArticle(
 		long groupId, java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestArticle(groupId, className,
 			classPK);
 	}
@@ -1998,13 +1884,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the latest matching web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle getLatestArticleByUrlTitle(
 		long groupId, java.lang.String urlTitle, int status)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestArticleByUrlTitle(groupId,
 			urlTitle, status);
 	}
@@ -2018,12 +1902,10 @@ public class JournalArticleLocalServiceWrapper
 	* @return the latest version number of the matching web content
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public double getLatestVersion(long groupId, java.lang.String articleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestVersion(groupId, articleId);
 	}
 
@@ -2039,13 +1921,10 @@ public class JournalArticleLocalServiceWrapper
 	* @return the latest version number of the matching web content
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public double getLatestVersion(long groupId, java.lang.String articleId,
-		int status)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		int status) throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getLatestVersion(groupId, articleId,
 			status);
 	}
@@ -2056,13 +1935,32 @@ public class JournalArticleLocalServiceWrapper
 	* @param groupId the primary key of the web content article's group
 	* @param folderId the primary key of the web content article folder
 	* @return the number of web content articles that are not recycled
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getNotInTrashArticlesCount(long groupId, long folderId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getNotInTrashArticlesCount(long groupId, long folderId) {
 		return _journalArticleLocalService.getNotInTrashArticlesCount(groupId,
 			folderId);
+	}
+
+	@Override
+	public com.liferay.portlet.journal.model.JournalArticle getOldestArticle(
+		long groupId, java.lang.String articleId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _journalArticleLocalService.getOldestArticle(groupId, articleId);
+	}
+
+	@Override
+	public com.liferay.portlet.journal.model.JournalArticle getOldestArticle(
+		long groupId, java.lang.String articleId, int status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _journalArticleLocalService.getOldestArticle(groupId, articleId,
+			status);
+	}
+
+	@Override
+	public com.liferay.portlet.journal.model.JournalArticle getPreviousApprovedArticle(
+		com.liferay.portlet.journal.model.JournalArticle article) {
+		return _journalArticleLocalService.getPreviousApprovedArticle(article);
 	}
 
 	/**
@@ -2073,12 +1971,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure
 	* @return the matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getStructureArticles(
-		long groupId, java.lang.String ddmStructureKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, java.lang.String ddmStructureKey) {
 		return _journalArticleLocalService.getStructureArticles(groupId,
 			ddmStructureKey);
 	}
@@ -2106,21 +2002,18 @@ public class JournalArticleLocalServiceWrapper
 	* @param obc the comparator to order the web content articles
 	* @return the range of matching web content articles ordered by the
 	comparator
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getStructureArticles(
 		long groupId, java.lang.String ddmStructureKey, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _journalArticleLocalService.getStructureArticles(groupId,
 			ddmStructureKey, start, end, obc);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getStructureArticles(
-		java.lang.String[] ddmStructureKeys)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String[] ddmStructureKeys) {
 		return _journalArticleLocalService.getStructureArticles(ddmStructureKeys);
 	}
 
@@ -2132,12 +2025,10 @@ public class JournalArticleLocalServiceWrapper
 	* @param ddmStructureKey the primary key of the web content article's DDM
 	structure
 	* @return the number of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public int getStructureArticlesCount(long groupId,
-		java.lang.String ddmStructureKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String ddmStructureKey) {
 		return _journalArticleLocalService.getStructureArticlesCount(groupId,
 			ddmStructureKey);
 	}
@@ -2147,16 +2038,12 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @return the matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getTemplateArticles(
-		long groupId, java.lang.String ddmTemplateKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, java.lang.String ddmTemplateKey) {
 		return _journalArticleLocalService.getTemplateArticles(groupId,
 			ddmTemplateKey);
 	}
@@ -2176,9 +2063,7 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param start the lower bound of the range of web content articles to
 	return
 	* @param end the upper bound of the range of web content articles to
@@ -2186,13 +2071,11 @@ public class JournalArticleLocalServiceWrapper
 	* @param obc the comparator to order the web content articles
 	* @return the range of matching web content articles ordered by the
 	comparator
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> getTemplateArticles(
 		long groupId, java.lang.String ddmTemplateKey, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _journalArticleLocalService.getTemplateArticles(groupId,
 			ddmTemplateKey, start, end, obc);
 	}
@@ -2203,16 +2086,12 @@ public class JournalArticleLocalServiceWrapper
 	*
 	* @param groupId the primary key of the web content article's group
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @return the number of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public int getTemplateArticlesCount(long groupId,
-		java.lang.String ddmTemplateKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String ddmTemplateKey) {
 		return _journalArticleLocalService.getTemplateArticlesCount(groupId,
 			ddmTemplateKey);
 	}
@@ -2220,8 +2099,7 @@ public class JournalArticleLocalServiceWrapper
 	@Override
 	public java.lang.String getUniqueUrlTitle(long groupId,
 		java.lang.String articleId, java.lang.String urlTitle)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.getUniqueUrlTitle(groupId,
 			articleId, urlTitle);
 	}
@@ -2233,11 +2111,9 @@ public class JournalArticleLocalServiceWrapper
 	* @param articleId the primary key of the web content article
 	* @return <code>true</code> if the specified web content article exists;
 	<code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public boolean hasArticle(long groupId, java.lang.String articleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public boolean hasArticle(long groupId, java.lang.String articleId) {
 		return _journalArticleLocalService.hasArticle(groupId, articleId);
 	}
 
@@ -2252,13 +2128,11 @@ public class JournalArticleLocalServiceWrapper
 	latest version; <code>false</code> otherwise
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean isLatestVersion(long groupId, java.lang.String articleId,
 		double version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.isLatestVersion(groupId, articleId,
 			version);
 	}
@@ -2277,15 +2151,22 @@ public class JournalArticleLocalServiceWrapper
 	latest version; <code>false</code> otherwise
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean isLatestVersion(long groupId, java.lang.String articleId,
 		double version, int status)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.isLatestVersion(groupId, articleId,
 			version, status);
+	}
+
+	@Override
+	public boolean isRenderable(
+		com.liferay.portlet.journal.model.JournalArticle article,
+		com.liferay.portal.kernel.portlet.PortletRequestModel portletRequestModel,
+		com.liferay.portal.theme.ThemeDisplay themeDisplay) {
+		return _journalArticleLocalService.isRenderable(article,
+			portletRequestModel, themeDisplay);
 	}
 
 	/**
@@ -2299,13 +2180,11 @@ public class JournalArticleLocalServiceWrapper
 	* @return the updated web content article, which was moved to a new folder
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle moveArticle(
 		long groupId, java.lang.String articleId, long newFolderId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.moveArticle(groupId, articleId,
 			newFolderId);
 	}
@@ -2331,7 +2210,6 @@ public class JournalArticleLocalServiceWrapper
 	Bin to a new folder
 	* @throws PortalException if a trashed web content article with the primary
 	key could not be found or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle moveArticleFromTrash(
@@ -2339,8 +2217,7 @@ public class JournalArticleLocalServiceWrapper
 		com.liferay.portlet.journal.model.JournalArticle article,
 		long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.moveArticleFromTrash(userId,
 			groupId, article, newFolderId, serviceContext);
 	}
@@ -2356,13 +2233,11 @@ public class JournalArticleLocalServiceWrapper
 	Bin
 	* @throws PortalException if the user did not have permission to move the
 	article to the Recycle Bin or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle moveArticleToTrash(
 		long userId, com.liferay.portlet.journal.model.JournalArticle article)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.moveArticleToTrash(userId, article);
 	}
 
@@ -2378,20 +2253,17 @@ public class JournalArticleLocalServiceWrapper
 	article was found
 	* @throws PortalException if the user did not have permission to move the
 	article to the Recycle Bin or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle moveArticleToTrash(
 		long userId, long groupId, java.lang.String articleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.moveArticleToTrash(userId, groupId,
 			articleId);
 	}
 
 	@Override
-	public void rebuildTree(long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void rebuildTree(long companyId) {
 		_journalArticleLocalService.rebuildTree(companyId);
 	}
 
@@ -2406,14 +2278,12 @@ public class JournalArticleLocalServiceWrapper
 	* @return the updated web content article with the locale removed
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle removeArticleLocale(
 		long groupId, java.lang.String articleId, double version,
 		java.lang.String languageId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.removeArticleLocale(groupId,
 			articleId, version, languageId);
 	}
@@ -2424,17 +2294,16 @@ public class JournalArticleLocalServiceWrapper
 	* @param userId the primary key of the user restoring the web content
 	article
 	* @param article the web content article
+	* @return the restored web content article from the Recycle Bin
 	* @throws PortalException if the web content article with the primary key
 	could not be found in the Recycle Bin, if the user did not have
 	permission to restore the article, or if a portal exception
 	occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle restoreArticleFromTrash(
 		long userId, com.liferay.portlet.journal.model.JournalArticle article)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.restoreArticleFromTrash(userId,
 			article);
 	}
@@ -2442,16 +2311,14 @@ public class JournalArticleLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> search(
 		long groupId, java.util.List<java.lang.Long> folderIds, int status,
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _journalArticleLocalService.search(groupId, folderIds, status,
 			start, end);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> search(
-		long groupId, long folderId, int status, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, long folderId, int status, int start, int end) {
 		return _journalArticleLocalService.search(groupId, folderId, status,
 			start, end);
 	}
@@ -2495,9 +2362,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param displayDateGT the date after which a matching web content
 	article's display date must be after (optionally
 	<code>null</code>)
@@ -2516,7 +2381,6 @@ public class JournalArticleLocalServiceWrapper
 	* @param obc the comparator to order the web content articles
 	* @return the range of matching web content articles ordered by the
 	comparator
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> search(
@@ -2525,8 +2389,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String type, java.lang.String ddmStructureKey,
 		java.lang.String ddmTemplateKey, java.util.Date displayDateGT,
 		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _journalArticleLocalService.search(companyId, groupId,
 			folderIds, classNameId, keywords, version, type, ddmStructureKey,
 			ddmTemplateKey, displayDateGT, displayDateLT, status, reviewDate,
@@ -2539,7 +2402,7 @@ public class JournalArticleLocalServiceWrapper
 	* article ID, title, description, and content, a DDM structure key
 	* parameter, a DDM template key parameter, and an AND operator switch. It
 	* is preferable to use the indexed version {@link #search(long, long, List,
-	* long, String, String, String, String, String, String, String, String,
+	* long, String, String, String, String, String, int, String, String,
 	* LinkedHashMap, boolean, int, int, Sort)} instead of this method wherever
 	* possible for performance reasons.
 	*
@@ -2576,9 +2439,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param displayDateGT the date after which a matching web content
 	article's display date must be after (optionally
 	<code>null</code>)
@@ -2600,7 +2461,6 @@ public class JournalArticleLocalServiceWrapper
 	* @param obc the comparator to order the web content articles
 	* @return the range of matching web content articles ordered by the
 	comparator
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> search(
@@ -2611,8 +2471,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
 		java.util.Date displayDateGT, java.util.Date displayDateLT, int status,
 		java.util.Date reviewDate, boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _journalArticleLocalService.search(companyId, groupId,
 			folderIds, classNameId, articleId, version, title, description,
 			content, type, ddmStructureKey, ddmTemplateKey, displayDateGT,
@@ -2683,7 +2542,6 @@ public class JournalArticleLocalServiceWrapper
 	* @param obc the comparator to order the web content articles
 	* @return the range of matching web content articles ordered by the
 	comparator
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> search(
@@ -2695,8 +2553,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String[] ddmTemplateKeys, java.util.Date displayDateGT,
 		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
 		boolean andOperator, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _journalArticleLocalService.search(companyId, groupId,
 			folderIds, classNameId, articleId, version, title, description,
 			content, type, ddmStructureKeys, ddmTemplateKeys, displayDateGT,
@@ -2732,9 +2589,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param keywords the keywords (space separated), which may occur in the
 	web content article ID, title, description, or content
 	(optionally <code>null</code>). If the keywords value is not
@@ -2748,7 +2603,6 @@ public class JournalArticleLocalServiceWrapper
 	* @param sort the field, type, and direction by which to sort (optionally
 	<code>null</code>)
 	* @return the matching web content articles ordered by <code>sort</code>
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portal.kernel.search.Hits search(long companyId,
@@ -2756,8 +2610,7 @@ public class JournalArticleLocalServiceWrapper
 		long classNameId, java.lang.String ddmStructureKey,
 		java.lang.String ddmTemplateKey, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.search.Sort sort)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end, com.liferay.portal.kernel.search.Sort sort) {
 		return _journalArticleLocalService.search(companyId, groupId,
 			folderIds, classNameId, ddmStructureKey, ddmTemplateKey, keywords,
 			params, start, end, sort);
@@ -2806,9 +2659,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param params the finder parameters (optionally <code>null</code>). Can
 	set parameter <code>"includeDiscussions"</code> to
 	<code>true</code> to search for the keywords in the web content
@@ -2822,45 +2673,62 @@ public class JournalArticleLocalServiceWrapper
 	* @param sort the field, type, and direction by which to sort (optionally
 	<code>null</code>)
 	* @return the matching web content articles ordered by <code>sort</code>
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portal.kernel.search.Hits search(long companyId,
 		long groupId, java.util.List<java.lang.Long> folderIds,
 		long classNameId, java.lang.String articleId, java.lang.String title,
 		java.lang.String description, java.lang.String content,
-		java.lang.String type, java.lang.String status,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		java.lang.String type, int status, java.lang.String ddmStructureKey,
+		java.lang.String ddmTemplateKey,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andSearch, int start, int end,
-		com.liferay.portal.kernel.search.Sort sort)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.search.Sort sort) {
 		return _journalArticleLocalService.search(companyId, groupId,
 			folderIds, classNameId, articleId, title, description, content,
 			type, status, ddmStructureKey, ddmTemplateKey, params, andSearch,
 			start, end, sort);
 	}
 
+	/**
+	* @deprecated As of 7.0.0, replaced by {@link #search(long, long, List,
+	long, String, String, String, String, String, int, String,
+	String, LinkedHashMap, boolean, int, int, Sort)}
+	*/
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.search.Hits search(long companyId,
+		long groupId, java.util.List<java.lang.Long> folderIds,
+		long classNameId, java.lang.String articleId, java.lang.String title,
+		java.lang.String description, java.lang.String content,
+		java.lang.String type, java.lang.String statusString,
+		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort) {
+		return _journalArticleLocalService.search(companyId, groupId,
+			folderIds, classNameId, articleId, title, description, content,
+			type, statusString, ddmStructureKey, ddmTemplateKey, params,
+			andSearch, start, end, sort);
+	}
+
 	@Override
 	public com.liferay.portal.kernel.search.Hits search(long groupId,
 		long userId, long creatorUserId, int status, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.search(groupId, userId,
 			creatorUserId, status, start, end);
 	}
 
 	@Override
 	public int searchCount(long groupId,
-		java.util.List<java.lang.Long> folderIds, int status)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.List<java.lang.Long> folderIds, int status) {
 		return _journalArticleLocalService.searchCount(groupId, folderIds,
 			status);
 	}
 
 	@Override
-	public int searchCount(long groupId, long folderId, int status)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int searchCount(long groupId, long folderId, int status) {
 		return _journalArticleLocalService.searchCount(groupId, folderId, status);
 	}
 
@@ -2891,9 +2759,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param displayDateGT the date after which a matching web content
 	article's display date must be after (optionally
 	<code>null</code>)
@@ -2906,7 +2772,6 @@ public class JournalArticleLocalServiceWrapper
 	* @param reviewDate the web content article's scheduled review date
 	(optionally <code>null</code>)
 	* @return the number of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public int searchCount(long companyId, long groupId,
@@ -2914,8 +2779,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String keywords, java.lang.Double version,
 		java.lang.String type, java.lang.String ddmStructureKey,
 		java.lang.String ddmTemplateKey, java.util.Date displayDateGT,
-		java.util.Date displayDateLT, int status, java.util.Date reviewDate)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.Date displayDateLT, int status, java.util.Date reviewDate) {
 		return _journalArticleLocalService.searchCount(companyId, groupId,
 			folderIds, classNameId, keywords, version, type, ddmStructureKey,
 			ddmTemplateKey, displayDateGT, displayDateLT, status, reviewDate);
@@ -2951,9 +2815,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param displayDateGT the date after which a matching web content
 	article's display date must be after (optionally
 	<code>null</code>)
@@ -2969,7 +2831,6 @@ public class JournalArticleLocalServiceWrapper
 	or just one field must match. Group, folder IDs, class name ID,
 	and status must all match their values.
 	* @return the number of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public int searchCount(long companyId, long groupId,
@@ -2979,8 +2840,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String content, java.lang.String type,
 		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
 		java.util.Date displayDateGT, java.util.Date displayDateLT, int status,
-		java.util.Date reviewDate, boolean andOperator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.Date reviewDate, boolean andOperator) {
 		return _journalArticleLocalService.searchCount(companyId, groupId,
 			folderIds, classNameId, articleId, version, title, description,
 			content, type, ddmStructureKey, ddmTemplateKey, displayDateGT,
@@ -3035,7 +2895,6 @@ public class JournalArticleLocalServiceWrapper
 	or just one field must match.  Group, folder IDs, class name ID,
 	and status must all match their values.
 	* @return the number of matching web content articles
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public int searchCount(long companyId, long groupId,
@@ -3046,8 +2905,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String[] ddmStructureKeys,
 		java.lang.String[] ddmTemplateKeys, java.util.Date displayDateGT,
 		java.util.Date displayDateLT, int status, java.util.Date reviewDate,
-		boolean andOperator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		boolean andOperator) {
 		return _journalArticleLocalService.searchCount(companyId, groupId,
 			folderIds, classNameId, articleId, version, title, description,
 			content, type, ddmStructureKeys, ddmTemplateKeys, displayDateGT,
@@ -3061,8 +2919,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String ddmTemplateKey, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		int start, int end, com.liferay.portal.kernel.search.Sort sort)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.searchJournalArticles(companyId,
 			groupId, folderIds, classNameId, ddmStructureKey, ddmTemplateKey,
 			keywords, params, start, end, sort);
@@ -3073,13 +2930,12 @@ public class JournalArticleLocalServiceWrapper
 		long companyId, long groupId, java.util.List<java.lang.Long> folderIds,
 		long classNameId, java.lang.String articleId, java.lang.String title,
 		java.lang.String description, java.lang.String content,
-		java.lang.String type, java.lang.String status,
-		java.lang.String ddmStructureKey, java.lang.String ddmTemplateKey,
+		java.lang.String type, int status, java.lang.String ddmStructureKey,
+		java.lang.String ddmTemplateKey,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andSearch, int start, int end,
 		com.liferay.portal.kernel.search.Sort sort)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.searchJournalArticles(companyId,
 			groupId, folderIds, classNameId, articleId, title, description,
 			content, type, status, ddmStructureKey, ddmTemplateKey, params,
@@ -3089,45 +2945,25 @@ public class JournalArticleLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portlet.journal.model.JournalArticle> searchJournalArticles(
 		long groupId, long userId, long creatorUserId, int status, int start,
-		int end)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		int end) throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.searchJournalArticles(groupId,
 			userId, creatorUserId, status, start, end);
 	}
 
-	/**
-	* Subscribes the user to notifications for the web content article matching
-	* the group, notifying him the instant versions of the article are created,
-	* deleted, or modified.
-	*
-	* @param userId the primary key of the user to subscribe
-	* @param groupId the primary key of the group
-	* @throws PortalException if a matching user or group could not be found
-	* @throws SystemException if a system exception occurred
-	*/
 	@Override
-	public void subscribe(long userId, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_journalArticleLocalService.subscribe(userId, groupId);
+	public void subscribeStructure(long groupId, long userId,
+		long ddmStructureId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_journalArticleLocalService.subscribeStructure(groupId, userId,
+			ddmStructureId);
 	}
 
-	/**
-	* Unsubscribes the user from notifications for the web content article
-	* matching the group.
-	*
-	* @param userId the primary key of the user to unsubscribe
-	* @param groupId the primary key of the group
-	* @throws PortalException if a matching user or subscription could not be
-	found
-	* @throws SystemException if a system exception occurred
-	*/
 	@Override
-	public void unsubscribe(long userId, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_journalArticleLocalService.unsubscribe(userId, groupId);
+	public void unsubscribeStructure(long groupId, long userId,
+		long ddmStructureId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_journalArticleLocalService.unsubscribeStructure(groupId, userId,
+			ddmStructureId);
 	}
 
 	/**
@@ -3162,7 +2998,6 @@ public class JournalArticleLocalServiceWrapper
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
 	occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateArticle(
@@ -3172,8 +3007,7 @@ public class JournalArticleLocalServiceWrapper
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String content, java.lang.String layoutUuid,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateArticle(userId, groupId,
 			folderId, articleId, version, titleMap, descriptionMap, content,
 			layoutUuid, serviceContext);
@@ -3201,9 +3035,7 @@ public class JournalArticleLocalServiceWrapper
 	structure, if the article is related to a DDM structure, or
 	<code>null</code> otherwise
 	* @param ddmTemplateKey the primary key of the web content article's DDM
-	template (optionally <code>null</code>). If the article is
-	related to a DDM structure, the template's structure must match
-	it.
+	template
 	* @param layoutUuid the unique string identifying the web content
 	article's display page
 	* @param displayDateMonth the month the web content article is set to
@@ -3264,7 +3096,6 @@ public class JournalArticleLocalServiceWrapper
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
 	occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateArticle(
@@ -3285,8 +3116,7 @@ public class JournalArticleLocalServiceWrapper
 		java.util.Map<java.lang.String, byte[]> images,
 		java.lang.String articleURL,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateArticle(userId, groupId,
 			folderId, articleId, version, titleMap, descriptionMap, content,
 			type, ddmStructureKey, ddmTemplateKey, layoutUuid,
@@ -3326,15 +3156,13 @@ public class JournalArticleLocalServiceWrapper
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
 	occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateArticle(
 		long userId, long groupId, long folderId, java.lang.String articleId,
 		double version, java.lang.String content,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateArticle(userId, groupId,
 			folderId, articleId, version, content, serviceContext);
 	}
@@ -3351,8 +3179,7 @@ public class JournalArticleLocalServiceWrapper
 		java.util.Locale locale, java.lang.String title,
 		java.lang.String description, java.lang.String content,
 		java.util.Map<java.lang.String, byte[]> images)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateArticleTranslation(groupId,
 			articleId, version, locale, title, description, content, images);
 	}
@@ -3377,7 +3204,6 @@ public class JournalArticleLocalServiceWrapper
 	* @throws PortalException if a user with the primary key or a matching web
 	content article could not be found, or if a portal exception
 	occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateArticleTranslation(
@@ -3386,8 +3212,7 @@ public class JournalArticleLocalServiceWrapper
 		java.lang.String description, java.lang.String content,
 		java.util.Map<java.lang.String, byte[]> images,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateArticleTranslation(groupId,
 			articleId, version, locale, title, description, content, images,
 			serviceContext);
@@ -3404,15 +3229,13 @@ public class JournalArticleLocalServiceWrapper
 	* @param assetTagNames the new asset tag names
 	* @param assetLinkEntryIds the primary keys of the new asset link entries
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void updateAsset(long userId,
 		com.liferay.portlet.journal.model.JournalArticle article,
 		long[] assetCategoryIds, java.lang.String[] assetTagNames,
 		long[] assetLinkEntryIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_journalArticleLocalService.updateAsset(userId, article,
 			assetCategoryIds, assetTagNames, assetLinkEntryIds);
 	}
@@ -3430,14 +3253,12 @@ public class JournalArticleLocalServiceWrapper
 	* @return the updated web content article
 	* @throws PortalException if a matching web content article could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateContent(
 		long groupId, java.lang.String articleId, double version,
 		java.lang.String content)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateContent(groupId, articleId,
 			version, content);
 	}
@@ -3452,8 +3273,6 @@ public class JournalArticleLocalServiceWrapper
 	information see {@link WorkflowConstants} for constants starting
 	with the "STATUS_" prefix.
 	* @param articleURL the web content article's accessible URL
-	* @param workflowContext the web content article's configured workflow
-	context
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, status date, and portlet preferences. With
 	respect to social activities, by setting the service context's
@@ -3461,20 +3280,20 @@ public class JournalArticleLocalServiceWrapper
 	com.liferay.portal.kernel.util.Constants#UPDATE}, the invocation
 	is considered a web content update activity; otherwise it is
 	considered a web content add activity.
+	* @param workflowContext the web content article's configured workflow
+	context
 	* @return the updated web content article
 	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateStatus(
 		long userId, com.liferay.portlet.journal.model.JournalArticle article,
 		int status, java.lang.String articleURL,
-		java.util.Map<java.lang.String, java.io.Serializable> workflowContext,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.service.ServiceContext serviceContext,
+		java.util.Map<java.lang.String, java.io.Serializable> workflowContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateStatus(userId, article,
-			status, articleURL, workflowContext, serviceContext);
+			status, articleURL, serviceContext, workflowContext);
 	}
 
 	/**
@@ -3496,15 +3315,13 @@ public class JournalArticleLocalServiceWrapper
 	* @return the updated web content article
 	* @throws PortalException if a matching web content article could not be
 	found or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateStatus(
 		long userId, long classPK, int status,
 		java.util.Map<java.lang.String, java.io.Serializable> workflowContext,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateStatus(userId, classPK,
 			status, workflowContext, serviceContext);
 	}
@@ -3529,7 +3346,6 @@ public class JournalArticleLocalServiceWrapper
 	* @return the updated web content article
 	* @throws PortalException if a matching web content article could not be
 	found or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.journal.model.JournalArticle updateStatus(
@@ -3537,8 +3353,7 @@ public class JournalArticleLocalServiceWrapper
 		int status, java.lang.String articleURL,
 		java.util.Map<java.lang.String, java.io.Serializable> workflowContext,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateStatus(userId, groupId,
 			articleId, version, status, articleURL, workflowContext,
 			serviceContext);
@@ -3557,12 +3372,10 @@ public class JournalArticleLocalServiceWrapper
 	old DDM template
 	* @param newDDMTemplateKey the primary key of the web content article's
 	new DDM template
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public void updateTemplateId(long groupId, long classNameId,
-		java.lang.String oldDDMTemplateKey, java.lang.String newDDMTemplateKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String oldDDMTemplateKey, java.lang.String newDDMTemplateKey) {
 		_journalArticleLocalService.updateTemplateId(groupId, classNameId,
 			oldDDMTemplateKey, newDDMTemplateKey);
 	}

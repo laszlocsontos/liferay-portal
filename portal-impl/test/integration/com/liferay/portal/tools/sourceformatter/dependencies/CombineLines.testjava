@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,18 +28,9 @@ public class CombineLines
 	}
 
 	public void method1(
-		String test1, String test2,
-		String test3, String test4) {
-
-		// These
-		// comments
-		// should
-		// all
-		// fit
-		// on
-		// one
-		// single
-		// line
+			String test1, String test2,
+			String test3, String test4)
+		throws Exception {
 
 		int i1 = 0;
 		int i2 = 0;

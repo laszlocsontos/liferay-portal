@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,14 +25,12 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
 @ProviderType
 public class ResourceTypePermissionFinderUtil {
 	public static java.util.List<com.liferay.portal.model.ResourceTypePermission> findByEitherScopeC_G_N(
-		long companyId, long groupId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long groupId, java.lang.String name) {
 		return getFinder().findByEitherScopeC_G_N(companyId, groupId, name);
 	}
 
 	public static java.util.List<com.liferay.portal.model.ResourceTypePermission> findByGroupScopeC_N_R(
-		long companyId, java.lang.String name, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, java.lang.String name, long roleId) {
 		return getFinder().findByGroupScopeC_N_R(companyId, name, roleId);
 	}
 

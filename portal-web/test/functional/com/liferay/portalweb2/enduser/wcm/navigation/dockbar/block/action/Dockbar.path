@@ -88,7 +88,7 @@
 <!--ADD_CONTENT_ADD_NEW_MENULIST-->
 <tr>
 	<td>ADD_CONTENT_ADD_NEW_MENULIST</td>
-	<td>//ul[@class='dropdown-menu ']/li/a[contains(.,'${key_assetType}')]/span</td>
+	<td>//ul[@class='dropdown-menu']/li/a[contains(.,'${key_assetType}')]/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -168,6 +168,57 @@
 <tr>
 	<td>ADD_PAGE_TYPE_PANEL_CHECKBOX_INPUT</td>
 	<td>//span[contains(.,'${key_componentOrPortletName}')]/../i[contains(@class,'tree-node-checkbox')]/input</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--PREVIEW-->
+<tr>
+	<td>PREVIEW</td>
+	<td>//a[@id='_145_previewPanel']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_AUTOSIZE</td>
+	<td>//li[@data-device='autosize']/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_SMARTPHONE</td>
+	<td>//li[@data-device='smartphone']/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_TABLET</td>
+	<td>//li[@data-device='tablet']/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_DESKTOP</td>
+	<td>//li[@data-device='desktop']/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_CUSTOM</td>
+	<td>//li[@data-device='custom']/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_CUSTOM_WIDTH_FIELD</td>
+	<td>//input[@id='_145_width']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_CUSTOM_HEIGHT_FIELD</td>
+	<td>//input[@id='_145_height']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PREVIEW_MESSAGE</td>
+	<td>//div[@id='_145_devicePreviewContainer']/div[@class='alert']</td>
 	<td></td>
 </tr>
 <tr>
@@ -340,9 +391,45 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--EDIT_SEO-->
+<tr>
+	<td>EDIT_SEO_HTML_TITLE</td>
+	<td>//div[@id='_145_titleContentBox']//li[contains(@class,'lfr-input-localized-default') and contains(@data-value,'${key_defaultSiteLanguageKey}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EDIT_SEO_META_TAGS_DESCRIPTION</td>
+	<td>//div[@id='_145_descriptionSEOContentBox']//li[contains(@class,'lfr-input-localized-default') and contains(@data-value,'${key_defaultSiteLanguageKey}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MY_SITES_SITE_NAME_1</td>
+	<td>xpath=(//span[@class='site-name'])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MY_SITES_SITE_NAME_2</td>
+	<td>xpath=(//span[@class='site-name'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MY_SITES_SITE_NAME_2</td>
+	<td>xpath=(//span[@class='site-name'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--ADMIN-->
 <tr>
 	<td>ADMIN</td>
+	<td>//li[@id='_145_adminLinks']/a</td>
+	<td>Admin Drop Down Button</td>
+</tr>
+<tr>
+	<td>ADMIN_LOCALIZED</td>
 	<td>//li[@id='_145_adminLinks']/a</td>
 	<td>Admin Drop Down Button</td>
 </tr>
@@ -368,7 +455,7 @@
 </tr>
 <tr>
 	<td>ADMIN_SITE_ADMINISTRATION_IMPERSONATE_USER_MESSAGE</td>
-	<td>//div[@class="alert alert-info"]</td>
+	<td>//div[@class='alert alert-info']</td>
 	<td></td>
 </tr>
 <tr>
@@ -382,6 +469,11 @@
 	<td>Configuration Navigation</td>
 </tr>
 <tr>
+	<td>ADMIN_SITE_ADMINISTRATION_CONFIGURATION_LOCALIZED</td>
+	<td>//li[@id='_145_adminLinks']/ul/li/ul/li/a[contains(.,'${key_localizedPortletCategoryName}')]</td>
+	<td>Configuration Navigation</td>
+</tr>
+<tr>
 	<td>ADMIN_SITE_ADMINISTRATION_CATEGORY</td>
 	<td>//li[@id='_145_adminLinks']/ul/li/ul/li/a[contains(.,' ${key_portletCategoryName}')]</td>
 	<td></td>
@@ -389,6 +481,11 @@
 <tr>
 	<td>ADMIN_CONTROL_PANEL</td>
 	<td>//li[@id='_145_adminLinks']/ul/li/a[contains(.,'Control Panel')]</td>
+	<td>Control Panel Navigation</td>
+</tr>
+<tr>
+	<td>ADMIN_CONTROL_PANEL_LOCALIZED</td>
+	<td>//li[@id='_145_adminLinks']/ul/li/a[contains(.,'${key_localizedControlPanel}')]</td>
 	<td>Control Panel Navigation</td>
 </tr>
 <tr>
@@ -415,6 +512,11 @@
 <tr>
 	<td>MY_SITES_SITE_NAME</td>
 	<td>//span[@class='site-name']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MY_SITES_SITE_NAME_2</td>
+	<td>//span[@class='site-name' and contains(.,'${key_siteName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -455,23 +557,33 @@
 </tr>
 <!--USER-->
 <tr>
+	<td>USER_AVATAR_IMAGE</td>
+	<td>//span[@class='user-avatar-image']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>USER_NAME</td>
 	<td>//span[@class='user-full-name']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>USER_MY_PROFILE</td>
-	<td>//span[contains(.,'My Profile')]</td>
+	<td>//a/span[contains(.,'My Profile')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>USER_MY_DASHBOARD</td>
-	<td>//span[contains(.,'My Dashboard')]</td>
+	<td>//a/span[contains(.,'My Dashboard')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>USER_MY_ACCOUNT</td>
 	<td>//a[@title='My Account']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_MY_ACCOUNT_LOCALIZED</td>
+	<td>//a[@title='${key_myAccount}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -482,6 +594,11 @@
 <tr>
 	<td>USER_SIGN_IN</td>
 	<td>//li[contains(@class,'sign-in')]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MY_SITES_SITE_NAME_1</td>
+	<td>//span[@class='site-name']</td>
 	<td></td>
 </tr>
 </tbody>

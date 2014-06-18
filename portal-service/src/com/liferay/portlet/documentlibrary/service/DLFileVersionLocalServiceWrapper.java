@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,12 +39,10 @@ public class DLFileVersionLocalServiceWrapper
 	*
 	* @param dlFileVersion the document library file version
 	* @return the document library file version that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion addDLFileVersion(
-		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion) {
 		return _dlFileVersionLocalService.addDLFileVersion(dlFileVersion);
 	}
 
@@ -66,13 +64,11 @@ public class DLFileVersionLocalServiceWrapper
 	* @param fileVersionId the primary key of the document library file version
 	* @return the document library file version that was removed
 	* @throws PortalException if a document library file version with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion deleteDLFileVersion(
 		long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.deleteDLFileVersion(fileVersionId);
 	}
 
@@ -81,12 +77,10 @@ public class DLFileVersionLocalServiceWrapper
 	*
 	* @param dlFileVersion the document library file version
 	* @return the document library file version that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion deleteDLFileVersion(
-		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion) {
 		return _dlFileVersionLocalService.deleteDLFileVersion(dlFileVersion);
 	}
 
@@ -100,13 +94,11 @@ public class DLFileVersionLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _dlFileVersionLocalService.dynamicQuery(dynamicQuery);
 	}
 
@@ -121,13 +113,12 @@ public class DLFileVersionLocalServiceWrapper
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return _dlFileVersionLocalService.dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,15 +134,13 @@ public class DLFileVersionLocalServiceWrapper
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return _dlFileVersionLocalService.dynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -161,12 +150,10 @@ public class DLFileVersionLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _dlFileVersionLocalService.dynamicQueryCount(dynamicQuery);
 	}
 
@@ -176,21 +163,18 @@ public class DLFileVersionLocalServiceWrapper
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return _dlFileVersionLocalService.dynamicQueryCount(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion fetchDLFileVersion(
-		long fileVersionId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long fileVersionId) {
 		return _dlFileVersionLocalService.fetchDLFileVersion(fileVersionId);
 	}
 
@@ -200,12 +184,10 @@ public class DLFileVersionLocalServiceWrapper
 	* @param uuid the document library file version's UUID
 	* @param companyId the primary key of the company
 	* @return the matching document library file version, or <code>null</code> if a matching document library file version could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion fetchDLFileVersionByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long companyId) {
 		return _dlFileVersionLocalService.fetchDLFileVersionByUuidAndCompanyId(uuid,
 			companyId);
 	}
@@ -216,12 +198,10 @@ public class DLFileVersionLocalServiceWrapper
 	* @param uuid the document library file version's UUID
 	* @param groupId the primary key of the group
 	* @return the matching document library file version, or <code>null</code> if a matching document library file version could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion fetchDLFileVersionByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long groupId) {
 		return _dlFileVersionLocalService.fetchDLFileVersionByUuidAndGroupId(uuid,
 			groupId);
 	}
@@ -232,21 +212,39 @@ public class DLFileVersionLocalServiceWrapper
 	* @param fileVersionId the primary key of the document library file version
 	* @return the document library file version
 	* @throws PortalException if a document library file version with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getDLFileVersion(
 		long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.getDLFileVersion(fileVersionId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _dlFileVersionLocalService.getActionableDynamicQuery();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		return _dlFileVersionLocalService.getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _dlFileVersionLocalService.deletePersistedModel(persistedModel);
 	}
 
 	@Override
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.getPersistedModel(primaryKeyObj);
 	}
 
@@ -257,13 +255,11 @@ public class DLFileVersionLocalServiceWrapper
 	* @param companyId the primary key of the company
 	* @return the matching document library file version
 	* @throws PortalException if a matching document library file version could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getDLFileVersionByUuidAndCompanyId(
 		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.getDLFileVersionByUuidAndCompanyId(uuid,
 			companyId);
 	}
@@ -275,13 +271,11 @@ public class DLFileVersionLocalServiceWrapper
 	* @param groupId the primary key of the group
 	* @return the matching document library file version
 	* @throws PortalException if a matching document library file version could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getDLFileVersionByUuidAndGroupId(
 		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.getDLFileVersionByUuidAndGroupId(uuid,
 			groupId);
 	}
@@ -296,12 +290,10 @@ public class DLFileVersionLocalServiceWrapper
 	* @param start the lower bound of the range of document library file versions
 	* @param end the upper bound of the range of document library file versions (not inclusive)
 	* @return the range of document library file versions
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileVersion> getDLFileVersions(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _dlFileVersionLocalService.getDLFileVersions(start, end);
 	}
 
@@ -309,11 +301,9 @@ public class DLFileVersionLocalServiceWrapper
 	* Returns the number of document library file versions.
 	*
 	* @return the number of document library file versions
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getDLFileVersionsCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getDLFileVersionsCount() {
 		return _dlFileVersionLocalService.getDLFileVersionsCount();
 	}
 
@@ -322,12 +312,10 @@ public class DLFileVersionLocalServiceWrapper
 	*
 	* @param dlFileVersion the document library file version
 	* @return the document library file version that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion updateDLFileVersion(
-		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion) {
 		return _dlFileVersionLocalService.updateDLFileVersion(dlFileVersion);
 	}
 
@@ -354,37 +342,32 @@ public class DLFileVersionLocalServiceWrapper
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getFileVersion(
 		long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.getFileVersion(fileVersionId);
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getFileVersion(
 		long fileEntryId, java.lang.String version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.getFileVersion(fileEntryId, version);
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getFileVersionByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long groupId) {
 		return _dlFileVersionLocalService.getFileVersionByUuidAndGroupId(uuid,
 			groupId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileVersion> getFileVersions(
-		long fileEntryId, int status)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long fileEntryId, int status) {
 		return _dlFileVersionLocalService.getFileVersions(fileEntryId, status);
 	}
 
 	@Override
-	public int getFileVersionsCount(long fileEntryId, int status)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getFileVersionsCount(long fileEntryId, int status) {
 		return _dlFileVersionLocalService.getFileVersionsCount(fileEntryId,
 			status);
 	}
@@ -392,8 +375,7 @@ public class DLFileVersionLocalServiceWrapper
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getLatestFileVersion(
 		long fileEntryId, boolean excludeWorkingCopy)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.getLatestFileVersion(fileEntryId,
 			excludeWorkingCopy);
 	}
@@ -401,15 +383,13 @@ public class DLFileVersionLocalServiceWrapper
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getLatestFileVersion(
 		long userId, long fileEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileVersionLocalService.getLatestFileVersion(userId,
 			fileEntryId);
 	}
 
 	@Override
-	public void rebuildTree(long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void rebuildTree(long companyId) {
 		_dlFileVersionLocalService.rebuildTree(companyId);
 	}
 

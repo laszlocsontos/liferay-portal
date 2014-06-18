@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -94,13 +94,9 @@ public class LuceneIndexer implements Runnable {
 		catch (InterruptedException ie) {
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isInfoEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		try {
 			LuceneHelperUtil.delete(_companyId);
@@ -153,13 +149,9 @@ public class LuceneIndexer implements Runnable {
 	}
 
 	protected void reindex(Indexer indexer) throws Exception {
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isInfoEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Reindexing with " + indexer.getClass() + " started");

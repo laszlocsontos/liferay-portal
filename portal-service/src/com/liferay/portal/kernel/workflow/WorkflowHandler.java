@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,10 +15,10 @@
 package com.liferay.portal.kernel.workflow;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.model.WorkflowDefinitionLink;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 
@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -37,24 +39,43 @@ import javax.portlet.RenderResponse;
  * @author Juan Fernández
  * @author Julio Camarero
  */
-public interface WorkflowHandler {
+public interface WorkflowHandler<T> {
 
 	public AssetRenderer getAssetRenderer(long classPK)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public AssetRendererFactory getAssetRendererFactory();
 
 	public String getClassName();
 
+	public String getIconCssClass();
+
 	public String getIconPath(LiferayPortletRequest liferayPortletRequest);
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(long,
+	 *             PortletRequest, PortletResponse)}
+	 */
+	@Deprecated
 	public String getSummary(long classPK, Locale locale);
+
+	public String getSummary(
+		long classPK, PortletRequest portletRequest,
+		PortletResponse portletResponse);
 
 	public String getTitle(long classPK, Locale locale);
 
 	public String getType(Locale locale);
 
 	public PortletURL getURLEdit(
+		long classPK, LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse);
+
+	public String getURLEditWorkflowTask(
+			long workflowTaskId, ServiceContext serviceContext)
+		throws PortalException;
+
+	public PortletURL getURLViewDiffs(
 		long classPK, LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse);
 
@@ -65,7 +86,7 @@ public interface WorkflowHandler {
 
 	public WorkflowDefinitionLink getWorkflowDefinitionLink(
 			long companyId, long groupId, long classPK)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public boolean isAssetTypeSearchable();
 
@@ -78,12 +99,11 @@ public interface WorkflowHandler {
 		RenderResponse renderResponse, String template);
 
 	public void startWorkflowInstance(
-			long companyId, long groupId, long userId, long classPK,
-			Object model, Map<String, Serializable> workflowContext)
-		throws PortalException, SystemException;
+			long companyId, long groupId, long userId, long classPK, T model,
+			Map<String, Serializable> workflowContext)
+		throws PortalException;
 
-	public Object updateStatus(
-			int status, Map<String, Serializable> workflowContext)
-		throws PortalException, SystemException;
+	public T updateStatus(int status, Map<String, Serializable> workflowContext)
+		throws PortalException;
 
 }

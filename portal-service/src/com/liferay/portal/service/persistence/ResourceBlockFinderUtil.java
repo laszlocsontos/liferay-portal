@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,8 +25,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
 @ProviderType
 public class ResourceBlockFinderUtil {
 	public static com.liferay.portal.security.permission.ResourceBlockIdsBag findByC_G_N_R(
-		long companyId, long groupId, java.lang.String name, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long groupId, java.lang.String name, long[] roleIds) {
 		return getFinder().findByC_G_N_R(companyId, groupId, name, roleIds);
 	}
 

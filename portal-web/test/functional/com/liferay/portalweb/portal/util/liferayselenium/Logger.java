@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,8 +52,8 @@ public class Logger {
 
 		WebDriver.Window window = options.window();
 
-		window.setPosition(new Point(1000, 50));
-		window.setSize(new Dimension(850, 1250));
+		window.setPosition(new Point(1050, 45));
+		window.setSize(new Dimension(850, 950));
 
 		_javascriptExecutor = (JavascriptExecutor)_webDriver;
 
@@ -124,8 +124,8 @@ public class Logger {
 		log("descriptionLog", sb.toString(), "descriptionLog");
 	}
 
-	public void logError(
-		Method method, Object[] arguments, Throwable throwable) {
+	public void logError(Method method, Object[] arguments, Throwable throwable)
+		throws Exception {
 
 		send("", "fail");
 
@@ -182,6 +182,39 @@ public class Logger {
 
 		log("actionCommandLog", sb.toString(), "selenium");
 
+		_liferaySelenium.saveScreenshot();
+
+		_screenshotCount++;
+
+		sb = new StringBundler();
+
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("<img alt=\"");
+		sb.append(_screenshotCount);
+		sb.append("\" height=\"450\" src=\"screenshots/");
+		sb.append(_screenshotCount);
+		sb.append(".jpg\" width=\"630\" />");
+		sb.append("<br />");
+
+		log("descriptionLog", sb.toString(), "descriptionLog");
+
+		log("errorLog", sb.toString(), "errorLog");
+
+		WebElement webElement = _webDriver.findElement(By.id("pauseError"));
+
+		String webElementText = webElement.getText();
+
+		while (webElementText.equals("Disable Pause After Error")) {
+			webElement = _webDriver.findElement(By.id("pauseError"));
+
+			webElementText = webElement.getText();
+
+			Thread.sleep(1000);
+		}
+
 		sb = new StringBundler();
 
 		sb.append("Command failure \"");
@@ -228,17 +261,20 @@ public class Logger {
 		log("descriptionLog", sb.toString(), "descriptionLog");
 	}
 
-	public void logScreenShots(Object[] arguments) throws Exception {
+	public void logScreenShots() throws Exception {
 		StringBundler sb = new StringBundler();
 
 		_screenshotCount++;
 
-		sb.append("<br />");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;");
 		sb.append("<img alt=\"");
 		sb.append(_screenshotCount);
-		sb.append("\" height=\"750\" src=\"screenshots/");
+		sb.append("\" height=\"450\" src=\"screenshots/");
 		sb.append(_screenshotCount);
-		sb.append(".jpg\" width=\"1050\" />");
+		sb.append(".jpg\" width=\"630\" />");
 		sb.append("<br />");
 
 		log("descriptionLog", sb.toString(), "descriptionLog");
@@ -357,7 +393,7 @@ public class Logger {
 			_liferaySelenium.getPrimaryTestSuiteName();
 
 		String htmlFileName =
-			_TEST_BASEDIR + "/test/functional-generated/" +
+			_TEST_BASE_DIR_NAME + "/test/functional-generated/" +
 				StringUtil.replace(primaryTestSuiteName, ".", "/") + ".html";
 
 		if (_loggerStarted) {
@@ -369,9 +405,9 @@ public class Logger {
 		}
 		else {
 			_webDriver.get(
-				"file:///" + _TEST_BASEDIR + "/test/functional/com/liferay/" +
-					"portalweb/portal/util/liferayselenium/dependencies/" +
-						"Logger.html");
+				"file:///" + _TEST_BASE_DIR_NAME + "/test/functional/com/" +
+					"liferay/portalweb/portal/util/liferayselenium/" +
+						"dependencies/Logger.html");
 		}
 
 		_loggerStarted = true;
@@ -387,7 +423,7 @@ public class Logger {
 					"outerHTML;");
 
 			String fileName =
-				_TEST_BASEDIR + "/test-results/functional/report.html";
+				_TEST_BASE_DIR_NAME + "/test-results/functional/report.html";
 
 			File file = new File(fileName);
 
@@ -607,7 +643,8 @@ public class Logger {
 		_javascriptExecutor.executeScript(sb.toString());
 	}
 
-	private static final String _TEST_BASEDIR = TestPropsValues.TEST_BASEDIR;
+	private static final String _TEST_BASE_DIR_NAME =
+		TestPropsValues.TEST_BASE_DIR_NAME;
 
 	private int _actionCount;
 	private int _actionStepCount = 1;

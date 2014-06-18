@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,13 +15,14 @@
 package com.liferay.portlet.journal.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFolder;
-import com.liferay.portlet.journal.util.JournalTestUtil;
+import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +45,6 @@ public class JournalArticleLocalServiceTreeTest {
 		for (int i = _articles.size() - 1; i >= 0; i--) {
 			JournalArticleLocalServiceUtil.deleteArticle(_articles.get(i));
 		}
-
-		JournalFolderLocalServiceUtil.deleteFolder(_folder);
 	}
 
 	@Test
@@ -72,7 +71,7 @@ public class JournalArticleLocalServiceTreeTest {
 	protected void createTree() throws Exception {
 		JournalArticle articleA = JournalTestUtil.addArticle(
 			TestPropsValues.getGroupId(), "Article A",
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 
 		_articles.add(articleA);
 
@@ -81,12 +80,14 @@ public class JournalArticleLocalServiceTreeTest {
 
 		JournalArticle articleAA = JournalTestUtil.addArticle(
 			TestPropsValues.getGroupId(), _folder.getFolderId(), "Article AA",
-			ServiceTestUtil.randomString());
+			RandomTestUtil.randomString());
 
 		_articles.add(articleAA);
 	}
 
 	private List<JournalArticle> _articles = new ArrayList<JournalArticle>();
+
+	@DeleteAfterTestRun
 	private JournalFolder _folder;
 
 }

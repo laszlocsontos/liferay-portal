@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.BaseUpgradePortletPreferences;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -33,8 +35,6 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
 import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.portlet.journal.model.JournalStructure;
-import com.liferay.portlet.journal.model.JournalTemplate;
 import com.liferay.portlet.journal.util.JournalConverterUtil;
 
 import java.sql.Connection;
@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
@@ -96,7 +97,9 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 			ps.setString(11, ddmStructureKey);
 			ps.setString(12, name);
 			ps.setString(13, description);
-			ps.setString(14, JournalConverterUtil.getDDMXSD(xsd));
+			ps.setString(
+				14,
+				JournalConverterUtil.getDDMXSD(xsd, getDefaultLocale(name)));
 			ps.setString(15, storageType);
 			ps.setInt(16, type);
 
@@ -254,6 +257,12 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 		return ddmStructureId;
 	}
 
+	protected Locale getDefaultLocale(String xml) {
+		String defaultLanguageId = LocalizationUtil.getDefaultLanguageId(xml);
+
+		return LocaleUtil.fromLanguageId(defaultLanguageId);
+	}
+
 	@Override
 	protected String[] getPortletIds() {
 		return new String[] {
@@ -366,7 +375,8 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 					name, description, xsd);
 
 				updateResourcePermission(
-					companyId, JournalStructure.class.getName(),
+					companyId,
+					"com.liferay.portlet.journal.model.JournalStructure",
 					DDMStructure.class.getName(), id_, ddmStructureId);
 
 				_ddmStructureIds.put(
@@ -422,7 +432,8 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 					name, description, xsd);
 
 				updateResourcePermission(
-					companyId, JournalStructure.class.getName(),
+					companyId,
+					"com.liferay.portlet.journal.model.JournalStructure",
 					DDMStructure.class.getName(), id_, ddmStructureId);
 
 				_ddmStructureIds.put(
@@ -485,7 +496,8 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 					cacheable, smallImage, smallImageId, smallImageURL);
 
 				updateResourcePermission(
-					companyId, JournalTemplate.class.getName(),
+					companyId,
+					"com.liferay.portlet.journal.model.JournalTemplate",
 					DDMTemplate.class.getName(), id_, ddmTemplateId);
 			}
 		}

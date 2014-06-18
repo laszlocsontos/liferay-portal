@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,25 +19,13 @@
 <%@ include file="/html/taglib/taglib-init.jsp" %>
 
 <%
-Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("aui:input:dynamicAttributes");
-Map<String, Object> scopedAttributes = (Map<String, Object>)request.getAttribute("aui:input:scopedAttributes");
-
-Map<String, Object> _options = new HashMap<String, Object>();
-
-if ((scopedAttributes != null) && !scopedAttributes.isEmpty()) {
-	_options.putAll(scopedAttributes);
-}
-
-if ((dynamicAttributes != null) && !dynamicAttributes.isEmpty()) {
-	_options.putAll(dynamicAttributes);
-}
-
 boolean autoFocus = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:autoFocus")));
 boolean autoSize = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:autoSize")));
 java.lang.Object bean = (java.lang.Object)request.getAttribute("aui:input:bean");
 boolean changesContext = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:changesContext")));
 boolean checked = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:checked")));
 long classPK = GetterUtil.getLong(String.valueOf(request.getAttribute("aui:input:classPK")));
+long classTypePK = GetterUtil.getLong(String.valueOf(request.getAttribute("aui:input:classTypePK")), -1);
 java.lang.String cssClass = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:cssClass"));
 java.util.Map data = (java.util.Map)request.getAttribute("aui:input:data");
 java.lang.String dateTogglerCheckboxLabel = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:dateTogglerCheckboxLabel"));
@@ -48,15 +36,15 @@ java.lang.String fieldParam = GetterUtil.getString((java.lang.String)request.get
 boolean first = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:first")));
 java.lang.String formName = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:formName"));
 java.lang.String helpMessage = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:helpMessage"));
-java.lang.String helpTextCssClass = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:helpTextCssClass"), "add-on");
+java.lang.String helpTextCssClass = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:helpTextCssClass"), "input-group-addon");
 java.lang.String id = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:id"));
 boolean ignoreRequestValue = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:ignoreRequestValue")));
-boolean includeHiddenField = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:includeHiddenField")), true);
 boolean inlineField = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:inlineField")));
 java.lang.String inlineLabel = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:inlineLabel"));
 java.lang.String label = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:label"));
 java.lang.String languageId = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:languageId"));
 boolean last = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:last")));
+boolean localized = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:localized")));
 java.lang.Number max = GetterUtil.getNumber(String.valueOf(request.getAttribute("aui:input:max")), null);
 java.lang.Class<?> model = (java.lang.Class<?>)request.getAttribute("aui:input:model");
 java.lang.Number min = GetterUtil.getNumber(String.valueOf(request.getAttribute("aui:input:min")), null);
@@ -75,54 +63,8 @@ java.lang.String type = GetterUtil.getString((java.lang.String)request.getAttrib
 boolean useNamespace = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:useNamespace")), true);
 java.lang.Object value = (java.lang.Object)request.getAttribute("aui:input:value");
 java.lang.String wrapperCssClass = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:wrapperCssClass"));
-
-_updateOptions(_options, "autoFocus", autoFocus);
-_updateOptions(_options, "autoSize", autoSize);
-_updateOptions(_options, "bean", bean);
-_updateOptions(_options, "changesContext", changesContext);
-_updateOptions(_options, "checked", checked);
-_updateOptions(_options, "classPK", classPK);
-_updateOptions(_options, "cssClass", cssClass);
-_updateOptions(_options, "data", data);
-_updateOptions(_options, "dateTogglerCheckboxLabel", dateTogglerCheckboxLabel);
-_updateOptions(_options, "defaultLanguageId", defaultLanguageId);
-_updateOptions(_options, "disabled", disabled);
-_updateOptions(_options, "field", field);
-_updateOptions(_options, "fieldParam", fieldParam);
-_updateOptions(_options, "first", first);
-_updateOptions(_options, "formName", formName);
-_updateOptions(_options, "helpMessage", helpMessage);
-_updateOptions(_options, "helpTextCssClass", helpTextCssClass);
-_updateOptions(_options, "id", id);
-_updateOptions(_options, "ignoreRequestValue", ignoreRequestValue);
-_updateOptions(_options, "includeHiddenField", includeHiddenField);
-_updateOptions(_options, "inlineField", inlineField);
-_updateOptions(_options, "inlineLabel", inlineLabel);
-_updateOptions(_options, "label", label);
-_updateOptions(_options, "languageId", languageId);
-_updateOptions(_options, "last", last);
-_updateOptions(_options, "max", max);
-_updateOptions(_options, "model", model);
-_updateOptions(_options, "min", min);
-_updateOptions(_options, "multiple", multiple);
-_updateOptions(_options, "name", name);
-_updateOptions(_options, "onChange", onChange);
-_updateOptions(_options, "onClick", onClick);
-_updateOptions(_options, "placeholder", placeholder);
-_updateOptions(_options, "prefix", prefix);
-_updateOptions(_options, "required", required);
-_updateOptions(_options, "resizable", resizable);
-_updateOptions(_options, "showRequiredLabel", showRequiredLabel);
-_updateOptions(_options, "suffix", suffix);
-_updateOptions(_options, "title", title);
-_updateOptions(_options, "type", type);
-_updateOptions(_options, "useNamespace", useNamespace);
-_updateOptions(_options, "value", value);
-_updateOptions(_options, "wrapperCssClass", wrapperCssClass);
+Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("aui:input:dynamicAttributes");
+Map<String, Object> scopedAttributes = (Map<String, Object>)request.getAttribute("aui:input:scopedAttributes");
 %>
 
 <%@ include file="/html/taglib/aui/input/init-ext.jspf" %>
-
-<%!
-private static final String _NAMESPACE = "aui:input:";
-%>

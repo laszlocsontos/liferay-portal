@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.wiki.trash;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
@@ -29,7 +28,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.PortletURLFactoryUtil;
-import com.liferay.portlet.trash.DuplicateEntryException;
+import com.liferay.portlet.trash.RestoreEntryException;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.wiki.asset.WikiNodeTrashRenderer;
 import com.liferay.portlet.wiki.model.WikiNode;
@@ -52,9 +51,9 @@ import javax.portlet.PortletURL;
 public class WikiNodeTrashHandler extends BaseTrashHandler {
 
 	@Override
-	public void checkDuplicateTrashEntry(
+	public void checkRestorableEntry(
 			TrashEntry trashEntry, long containerModelId, String newName)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		WikiNode node = WikiNodeLocalServiceUtil.getNode(
 			trashEntry.getClassPK());
@@ -69,20 +68,19 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 			node.getGroupId(), originalTitle);
 
 		if (duplicateNode != null) {
-			DuplicateEntryException dee = new DuplicateEntryException();
+			RestoreEntryException ree = new RestoreEntryException(
+				RestoreEntryException.DUPLICATE);
 
-			dee.setDuplicateEntryId(duplicateNode.getNodeId());
-			dee.setOldName(duplicateNode.getName());
-			dee.setTrashEntryId(trashEntry.getEntryId());
+			ree.setDuplicateEntryId(duplicateNode.getNodeId());
+			ree.setOldName(duplicateNode.getName());
+			ree.setTrashEntryId(trashEntry.getEntryId());
 
-			throw dee;
+			throw ree;
 		}
 	}
 
 	@Override
-	public void deleteTrashEntry(long classPK)
-		throws PortalException, SystemException {
-
+	public void deleteTrashEntry(long classPK) throws PortalException {
 		WikiNodeLocalServiceUtil.deleteNode(classPK);
 	}
 
@@ -94,7 +92,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	@Override
 	public String getRestoreContainedModelLink(
 			PortletRequest portletRequest, long classPK)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		WikiNode node = WikiNodeLocalServiceUtil.getNode(classPK);
 
@@ -108,7 +106,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	@Override
 	public String getRestoreContainerModelLink(
 			PortletRequest portletRequest, long classPK)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletURL portletURL = getRestoreURL(portletRequest, classPK, true);
 
@@ -131,9 +129,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public int getTrashContainedModelsCount(long classPK)
-		throws SystemException {
-
+	public int getTrashContainedModelsCount(long classPK) {
 		return WikiPageLocalServiceUtil.getPagesCount(
 			classPK, true, WorkflowConstants.STATUS_IN_TRASH);
 	}
@@ -141,7 +137,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	@Override
 	public List<TrashRenderer> getTrashContainedModelTrashRenderers(
 			long classPK, int start, int end)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<TrashRenderer> trashRenderers = new ArrayList<TrashRenderer>();
 
@@ -163,18 +159,14 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public TrashEntry getTrashEntry(long classPK)
-		throws PortalException, SystemException {
-
+	public TrashEntry getTrashEntry(long classPK) throws PortalException {
 		WikiNode node = WikiNodeLocalServiceUtil.getNode(classPK);
 
 		return node.getTrashEntry();
 	}
 
 	@Override
-	public TrashRenderer getTrashRenderer(long classPK)
-		throws PortalException, SystemException {
-
+	public TrashRenderer getTrashRenderer(long classPK) throws PortalException {
 		WikiNode node = WikiNodeLocalServiceUtil.getNode(classPK);
 
 		return new WikiNodeTrashRenderer(node);
@@ -186,9 +178,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public boolean isInTrash(long classPK)
-		throws PortalException, SystemException {
-
+	public boolean isInTrash(long classPK) throws PortalException {
 		WikiNode node = WikiNodeLocalServiceUtil.getNode(classPK);
 
 		return node.isInTrash();
@@ -196,7 +186,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 
 	@Override
 	public void restoreTrashEntry(long userId, long classPK)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		WikiNode node = WikiNodeLocalServiceUtil.getNode(classPK);
 
@@ -204,9 +194,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
-	public void updateTitle(long classPK, String name)
-		throws PortalException, SystemException {
-
+	public void updateTitle(long classPK, String name) throws PortalException {
 		WikiNode node = WikiNodeLocalServiceUtil.getNode(classPK);
 
 		node.setName(name);
@@ -217,7 +205,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	protected PortletURL getRestoreURL(
 			PortletRequest portletRequest, long classPK,
 			boolean isContainerModel)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String portletId = PortletKeys.WIKI;
 
@@ -252,7 +240,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	@Override
 	protected boolean hasPermission(
 			PermissionChecker permissionChecker, long classPK, String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return WikiNodePermission.contains(
 			permissionChecker, classPK, actionId);

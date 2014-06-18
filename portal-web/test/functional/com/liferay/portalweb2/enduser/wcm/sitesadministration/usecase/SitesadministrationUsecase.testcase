@@ -1,4 +1,6 @@
 <definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="WCM" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -13,6 +15,8 @@
 		<execute macro="Team#tearDownCP" />
 
 		<execute macro="Page#tearDownPG" />
+
+		<execute macro="UserGroup#tearDownCP" />
 	</tear-down>
 
 	<command name="AddOrganizationSitesAndDeactivate" priority="5">
@@ -203,7 +207,7 @@
 			<var name="siteURL" value="true" />
 		</execute>
 
-		<execute action="Home#assertTextEquals" locator-key1="ERROR_MESSAGE_ALERT_INFO" value1="This site is inactive. Please contact the administrator." />
+		<execute action="Home#assertTextEquals" locator-key1="STATUS_MESSAGE" value1="This site is inactive. Please contact the administrator." />
 
 		<execute macro="User#firstLoginPG">
 			<var name="password" value="test" />
@@ -234,7 +238,7 @@
 			<var name="siteScopeName" value="${site1Name}" />
 		</execute>
 
-		<execute action="CPSitesettings#select" locator-key1="APPLICATION_ADAPTER_SELECT" value1="Sample Application Adapter EE Hook" />
+		<execute action="CPSitesettings#select" locator-key1="APPLICATION_ADAPTER_SELECT" value1="Sample Application Adapter Hook" />
 		<execute action="CPSitesettings#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 
 		<execute macro="Page#gotoCP">
@@ -298,7 +302,7 @@
 			<var name="siteScopeName" value="${site2Name}" />
 		</execute>
 
-		<execute action="CPSitesettings#select" locator-key1="APPLICATION_ADAPTER_SELECT" value1="Sample Application Adapter EE Hook" />
+		<execute action="CPSitesettings#select" locator-key1="APPLICATION_ADAPTER_SELECT" value1="Sample Application Adapter Hook" />
 		<execute action="CPSitesettings#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 
 		<execute macro="Page#gotoPG">
@@ -328,6 +332,326 @@
 		<var name="key_portletName" value="Navigation" />
 
 		<execute action="PGNavigation#assertTextNotPresent" locator-key1="PORTLET_BODY" value1="This was modified by the Sample Application Adapter." />
+	</command>
+
+	<command name="MySitesDropDownDoesNotShowUserOrganizationOnTop" priority="4">
+		<var name="siteNameLists" value="Site1 Name,Site2 Name,Site3 Name,Site4 Name,Site5 Name,Site6 Name,Site7 Name,Site8 Name,Site9 Name,Site10 Name" />
+
+		<for list="${siteNameLists}" param="siteNameListsCount" >
+
+			<execute macro="Page#gotoCP">
+				<var name="portletName" value="Sites" />
+			</execute>
+
+			<execute macro="Site#addCommunityCP">
+				<var name="siteName" value="${siteNameListsCount}" />
+			</execute>
+		</for>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addCP">
+			<var name="orgName" value="Site Organization Name" />
+			<var name="orgType" value="Regular Organization" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addSiteCP">
+			<var name="organizationSite" value="Community Site" />
+			<var name="orgName" value="Site Organization Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="Organization#addMemberCP">
+			<var name="orgName" value="Site Organization Name" />
+			<var name="userFirstName" value="Test" />
+			<var name="userLastName" value="Test" />
+			<var name="userScreenName" value="test" />
+		</execute>
+
+		<execute macro="Dockbar#viewMySitesDropDownSiteName">
+			<var name="siteName" value="Site Organization Name" />
+		</execute>
+	</command>
+
+	<command name="PrivateVirtualHostUrlDoesNotRedirectUserToLoginPage" priority="5">
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+		</execute>
+
+		<execute macro="Site#addVirtualHostsURLCP">
+			<var name="privatePageVirtualHostURL" value="www.able.com" />
+			<var name="privateVirtualHosts" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoPagesCP">
+			<var name="portletName" value="Site Pages" />
+		</execute>
+
+		<execute macro="SitePage#addCP">
+			<var name="sitePageName" value="Private Page" />
+			<var name="sitePagePrivacy" value="Private" />
+			<var name="siteScopeSelected" value="true" />
+		</execute>
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="Page#openURL">
+			<var name="virtualHostsURL" value="http://www.able.com:8080/private-page" />
+		</execute>
+
+		<execute macro="Site#viewPrivateVirtaulHostUrlUserLoginRedirect">
+			<var name="userEmailAddress" value="@liferay.com" />
+		</execute>
+
+		<execute macro="User#loginUserPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editUserSiteCP">
+			<var name="siteName" value="Liferay" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="virtualHostsURL" value="http://www.able.com:8080/private-page" />
+		</execute>
+
+		<execute action="Home#assertLocation" value1="http://www.able.com:8080/private-page" />
+		<execute action="Home#assertTextEquals" locator-key1="BREADCRUMB_1" value1="Private Page" />
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+	</command>
+
+	<command name="SiteFriendlyURLLayoutImporter" priority="3">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="User Groups" />
+		</execute>
+
+		<execute macro="UserGroup#addCP">
+			<var name="userGroupName" value="User Group Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="User Groups" />
+		</execute>
+
+		<execute macro="UserGroup#addPageCP">
+			<var name="sitePageName" value="site Page Name" />
+			<var name="sitePagePrivacy" value="Public" />
+			<var name="userGroupName" value="User Group Name" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="User Groups" />
+		</execute>
+
+		<execute macro="UserGroup#assignMemberCP">
+			<var name="userGroupName" value="User Group Name" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute action="Home#assertConsoleTextNotPresent" value1="Error" />
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Page#gotoMyDashboard" />
+
+		<execute action="Home#assertLocation" value1="http://localhost:8080/user/usersn/home" />
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Site Page Name" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+		</execute>
+
+		<execute macro="Site#editFriendlyURLCP">
+			<var name="siteFriendlyURLEdit" value="liferay" />
+		</execute>
+
+		<execute action="Home#open" locator1="http://localhost:8080/web/liferay/site-page-name" />
+
+		<execute action="Home#assertLocation" value1="http://localhost:8080/web/liferay/site-page-name" />
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Liferay" />
+		</execute>
+
+		<execute macro="Site#editFriendlyURLCP">
+			<var name="siteFriendlyURLEdit" value="guest" />
+		</execute>
+	</command>
+
+	<command name="SitesDeactivated" priority="3">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site1 Name" />
+		</execute>
+
+		<execute macro="Site#selectPageType">
+			<var name="selectPublicPages" value="true" />
+			<var name="siteTemplate" value="Community Site" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site2 Name" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site2 Name" />
+		</execute>
+
+		<execute macro="Site#editCP">
+			<var name="siteName" value="Site2 Name" />
+			<var name="siteNameEdit" value="Site2 Name Edit" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editUserSiteCP">
+			<var name="siteName" value="Site1 Name" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="SitePage#viewDefaultSiteTemplatePagesPG">
+			<var name="siteName" value="Site1 Name" />
+			<var name="siteTemplate" value="Community" />
+		</execute>
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site1 Name" />
+		</execute>
+
+		<execute macro="Site#inactivateCP">
+			<var name="siteName" value="Site1 Name" />
+		</execute>
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Page#openURL">
+			<var name="siteName" value="Site1 Name" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute action="Home#assertTextEquals" locator-key1="ERROR_MESSAGE_ALERT_INFO" value1="This site is inactive. Please contact the administrator." />
+
+		<execute macro="User#firstLoginPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
 	</command>
 
 	<command name="SiteTeams" priority="4">
@@ -644,6 +968,35 @@
 		<execute macro="User#firstLoginPG">
 			<var name="password" value="test" />
 			<var name="userEmailAddress" value="test@liferay.com" />
+		</execute>
+	</command>
+
+	<command name="SiteTeamsXSS" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="Site Teams" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Team#addCP">
+			<var name="teamDescription"><![CDATA[<script>alert(123)</script>]]></var>
+			<var name="teamName"><![CDATA[<script>alert(123)</script>]]></var>
+		</execute>
+
+		<execute macro="Page#gotoConfigurationCP">
+			<var name="portletName" value="Site Settings" />
+			<var name="siteScopeName" value="Site Name" />
+		</execute>
+
+		<execute macro="Site#assignDefaultSiteTeam">
+			<var name="teamName"><![CDATA[<script>alert(123)</script>]]></var>
 		</execute>
 	</command>
 </definition>

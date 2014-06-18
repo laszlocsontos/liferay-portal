@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -81,7 +81,14 @@ if (useDialog && Validator.isNull(data.get("title"))) {
 }
 
 if (Validator.isNull(method)) {
-	method = "post";
+	int pos = url.indexOf("p_p_lifecycle=0");
+
+	if (pos != -1) {
+		method = "get";
+	}
+	else {
+		method = "post";
+	}
 }
 
 boolean auiImage = (image != null) && image.startsWith(_AUI_PATH);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.layoutsadmin.action;
 
+import com.liferay.portal.LARFileNameException;
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.ExportImportDateUtil;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
@@ -76,7 +76,7 @@ public class ExportLayoutsAction extends PortletAction {
 		}
 
 		try {
-			long groupId = ParamUtil.getLong(actionRequest, "groupId");
+			long groupId = ParamUtil.getLong(actionRequest, "liveGroupId");
 			boolean privateLayout = ParamUtil.getBoolean(
 				actionRequest, "privateLayout");
 			long[] layoutIds = getLayoutIds(actionRequest);
@@ -84,34 +84,37 @@ public class ExportLayoutsAction extends PortletAction {
 				actionRequest, groupId, privateLayout, 0, null,
 				ExportImportDateUtil.RANGE_ALL);
 
-			String fileName = LanguageUtil.get(
-				actionRequest.getLocale(), "public-pages");
+			String taskName = StringPool.BLANK;
 
 			if (privateLayout) {
-				fileName = LanguageUtil.get(
+				taskName = LanguageUtil.get(
 					actionRequest.getLocale(), "private-pages");
 			}
-
-			fileName = fileName + StringPool.DASH + Time.getShortTimestamp();
+			else {
+				taskName = LanguageUtil.get(
+					actionRequest.getLocale(), "public-pages");
+			}
 
 			LayoutServiceUtil.exportLayoutsAsFileInBackground(
-				fileName, groupId, privateLayout, layoutIds,
+				taskName, groupId, privateLayout, layoutIds,
 				actionRequest.getParameterMap(), dateRange.getStartDate(),
-				dateRange.getEndDate(), fileName);
+				dateRange.getEndDate());
 
 			String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 		catch (Exception e) {
-			_log.error(e, e);
-
 			SessionErrors.add(actionRequest, e.getClass());
 
-			String pagesRedirect = ParamUtil.getString(
-				actionRequest, "pagesRedirect");
+			if (!(e instanceof LARFileNameException)) {
+				_log.error(e, e);
 
-			sendRedirect(actionRequest, actionResponse, pagesRedirect);
+				String pagesRedirect = ParamUtil.getString(
+					actionRequest, "pagesRedirect");
+
+				sendRedirect(actionRequest, actionResponse, pagesRedirect);
+			}
 		}
 	}
 

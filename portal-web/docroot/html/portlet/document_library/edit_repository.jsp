@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,7 +62,7 @@ long folderId = ParamUtil.getLong(request, "folderId");
 				<aui:select id="repositoryTypes" label="repository-type" name="className">
 
 					<%
-					for (String dlRepositoryImpl : RepositoryFactoryUtil.getRepositoryClassNames()) {
+					for (String dlRepositoryImpl : ExternalRepositoryFactoryUtil.getExternalRepositoryClassNames()) {
 					%>
 
 						<aui:option label="<%= HtmlUtil.escape(ResourceActionsUtil.getModelResource(locale, dlRepositoryImpl)) %>" value="<%= HtmlUtil.escapeAttribute(dlRepositoryImpl) %>" />
@@ -133,7 +133,7 @@ long folderId = ParamUtil.getLong(request, "folderId");
 <div class="hide" id="<portlet:namespace />settingsSupported">
 
 	<%
-	for (String dlRepositoryImpl : RepositoryFactoryUtil.getRepositoryClassNames()) {
+	for (String dlRepositoryImpl : ExternalRepositoryFactoryUtil.getExternalRepositoryClassNames()) {
 		String className = HtmlUtil.escapeAttribute(dlRepositoryImpl.substring(dlRepositoryImpl.lastIndexOf(StringPool.PERIOD) + 1));
 
 		long classNameId = PortalUtil.getClassNameId(dlRepositoryImpl);
