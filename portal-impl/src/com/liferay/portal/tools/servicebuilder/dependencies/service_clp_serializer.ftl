@@ -151,20 +151,27 @@ public class ClpSerializer {
 				<#if entity.hasColumns()>
 					if (oldModelClassName.equals("${packagePath}.model.impl.${entity.name}Impl")) {
 						return translateOutput${entity.name}(oldModel);
-					} else if (oldModelClassName.endsWith("Clp")) {
-						try {						
-							Class<?> originalClpSerializerClass = (Class<?>) oldModelClass.getMethod("getClpSerializerClass").invoke(oldModel);
-						
-							ClassLoader currentClassLoader = ClpSerializer.class.getClassLoader(); 
-							
-							Class<?> newClpSerializerClass = (Class<?>) currentClassLoader.loadClass(originalClpSerializerClass.getName());
-									
-							String remoteModelGetterName = "get" + oldModel.getModelClass().getSimpleName() + "RemoteModel";
-						
-							Object remoteModel = oldModelClass.getMethod(remoteModelGetterName).invoke(oldModel);
-							
-							BaseModel<?> newModel = (BaseModel<?>) newClpSerializerClass.getMethod("translateOutput", BaseModel.class).invoke(null, remoteModel);
-							
+					}
+					else if (oldModelClassName.endsWith("Clp")) {
+						try {
+							Method getClpSerializerClassMethod = oldModelClass.getMethod("getClpSerializerClass");
+
+							Class<?> originalClpSerializerClass = (Class<?>)getClpSerializerClassMethod.invoke(oldModel);
+
+							ClassLoader classLoader = ClpSerializer.class.getClassLoader();
+
+							Class<?> oldModelModelClass = (Class<?>)oldModel.getModelClass();
+
+							Method getMethod = oldModelClass.getMethod("get" + oldModelModelClass.getSimpleName() + "RemoteModel");
+
+							Object remoteModel = getMethod.invoke(oldModel);
+
+							Class<?> newClpSerializerClass = classLoader.loadClass(originalClpSerializerClass.getName());
+
+							Method translateOutputMethod = newClpSerializerClass.getMethod("translateOutput", BaseModel.class);
+
+							BaseModel<?> newModel = (BaseModel<?>)translateOutputMethod.invoke(null, remoteModel);
+
 							return newModel;
 						}
 						catch (Throwable t) {
