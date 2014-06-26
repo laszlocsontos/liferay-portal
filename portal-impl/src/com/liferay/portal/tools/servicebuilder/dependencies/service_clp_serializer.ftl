@@ -160,7 +160,9 @@ public class ClpSerializer {
 
 							ClassLoader classLoader = ClpSerializer.class.getClassLoader();
 
-							Method getMethod = oldModelClass.getMethod("get" + oldModelClass.getSimpleName() + "RemoteModel");
+							Class<?> oldModelModelClass = (Class<?>)oldModel.getModelClass();
+
+							Method getMethod = oldModelClass.getMethod("get" + oldModelModelClass.getSimpleName() + "RemoteModel");
 
 							Object remoteModel = getMethod.invoke(oldModel);
 
