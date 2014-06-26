@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -114,9 +114,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 				if ((question != null) && ((i - 1) < choices.size())) {
 					choice = (PollsChoice)choices.get(i - 1);
 				}
-				else {
-					choice = new PollsChoiceImpl();
-				}
 			%>
 
 				<div class="choice <%= (i == choicesCount) ? "last-choice" : StringPool.BLANK %>">
@@ -158,12 +155,12 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 
 <aui:script>
 	function <portlet:namespace />addPollChoice() {
+		document.<portlet:namespace />fm.<portlet:namespace />choicesCount.value = '<%= choicesCount + 1 %>';
+
 		<liferay-portlet:actionURL allowEmptyParam="<%= true %>" var="addPollChoiceURL">
 			<liferay-portlet:param name="struts_action" value="/polls/edit_question" />
 			<liferay-portlet:param name="<%= EditQuestionAction.CHOICE_DESCRIPTION_PREFIX + (char)(96 + choicesCount + 1) %>" value="" />
 		</liferay-portlet:actionURL>
-
-		document.<portlet:namespace />fm.<portlet:namespace />choicesCount.value = '<%= choicesCount + 1 %>';
 
 		submitForm(document.<portlet:namespace />fm, '<%= addPollChoiceURL %>');
 	}
@@ -176,7 +173,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	}
 
 	function <portlet:namespace />saveQuestion() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (question == null) ? Constants.ADD : Constants.UPDATE %>";
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (question == null) ? Constants.ADD : Constants.UPDATE %>';
 
 		submitForm(document.<portlet:namespace />fm);
 	}
@@ -185,9 +182,9 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 <%
 if (question != null) {
 	PortalUtil.addPortletBreadcrumbEntry(request, question.getTitle(locale), null);
-	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "edit"), currentURL);
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
 }
 else {
-	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "add-poll"), currentURL);
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-poll"), currentURL);
 }
 %>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,8 +21,11 @@ import java.util.Map;
  */
 public class FunctionConverter extends BaseConverter {
 
-	public FunctionConverter(SeleniumBuilderContext seleniumBuilderContext) {
-		super(seleniumBuilderContext);
+	public FunctionConverter(
+		SeleniumBuilderContext seleniumBuilderContext,
+		SeleniumBuilderFileUtil seleniumBuilderFileUtil) {
+
+		super(seleniumBuilderContext, seleniumBuilderFileUtil);
 	}
 
 	public void convert(String functionName) throws Exception {

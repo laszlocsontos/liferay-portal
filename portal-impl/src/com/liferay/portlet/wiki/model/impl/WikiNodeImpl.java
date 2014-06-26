@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portlet.wiki.model.impl;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.model.Repository;
@@ -39,9 +38,7 @@ public class WikiNodeImpl extends WikiNodeBaseImpl {
 	}
 
 	@Override
-	public Folder addAttachmentsFolder()
-		throws PortalException, SystemException {
-
+	public Folder addAttachmentsFolder() throws PortalException {
 		if (_attachmentsFolderId !=
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 
@@ -68,7 +65,7 @@ public class WikiNodeImpl extends WikiNodeBaseImpl {
 	}
 
 	@Override
-	public long getAttachmentsFolderId() throws SystemException {
+	public long getAttachmentsFolderId() {
 		if (_attachmentsFolderId !=
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 
@@ -103,7 +100,7 @@ public class WikiNodeImpl extends WikiNodeBaseImpl {
 	}
 
 	@Override
-	public List<FileEntry> getDeletedAttachmentsFiles() throws SystemException {
+	public List<FileEntry> getDeletedAttachmentsFiles() {
 		List<WikiPage> wikiPages = WikiPageLocalServiceUtil.getPages(
 			getNodeId(), true, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,7 +51,7 @@ else {
 }
 %>
 
-<liferay-ui:icon-menu>
+<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
 	<c:if test="<%= !defaultParentCategory && MBCategoryPermission.contains(permissionChecker, category, ActionKeys.UPDATE) %>">
 		<portlet:renderURL var="editURL">
 			<portlet:param name="struts_action" value="/message_boards/edit_category" />
@@ -60,7 +60,8 @@ else {
 		</portlet:renderURL>
 
 		<liferay-ui:icon
-			image="edit"
+			iconCssClass="icon-edit"
+			message="edit"
 			url="<%= editURL %>"
 		/>
 
@@ -71,7 +72,7 @@ else {
 		</portlet:renderURL>
 
 		<liferay-ui:icon
-			image="submit"
+			iconCssClass="icon-move"
 			message="move"
 			url="<%= moveURL %>"
 		/>
@@ -87,7 +88,8 @@ else {
 		/>
 
 		<liferay-ui:icon
-			image="permissions"
+			iconCssClass="icon-lock"
+			message="permissions"
 			method="get"
 			url="<%= permissionsURL %>"
 			useDialog="<%= true %>"
@@ -131,7 +133,7 @@ else {
 		}
 		%>
 
-		<c:if test="<%= hasSubscriptionPermission && (MBUtil.getEmailMessageAddedEnabled(groupPortletSettings) || MBUtil.getEmailMessageUpdatedEnabled(groupPortletSettings)) %>">
+		<c:if test="<%= hasSubscriptionPermission && (mbSettings.isEmailMessageAddedEnabled() || mbSettings.isEmailMessageUpdatedEnabled()) %>">
 			<c:choose>
 				<c:when test="<%= (categorySubscriptionClassPKs != null) && categorySubscriptionClassPKs.contains(categorySubscriptionClassPK) %>">
 					<portlet:actionURL var="unsubscribeURL">
@@ -142,7 +144,8 @@ else {
 					</portlet:actionURL>
 
 					<liferay-ui:icon
-						image="unsubscribe"
+						iconCssClass="icon-remove-sign"
+						message="unsubscribe"
 						url="<%= unsubscribeURL %>"
 					/>
 				</c:when>
@@ -155,7 +158,8 @@ else {
 					</portlet:actionURL>
 
 					<liferay-ui:icon
-						image="subscribe"
+						iconCssClass="icon-ok-sign"
+						message="subscribe"
 						url="<%= subscribeURL %>"
 					/>
 				</c:otherwise>

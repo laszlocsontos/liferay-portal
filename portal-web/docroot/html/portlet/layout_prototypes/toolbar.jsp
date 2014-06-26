@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,12 +21,12 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem");
 %>
 
 <aui:nav-bar>
-	<aui:nav>
-		<portlet:renderURL var="viewLayoutPrototypesURL">
-			<portlet:param name="struts_action" value="/layout_prototypes/view" />
-		</portlet:renderURL>
-
+	<aui:nav cssClass="navbar-nav">
 		<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_LAYOUT_PROTOTYPE) %>">
+			<portlet:renderURL var="viewLayoutPrototypesURL">
+				<portlet:param name="struts_action" value="/layout_prototypes/view" />
+			</portlet:renderURL>
+
 			<portlet:renderURL var="addLayoutPrototypeURL">
 				<portlet:param name="struts_action" value="/layout_prototypes/edit_layout_prototype" />
 				<portlet:param name="redirect" value="<%= viewLayoutPrototypesURL %>" />

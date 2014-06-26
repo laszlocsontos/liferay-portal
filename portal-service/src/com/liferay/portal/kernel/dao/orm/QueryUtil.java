@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.RandomUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -226,7 +225,7 @@ public class QueryUtil {
 		}
 
 		if (unmodifiable) {
-			return new UnmodifiableList<Object>(list);
+			return Collections.unmodifiableList(list);
 		}
 		else {
 			return list;
@@ -283,7 +282,7 @@ public class QueryUtil {
 		}
 
 		if (unmodifiable) {
-			return new UnmodifiableList<Object>(list);
+			return Collections.unmodifiableList(list);
 		}
 		else {
 			return list;

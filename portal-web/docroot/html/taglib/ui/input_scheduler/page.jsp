@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -88,13 +88,13 @@
 
 <aui:script>
 	function <portlet:namespace />showTable(id) {
-		document.getElementById("<portlet:namespace />neverTable").style.display = "none";
-		document.getElementById("<portlet:namespace />dailyTable").style.display = "none";
-		document.getElementById("<portlet:namespace />weeklyTable").style.display = "none";
-		document.getElementById("<portlet:namespace />monthlyTable").style.display = "none";
-		document.getElementById("<portlet:namespace />yearlyTable").style.display = "none";
+		document.getElementById('<portlet:namespace />neverTable').style.display = 'none';
+		document.getElementById('<portlet:namespace />dailyTable').style.display = 'none';
+		document.getElementById('<portlet:namespace />weeklyTable').style.display = 'none';
+		document.getElementById('<portlet:namespace />monthlyTable').style.display = 'none';
+		document.getElementById('<portlet:namespace />yearlyTable').style.display = 'none';
 
-		document.getElementById(id).style.display = "block";
+		document.getElementById(id).style.display = 'block';
 	}
 
 	Liferay.Util.toggleRadio('<portlet:namespace />schedulerEndBy', '<portlet:namespace />schedulerEndDateType');

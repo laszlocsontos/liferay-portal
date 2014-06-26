@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -187,6 +187,60 @@ public class ArrayUtilTest {
 
 		Assert.assertFalse(ArrayUtil.contains(array, brian));
 		Assert.assertTrue(ArrayUtil.contains(array, julio));
+	}
+
+	@Test
+	public void testCountStringArray() {
+		String[] array = {"a", "b", "c"};
+
+		PredicateFilter<String> predicateFilter =
+			new PredicateFilter<String>() {
+
+				@Override
+				public boolean filter(String string) {
+					if (string.equals("b")) {
+						return true;
+					}
+
+					return false;
+				}
+
+			};
+
+		Assert.assertEquals(1, ArrayUtil.count(array, predicateFilter));
+	}
+
+	@Test
+	public void testCountStringEmptyArray() {
+		String[] array = {};
+
+		PredicateFilter<String> predicateFilter =
+			new PredicateFilter<String>() {
+
+				@Override
+				public boolean filter(String string) {
+					return true;
+				}
+			};
+
+		Assert.assertEquals(0, ArrayUtil.count(array, predicateFilter));
+	}
+
+	@Test
+	public void testCountStringNullArray() {
+		String[] array = null;
+
+		PredicateFilter<String> predicateFilter =
+			new PredicateFilter<String>() {
+
+				@Override
+				public boolean filter(String string) {
+					return true;
+				}
+
+			};
+
+		Assert.assertEquals(0, ArrayUtil.count(array, predicateFilter));
 	}
 
 	@Test

@@ -40,7 +40,7 @@
 </tr>
 <tr>
 	<td>HEADER_TITLE</td>
-	<td>//h3[@class='header-title']</td>
+	<td>//h3[@class='header-title']/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -132,6 +132,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>RECORD_TABLE_GUEST_VIEW_LINK</td>
+	<td>//a[contains(.,'View')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -154,12 +159,12 @@
 </tr>
 <tr>
 	<td>TOOLBAR_SELECT_LIST</td>
-	<td>//span[contains(@class,'lfr-icon-action-configuration')]/a[contains(.,'Select List')]</td>
+	<td>//span[contains(@class,'lfr-icon-action')]/a[contains(.,'Select List')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>TOOLBAR_ADD_LIST</td>
-	<td>//span[contains(@class,'lfr-icon-action-add')]/a[contains(.,'Add List')]</td>
+	<td>//span[contains(@class,'lfr-icon-action')]/a[contains(.,'Add List')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -181,6 +186,27 @@
 <tr>
 	<td>RECORD_MENULIST_DELETE</td>
 	<td>//a[@role='menuitem' and contains(.,'Delete')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--SPREADSHEET_EDIT_CONTROLS-->
+<tr>
+	<td>SPREADSHEET_EDIT_CONTROLS_ADD_ROWS_BUTTON</td>
+	<td>//button[contains(.,'Add')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SPREADSHEET_EDIT_CONTROLS_ADD_ROWS_SELECT_MENULIST</td>
+	<td>//label[contains(.,'More rows at bottom.')]/../select</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 </tbody>

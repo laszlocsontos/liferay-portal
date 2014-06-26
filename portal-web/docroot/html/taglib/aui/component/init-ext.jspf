@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,7 @@
 <%
 Map<String, Object> jsonifiedOptions = (Map<String, Object>)request.getAttribute("aui:component:jsonifiedOptions");
 
-Object render = String.valueOf(_options.get("render"));
+Object render = String.valueOf(AUIUtil.getAttribute(request, "aui:component:", "render"));
 
 if (Validator.isNull(render)) {
 	render = true;

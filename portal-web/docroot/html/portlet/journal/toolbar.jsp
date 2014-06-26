@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,73 +18,78 @@
 
 <%
 String strutsAction = ParamUtil.getString(request, "struts_action");
+
+long folderId = GetterUtil.getLong((String)liferayPortletRequest.getAttribute("view.jsp-folderId"));
+
+PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+portletURL.setParameter("struts_action", "/journal/view");
+portletURL.setParameter("folderId", String.valueOf(folderId));
 %>
 
-<aui:nav-bar>
-	<aui:nav collapsible="<%= false %>" cssClass="nav-display-style-buttons pull-right" id="displayStyleButtons">
-		<aui:nav-item>
-			<span class="pull-left display-style-buttons-container" id="<portlet:namespace />displayStyleButtonsContainer">
-				<c:if test='<%= !strutsAction.equals("/journal/search") %>'>
-					<liferay-util:include page="/html/portlet/journal/display_style_buttons.jsp" />
-				</c:if>
-			</span>
-		</aui:nav-item>
-	</aui:nav>
+<aui:form action="<%= portletURL.toString() %>" method="post" name="fm1" onSubmit="event.preventDefault();">
+	<aui:nav-bar>
+		<aui:nav collapsible="<%= true %>" cssClass="nav-display-style-buttons navbar-nav" icon="th-list" id="displayStyleButtons">
+			<c:if test='<%= !strutsAction.equals("/journal/search") %>'>
+				<liferay-util:include page="/html/portlet/journal/display_style_buttons.jsp" />
+			</c:if>
+		</aui:nav>
 
-	<aui:nav id="toolbarContainer">
-		<aui:nav-item cssClass="hide" dropdown="<%= true %>" id="actionsButtonContainer" label="actions">
-
-			<%
-			String taglibURL = "javascript:Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + Constants.EXPIRE + "'}); void(0);";
-			%>
-
-			<aui:nav-item href="<%= taglibURL %>" label="expire" />
-
-			<%
-			taglibURL = "javascript:Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + Constants.MOVE + "'}); void(0);";
-			%>
-
-			<aui:nav-item href="<%= taglibURL %>" label="move" />
-
-			<%
-			taglibURL = "javascript:" + renderResponse.getNamespace() + "deleteEntries();";
-			%>
-
-			<aui:nav-item href="<%= taglibURL %>" iconCssClass='<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "icon-trash" : "icon-remove" %>' label='<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "move-to-the-recycle-bin" : "delete" %>' />
-		</aui:nav-item>
-
-		<liferay-util:include page="/html/portlet/journal/add_button.jsp" />
-
-		<liferay-util:include page="/html/portlet/journal/sort_button.jsp" />
-
-		<c:if test="<%= !user.isDefaultUser() %>">
-			<aui:nav-item dropdown="<%= true %>" label="manage">
+		<aui:nav cssClass="navbar-nav" id="toolbarContainer">
+			<aui:nav-item cssClass="hide" dropdown="<%= true %>" id="actionsButtonContainer" label="actions">
 
 				<%
-				String taglibURL = "javascript:" + renderResponse.getNamespace() + "openStructuresView()";
+				String taglibURL = "javascript:Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + Constants.EXPIRE + "'}); void(0);";
 				%>
 
-				<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-tasks" label="structures" />
+				<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-time" label="expire" />
 
 				<%
-				taglibURL = "javascript:" + renderResponse.getNamespace() + "openTemplatesView()";
+				taglibURL = "javascript:Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + Constants.MOVE + "'}); void(0);";
 				%>
 
-				<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-list-alt" label="templates" />
+				<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-move" label="move" />
 
 				<%
-				taglibURL = "javascript:" + renderResponse.getNamespace() + "openFeedsView()";
+				taglibURL = "javascript:" + renderResponse.getNamespace() + "deleteEntries();";
 				%>
 
-				<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
-					<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-rss" label="feeds" />
-				</c:if>
+				<aui:nav-item cssClass="item-remove" href="<%= taglibURL %>" iconCssClass='<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "icon-trash" : "icon-remove" %>' label='<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "move-to-the-recycle-bin" : "delete" %>' />
 			</aui:nav-item>
-		</c:if>
-	</aui:nav>
 
-	<aui:nav-bar-search cssClass="pull-right" file="/html/portlet/journal/article_search.jsp" />
-</aui:nav-bar>
+			<liferay-util:include page="/html/portlet/journal/add_button.jsp" />
+
+			<liferay-util:include page="/html/portlet/journal/sort_button.jsp" />
+
+			<c:if test="<%= !user.isDefaultUser() %>">
+				<aui:nav-item dropdown="<%= true %>" label="manage">
+
+					<%
+					String taglibURL = "javascript:" + renderResponse.getNamespace() + "openStructuresView()";
+					%>
+
+					<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-th-large" label="structures" />
+
+					<%
+					taglibURL = "javascript:" + renderResponse.getNamespace() + "openTemplatesView()";
+					%>
+
+					<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-list-alt" label="templates" />
+
+					<%
+					taglibURL = "javascript:" + renderResponse.getNamespace() + "openFeedsView()";
+					%>
+
+					<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
+						<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-rss" label="feeds" />
+					</c:if>
+				</aui:nav-item>
+			</c:if>
+		</aui:nav>
+
+		<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/journal/article_search.jsp" />
+	</aui:nav-bar>
+</aui:form>
 
 <aui:script>
 	<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
@@ -92,7 +97,7 @@ String strutsAction = ParamUtil.getString(request, "struts_action");
 			Liferay.Util.openWindow(
 				{
 					id: '<portlet:namespace />openFeedsView',
-					title: '<%= UnicodeLanguageUtil.get(pageContext, "feeds") %>',
+					title: '<%= UnicodeLanguageUtil.get(request, "feeds") %>',
 					uri: '<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/journal/view_feeds" /></liferay-portlet:renderURL>'
 				}
 			);
@@ -104,7 +109,7 @@ String strutsAction = ParamUtil.getString(request, "struts_action");
 	%>
 
 	function <portlet:namespace />deleteEntries() {
-		if (<%= TrashUtil.isTrashEnabled(scopeGroupId) %> || confirm(' <%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-delete-the-selected-entries") %>')) {
+		if (<%= TrashUtil.isTrashEnabled(scopeGroupId) %> || confirm(' <%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries") %>')) {
 			Liferay.fire(
 				'<%= renderResponse.getNamespace() %>editEntry',
 				{
@@ -130,9 +135,9 @@ String strutsAction = ParamUtil.getString(request, "struts_action");
 				},
 				refererPortletName: '<%= PortletKeys.JOURNAL %>',
 				refererWebDAVToken: '<%= portlet.getWebDAVStorageToken() %>',
-				showGlobalScope: false,
+				showAncestorScopes: true,
 				showManageTemplates: true,
-				title: '<%= UnicodeLanguageUtil.get(pageContext, "structures") %>'
+				title: '<%= UnicodeLanguageUtil.get(request, "structures") %>'
 			}
 		);
 	}
@@ -148,9 +153,10 @@ String strutsAction = ParamUtil.getString(request, "struts_action");
 				groupId: <%= scopeGroupId %>,
 				refererPortletName: '<%= PortletKeys.JOURNAL %>',
 				refererWebDAVToken: '<%= portlet.getWebDAVStorageToken() %>',
+				showAncestorScopes: true,
 				showHeader: false,
 				struts_action: '/dynamic_data_mapping/view_template',
-				title: '<%= UnicodeLanguageUtil.get(pageContext, "templates") %>'
+				title: '<%= UnicodeLanguageUtil.get(request, "templates") %>'
 			}
 		);
 	}

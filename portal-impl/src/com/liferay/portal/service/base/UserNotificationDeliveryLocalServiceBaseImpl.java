@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -70,13 +72,11 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 *
 	 * @param userNotificationDelivery the user notification delivery
 	 * @return the user notification delivery that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public UserNotificationDelivery addUserNotificationDelivery(
-		UserNotificationDelivery userNotificationDelivery)
-		throws SystemException {
+		UserNotificationDelivery userNotificationDelivery) {
 		userNotificationDelivery.setNew(true);
 
 		return userNotificationDeliveryPersistence.update(userNotificationDelivery);
@@ -100,13 +100,11 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 * @param userNotificationDeliveryId the primary key of the user notification delivery
 	 * @return the user notification delivery that was removed
 	 * @throws PortalException if a user notification delivery with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public UserNotificationDelivery deleteUserNotificationDelivery(
-		long userNotificationDeliveryId)
-		throws PortalException, SystemException {
+		long userNotificationDeliveryId) throws PortalException {
 		return userNotificationDeliveryPersistence.remove(userNotificationDeliveryId);
 	}
 
@@ -115,13 +113,11 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 *
 	 * @param userNotificationDelivery the user notification delivery
 	 * @return the user notification delivery that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public UserNotificationDelivery deleteUserNotificationDelivery(
-		UserNotificationDelivery userNotificationDelivery)
-		throws SystemException {
+		UserNotificationDelivery userNotificationDelivery) {
 		return userNotificationDeliveryPersistence.remove(userNotificationDelivery);
 	}
 
@@ -138,12 +134,10 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return userNotificationDeliveryPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -158,12 +152,10 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return userNotificationDeliveryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -180,12 +172,11 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return userNotificationDeliveryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -195,11 +186,9 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return userNotificationDeliveryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -209,18 +198,17 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return userNotificationDeliveryPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public UserNotificationDelivery fetchUserNotificationDelivery(
-		long userNotificationDeliveryId) throws SystemException {
+		long userNotificationDeliveryId) {
 		return userNotificationDeliveryPersistence.fetchByPrimaryKey(userNotificationDeliveryId);
 	}
 
@@ -230,18 +218,49 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 * @param userNotificationDeliveryId the primary key of the user notification delivery
 	 * @return the user notification delivery
 	 * @throws PortalException if a user notification delivery with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public UserNotificationDelivery getUserNotificationDelivery(
-		long userNotificationDeliveryId)
-		throws PortalException, SystemException {
+		long userNotificationDeliveryId) throws PortalException {
 		return userNotificationDeliveryPersistence.findByPrimaryKey(userNotificationDeliveryId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.UserNotificationDeliveryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(UserNotificationDelivery.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName(
+			"userNotificationDeliveryId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.UserNotificationDeliveryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(UserNotificationDelivery.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName(
+			"userNotificationDeliveryId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return userNotificationDeliveryLocalService.deleteUserNotificationDelivery((UserNotificationDelivery)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return userNotificationDeliveryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -255,11 +274,10 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of user notification deliveries
 	 * @param end the upper bound of the range of user notification deliveries (not inclusive)
 	 * @return the range of user notification deliveries
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<UserNotificationDelivery> getUserNotificationDeliveries(
-		int start, int end) throws SystemException {
+		int start, int end) {
 		return userNotificationDeliveryPersistence.findAll(start, end);
 	}
 
@@ -267,10 +285,9 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 * Returns the number of user notification deliveries.
 	 *
 	 * @return the number of user notification deliveries
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getUserNotificationDeliveriesCount() throws SystemException {
+	public int getUserNotificationDeliveriesCount() {
 		return userNotificationDeliveryPersistence.countAll();
 	}
 
@@ -279,13 +296,11 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 *
 	 * @param userNotificationDelivery the user notification delivery
 	 * @return the user notification delivery that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public UserNotificationDelivery updateUserNotificationDelivery(
-		UserNotificationDelivery userNotificationDelivery)
-		throws SystemException {
+		UserNotificationDelivery userNotificationDelivery) {
 		return userNotificationDeliveryPersistence.update(userNotificationDelivery);
 	}
 
@@ -463,7 +478,7 @@ public abstract class UserNotificationDeliveryLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = userNotificationDeliveryPersistence.getDataSource();
 

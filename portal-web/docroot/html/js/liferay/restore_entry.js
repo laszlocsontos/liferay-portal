@@ -123,13 +123,13 @@ AUI.add(
 									failure: A.rbind('_afterCheckEntryFailure', instance),
 									success: A.rbind('_afterCheckEntrySuccess', instance)
 								},
-								arguments: uri,
+								'arguments': uri,
 								data: instance.ns(
 									{
 										trashEntryId: event.trashEntryId
 									}
 								),
-								dataType: 'json'
+								dataType: 'JSON'
 							}
 						);
 					},
@@ -209,14 +209,14 @@ AUI.add(
 										failure: A.rbind('_afterPopupCheckEntryFailure', instance),
 										success: A.rbind('_afterPopupCheckEntrySuccess', instance)
 									},
-									arguments: form,
+									'arguments': form,
 									data: instance.ns(
 										{
 											trashEntryId: trashEntryId.val(),
 											newName: newName.val()
 										}
 									),
-									dataType: 'json'
+									dataType: 'JSON'
 								}
 							);
 						}

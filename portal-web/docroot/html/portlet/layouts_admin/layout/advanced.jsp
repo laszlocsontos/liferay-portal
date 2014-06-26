@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -71,7 +71,7 @@ UnicodeProperties layoutTypeSettings = selLayout.getTypeSettingsProperties();
 			if (!layoutLogo) {
 				var layoutNavItem = A.one('#layout_<%= selLayout.getLayoutId() %> span');
 
-				layoutLogo = A.Node.create('<img class="layout-logo-<%= selLayout.getPlid() %>" src="' + logoURL + '" />');
+				layoutLogo = A.Node.create('<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="logo" />" class="layout-logo-<%= selLayout.getPlid() %>" src="' + logoURL + '" />');
 
 				if (layoutNavItem) {
 					layoutNavItem.prepend(layoutLogo);

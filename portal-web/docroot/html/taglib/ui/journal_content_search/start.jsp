@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,6 @@
 boolean showListed = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:journal-content-search:showListed"));
 String targetPortletId = (String)request.getAttribute("liferay-ui:journal-content-search:targetPortletId");
 String type = (String)request.getAttribute("liferay-ui:journal-content-search:type");
-
-String defaultKeywords = LanguageUtil.get(pageContext, "search") + StringPool.TRIPLE_PERIOD;
-String unicodeDefaultKeywords = UnicodeFormatter.toString(defaultKeywords);
-
-String keywords = ParamUtil.getString(request, namespace + "keywords", defaultKeywords);
 
 PortletURL portletURL = null;
 
@@ -54,11 +49,6 @@ portletURL.setWindowState(WindowState.MAXIMIZED);
 
 <form action="<%= HtmlUtil.escape(portletURL.toString()) %>" class="form" method="post" name="<%= namespace %>fm" onSubmit="submitForm(this); return false;">
 
-<%
-String taglibOnBlur = "if (this.value == '') { this.value = '" + unicodeDefaultKeywords + "'; }";
-String taglibOnFocus = "if (this.value == '" + unicodeDefaultKeywords + "') { this.value = ''; }";
-%>
-
-<aui:input cssClass="lfr-search-keywords" inlineField="<%= true %>" label="" name="keywords" onBlur="<%= taglibOnBlur %>" onFocus="<%= taglibOnFocus %>" size="30" title="search-web-content" type="text" value="<%= HtmlUtil.escape(keywords) %>" />
-
-<aui:input alt="search" cssClass="lfr-search-button" inlineField="<%= true %>" label="" name="search" src='<%= themeDisplay.getPathThemeImages() + "/common/search.png" %>' type="image" />
+<div class="form-search">
+	<liferay-ui:input-search id='<%= namespace + "keywords_" + StringUtil.randomId() %>' name='<%= namespace + "keywords" %>' placeholder='<%= LanguageUtil.get(locale, "keywords") %>' useNamespace="<%= false %>" />
+</div>

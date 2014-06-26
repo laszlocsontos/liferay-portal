@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -69,12 +71,10 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param scLicense the s c license
 	 * @return the s c license that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public SCLicense addSCLicense(SCLicense scLicense)
-		throws SystemException {
+	public SCLicense addSCLicense(SCLicense scLicense) {
 		scLicense.setNew(true);
 
 		return scLicensePersistence.update(scLicense);
@@ -97,12 +97,10 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param licenseId the primary key of the s c license
 	 * @return the s c license that was removed
 	 * @throws PortalException if a s c license with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public SCLicense deleteSCLicense(long licenseId)
-		throws PortalException, SystemException {
+	public SCLicense deleteSCLicense(long licenseId) throws PortalException {
 		return scLicensePersistence.remove(licenseId);
 	}
 
@@ -111,12 +109,10 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param scLicense the s c license
 	 * @return the s c license that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public SCLicense deleteSCLicense(SCLicense scLicense)
-		throws SystemException {
+	public SCLicense deleteSCLicense(SCLicense scLicense) {
 		return scLicensePersistence.remove(scLicense);
 	}
 
@@ -133,12 +129,10 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return scLicensePersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -153,12 +147,10 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return scLicensePersistence.findWithDynamicQuery(dynamicQuery, start,
 			end);
 	}
@@ -175,12 +167,11 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return scLicensePersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -190,11 +181,9 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return scLicensePersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -204,17 +193,16 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return scLicensePersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public SCLicense fetchSCLicense(long licenseId) throws SystemException {
+	public SCLicense fetchSCLicense(long licenseId) {
 		return scLicensePersistence.fetchByPrimaryKey(licenseId);
 	}
 
@@ -224,17 +212,46 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param licenseId the primary key of the s c license
 	 * @return the s c license
 	 * @throws PortalException if a s c license with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public SCLicense getSCLicense(long licenseId)
-		throws PortalException, SystemException {
+	public SCLicense getSCLicense(long licenseId) throws PortalException {
 		return scLicensePersistence.findByPrimaryKey(licenseId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.softwarecatalog.service.SCLicenseLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SCLicense.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("licenseId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.softwarecatalog.service.SCLicenseLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SCLicense.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("licenseId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return scLicenseLocalService.deleteSCLicense((SCLicense)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scLicensePersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -248,11 +265,9 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of s c licenses
 	 * @param end the upper bound of the range of s c licenses (not inclusive)
 	 * @return the range of s c licenses
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<SCLicense> getSCLicenses(int start, int end)
-		throws SystemException {
+	public List<SCLicense> getSCLicenses(int start, int end) {
 		return scLicensePersistence.findAll(start, end);
 	}
 
@@ -260,10 +275,9 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the number of s c licenses.
 	 *
 	 * @return the number of s c licenses
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSCLicensesCount() throws SystemException {
+	public int getSCLicensesCount() {
 		return scLicensePersistence.countAll();
 	}
 
@@ -272,160 +286,147 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param scLicense the s c license
 	 * @return the s c license that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public SCLicense updateSCLicense(SCLicense scLicense)
-		throws SystemException {
+	public SCLicense updateSCLicense(SCLicense scLicense) {
 		return scLicensePersistence.update(scLicense);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addSCProductEntrySCLicense(long productEntryId, long licenseId)
-		throws SystemException {
+	public void addSCProductEntrySCLicense(long productEntryId, long licenseId) {
 		scProductEntryPersistence.addSCLicense(productEntryId, licenseId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCProductEntrySCLicense(long productEntryId,
-		SCLicense scLicense) throws SystemException {
+		SCLicense scLicense) {
 		scProductEntryPersistence.addSCLicense(productEntryId, scLicense);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCProductEntrySCLicenses(long productEntryId,
-		long[] licenseIds) throws SystemException {
+		long[] licenseIds) {
 		scProductEntryPersistence.addSCLicenses(productEntryId, licenseIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCProductEntrySCLicenses(long productEntryId,
-		List<SCLicense> SCLicenses) throws SystemException {
+		List<SCLicense> SCLicenses) {
 		scProductEntryPersistence.addSCLicenses(productEntryId, SCLicenses);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearSCProductEntrySCLicenses(long productEntryId)
-		throws SystemException {
+	public void clearSCProductEntrySCLicenses(long productEntryId) {
 		scProductEntryPersistence.clearSCLicenses(productEntryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCProductEntrySCLicense(long productEntryId,
-		long licenseId) throws SystemException {
+		long licenseId) {
 		scProductEntryPersistence.removeSCLicense(productEntryId, licenseId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCProductEntrySCLicense(long productEntryId,
-		SCLicense scLicense) throws SystemException {
+		SCLicense scLicense) {
 		scProductEntryPersistence.removeSCLicense(productEntryId, scLicense);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCProductEntrySCLicenses(long productEntryId,
-		long[] licenseIds) throws SystemException {
+		long[] licenseIds) {
 		scProductEntryPersistence.removeSCLicenses(productEntryId, licenseIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCProductEntrySCLicenses(long productEntryId,
-		List<SCLicense> SCLicenses) throws SystemException {
+		List<SCLicense> SCLicenses) {
 		scProductEntryPersistence.removeSCLicenses(productEntryId, SCLicenses);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the productEntryIds of the s c product entries associated with the s c license.
+	 *
+	 * @param licenseId the licenseId of the s c license
+	 * @return long[] the productEntryIds of s c product entries associated with the s c license
 	 */
 	@Override
-	public List<SCLicense> getSCProductEntrySCLicenses(long productEntryId)
-		throws SystemException {
+	public long[] getSCProductEntryPrimaryKeys(long licenseId) {
+		return scLicensePersistence.getSCProductEntryPrimaryKeys(licenseId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<SCLicense> getSCProductEntrySCLicenses(long productEntryId) {
 		return scProductEntryPersistence.getSCLicenses(productEntryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<SCLicense> getSCProductEntrySCLicenses(long productEntryId,
-		int start, int end) throws SystemException {
+		int start, int end) {
 		return scProductEntryPersistence.getSCLicenses(productEntryId, start,
 			end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<SCLicense> getSCProductEntrySCLicenses(long productEntryId,
-		int start, int end, OrderByComparator orderByComparator)
-		throws SystemException {
+		int start, int end, OrderByComparator orderByComparator) {
 		return scProductEntryPersistence.getSCLicenses(productEntryId, start,
 			end, orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSCProductEntrySCLicensesCount(long productEntryId)
-		throws SystemException {
+	public int getSCProductEntrySCLicensesCount(long productEntryId) {
 		return scProductEntryPersistence.getSCLicensesSize(productEntryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public boolean hasSCProductEntrySCLicense(long productEntryId,
-		long licenseId) throws SystemException {
+		long licenseId) {
 		return scProductEntryPersistence.containsSCLicense(productEntryId,
 			licenseId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasSCProductEntrySCLicenses(long productEntryId)
-		throws SystemException {
+	public boolean hasSCProductEntrySCLicenses(long productEntryId) {
 		return scProductEntryPersistence.containsSCLicenses(productEntryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void setSCProductEntrySCLicenses(long productEntryId,
-		long[] licenseIds) throws SystemException {
+		long[] licenseIds) {
 		scProductEntryPersistence.setSCLicenses(productEntryId, licenseIds);
 	}
 
@@ -605,7 +606,7 @@ public abstract class SCLicenseLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = scLicensePersistence.getDataSource();
 

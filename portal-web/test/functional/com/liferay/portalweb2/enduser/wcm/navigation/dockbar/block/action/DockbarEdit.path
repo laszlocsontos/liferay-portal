@@ -18,6 +18,16 @@
 	<td></td>
 	<td></td>
 </tr>
+<tr>
+	<td>EXTEND_ACTION_PATH</td>
+	<td>Dockbar</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--DOCKBAR-->
 <tr>
 	<td>DOCKBAR_EDIT</td>
@@ -33,6 +43,11 @@
 <tr>
 	<td>TOOLBAR_COPY_APPLICATIONS</td>
 	<td>//li[@data-value='copy-applications']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TOOLBAR_DETAILS</td>
+	<td>//div[@id='_145_details']/div</td>
 	<td></td>
 </tr>
 <tr>
@@ -68,6 +83,31 @@
 </tr>
 <!--DETAILS-->
 <tr>
+	<td>DETAILS_FRIENDLY_URL_TITLE</td>
+	<td>//label[@for='_145_friendlyURL']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_FRIENDLY_URL_ENGLISH_UNITED_STATES</td>
+	<td>//div[contains(@id,'friendlyURL')]//li[@data-value='en_US']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_FRIENDLY_URL_LOCALIZED</td>
+	<td>//div[contains(@id,'friendlyURL')]//li[@data-value='${key_friendlyUrlLocalized}']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_FRIENDLY_URL_SPANISH_SPAIN</td>
+	<td>//div[contains(@id,'friendlyURL')]//li[@data-value='es_ES']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_FRIENDLY_URL_PORTUGUESE_BRAZIL</td>
+	<td>//div[contains(@id,'friendlyURL')]//li[@data-value='pt_BR']/a</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DETAILS_TYPE_PAGE_OPTIONS</td>
 	<td>//div[contains(@id,'typeOptions')]//select[@id='_145_type']/option[@value='embedded']</td>
 	<td></td>
@@ -75,6 +115,16 @@
 <tr>
 	<td>DETAILS_TYPE_PAGE_URL</td>
 	<td>//input[@id='_145_urlEmbedded']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_PAGE_NAME_FILED</td>
+	<td>//input[@id='_145_name']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DETAILS_FRIENDLYURL</td>
+	<td>//input[@id='_145_friendlyURL']</td>
 	<td></td>
 </tr>
 <tr>
@@ -90,6 +140,38 @@
 <tr>
 	<td>SAVE_BUTTON</td>
 	<td>//button[contains(.,'Save')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ADD_PAGE_TYPE_RADIO</td>
+	<td>//label[@class='radio' and contains(.,'${key_pageTypeLayout}')]/input</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--EDIT-->
+<tr>
+	<td>EDIT_CUSTOMIZATION_SETTINGS</td>
+	<td>//div[@id='_145_customizationSettings']/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--CUSTOMIZATION_SETTINGS-->
+<tr>
+	<td>CUSTOMIZATION_SETTINGS_SHOW_CUSTOMIZABLE_SECTIONS</td>
+	<td>//div[@class='customization-settings']/button[contains(@id,'_145_manageCustomization')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOMIZATION_SETTINGS_CUSTOMIZABLE_COLUMN_CHECKBOX</td>
+	<td>//input[contains(@id,'TypeSettingsProperties--column-${key_columnId}-customizable--')]</td>
 	<td></td>
 </tr>
 </tbody>

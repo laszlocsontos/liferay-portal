@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 
 /**
  * @author Brian Wing Shun Chan
@@ -23,8 +22,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 public interface AssetEntryValidator {
 
 	public void validate(
-			long groupId, String className, long[] categoryIds,
-			String[] entryNames)
-		throws PortalException, SystemException;
+			long groupId, String className, long classTypePK,
+			long[] categoryIds, String[] entryNames)
+		throws PortalException;
 
 }

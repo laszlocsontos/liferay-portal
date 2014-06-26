@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,9 +17,7 @@ package com.liferay.portal.kernel.resiliency.spi.agent;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.resiliency.spi.SPIConfiguration;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.util.ReflectionUtil;
-
-import java.lang.reflect.Field;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -121,7 +119,9 @@ public class SPIAgentFactoryUtilTest {
 		spiAgentFactoryUtil.setSPIAgentClasses(agentClassNames);
 
 		Map<String, Class<? extends SPIAgent>> spiAgentClasses =
-			_getSpiAgentClasses();
+			(Map<String, Class<? extends SPIAgent>>)
+				ReflectionTestUtil.getFieldValue(
+					SPIAgentFactoryUtil.class, "_spiAgentClasses");
 
 		Assert.assertEquals(2, spiAgentClasses.size());
 		Assert.assertSame(
@@ -199,16 +199,6 @@ public class SPIAgentFactoryUtilTest {
 			throw new UnsupportedOperationException();
 		}
 
-	}
-
-	private static Map<String, Class<? extends SPIAgent>>
-		_getSpiAgentClasses() throws Exception {
-
-		Field spiAgentClassesField = ReflectionUtil.getDeclaredField(
-			SPIAgentFactoryUtil.class, "_spiAgentClasses");
-
-		return (Map<String, Class<? extends SPIAgent>>)
-			spiAgentClassesField.get(null);
 	}
 
 }

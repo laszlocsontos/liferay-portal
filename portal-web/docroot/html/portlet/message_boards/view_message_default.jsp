@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,7 @@ MBThread thread = messageDisplay.getThread();
 
 <div id="<portlet:namespace />addAnswerFlagDiv" style="display: none;">
 	<liferay-ui:icon
-		image="checked"
+		iconCssClass="icon-check"
 		label="<%= true %>"
 		message="answer"
 	/>
@@ -50,7 +50,7 @@ MBThread thread = messageDisplay.getThread();
 	%>
 
 	<liferay-ui:icon
-		image="checked"
+		iconCssClass="icon-check"
 		label="<%= true %>"
 		message="mark-as-an-answer"
 		url="<%= taglibMarkAsAnAnswerURL %>"
@@ -181,7 +181,7 @@ MBThread thread = messageDisplay.getThread();
 	);
 
 	<c:if test="<%= thread.getRootMessageId() != message.getMessageId() %>">
-		document.getElementById("<portlet:namespace />message_" + <%= message.getMessageId() %>).scrollIntoView(true);
+		document.getElementById('<portlet:namespace />message_' + <%= message.getMessageId() %>).scrollIntoView(true);
 	</c:if>
 </aui:script>
 

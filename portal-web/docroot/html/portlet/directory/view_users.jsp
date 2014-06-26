@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,17 +66,17 @@ if (Validator.isNotNull(viewUsersRedirect)) {
 	<c:if test="<%= organization != null %>">
 		<aui:input name="<%= UserDisplayTerms.ORGANIZATION_ID %>" type="hidden" value="<%= organization.getOrganizationId() %>" />
 
-		<h3><%= HtmlUtil.escape(LanguageUtil.format(pageContext, "users-of-x", organization.getName(), false)) %></h3>
+		<h3><%= HtmlUtil.escape(LanguageUtil.format(request, "users-of-x", organization.getName(), false)) %></h3>
 	</c:if>
 
 	<c:if test="<%= userGroup != null %>">
 		<aui:input name="<%= UserDisplayTerms.USER_GROUP_ID %>" type="hidden" value="<%= userGroup.getUserGroupId() %>" />
 
-		<h3><%= LanguageUtil.format(pageContext, "users-of-x", HtmlUtil.escape(userGroup.getName()), false) %></h3>
+		<h3><%= LanguageUtil.format(request, "users-of-x", HtmlUtil.escape(userGroup.getName()), false) %></h3>
 	</c:if>
 
 	<aui:nav-bar>
-		<aui:nav-bar-search cssClass="pull-right" file="/html/portlet/directory/user_search.jsp" searchContainer="<%= userSearchContainer %>" />
+		<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/directory/user_search.jsp" searchContainer="<%= userSearchContainer %>" />
 	</aui:nav-bar>
 
 	<%

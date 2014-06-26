@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,7 +48,7 @@ JSONArray rangesJSONArray = dataJSONObject.getJSONArray("ranges");
 					Liferay.Search.tokenList.add(
 						{
 							clearFields: '<%= renderResponse.getNamespace() + HtmlUtil.escapeJS(facet.getFieldId()) %>',
-							text: '<%= UnicodeLanguageUtil.get(pageContext, HtmlUtil.escape(label)) %>'
+							text: '<%= UnicodeLanguageUtil.get(request, HtmlUtil.escape(label)) %>'
 						}
 					);
 				</aui:script>

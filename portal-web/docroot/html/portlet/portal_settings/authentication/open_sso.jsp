@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,9 +43,7 @@ String openSsoLastNameAttr = PrefsPropsUtil.getString(company.getCompanyId(), Pr
 
 	<aui:input cssClass="lfr-input-text-container" label="email-address-attribute" name='<%= "settings--" + PropsKeys.OPEN_SSO_EMAIL_ADDRESS_ATTR + "--" %>' type="text" value="<%= openSsoEmailAddressAttr %>" />
 
-	<aui:input cssClass="lfr-input-text-container" label="first-name-attribute" name='<%= "settings--" + PropsKeys.OPEN_SSO_FIRST_NAME_ATTR + "--" %>' type="text" value="<%= openSsoFirstNameAttr %>" />
-
-	<aui:input cssClass="lfr-input-text-container" label="last-name-attribute" name='<%= "settings--" + PropsKeys.OPEN_SSO_LAST_NAME_ATTR + "--" %>' type="text" value="<%= openSsoLastNameAttr %>" />
+	<%@ include file="/html/portlet/portal_settings/authentication/open_sso_user_name.jspf" %>
 
 	<aui:button-row>
 
@@ -74,14 +72,14 @@ String openSsoLastNameAttr = PrefsPropsUtil.getString(company.getCompanyId(), Pr
 			data.<portlet:namespace />openSsoFirstNameAttr = document.<portlet:namespace />fm['<portlet:namespace />settings--<%= PropsKeys.OPEN_SSO_FIRST_NAME_ATTR %>--'].value;
 			data.<portlet:namespace />openSsoLastNameAttr = document.<portlet:namespace />fm['<portlet:namespace />settings--<%= PropsKeys.OPEN_SSO_LAST_NAME_ATTR %>--'].value;
 
-			var url = "<portlet:renderURL windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="struts_action" value="/portal_settings/test_opensso_configuration" /></portlet:renderURL>";
+			var url = '<portlet:renderURL windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="struts_action" value="/portal_settings/test_opensso_configuration" /></portlet:renderURL>';
 
 			var dialog = Liferay.Util.Window.getWindow(
 				{
 					dialog: {
 						destroyOnHide: true
 					},
-					title: '<%= UnicodeLanguageUtil.get(pageContext, "open-sso") %>'
+					title: '<%= UnicodeLanguageUtil.get(request, "open-sso") %>'
 				}
 			);
 

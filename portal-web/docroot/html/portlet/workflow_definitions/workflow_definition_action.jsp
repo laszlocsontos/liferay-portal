@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 WorkflowDefinition workflowDefinition = (WorkflowDefinition)row.getObject();
 %>
 
-<liferay-ui:icon-menu>
+<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
 	<portlet:renderURL var="editURL">
 		<portlet:param name="struts_action" value="/workflow_definitions/edit_workflow_definition" />
 		<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UPDATE %>" />
@@ -32,8 +32,8 @@ WorkflowDefinition workflowDefinition = (WorkflowDefinition)row.getObject();
 	</portlet:renderURL>
 
 	<liferay-ui:icon
-		image="post"
-		message='<%= LanguageUtil.format(pageContext, "add-new-x", "file") %>'
+		iconCssClass="icon-plus"
+		message='<%= LanguageUtil.format(request, "add-new-x", "file") %>'
 		url="<%= editURL %>"
 	/>
 
@@ -44,7 +44,8 @@ WorkflowDefinition workflowDefinition = (WorkflowDefinition)row.getObject();
 		%>
 
 		<liferay-ui:icon
-			image="edit"
+			iconCssClass="icon-edit"
+			message="edit"
 			url="<%= taglibOnClick %>"
 		/>
 	</c:if>
@@ -59,7 +60,8 @@ WorkflowDefinition workflowDefinition = (WorkflowDefinition)row.getObject();
 		</portlet:actionURL>
 
 		<liferay-ui:icon
-			image="activate"
+			iconCssClass="icon-ok-sign"
+			message="activate"
 			url="<%= restoreWorkflowDefinitionURL %>"
 		/>
 	</c:if>

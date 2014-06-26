@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -310,11 +310,9 @@ public class OrganizationWrapper implements Organization,
 	* Returns the user uuid of this organization.
 	*
 	* @return the user uuid of this organization
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _organization.getUserUuid();
 	}
 
@@ -697,21 +695,18 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_organization.persist();
 	}
 
 	@Override
 	public java.lang.String buildTreePath()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organization.buildTreePath();
 	}
 
 	@Override
-	public void updateTreePath(java.lang.String treePath)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void updateTreePath(java.lang.String treePath) {
 		_organization.updateTreePath(treePath);
 	}
 
@@ -721,15 +716,13 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Address> getAddresses()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Address> getAddresses() {
 		return _organization.getAddresses();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portal.model.Organization> getAncestors()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organization.getAncestors();
 	}
 
@@ -739,8 +732,7 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Organization> getDescendants()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Organization> getDescendants() {
 		return _organization.getDescendants();
 	}
 
@@ -756,14 +748,17 @@ public class OrganizationWrapper implements Organization,
 
 	@Override
 	public com.liferay.portal.model.Organization getParentOrganization()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _organization.getParentOrganization();
 	}
 
 	@Override
-	public javax.portlet.PortletPreferences getPreferences()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getParentOrganizationName() {
+		return _organization.getParentOrganizationName();
+	}
+
+	@Override
+	public javax.portlet.PortletPreferences getPreferences() {
 		return _organization.getPreferences();
 	}
 
@@ -779,27 +774,23 @@ public class OrganizationWrapper implements Organization,
 
 	@Override
 	public java.util.Set<java.lang.String> getReminderQueryQuestions(
-		java.util.Locale locale)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.Locale locale) {
 		return _organization.getReminderQueryQuestions(locale);
 	}
 
 	@Override
 	public java.util.Set<java.lang.String> getReminderQueryQuestions(
-		java.lang.String languageId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String languageId) {
 		return _organization.getReminderQueryQuestions(languageId);
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.model.Organization> getSuborganizations()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portal.model.Organization> getSuborganizations() {
 		return _organization.getSuborganizations();
 	}
 
 	@Override
-	public int getSuborganizationsSize()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getSuborganizationsSize() {
 		return _organization.getSuborganizationsSize();
 	}
 
@@ -819,8 +810,7 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	@Override
-	public boolean hasSuborganizations()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public boolean hasSuborganizations() {
 		return _organization.hasSuborganizations();
 	}
 

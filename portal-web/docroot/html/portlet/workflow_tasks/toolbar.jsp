@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,12 +21,7 @@ String toolbarItem = ParamUtil.getString(request, "toolbarItem", "assigned-to-me
 %>
 
 <aui:nav-bar>
-	<aui:nav>
-		<portlet:renderURL var="assignedToMeURL">
-			<portlet:param name="struts_action" value="/workflow_tasks/view" />
-			<portlet:param name="toolbarItem" value="assigned-to-me" />
-		</portlet:renderURL>
-
+	<aui:nav cssClass="navbar-nav">
 		<portlet:renderURL var="completedURL">
 			<portlet:param name="struts_action" value="/workflow_tasks/view" />
 			<portlet:param name="toolbarItem" value="my-completed-tasks" />

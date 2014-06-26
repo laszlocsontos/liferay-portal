@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,6 +50,13 @@ import javax.portlet.WindowState;
  * @author Raymond Augé
  */
 public class MVCPortlet extends LiferayPortlet {
+
+	@Override
+	public void destroy() {
+		super.destroy();
+
+		_actionCommandCache.close();
+	}
 
 	@Override
 	public void doAbout(
@@ -187,9 +194,8 @@ public class MVCPortlet extends LiferayPortlet {
 		String packagePrefix = getInitParameter(
 			ActionCommandCache.ACTION_PACKAGE_NAME);
 
-		if (Validator.isNotNull(packagePrefix)) {
-			_actionCommandCache = new ActionCommandCache(packagePrefix);
-		}
+		_actionCommandCache = new ActionCommandCache(
+			packagePrefix, getPortletName());
 	}
 
 	public void invokeTaglibDiscussion(
@@ -243,10 +249,6 @@ public class MVCPortlet extends LiferayPortlet {
 			throw new PortletException(e);
 		}
 
-		if (_actionCommandCache == null) {
-			return super.callActionMethod(actionRequest, actionResponse);
-		}
-
 		String actionName = ParamUtil.getString(
 			actionRequest, ActionRequest.ACTION_NAME);
 
@@ -263,22 +265,20 @@ public class MVCPortlet extends LiferayPortlet {
 			List<ActionCommand> actionCommands =
 				_actionCommandCache.getActionCommandChain(actionName);
 
-			if (actionCommands.isEmpty()) {
-				return false;
-			}
+			if (!actionCommands.isEmpty()) {
+				for (ActionCommand actionCommand : actionCommands) {
+					if (!actionCommand.processCommand(
+							actionRequest, actionResponse)) {
 
-			for (ActionCommand actionCommand : actionCommands) {
-				if (!actionCommand.processCommand(
-						actionRequest, actionResponse)) {
-
-					return false;
+						return false;
+					}
 				}
-			}
 
-			return true;
+				return true;
+			}
 		}
 
-		return false;
+		return super.callActionMethod(actionRequest, actionResponse);
 	}
 
 	protected void checkPath(String path) throws PortletException {

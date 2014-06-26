@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,38 +31,50 @@ if (fileEntry.getVersion().equals(fileVersion.getVersion())) {
 }
 %>
 
-<p class="asset-description">
-	<%= HtmlUtil.escape(StringUtil.shorten(fileEntry.getDescription(), abstractLength)) %>
-</p>
-
 <c:if test="<%= fileVersion.isApproved() %>">
 	<div class="asset-resource-info">
 		<c:choose>
 			<c:when test="<%= showThumbnail && ImageProcessorUtil.hasImages(fileVersion) %>">
-				<div>
-					<img alt="" src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imageThumbnail=1") %>" />
+				<div class="asset-thumbnail">
+					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imageThumbnail=1") %>' />
 				</div>
+
+				<p class="asset-description">
+					<%= HtmlUtil.escape(StringUtil.shorten(fileEntry.getDescription(), abstractLength)) %>
+				</p>
 			</c:when>
 			<c:when test="<%= showThumbnail && PDFProcessorUtil.hasImages(fileVersion) %>">
-				<div>
-					<img alt="" src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&documentThumbnail=1") %>" />
+				<div class="asset-thumbnail">
+					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="document" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&documentThumbnail=1") %>' />
 				</div>
+
+				<p class="asset-description">
+					<%= HtmlUtil.escape(StringUtil.shorten(fileEntry.getDescription(), abstractLength)) %>
+				</p>
 			</c:when>
 			<c:when test="<%= showThumbnail && VideoProcessorUtil.hasVideo(fileVersion) %>">
-				<div>
-					<img alt="" src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1") %>" />
+				<div class="asset-thumbnail">
+					<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="video" />" class="img-thumbnail" src='<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1") %>' />
 				</div>
+
+				<p class="asset-description">
+					<%= HtmlUtil.escape(StringUtil.shorten(fileEntry.getDescription(), abstractLength)) %>
+				</p>
 			</c:when>
 			<c:otherwise>
+
+				<p class="asset-description">
+					<%= HtmlUtil.escape(StringUtil.shorten(fileEntry.getDescription(), abstractLength)) %>
+				</p>
 
 				<%
 				String taglibFileEntryTitle = "<span class='hide-accessible'>" + fileEntry.getTitle() + "</span>";
 				%>
 
 				<liferay-ui:icon
-					image="download"
+					iconCssClass="icon-download"
 					label="<%= true %>"
-					message='<%= LanguageUtil.format(pageContext, "download-x", taglibFileEntryTitle, false) + " (" + TextFormatter.formatStorageSize(fileVersion.getSize(), locale) + ")" %>'
+					message='<%= LanguageUtil.format(request, "download-x", taglibFileEntryTitle, false) + " (" + TextFormatter.formatStorageSize(fileVersion.getSize(), locale) + ")" %>'
 					url="<%= assetRenderer.getURLDownload(themeDisplay) %>"
 				/>
 			</c:otherwise>

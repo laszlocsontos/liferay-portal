@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,8 +33,6 @@ import com.liferay.portlet.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.portlet.bookmarks.service.BookmarksEntryLocalServiceUtil;
 import com.liferay.portlet.bookmarks.service.BookmarksFolderLocalServiceUtil;
 import com.liferay.portlet.bookmarks.service.permission.BookmarksPermission;
-import com.liferay.portlet.bookmarks.service.persistence.BookmarksEntryExportActionableDynamicQuery;
-import com.liferay.portlet.bookmarks.service.persistence.BookmarksFolderExportActionableDynamicQuery;
 
 import java.util.List;
 import java.util.Map;
@@ -108,12 +106,14 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
 
 		ActionableDynamicQuery folderActionableDynamicQuery =
-			new BookmarksFolderExportActionableDynamicQuery(portletDataContext);
+			BookmarksFolderLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
 		folderActionableDynamicQuery.performActions();
 
 		ActionableDynamicQuery entryActionableDynamicQuery =
-			new BookmarksEntryExportActionableDynamicQuery(portletDataContext);
+			BookmarksEntryLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
 		entryActionableDynamicQuery.performActions();
 
@@ -163,12 +163,14 @@ public class BookmarksPortletDataHandler extends BasePortletDataHandler {
 		throws Exception {
 
 		ActionableDynamicQuery entryExportActionableDynamicQuery =
-			new BookmarksEntryExportActionableDynamicQuery(portletDataContext);
+			BookmarksEntryLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
 		entryExportActionableDynamicQuery.performCount();
 
 		ActionableDynamicQuery folderExportActionableDynamicQuery =
-			new BookmarksFolderExportActionableDynamicQuery(portletDataContext);
+			BookmarksFolderLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
 		folderExportActionableDynamicQuery.performCount();
 	}

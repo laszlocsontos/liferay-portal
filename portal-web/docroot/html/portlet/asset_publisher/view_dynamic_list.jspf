@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,7 +64,7 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 				results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
 			}
 
-			if (!results.isEmpty()) {
+			if (!results.isEmpty() && (start < groupTotal)) {
 				searchContainer.setResults(results);
 
 				request.setAttribute("view.jsp-results", results);
@@ -74,7 +74,7 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 
 				<c:choose>
 					<c:when test="<%= assetPublisherDisplayContext.getPortletDisplayDDMTemplateId() > 0 %>">
-						<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), results, contextObjects) %>
+						<%= PortletDisplayTemplateUtil.renderDDMTemplate(request, response, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), results, contextObjects) %>
 					</c:when>
 					<c:otherwise>
 						<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
@@ -130,33 +130,29 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 			results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
 		}
 
-		searchContainer.setResults(results);
+		if (!results.isEmpty() && (start < total)) {
+			searchContainer.setResults(results);
 
-		request.setAttribute("view.jsp-results", results);
+			request.setAttribute("view.jsp-results", results);
 %>
 
-		<c:choose>
-			<c:when test="<%= assetPublisherDisplayContext.getPortletDisplayDDMTemplateId() > 0 %>">
-				<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), results, contextObjects) %>
-			</c:when>
-			<c:otherwise>
-				<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
-			</c:otherwise>
-		</c:choose>
+			<c:choose>
+				<c:when test="<%= assetPublisherDisplayContext.getPortletDisplayDDMTemplateId() > 0 %>">
+					<%= PortletDisplayTemplateUtil.renderDDMTemplate(request, response, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), results, contextObjects) %>
+				</c:when>
+				<c:otherwise>
+					<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
+				</c:otherwise>
+			</c:choose>
 
 <%
+		 }
 	}
 	else {
 		for (long classNameId : assetPublisherDisplayContext.getClassNameIds()) {
-			long[] oldGroupClassNameIds = assetEntryQuery.getClassNameIds();
+			assetEntryQuery.setClassNameIds(new long[] {classNameId});
 
-			long[] groupClassNameIds = {classNameId};
-
-			assetEntryQuery.setClassNameIds(groupClassNameIds);
-
-			String groupClassName = PortalUtil.getClassName(classNameId);
-
-			AssetRendererFactory groupAssetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(groupClassName);
+			AssetRendererFactory groupAssetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(classNameId);
 
 			int groupTotal = 0;
 
@@ -184,14 +180,14 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 
 			request.setAttribute("view.jsp-results", results);
 
-			if (!results.isEmpty()) {
+			if (!results.isEmpty() && (start < groupTotal)) {
 %>
 
 				<h3 class="asset-entries-group-label"><%= ResourceActionsUtil.getModelResource(locale, groupAssetRendererFactory.getClassName()) %></h3>
 
 				<c:choose>
 					<c:when test="<%= assetPublisherDisplayContext.getPortletDisplayDDMTemplateId() > 0 %>">
-						<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), results, contextObjects) %>
+						<%= PortletDisplayTemplateUtil.renderDDMTemplate(request, response, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), results, contextObjects) %>
 					</c:when>
 					<c:otherwise>
 						<%@ include file="/html/portlet/asset_publisher/view_dynamic_list_asset.jspf" %>
@@ -218,7 +214,6 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 					}
 				}
 
-				assetEntryQuery.setClassNameIds(oldGroupClassNameIds);
 				assetEntryQuery.setEnd(QueryUtil.ALL_POS);
 				assetEntryQuery.setStart(QueryUtil.ALL_POS);
 			}
@@ -227,24 +222,32 @@ if (!portletName.equals(PortletKeys.RELATED_ASSETS) || (assetEntryQuery.getLinke
 		searchContainer.setTotal(total);
 	}
 }
-
-if ((total == 0) && (assetPublisherDisplayContext.getPortletDisplayDDMTemplateId() == 0)) {
-	if (!hasAddPortletURLs && !((assetCategoryId > 0) || Validator.isNotNull(assetTagName))) {
-		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
-	}
 %>
 
-	<div class="alert alert-info">
-		<c:choose>
-			<c:when test="<%= !portletName.equals(PortletKeys.RELATED_ASSETS) %>">
-				<liferay-ui:message key="there-are-no-results" />
-			</c:when>
-			<c:otherwise>
-				<liferay-ui:message key="there-are-no-related-assets" />
-			</c:otherwise>
-		</c:choose>
-	</div>
+<c:if test="<%= total == 0 %>">
+	<c:choose>
+		<c:when test="<%= assetPublisherDisplayContext.getPortletDisplayDDMTemplateId() > 0 %>">
+			<%= PortletDisplayTemplateUtil.renderDDMTemplate(request, response, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), results, contextObjects) %>
+		</c:when>
+		<c:otherwise>
+			<c:if test="<%= !hasAddPortletURLs && !((assetCategoryId > 0) || Validator.isNotNull(assetTagName)) %>">
 
-<%
-}
-%>
+				<%
+				renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
+				%>
+
+			</c:if>
+
+			<div class="alert alert-info">
+				<c:choose>
+					<c:when test="<%= !portletName.equals(PortletKeys.RELATED_ASSETS) %>">
+						<liferay-ui:message key="there-are-no-results" />
+					</c:when>
+					<c:otherwise>
+						<liferay-ui:message key="there-are-no-related-assets" />
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</c:otherwise>
+	</c:choose>
+</c:if>

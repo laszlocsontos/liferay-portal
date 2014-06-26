@@ -30,7 +30,7 @@
 </tr>
 <tr>
 	<td>CANCEL_BUTTON</td>
-	<td>//button[contains(.,'Cancel')]</td>
+	<td>//a[contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -70,6 +70,22 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MENU_CONFIGURATION_RECYCLE_BIN</td>
+	<td>//a[@id='_130_recycleBinLink']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--MENU_MISCELLANEOUS-->
+<tr>
+	<td>MENU_MISCELLANEOUS_DISPLAY_SETTINGS</td>
+	<td>//a[@id='_130_displaySettingsLink']</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -102,7 +118,7 @@
 </tr>
 <tr>
 	<td>MAIN_CONFIGURATION_CDN_DYNAMIC_RESOURCES_ENABLE_CHECKBOX</td>
-	<td>//input[@id='_130_cdn.dynamic.resources.enabledCheckbox']</td>
+	<td>//input[@id='_130_cdn.dynamic.resources.enabled']</td>
 	<td></td>
 </tr>
 <tr>

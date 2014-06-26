@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,8 @@ public interface ContentTypes {
 
 	public static final String APPLICATION_X_WWW_FORM_URLENCODED_UTF8 =
 		"application/x-www-form-urlencoded; charset=UTF-8";
+
+	public static final String APPLICATION_XSLT_XML = "application/xslt+xml";
 
 	public static final String APPLICATION_ZIP = "application/zip";
 

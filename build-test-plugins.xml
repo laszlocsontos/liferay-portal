@@ -5,22 +5,19 @@
 
 	<target name="deploy-simple-server-plugins">
 		<if>
-			<equals arg1="${app.server.type}" arg2="websphere" />
+			<equals arg1="${app.server.type}" arg2="jboss" />
 			<then>
-				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.type=websphere
-app.server.dir=${app.server.dir}
-app.server.deploy.dir=${app.server.dir}/profiles/liferay/wsadmin-deploy
-app.server.lib.global.dir=${app.server.dir}/lib/ext
-app.server.portal.dir=${app.server.dir}/profiles/liferay/installedApps/liferay-cell/liferay-portal.ear/liferay-portal.war
+				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.parent.dir=${app.server.parent.dir}
+app.server.type=${app.server.type}
+app.server.jboss.dir=${app.server.dir}
 
 auto.deploy.dir=${liferay.home}/deploy
 
 plugins.includes=${plugins.includes}</echo>
 			</then>
 			<else>
-				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.dir=${app.server.dir}
-app.server.lib.global.dir=${app.server.lib.global.dir}
-app.server.portal.dir=${app.server.portal.dir}
+				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.parent.dir=${app.server.parent.dir}
+app.server.type=${app.server.type}
 
 auto.deploy.dir=${liferay.home}/deploy
 
@@ -31,11 +28,12 @@ plugins.includes=${plugins.includes}</echo>
 		<if>
 			<equals arg1="${java.security}" arg2="true" />
 			<then>
-				<loadfile failonerror="false" property="liferay-plugin-package.properties.content" srcfile="${lp.plugins.dir}/${plugin.types}/${portlet.plugins.includes}/docroot/WEB-INF/liferay-plugin-package.properties" />
-
 				<if>
 					<not>
-						<contains string="${liferay-plugin-package.properties.content}" substring="security-manager-enabled=true" />
+						<resourcecontains
+							resource="${lp.plugins.dir}/${plugin.types}/${portlet.plugins.includes}/docroot/WEB-INF/liferay-plugin-package.properties"
+							substring="security-manager-enabled=true"
+						/>
 					</not>
 					<then>
 						<echo append="true" file="${lp.plugins.dir}/${plugin.types}/${portlet.plugins.includes}/docroot/WEB-INF/liferay-plugin-package.properties">
@@ -71,20 +69,66 @@ security-manager-enabled=true</echo>
 			<then>
 				<for list="${plugins.includes}" param="plugin.includes">
 					<sequential>
-						<copy todir="${liferay.home}/deploy">
-							<fileset
-								dir="plugins"
-								includes="@{plugin.includes}*.war"
-							/>
-						</copy>
+						<pathconvert pathsep="," property="plugin.war" setonempty="false">
+							<path>
+								<fileset
+									dir="plugins"
+									includes="@{plugin.includes}*.war"
+								/>
+							</path>
+						</pathconvert>
+
+						<propertyregex
+							input="${plugin.war}"
+							override="true"
+							property="plugin.war"
+							regexp=",.*"
+							replace=""
+						/>
+
+						<if>
+							<isset property="plugin.war" />
+							<then>
+								<copy file="${plugin.war}" todir="${liferay.home}/deploy" />
+
+								<var name="plugin.war" unset="true" />
+							</then>
+							<else>
+								<ant dir="${lp.plugins.dir}/${plugin.types}/@{plugin.includes}" inheritAll="false">
+									<target name="clean" />
+									<target name="deploy" />
+								</ant>
+							</else>
+						</if>
 					</sequential>
 				</for>
 			</then>
 			<else>
-				<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
-					<target name="clean" />
-					<target name="deploy" />
-				</ant>
+				<if>
+					<isset property="plugin.types" />
+					<then>
+						<ant-execute
+							ant.dir="${lp.plugins.dir}/${plugin.types}"
+							ant.target="clean"
+						/>
+
+						<ant-execute
+							ant.dir="${lp.plugins.dir}/${plugin.types}"
+							ant.target="deploy"
+						/>
+					</then>
+					<else>
+						<ant-execute
+							ant.dir="${lp.plugins.dir}"
+							ant.target="clean"
+						/>
+
+						<ant-execute
+							ant.dir="${lp.plugins.dir}"
+							ant.target="deploy"
+						/>
+					</else>
+				</if>
 			</else>
 		</if>
 

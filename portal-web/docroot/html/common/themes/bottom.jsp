@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -59,27 +59,6 @@ StringBundler pageBottomSB = OutputTag.getData(request, WebKeys.PAGE_BOTTOM);
 <%-- Theme JavaScript --%>
 
 <script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeJavaScript() + "/main.js")) %>" type="text/javascript"></script>
-
-<c:if test="<%= layout != null %>">
-
-	<%-- User Inputted Layout and LayoutSet JavaScript --%>
-
-	<%
-	LayoutSet layoutSet = themeDisplay.getLayoutSet();
-
-	UnicodeProperties layoutSetSettings = layoutSet.getSettingsProperties();
-
-	UnicodeProperties layoutTypeSettings = layout.getTypeSettingsProperties();
-	%>
-
-	<script type="text/javascript">
-		// <![CDATA[
-			<%= GetterUtil.getString(layoutSetSettings.getProperty("javascript")) %>
-
-			<%= GetterUtil.getString(layoutTypeSettings.getProperty("javascript")) %>
-		// ]]>
-	</script>
-</c:if>
 
 <c:if test="<%= PropsValues.MONITORING_PORTAL_REQUEST %>">
 	<%@ include file="/html/common/themes/bottom_monitoring.jspf" %>

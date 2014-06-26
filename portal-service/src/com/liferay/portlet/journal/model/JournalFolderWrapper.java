@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,6 +66,7 @@ public class JournalFolderWrapper implements JournalFolder,
 		attributes.put("treePath", getTreePath());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
+		attributes.put("restrictionType", getRestrictionType());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
@@ -146,6 +147,12 @@ public class JournalFolderWrapper implements JournalFolder,
 
 		if (description != null) {
 			setDescription(description);
+		}
+
+		Integer restrictionType = (Integer)attributes.get("restrictionType");
+
+		if (restrictionType != null) {
+			setRestrictionType(restrictionType);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -297,11 +304,9 @@ public class JournalFolderWrapper implements JournalFolder,
 	* Returns the user uuid of this journal folder.
 	*
 	* @return the user uuid of this journal folder
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _journalFolder.getUserUuid();
 	}
 
@@ -456,6 +461,26 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
+	* Returns the restriction type of this journal folder.
+	*
+	* @return the restriction type of this journal folder
+	*/
+	@Override
+	public int getRestrictionType() {
+		return _journalFolder.getRestrictionType();
+	}
+
+	/**
+	* Sets the restriction type of this journal folder.
+	*
+	* @param restrictionType the restriction type of this journal folder
+	*/
+	@Override
+	public void setRestrictionType(int restrictionType) {
+		_journalFolder.setRestrictionType(restrictionType);
+	}
+
+	/**
 	* Returns the status of this journal folder.
 	*
 	* @return the status of this journal folder
@@ -499,11 +524,9 @@ public class JournalFolderWrapper implements JournalFolder,
 	* Returns the status by user uuid of this journal folder.
 	*
 	* @return the status by user uuid of this journal folder
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getStatusByUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getStatusByUserUuid() {
 		return _journalFolder.getStatusByUserUuid();
 	}
 
@@ -561,12 +584,10 @@ public class JournalFolderWrapper implements JournalFolder,
 	* Returns the trash entry created when this journal folder was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this journal folder.
 	*
 	* @return the trash entry created when this journal folder was moved to the Recycle Bin
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.trash.model.TrashEntry getTrashEntry()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalFolder.getTrashEntry();
 	}
 
@@ -604,7 +625,6 @@ public class JournalFolderWrapper implements JournalFolder,
 	* Returns <code>true</code> if the parent of this journal folder is in the Recycle Bin.
 	*
 	* @return <code>true</code> if the parent of this journal folder is in the Recycle Bin; <code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean isInTrashContainer() {
@@ -612,9 +632,13 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	@Override
-	public boolean isInTrashExplicitly()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public boolean isInTrashExplicitly() {
 		return _journalFolder.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return _journalFolder.isInTrashImplicitly();
 	}
 
 	/**
@@ -856,42 +880,36 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_journalFolder.persist();
 	}
 
 	@Override
 	public java.lang.String buildTreePath()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalFolder.buildTreePath();
 	}
 
 	@Override
-	public void updateTreePath(java.lang.String treePath)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void updateTreePath(java.lang.String treePath) {
 		_journalFolder.updateTreePath(treePath);
 	}
 
 	@Override
 	public java.util.List<java.lang.Long> getAncestorFolderIds()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalFolder.getAncestorFolderIds();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.journal.model.JournalFolder> getAncestors()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalFolder.getAncestors();
 	}
 
 	@Override
 	public com.liferay.portlet.journal.model.JournalFolder getParentFolder()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalFolder.getParentFolder();
 	}
 

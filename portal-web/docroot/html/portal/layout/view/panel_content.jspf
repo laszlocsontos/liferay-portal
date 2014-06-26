@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,7 +46,7 @@ if (themeDisplay.isStatePopUp() || (layoutTypePortlet.hasStateMax() && (portlet 
 	StringBundler sb = null;
 
 	if (Validator.isNotNull(velocityTemplateId) && Validator.isNotNull(content)) {
-		sb = RuntimePageUtil.getProcessedTemplate(pageContext, ppid, new StringTemplateResource(velocityTemplateId, content));
+		sb = RuntimePageUtil.getProcessedTemplate(request, response, ppid, new StringTemplateResource(velocityTemplateId, content));
 	}
 
 	if (sb != null) {
@@ -57,7 +57,7 @@ else {
 %>
 
 	<div class="portlet-msg-info">
-		<%= LanguageUtil.get(pageContext, "please-select-a-tool-from-the-left-menu") %>
+		<%= LanguageUtil.get(request, "please-select-a-tool-from-the-left-menu") %>
 	</div>
 
 <%

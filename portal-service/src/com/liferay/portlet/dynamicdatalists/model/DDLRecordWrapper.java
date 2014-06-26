@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -282,11 +282,9 @@ public class DDLRecordWrapper implements DDLRecord, ModelWrapper<DDLRecord> {
 	* Returns the user uuid of this d d l record.
 	*
 	* @return the user uuid of this d d l record
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _ddlRecord.getUserUuid();
 	}
 
@@ -344,11 +342,9 @@ public class DDLRecordWrapper implements DDLRecord, ModelWrapper<DDLRecord> {
 	* Returns the version user uuid of this d d l record.
 	*
 	* @return the version user uuid of this d d l record
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getVersionUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getVersionUserUuid() {
 		return _ddlRecord.getVersionUserUuid();
 	}
 
@@ -602,8 +598,7 @@ public class DDLRecordWrapper implements DDLRecord, ModelWrapper<DDLRecord> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_ddlRecord.persist();
 	}
 
@@ -616,8 +611,7 @@ public class DDLRecordWrapper implements DDLRecord, ModelWrapper<DDLRecord> {
 
 	@Override
 	public java.io.Serializable getFieldDataType(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getFieldDataType(fieldName);
 	}
 
@@ -655,37 +649,32 @@ public class DDLRecordWrapper implements DDLRecord, ModelWrapper<DDLRecord> {
 
 	@Override
 	public com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion getLatestRecordVersion()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getLatestRecordVersion();
 	}
 
 	@Override
 	public com.liferay.portlet.dynamicdatalists.model.DDLRecordSet getRecordSet()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getRecordSet();
 	}
 
 	@Override
 	public com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion getRecordVersion()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getRecordVersion();
 	}
 
 	@Override
 	public com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion getRecordVersion(
 		java.lang.String version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getRecordVersion(version);
 	}
 
 	@Override
 	public int getStatus()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddlRecord.getStatus();
 	}
 

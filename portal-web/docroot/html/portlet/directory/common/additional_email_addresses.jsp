@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,24 +28,23 @@ if (classPK > 0) {
 %>
 
 <c:if test="<%= !emailAddresses.isEmpty() %>">
-	<h3><liferay-ui:message key="additional-email-addresses" /></h3>
+	<h3 class="icon-envelope"><liferay-ui:message key="additional-email-addresses" /></h3>
 
 	<ul class="property-list">
 
-	<%
-	for (int i = 0; i < emailAddresses.size(); i++) {
-		EmailAddress emailAddress = emailAddresses.get(i);
-	%>
+		<%
+		for (EmailAddress emailAddress : emailAddresses) {
+		%>
 
-		<li class="<%= emailAddress.isPrimary() ? "primary" : "" %>">
-			<a href="mailto:<%= emailAddress.getAddress() %>"><%= emailAddress.getAddress() %></a>
+			<li class="<%= (emailAddress.isPrimary() && !emailAddresses.isEmpty()) ? "icon-star" : StringPool.BLANK %>">
+				<a href="mailto:<%= emailAddress.getAddress() %>"><%= emailAddress.getAddress() %></a>
 
-			<%= LanguageUtil.get(pageContext, emailAddress.getType().getName()) %>
-		</li>
+				<%= LanguageUtil.get(request, emailAddress.getType().getName()) %>
+			</li>
 
-	<%
-	}
-	%>
+		<%
+		}
+		%>
 
 	</ul>
 </c:if>

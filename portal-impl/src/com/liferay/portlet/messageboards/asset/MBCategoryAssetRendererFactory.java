@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.messageboards.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -43,9 +42,14 @@ public class MBCategoryAssetRendererFactory extends BaseAssetRendererFactory {
 
 	public static final String TYPE = "category";
 
+	public MBCategoryAssetRendererFactory() {
+		setCategorizable(false);
+		setSelectable(false);
+	}
+
 	@Override
 	public AssetRenderer getAssetRenderer(long classPK, int type)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		MBCategory category = MBCategoryLocalServiceUtil.getMBCategory(classPK);
 
@@ -60,6 +64,11 @@ public class MBCategoryAssetRendererFactory extends BaseAssetRendererFactory {
 	@Override
 	public String getClassName() {
 		return MBCategory.class.getName();
+	}
+
+	@Override
+	public String getIconCssClass() {
+		return "icon-comments";
 	}
 
 	@Override
@@ -97,20 +106,8 @@ public class MBCategoryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	public boolean isCategorizable() {
-		return false;
-	}
-
-	@Override
-	public boolean isSelectable() {
-		return _SELECTABLE;
-	}
-
-	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/conversation.png";
 	}
-
-	private static final boolean _SELECTABLE = false;
 
 }

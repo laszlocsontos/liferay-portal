@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
@@ -31,9 +30,9 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
+import com.liferay.portlet.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.portlet.wiki.service.permission.WikiPermission;
 import com.liferay.portlet.wiki.service.persistence.WikiNodeUtil;
-import com.liferay.portlet.wiki.service.persistence.WikiPageExportActionableDynamicQuery;
 
 import java.util.Map;
 
@@ -152,30 +151,46 @@ public class WikiDisplayPortletDataHandler extends WikiPortletDataHandler {
 	}
 
 	protected ActionableDynamicQuery getPageActionableDynamicQuery(
-			final PortletDataContext portletDataContext, final long nodeId,
-			final String portletId)
-		throws SystemException {
+		final PortletDataContext portletDataContext, final long nodeId,
+		final String portletId) {
 
-		return new WikiPageExportActionableDynamicQuery(portletDataContext) {
+		ActionableDynamicQuery actionableDynamicQuery =
+			WikiPageLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
-			@Override
-			protected void addCriteria(DynamicQuery dynamicQuery) {
-				super.addCriteria(dynamicQuery);
+		final ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
+			actionableDynamicQuery.getAddCriteriaMethod();
 
-				Property property = PropertyFactoryUtil.forName("nodeId");
+		actionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
 
-				dynamicQuery.add(property.eq(nodeId));
-			}
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					addCriteriaMethod.addCriteria(dynamicQuery);
 
-			@Override
-			protected void performAction(Object object) throws PortalException {
-				WikiPage page = (WikiPage)object;
+					Property property = PropertyFactoryUtil.forName("nodeId");
 
-				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, portletId, page);
-			}
+					dynamicQuery.add(property.eq(nodeId));
+				}
 
-		};
+			});
+
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					WikiPage page = (WikiPage)object;
+
+					StagedModelDataHandlerUtil.exportReferenceStagedModel(
+						portletDataContext, portletId, page);
+				}
+
+			});
+
+		return actionableDynamicQuery;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

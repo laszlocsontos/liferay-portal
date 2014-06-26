@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.expando.model.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
@@ -648,7 +647,7 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		return columns;
 	}
 
-	protected ExpandoTable getTable() throws PortalException, SystemException {
+	protected ExpandoTable getTable() throws PortalException {
 		ExpandoTable table = ExpandoTableLocalServiceUtil.fetchDefaultTable(
 			_companyId, _className);
 

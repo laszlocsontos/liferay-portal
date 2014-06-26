@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -75,12 +77,10 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @param ratingsStats the ratings stats
 	 * @return the ratings stats that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public RatingsStats addRatingsStats(RatingsStats ratingsStats)
-		throws SystemException {
+	public RatingsStats addRatingsStats(RatingsStats ratingsStats) {
 		ratingsStats.setNew(true);
 
 		return ratingsStatsPersistence.update(ratingsStats);
@@ -103,12 +103,11 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param statsId the primary key of the ratings stats
 	 * @return the ratings stats that was removed
 	 * @throws PortalException if a ratings stats with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public RatingsStats deleteRatingsStats(long statsId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ratingsStatsPersistence.remove(statsId);
 	}
 
@@ -117,12 +116,10 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @param ratingsStats the ratings stats
 	 * @return the ratings stats that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public RatingsStats deleteRatingsStats(RatingsStats ratingsStats)
-		throws SystemException {
+	public RatingsStats deleteRatingsStats(RatingsStats ratingsStats) {
 		return ratingsStatsPersistence.remove(ratingsStats);
 	}
 
@@ -139,12 +136,10 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return ratingsStatsPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -159,12 +154,10 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return ratingsStatsPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -181,12 +174,11 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return ratingsStatsPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -196,11 +188,9 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return ratingsStatsPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -210,18 +200,16 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return ratingsStatsPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public RatingsStats fetchRatingsStats(long statsId)
-		throws SystemException {
+	public RatingsStats fetchRatingsStats(long statsId) {
 		return ratingsStatsPersistence.fetchByPrimaryKey(statsId);
 	}
 
@@ -231,17 +219,46 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param statsId the primary key of the ratings stats
 	 * @return the ratings stats
 	 * @throws PortalException if a ratings stats with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public RatingsStats getRatingsStats(long statsId)
-		throws PortalException, SystemException {
+	public RatingsStats getRatingsStats(long statsId) throws PortalException {
 		return ratingsStatsPersistence.findByPrimaryKey(statsId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(RatingsStats.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("statsId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(RatingsStats.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("statsId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return ratingsStatsLocalService.deleteRatingsStats((RatingsStats)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ratingsStatsPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -255,11 +272,9 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * @param start the lower bound of the range of ratings statses
 	 * @param end the upper bound of the range of ratings statses (not inclusive)
 	 * @return the range of ratings statses
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<RatingsStats> getRatingsStatses(int start, int end)
-		throws SystemException {
+	public List<RatingsStats> getRatingsStatses(int start, int end) {
 		return ratingsStatsPersistence.findAll(start, end);
 	}
 
@@ -267,10 +282,9 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 * Returns the number of ratings statses.
 	 *
 	 * @return the number of ratings statses
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getRatingsStatsesCount() throws SystemException {
+	public int getRatingsStatsesCount() {
 		return ratingsStatsPersistence.countAll();
 	}
 
@@ -279,12 +293,10 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @param ratingsStats the ratings stats
 	 * @return the ratings stats that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public RatingsStats updateRatingsStats(RatingsStats ratingsStats)
-		throws SystemException {
+	public RatingsStats updateRatingsStats(RatingsStats ratingsStats) {
 		return ratingsStatsPersistence.update(ratingsStats);
 	}
 
@@ -631,7 +643,7 @@ public abstract class RatingsStatsLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = ratingsStatsPersistence.getDataSource();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -264,6 +264,11 @@ public class ArrayUtil_IW {
 		return ArrayUtil.containsAll(array1, array2);
 	}
 
+	public <T> int count(T[] array,
+		com.liferay.portal.kernel.util.PredicateFilter<T> predicateFilter) {
+		return ArrayUtil.count(array, predicateFilter);
+	}
+
 	public java.lang.String[] distinct(java.lang.String[] array) {
 		return ArrayUtil.distinct(array);
 	}
@@ -271,6 +276,11 @@ public class ArrayUtil_IW {
 	public java.lang.String[] distinct(java.lang.String[] array,
 		java.util.Comparator<java.lang.String> comparator) {
 		return ArrayUtil.distinct(array, comparator);
+	}
+
+	public <T> boolean exists(T[] array,
+		com.liferay.portal.kernel.util.PredicateFilter<T> predicateFilter) {
+		return ArrayUtil.exists(array, predicateFilter);
 	}
 
 	public boolean[] filter(boolean[] array,
@@ -440,6 +450,11 @@ public class ArrayUtil_IW {
 		return ArrayUtil.removeByPrefix(array, prefix);
 	}
 
+	public void replace(java.lang.String[] values, java.lang.String oldValue,
+		java.lang.String newValue) {
+		ArrayUtil.replace(values, oldValue, newValue);
+	}
+
 	public void reverse(boolean[] array) {
 		ArrayUtil.reverse(array);
 	}
@@ -568,6 +583,11 @@ public class ArrayUtil_IW {
 		return ArrayUtil.toArray(array);
 	}
 
+	public <T, A> A[] toArray(T[] list,
+		com.liferay.portal.kernel.util.Accessor<T, A> accessor) {
+		return ArrayUtil.toArray(list, accessor);
+	}
+
 	public double[] toDoubleArray(
 		java.util.Collection<java.lang.Double> collection) {
 		return ArrayUtil.toDoubleArray(collection);
@@ -584,6 +604,14 @@ public class ArrayUtil_IW {
 
 	public long[] toLongArray(java.util.Collection<java.lang.Long> collection) {
 		return ArrayUtil.toLongArray(collection);
+	}
+
+	public java.lang.Long[] toLongArray(int[] array) {
+		return ArrayUtil.toLongArray(array);
+	}
+
+	public java.lang.Long[] toLongArray(long[] array) {
+		return ArrayUtil.toLongArray(array);
 	}
 
 	public java.lang.Long[] toLongArray(java.lang.Object[] array) {
@@ -611,19 +639,19 @@ public class ArrayUtil_IW {
 		return ArrayUtil.toString(array, param, delimiter, locale);
 	}
 
-	public <T, V> java.lang.String toString(T[] list,
-		com.liferay.portal.kernel.util.Accessor<T, V> accessor) {
+	public <T, A> java.lang.String toString(T[] list,
+		com.liferay.portal.kernel.util.Accessor<T, A> accessor) {
 		return ArrayUtil.toString(list, accessor);
 	}
 
-	public <T, V> java.lang.String toString(T[] list,
-		com.liferay.portal.kernel.util.Accessor<T, V> accessor,
+	public <T, A> java.lang.String toString(T[] list,
+		com.liferay.portal.kernel.util.Accessor<T, A> accessor,
 		java.lang.String delimiter) {
 		return ArrayUtil.toString(list, accessor, delimiter);
 	}
 
-	public <T, V> java.lang.String toString(T[] list,
-		com.liferay.portal.kernel.util.Accessor<T, V> accessor,
+	public <T, A> java.lang.String toString(T[] list,
+		com.liferay.portal.kernel.util.Accessor<T, A> accessor,
 		java.lang.String delimiter, java.util.Locale locale) {
 		return ArrayUtil.toString(list, accessor, delimiter, locale);
 	}
@@ -638,6 +666,11 @@ public class ArrayUtil_IW {
 
 	public java.lang.String[] toStringArray(char[] array) {
 		return ArrayUtil.toStringArray(array);
+	}
+
+	public java.lang.String[] toStringArray(
+		java.util.Collection<java.lang.String> collection) {
+		return ArrayUtil.toStringArray(collection);
 	}
 
 	public java.lang.String[] toStringArray(java.util.Date[] array,

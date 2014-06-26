@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,8 +34,11 @@ public class SeleniumBuilderContextTest {
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		try {
+			_seleniumBuilderFileUtil = new SeleniumBuilderFileUtil(
+				_BASE_DIR, ".");
+
 			_seleniumBuilderContext = new SeleniumBuilderContext(
-				_BASE_DIR, _LIFERAY_SELENIUM_DIR);
+				_seleniumBuilderFileUtil, _LIFERAY_SELENIUM_DIR);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -531,7 +534,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseCommandElement1009.testcase",
 			"Error 1009: Duplicate command name name at " + _DIR_NAME +
-				"/TestCaseCommandElement1009.testcase:6");
+				"/TestCaseCommandElement1009.testcase:8");
 	}
 
 	@Test
@@ -555,7 +558,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1006_3.testcase",
 			"Error 1006: Invalid action attribute value in " + _DIR_NAME +
-				"/TestCaseExecuteElement1006_3.testcase:3");
+				"/TestCaseExecuteElement1006_3.testcase:5");
 	}
 
 	@Test
@@ -563,7 +566,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1006_4.testcase",
 			"Error 1006: Invalid action attribute value in " + _DIR_NAME +
-				"/TestCaseExecuteElement1006_4.testcase:3");
+				"/TestCaseExecuteElement1006_4.testcase:5");
 	}
 
 	@Test
@@ -571,7 +574,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1006_5.testcase",
 			"Error 1006: Invalid macro attribute value in " + _DIR_NAME +
-				"/TestCaseExecuteElement1006_5.testcase:3");
+				"/TestCaseExecuteElement1006_5.testcase:5");
 	}
 
 	@Test
@@ -579,7 +582,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1006_6.testcase",
 			"Error 1006: Invalid macro attribute value in " + _DIR_NAME +
-				"/TestCaseExecuteElement1006_6.testcase:3");
+				"/TestCaseExecuteElement1006_6.testcase:5");
 	}
 
 	@Test
@@ -587,7 +590,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1010.testcase",
 			"Error 1010: Invalid locator-key PAGE_NAME_X at " + _DIR_NAME +
-				"/TestCaseExecuteElement1010.testcase:3");
+				"/TestCaseExecuteElement1010.testcase:5");
 	}
 
 	@Test
@@ -595,7 +598,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1011_1.testcase",
 			"Error 1011: Invalid action name BaseLiferays at " + _DIR_NAME +
-				"/TestCaseExecuteElement1011_1.testcase:3");
+				"/TestCaseExecuteElement1011_1.testcase:5");
 	}
 
 	@Test
@@ -603,7 +606,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1011_2.testcase",
 			"Error 1011: Invalid macro name BlogsEntrys at " + _DIR_NAME +
-				"/TestCaseExecuteElement1011_2.testcase:3");
+				"/TestCaseExecuteElement1011_2.testcase:5");
 	}
 
 	@Test
@@ -611,7 +614,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1012_1.testcase",
 			"Error 1012: Invalid action command clicks at " + _DIR_NAME +
-				"/TestCaseExecuteElement1012_1.testcase:3");
+				"/TestCaseExecuteElement1012_1.testcase:5");
 	}
 
 	@Test
@@ -619,7 +622,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseExecuteElement1012_2.testcase",
 			"Error 1012: Invalid macro command pgAdder at " + _DIR_NAME +
-				"/TestCaseExecuteElement1012_2.testcase:3");
+				"/TestCaseExecuteElement1012_2.testcase:5");
 	}
 
 	@Test
@@ -635,7 +638,7 @@ public class SeleniumBuilderContextTest {
 		test(
 			"TestCaseSetUpElement1006_2.testcase",
 			"Error 1006: Invalid test-case attribute value in " + _DIR_NAME +
-				"/TestCaseSetUpElement1006_2.testcase:3");
+				"/TestCaseSetUpElement1006_2.testcase:5");
 	}
 
 	protected void test(String fileName) throws Exception {
@@ -700,5 +703,6 @@ public class SeleniumBuilderContextTest {
 		SeleniumBuilderContextTest.class);
 
 	private static SeleniumBuilderContext _seleniumBuilderContext;
+	private static SeleniumBuilderFileUtil _seleniumBuilderFileUtil;
 
 }

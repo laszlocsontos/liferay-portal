@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,32 +20,31 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.StagingLocalServiceUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.util.GroupTestUtil;
-import com.liferay.portal.util.LayoutTestUtil;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.LayoutTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
-import com.liferay.portlet.journal.util.JournalTestUtil;
+import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,11 +64,6 @@ public class StagingImplTest {
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		GroupLocalServiceUtil.deleteGroup(_group);
 	}
 
 	@Test
@@ -95,8 +89,8 @@ public class StagingImplTest {
 				locale, description.concat(LocaleUtil.toLanguageId(locale)));
 		}
 
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			groupId);
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(groupId);
 
 		AssetVocabulary assetVocabulary =
 			AssetVocabularyLocalServiceUtil.addVocabulary(
@@ -125,14 +119,11 @@ public class StagingImplTest {
 		JournalArticle journalArticle = JournalTestUtil.addArticle(
 			_group.getGroupId(), "Title", "content");
 
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			_group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		Map<String, String[]> parameters = StagingUtil.getStagingParameters();
 
-		parameters.put(
-			PortletDataHandlerKeys.CATEGORIES,
-			new String[] {String.valueOf(stageCategories)});
 		parameters.put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION +
 				StringPool.UNDERLINE + PortletKeys.JOURNAL,
@@ -156,9 +147,6 @@ public class StagingImplTest {
 				PortletKeys.JOURNAL,
 			new String[] {String.valueOf(stageJournal)});
 
-		serviceContext.setAttribute(
-			StagingUtil.getStagedPortletId(PortletDataHandlerKeys.CATEGORIES),
-			stageCategories);
 		serviceContext.setAttribute(
 			StagingUtil.getStagedPortletId(PortletKeys.JOURNAL), stageJournal);
 
@@ -255,13 +243,14 @@ public class StagingImplTest {
 			TestPropsValues.getUserId(), category.getCategoryId(),
 			category.getParentCategoryId(), titleMap,
 			category.getDescriptionMap(), category.getVocabularyId(), null,
-			ServiceTestUtil.getServiceContext());
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	private static Locale[] _locales = {
 		LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US
 	};
 
+	@DeleteAfterTestRun
 	private Group _group;
 
 }

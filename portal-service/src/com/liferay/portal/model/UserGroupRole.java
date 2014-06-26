@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +39,16 @@ public interface UserGroupRole extends UserGroupRoleModel, PersistedModel {
 			public Long get(UserGroupRole userGroupRole) {
 				return userGroupRole.getGroupId();
 			}
+
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
+
+			@Override
+			public Class<UserGroupRole> getTypeClass() {
+				return UserGroupRole.class;
+			}
 		};
 
 	public static final Accessor<UserGroupRole, Long> ROLE_ID_ACCESSOR = new Accessor<UserGroupRole, Long>() {
@@ -46,17 +56,24 @@ public interface UserGroupRole extends UserGroupRoleModel, PersistedModel {
 			public Long get(UserGroupRole userGroupRole) {
 				return userGroupRole.getRoleId();
 			}
+
+			@Override
+			public Class<Long> getAttributeClass() {
+				return Long.class;
+			}
+
+			@Override
+			public Class<UserGroupRole> getTypeClass() {
+				return UserGroupRole.class;
+			}
 		};
 
 	public com.liferay.portal.model.Group getGroup()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public com.liferay.portal.model.Role getRole()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public com.liferay.portal.model.User getUser()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 }

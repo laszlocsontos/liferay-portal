@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -269,11 +269,9 @@ public class PollsQuestionWrapper implements PollsQuestion,
 	* Returns the user uuid of this polls question.
 	*
 	* @return the user uuid of this polls question
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _pollsQuestion.getUserUuid();
 	}
 
@@ -792,33 +790,28 @@ public class PollsQuestionWrapper implements PollsQuestion,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_pollsQuestion.persist();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portlet.polls.model.PollsChoice> getChoices()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portlet.polls.model.PollsChoice> getChoices() {
 		return _pollsQuestion.getChoices();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portlet.polls.model.PollsVote> getVotes()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portlet.polls.model.PollsVote> getVotes() {
 		return _pollsQuestion.getVotes();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.polls.model.PollsVote> getVotes(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _pollsQuestion.getVotes(start, end);
 	}
 
 	@Override
-	public int getVotesCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getVotesCount() {
 		return _pollsQuestion.getVotesCount();
 	}
 

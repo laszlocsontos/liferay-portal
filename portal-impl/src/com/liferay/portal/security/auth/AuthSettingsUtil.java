@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.security.auth;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
@@ -53,9 +52,7 @@ public class AuthSettingsUtil {
 		return false;
 	}
 
-	public static boolean isLDAPAuthEnabled(long companyId)
-		throws SystemException {
-
+	public static boolean isLDAPAuthEnabled(long companyId) {
 		if (PrefsPropsUtil.getBoolean(
 				companyId, PropsKeys.LDAP_AUTH_ENABLED,
 				PropsValues.LDAP_AUTH_ENABLED)) {
@@ -67,7 +64,7 @@ public class AuthSettingsUtil {
 		}
 	}
 
-	public static boolean isNtlmEnabled(long companyId) throws SystemException {
+	public static boolean isNtlmEnabled(long companyId) {
 		if (PrefsPropsUtil.getBoolean(
 				companyId, PropsKeys.NTLM_AUTH_ENABLED,
 				PropsValues.NTLM_AUTH_ENABLED)) {
@@ -79,9 +76,7 @@ public class AuthSettingsUtil {
 		}
 	}
 
-	public static boolean isSiteMinderEnabled(long companyId)
-		throws SystemException {
-
+	public static boolean isSiteMinderEnabled(long companyId) {
 		if (PrefsPropsUtil.getBoolean(
 				companyId, PropsKeys.SITEMINDER_AUTH_ENABLED,
 				PropsValues.SITEMINDER_AUTH_ENABLED)) {

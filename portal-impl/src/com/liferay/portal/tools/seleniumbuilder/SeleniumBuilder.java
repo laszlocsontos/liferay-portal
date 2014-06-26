@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.tools.ArgumentsUtil;
-import com.liferay.portal.util.InitUtil;
+import com.liferay.portal.tools.ToolDependencies;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ import java.util.TreeSet;
 public class SeleniumBuilder {
 
 	public static void main(String[] args) throws Exception {
-		InitUtil.initWithSpring();
+		ToolDependencies.wireBasic();
 
 		new SeleniumBuilder(args);
 	}
@@ -49,57 +49,72 @@ public class SeleniumBuilder {
 	public SeleniumBuilder(String[] args) throws Exception {
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
-		String baseDir = arguments.get("selenium.base.dir");
+		String baseDirName = arguments.get("selenium.base.dir");
+		String projectDirName = arguments.get("project.dir");
 
-		_seleniumBuilderContext = new SeleniumBuilderContext(baseDir);
-		_seleniumBuilderFileUtil = new SeleniumBuilderFileUtil(baseDir);
+		_seleniumBuilderFileUtil = new SeleniumBuilderFileUtil(
+			baseDirName, projectDirName);
+
+		_seleniumBuilderContext = new SeleniumBuilderContext(
+			_seleniumBuilderFileUtil);
+
+		Set<String> actionNames = _seleniumBuilderContext.getActionNames();
+
+		for (String actionName : actionNames) {
+			_seleniumBuilderContext.validateActionElements(actionName);
+		}
+
+		Set<String> functionNames = _seleniumBuilderContext.getFunctionNames();
+
+		for (String functionName : functionNames) {
+			_seleniumBuilderContext.validateFunctionElements(functionName);
+		}
+
+		Set<String> macroNames = _seleniumBuilderContext.getMacroNames();
+
+		for (String macroName : macroNames) {
+			_seleniumBuilderContext.validateMacroElements(macroName);
+		}
+
+		Set<String> testCaseNames = _seleniumBuilderContext.getTestCaseNames();
+
+		for (String testCaseName : testCaseNames) {
+			_seleniumBuilderContext.validateTestCaseElements(testCaseName);
+		}
 
 		Set<String> types = SetUtil.fromArray(
 			StringUtil.split(arguments.get("selenium.types")));
 
 		if (types.contains("action")) {
 			ActionConverter actionConverter = new ActionConverter(
-				_seleniumBuilderContext);
-
-			Set<String> actionNames = _seleniumBuilderContext.getActionNames();
+				_seleniumBuilderContext, _seleniumBuilderFileUtil);
 
 			for (String actionName : actionNames) {
-				_seleniumBuilderContext.validateActionElements(actionName);
-
 				actionConverter.convert(actionName);
 			}
 		}
 
 		if (types.contains("function")) {
 			FunctionConverter functionConverter = new FunctionConverter(
-				_seleniumBuilderContext);
-
-			Set<String> functionNames =
-				_seleniumBuilderContext.getFunctionNames();
+				_seleniumBuilderContext, _seleniumBuilderFileUtil);
 
 			for (String functionName : functionNames) {
-				_seleniumBuilderContext.validateFunctionElements(functionName);
-
 				functionConverter.convert(functionName);
 			}
 		}
 
 		if (types.contains("macro")) {
 			MacroConverter macroConverter = new MacroConverter(
-				_seleniumBuilderContext);
-
-			Set<String> macroNames = _seleniumBuilderContext.getMacroNames();
+				_seleniumBuilderContext, _seleniumBuilderFileUtil);
 
 			for (String macroName : macroNames) {
-				_seleniumBuilderContext.validateMacroElements(macroName);
-
 				macroConverter.convert(macroName);
 			}
 		}
 
 		if (types.contains("path")) {
 			PathConverter pathConverter = new PathConverter(
-				_seleniumBuilderContext);
+				_seleniumBuilderContext, _seleniumBuilderFileUtil);
 
 			Set<String> pathNames = _seleniumBuilderContext.getPathNames();
 
@@ -110,15 +125,49 @@ public class SeleniumBuilder {
 
 		if (types.contains("testcase")) {
 			TestCaseConverter testCaseConverter = new TestCaseConverter(
-				_seleniumBuilderContext);
+				_seleniumBuilderContext, _seleniumBuilderFileUtil);
 
-			Set<String> testCaseNames =
-				_seleniumBuilderContext.getTestCaseNames();
+			String testClass = arguments.get("test.class");
 
-			for (String testCaseName : testCaseNames) {
-				_seleniumBuilderContext.validateTestCaseElements(testCaseName);
+			if (!testClass.equals("${test.class}")) {
+				String testCaseCommandName = null;
+				String testCaseName = null;
 
-				testCaseConverter.convert(testCaseName);
+				if (testClass.contains("#")) {
+					String[] testClassParts = StringUtil.split(testClass, "#");
+
+					testCaseCommandName = testClassParts[1];
+					testCaseName = testClassParts[0];
+				}
+				else {
+					testCaseName = testClass;
+				}
+
+				if ((testCaseCommandName != null) &&
+					testCaseCommandName.startsWith("test")) {
+
+					testCaseCommandName = StringUtil.replaceFirst(
+						testCaseCommandName, "test", "");
+				}
+
+				if (testCaseName.endsWith("TestCase")) {
+					testCaseName = StringUtil.replaceLast(
+						testCaseName, "TestCase", "");
+				}
+
+				Element rootElement =
+					_seleniumBuilderContext.getTestCaseRootElement(
+						testCaseName);
+
+				String extendsTestCaseName = rootElement.attributeValue(
+					"extends");
+
+				if (extendsTestCaseName != null) {
+					testCaseConverter.convert(
+						extendsTestCaseName, testCaseCommandName);
+				}
+
+				testCaseConverter.convert(testCaseName, testCaseCommandName);
 			}
 		}
 
@@ -288,8 +337,10 @@ public class SeleniumBuilder {
 				testCaseMethodNames.add(testCaseMethodName);
 			}
 
-			testCaseMethodNameMap.put(
-				componentName, compontentTestCaseMethodNames);
+			if (!compontentTestCaseMethodNames.isEmpty()) {
+				testCaseMethodNameMap.put(
+					componentName, compontentTestCaseMethodNames);
+			}
 		}
 
 		List<String> componentNames =
@@ -347,7 +398,7 @@ public class SeleniumBuilder {
 				}
 			}
 
-			if (productTestCaseMethodNames.size() != 0) {
+			if (!productTestCaseMethodNames.isEmpty()) {
 				String testCaseMethodNamesString = StringUtil.merge(
 					productTestCaseMethodNames.toArray(
 						new String[productTestCaseMethodNames.size()]),
@@ -419,16 +470,45 @@ public class SeleniumBuilder {
 			List<Element> rootPropertyElements = rootElement.elements(
 				"property");
 
+			StringBundler sb = new StringBundler();
+
+			sb.append(testCaseName);
+			sb.append("TestCase.all.testray.testcase.product.edition=CE");
+
+			testCaseProperties.add(sb.toString());
+
 			for (Element rootPropertyElement : rootPropertyElements) {
-				StringBundler sb = new StringBundler();
+				sb = new StringBundler();
 
 				sb.append(testCaseName);
 				sb.append("TestCase.all.");
-				sb.append(rootPropertyElement.attributeValue("name"));
+
+				String rootPropertyName = rootPropertyElement.attributeValue(
+					"name");
+
+				sb.append(rootPropertyName);
+
 				sb.append("=");
 				sb.append(rootPropertyElement.attributeValue("value"));
 
 				testCaseProperties.add(sb.toString());
+
+				String rootPropertyDelimiter =
+					rootPropertyElement.attributeValue("delimiter");
+
+				if ((rootPropertyDelimiter != null) &&
+					rootPropertyName.equals("ignore.errors")) {
+
+					sb = new StringBundler();
+
+					sb.append(testCaseName);
+					sb.append("TestCase.all.");
+					sb.append(rootPropertyName);
+					sb.append(".delimiter=");
+					sb.append(rootPropertyDelimiter);
+
+					testCaseProperties.add(sb.toString());
+				}
 			}
 
 			List<Element> commandElements =
@@ -441,7 +521,7 @@ public class SeleniumBuilder {
 						commandElement, "property");
 
 				for (Element commandPropertyElement : commandPropertyElements) {
-					StringBundler sb = new StringBundler();
+					sb = new StringBundler();
 
 					sb.append(testCaseName);
 					sb.append("TestCase.test");
@@ -453,6 +533,41 @@ public class SeleniumBuilder {
 
 					testCaseProperties.add(sb.toString());
 				}
+
+				sb = new StringBundler();
+
+				sb.append(testCaseName);
+				sb.append("TestCase.test");
+				sb.append(commandElement.attributeValue("name"));
+				sb.append(".testray.testcase.description=");
+
+				if (commandElement.attributeValue("description") != null) {
+					sb.append(commandElement.attributeValue("description"));
+				}
+
+				testCaseProperties.add(sb.toString());
+
+				sb = new StringBundler();
+
+				sb.append(testCaseName);
+				sb.append("TestCase.test");
+				sb.append(commandElement.attributeValue("name"));
+				sb.append(".testray.testcase.name=");
+				sb.append(testCaseName);
+				sb.append("#");
+				sb.append(commandElement.attributeValue("name"));
+
+				testCaseProperties.add(sb.toString());
+
+				sb = new StringBundler();
+
+				sb.append(testCaseName);
+				sb.append("TestCase.test");
+				sb.append(commandElement.attributeValue("name"));
+				sb.append(".testray.testcase.priority=");
+				sb.append(commandElement.attributeValue("priority"));
+
+				testCaseProperties.add(sb.toString());
 			}
 		}
 

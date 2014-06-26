@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,7 +55,7 @@ else {
 	>
 		<liferay-ui:search-container-column-text
 			name="type"
-			value="<%= LanguageUtil.get(pageContext, delivery.getType()) %>"
+			value="<%= LanguageUtil.get(request, delivery.getType()) %>"
 		/>
 		<liferay-ui:search-container-column-jsp
 			name="email"

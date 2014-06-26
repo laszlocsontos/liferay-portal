@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,13 +57,9 @@ catch (Exception e) {
 	<aui:fieldset>
 		<c:choose>
 			<c:when test="<%= selCompany != null %>">
-				<aui:field-wrapper label="id">
-					<liferay-ui:input-resource url="<%= String.valueOf(companyId) %>" />
-				</aui:field-wrapper>
+				<aui:input name="id" type="resource" value="<%= String.valueOf(companyId) %>" />
 
-				<aui:field-wrapper label="web-id">
-					<liferay-ui:input-resource url="<%= selCompany.getWebId() %>" />
-				</aui:field-wrapper>
+				<aui:input name="web-id" type="resource" value="<%= selCompany.getWebId() %>" />
 			</c:when>
 			<c:otherwise>
 				<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="webId" />
@@ -111,7 +107,7 @@ catch (Exception e) {
 
 <aui:script>
 	function <portlet:namespace />saveCompany() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (selCompany == null) ? Constants.ADD : Constants.UPDATE %>";
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (selCompany == null) ? Constants.ADD : Constants.UPDATE %>';
 
 		submitForm(document.<portlet:namespace />fm);
 	}

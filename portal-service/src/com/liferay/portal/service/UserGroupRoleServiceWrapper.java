@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,29 +53,25 @@ public class UserGroupRoleServiceWrapper implements UserGroupRoleService,
 
 	@Override
 	public void addUserGroupRoles(long userId, long groupId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_userGroupRoleService.addUserGroupRoles(userId, groupId, roleIds);
 	}
 
 	@Override
 	public void addUserGroupRoles(long[] userIds, long groupId, long roleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_userGroupRoleService.addUserGroupRoles(userIds, groupId, roleId);
 	}
 
 	@Override
 	public void deleteUserGroupRoles(long userId, long groupId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_userGroupRoleService.deleteUserGroupRoles(userId, groupId, roleIds);
 	}
 
 	@Override
 	public void deleteUserGroupRoles(long[] userIds, long groupId, long roleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_userGroupRoleService.deleteUserGroupRoles(userIds, groupId, roleId);
 	}
 

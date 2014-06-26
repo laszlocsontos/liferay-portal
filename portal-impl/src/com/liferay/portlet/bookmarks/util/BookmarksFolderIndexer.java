@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portlet.bookmarks.util;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -38,11 +37,11 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
 import com.liferay.portlet.bookmarks.service.BookmarksFolderLocalServiceUtil;
 import com.liferay.portlet.bookmarks.service.permission.BookmarksFolderPermission;
-import com.liferay.portlet.bookmarks.service.persistence.BookmarksFolderActionableDynamicQuery;
 
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
 
@@ -57,6 +56,9 @@ public class BookmarksFolderIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.BOOKMARKS;
 
 	public BookmarksFolderIndexer() {
+		setDefaultSelectedFieldNames(
+			Field.COMPANY_ID, Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK,
+			Field.TITLE, Field.UID);
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -131,8 +133,8 @@ public class BookmarksFolderIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet,
-		PortletURL portletURL) {
+		Document document, Locale locale, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		LiferayPortletURL liferayPortletURL = (LiferayPortletURL)portletURL;
 
@@ -197,24 +199,26 @@ public class BookmarksFolderIndexer extends BaseIndexer {
 		return PORTLET_ID;
 	}
 
-	protected void reindexFolders(long companyId)
-		throws PortalException, SystemException {
-
-		ActionableDynamicQuery actionableDynamicQuery =
-			new BookmarksFolderActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object) throws PortalException {
-				BookmarksFolder folder = (BookmarksFolder)object;
-
-				Document document = getDocument(folder);
-
-				addDocument(document);
-			}
-
-		};
+	protected void reindexFolders(long companyId) throws PortalException {
+		final ActionableDynamicQuery actionableDynamicQuery =
+			BookmarksFolderLocalServiceUtil.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setCompanyId(companyId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					BookmarksFolder folder = (BookmarksFolder)object;
+
+					Document document = getDocument(folder);
+
+					actionableDynamicQuery.addDocument(document);
+				}
+
+			});
 		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		actionableDynamicQuery.performActions();

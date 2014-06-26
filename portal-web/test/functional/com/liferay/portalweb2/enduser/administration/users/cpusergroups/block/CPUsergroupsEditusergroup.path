@@ -45,12 +45,38 @@
 </tr>
 <tr>
 	<td>CANCEL_BUTTON</td>
-	<td>//button[contains(.,'Cancel')]</td>
+	<td>//a[contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PUBLIC_PAGES_OPEN_PAGES</td>
 	<td>//a[contains(@title,'(Opens New Window)')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENABLE_PROPAGATION_PUBLIC_PAGE_CHECKBOX</td>
+	<td>//input[@id='_127_publicLayoutSetPrototypeLinkEnabled']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENABLE_PROPAGATION_PRIVATE_PAGE_CHECKBOX</td>
+	<td>//input[@id='_127_privateLayoutSetPrototypeLinkEnabled']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--USER_GROUP_SITE-->
+<tr>
+	<td>USER_GROUP_SITE_PUBLIC_PAGES_SELECT</td>
+	<td>//select[@id='_127_publicLayoutSetPrototypeId']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>USER_GROUP_SITE_PRIVATE_PAGES_SELECT</td>
+	<td>//select[@id='_127_privateLayoutSetPrototypeId']</td>
 	<td></td>
 </tr>
 </tbody>

@@ -295,7 +295,7 @@
 	<#assign the_title = page_group.getDescriptiveName() />
 </#if>
 
-<#if (tilesTitle == "") && !pageTitle??>
+<#if tilesTitle == "">
 	<#assign the_title = htmlUtil.escape(the_title) />
 </#if>
 
@@ -326,7 +326,7 @@
 
 <#assign logo_description = "" />
 
-<#if !$show_site_name>
+<#if !show_site_name>
 	<#assign logo_description = htmlUtil.escape(site_name) />
 </#if>
 

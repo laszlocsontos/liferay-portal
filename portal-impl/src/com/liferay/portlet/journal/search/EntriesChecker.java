@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,6 +56,11 @@ public class EntriesChecker extends RowChecker {
 
 	@Override
 	public String getAllRowsCheckBox() {
+		return null;
+	}
+
+	@Override
+	public String getAllRowsCheckBox(HttpServletRequest request) {
 		return null;
 	}
 
@@ -134,19 +139,19 @@ public class EntriesChecker extends RowChecker {
 		sb.append(_liferayPortletResponse.getNamespace());
 		sb.append(RowChecker.ROW_IDS);
 		sb.append(JournalFolder.class.getSimpleName());
-		sb.append("Checkbox', '");
+		sb.append("', '");
 		sb.append(_liferayPortletResponse.getNamespace());
 		sb.append(RowChecker.ROW_IDS);
 		sb.append(JournalArticle.class.getSimpleName());
-		sb.append("Checkbox']");
+		sb.append("']");
 
 		String checkBoxRowIds = sb.toString();
 
 		return getRowCheckBox(
-			checked, disabled,
+			request, checked, disabled,
 			_liferayPortletResponse.getNamespace() + RowChecker.ROW_IDS +
-				name + "Checkbox",
-			primaryKey, checkBoxRowIds, "'#" + getAllRowIds() + "Checkbox'",
+				name + "",
+			primaryKey, checkBoxRowIds, "'#" + getAllRowIds() + "'",
 			StringPool.BLANK);
 	}
 

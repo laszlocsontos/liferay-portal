@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,15 +14,14 @@
  */
 --%>
 
-<div>
+<%
+List<Portlet> portlets = PortalUtil.getControlPanelPortlets(controlPanelCategory, themeDisplay);
 
-	<%
-	List<Portlet> portlets = PortalUtil.getControlPanelPortlets(controlPanelCategory, themeDisplay);
+if (portlets.size() > 1) {
+%>
 
-	if (portlets.size() > 1) {
-	%>
-
-		<aui:nav cssClass="control-panel-bar-secondary nav-pills">
+	<div class="control-panel-bar-secondary">
+		<aui:nav cssClass="nav-pills">
 
 			<%
 			for (Portlet curPortlet : portlets) {
@@ -58,9 +57,8 @@
 			%>
 
 		</aui:nav>
+	</div>
 
-	<%
-	}
-	%>
-
-</div>
+<%
+}
+%>

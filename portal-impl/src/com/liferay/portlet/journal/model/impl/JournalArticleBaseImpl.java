@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,8 +13,6 @@
  */
 
 package com.liferay.portlet.journal.model.impl;
-
-import com.liferay.portal.kernel.exception.SystemException;
 
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
@@ -39,7 +37,7 @@ public abstract class JournalArticleBaseImpl extends JournalArticleModelImpl
 	 * Never modify or reference this class directly. All methods that expect a journal article model instance should use the {@link JournalArticle} interface instead.
 	 */
 	@Override
-	public void persist() throws SystemException {
+	public void persist() {
 		if (this.isNew()) {
 			JournalArticleLocalServiceUtil.addJournalArticle(this);
 		}
@@ -49,7 +47,7 @@ public abstract class JournalArticleBaseImpl extends JournalArticleModelImpl
 	}
 
 	@Override
-	public void updateTreePath(String treePath) throws SystemException {
+	public void updateTreePath(String treePath) {
 		JournalArticle journalArticle = this;
 
 		journalArticle.setTreePath(treePath);

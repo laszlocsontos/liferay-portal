@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,14 +21,13 @@ import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.microsofttranslator.MicrosoftTranslatorException;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.NumericalStringComparator;
+import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webcache.WebCacheItem;
-import com.liferay.portal.util.InitUtil;
 import com.liferay.portlet.translator.model.Translation;
 import com.liferay.portlet.translator.util.TranslationWebCacheItem;
 
@@ -54,11 +53,11 @@ public class LangBuilder {
 		" (Automatic Translation)";
 
 	public static void main(String[] args) {
+		ToolDependencies.wireBasic();
+
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
 		System.setProperty("line.separator", StringPool.NEW_LINE);
-
-		InitUtil.initWithSpring();
 
 		String langDir = arguments.get("lang.dir");
 		String langFile = arguments.get("lang.file");
@@ -488,7 +487,7 @@ public class LangBuilder {
 			new FileWriter(propertiesFile));
 
 		Map<String, String> messages = new TreeMap<String, String>(
-			new NumericalStringComparator(true, true));
+			new NaturalOrderStringComparator(true, true));
 
 		boolean begin = false;
 		boolean firstLine = true;

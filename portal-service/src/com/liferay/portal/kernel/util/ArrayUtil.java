@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -805,6 +805,22 @@ public class ArrayUtil {
 		return true;
 	}
 
+	public static <T> int count(T[] array, PredicateFilter<T> predicateFilter) {
+		if (isEmpty(array)) {
+			return 0;
+		}
+
+		int count = 0;
+
+		for (T t : array) {
+			if (predicateFilter.filter(t)) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	public static String[] distinct(String[] array) {
 		return distinct(array, null);
 	}
@@ -830,6 +846,22 @@ public class ArrayUtil {
 		}
 
 		return set.toArray(new String[set.size()]);
+	}
+
+	public static <T> boolean exists(
+		T[] array, PredicateFilter<T> predicateFilter) {
+
+		if (isEmpty(array)) {
+			return false;
+		}
+
+		for (T t : array) {
+			if (predicateFilter.filter(t)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static boolean[] filter(
@@ -1244,6 +1276,16 @@ public class ArrayUtil {
 		return list.toArray(new String[list.size()]);
 	}
 
+	public static void replace(
+		String[] values, String oldValue, String newValue) {
+
+		for (int i = 0; i < values.length; i++) {
+			if (values[i].equals(oldValue)) {
+				values[i] = newValue;
+			}
+		}
+	}
+
 	public static void reverse(boolean[] array) {
 		for (int left = 0, right = array.length - 1; left < right;
 				left++, right--) {
@@ -1592,6 +1634,17 @@ public class ArrayUtil {
 		return newArray;
 	}
 
+	public static <T, A> A[] toArray(T[] list, Accessor<T, A> accessor) {
+		A[] aArray = (A[])Array.newInstance(
+			accessor.getAttributeClass(), list.length);
+
+		for (int i = 0; i < list.length; i++) {
+			aArray[i] = accessor.get(list[i]);
+		}
+
+		return aArray;
+	}
+
 	public static double[] toDoubleArray(Collection<Double> collection) {
 		double[] newArray = new double[collection.size()];
 
@@ -1700,6 +1753,26 @@ public class ArrayUtil {
 		return newArray;
 	}
 
+	public static Long[] toLongArray(int[] array) {
+		Long[] newArray = new Long[array.length];
+
+		for (int i = 0; i < array.length; i++) {
+			newArray[i] = (long)array[i];
+		}
+
+		return newArray;
+	}
+
+	public static Long[] toLongArray(long[] array) {
+		Long[] newArray = new Long[array.length];
+
+		for (int i = 0; i < array.length; i++) {
+			newArray[i] = array[i];
+		}
+
+		return newArray;
+	}
+
 	public static Long[] toLongArray(Object[] array) {
 		Long[] newArray = new Long[array.length];
 
@@ -1787,21 +1860,21 @@ public class ArrayUtil {
 	/**
 	 * @see ListUtil#toString(List, Accessor)
 	 */
-	public static <T, V> String toString(T[] list, Accessor<T, V> accessor) {
+	public static <T, A> String toString(T[] list, Accessor<T, A> accessor) {
 		return toString(list, accessor, StringPool.COMMA);
 	}
 
 	/**
 	 * @see ListUtil#toString(List, Accessor, String)
 	 */
-	public static <T, V> String toString(
-		T[] list, Accessor<T, V> accessor, String delimiter) {
+	public static <T, A> String toString(
+		T[] list, Accessor<T, A> accessor, String delimiter) {
 
 		return toString(list, accessor, delimiter, null);
 	}
 
-	public static <T, V> String toString(
-		T[] list, Accessor<T, V> accessor, String delimiter, Locale locale) {
+	public static <T, A> String toString(
+		T[] list, Accessor<T, A> accessor, String delimiter, Locale locale) {
 
 		if (isEmpty(list)) {
 			return StringPool.BLANK;
@@ -1812,14 +1885,14 @@ public class ArrayUtil {
 		for (int i = 0; i < list.length; i++) {
 			T bean = list[i];
 
-			V value = accessor.get(bean);
+			A attribute = accessor.get(bean);
 
-			if (value != null) {
+			if (attribute != null) {
 				if (locale != null) {
-					sb.append(LanguageUtil.get(locale, value.toString()));
+					sb.append(LanguageUtil.get(locale, attribute.toString()));
 				}
 				else {
-					sb.append(value);
+					sb.append(attribute);
 				}
 			}
 
@@ -1856,6 +1929,33 @@ public class ArrayUtil {
 
 		for (int i = 0; i < array.length; i++) {
 			newArray[i] = String.valueOf(array[i]);
+		}
+
+		return newArray;
+	}
+
+	public static String[] toStringArray(Collection<String> collection) {
+		String[] newArray = new String[collection.size()];
+
+		if (collection instanceof List) {
+			List<String> list = (List<String>)collection;
+
+			for (int i = 0; i < list.size(); i++) {
+				String value = list.get(i);
+
+				newArray[i] = String.valueOf(value);
+			}
+		}
+		else {
+			int i = 0;
+
+			Iterator<String> iterator = collection.iterator();
+
+			while (iterator.hasNext()) {
+				String value = iterator.next();
+
+				newArray[i++] = String.valueOf(value);
+			}
 		}
 
 		return newArray;

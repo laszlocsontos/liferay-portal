@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -382,11 +382,9 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	* Returns the user uuid of this document library file entry.
 	*
 	* @return the user uuid of this document library file entry
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _dlFileEntry.getUserUuid();
 	}
 
@@ -899,12 +897,10 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	* Returns the trash entry created when this document library file entry was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this document library file entry.
 	*
 	* @return the trash entry created when this document library file entry was moved to the Recycle Bin
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.trash.model.TrashEntry getTrashEntry()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.getTrashEntry();
 	}
 
@@ -942,7 +938,6 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	* Returns <code>true</code> if the parent of this document library file entry is in the Recycle Bin.
 	*
 	* @return <code>true</code> if the parent of this document library file entry is in the Recycle Bin; <code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean isInTrashContainer() {
@@ -950,9 +945,13 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	}
 
 	@Override
-	public boolean isInTrashExplicitly()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public boolean isInTrashExplicitly() {
 		return _dlFileEntry.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return _dlFileEntry.isInTrashImplicitly();
 	}
 
 	@Override
@@ -1055,35 +1054,30 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_dlFileEntry.persist();
 	}
 
 	@Override
-	public void updateTreePath(java.lang.String treePath)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void updateTreePath(java.lang.String treePath) {
 		_dlFileEntry.updateTreePath(treePath);
 	}
 
 	@Override
 	public java.lang.String buildTreePath()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.buildTreePath();
 	}
 
 	@Override
 	public java.io.InputStream getContentStream()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.getContentStream();
 	}
 
 	@Override
 	public java.io.InputStream getContentStream(java.lang.String version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.getContentStream(version);
 	}
 
@@ -1100,42 +1094,37 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	@Override
 	public java.util.Map<java.lang.String, com.liferay.portlet.dynamicdatamapping.storage.Fields> getFieldsMap(
 		long fileVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.getFieldsMap(fileVersionId);
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getFileVersion()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.getFileVersion();
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getFileVersion(
 		java.lang.String version)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.getFileVersion(version);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileVersion> getFileVersions(
-		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		int status) {
 		return _dlFileEntry.getFileVersions(status);
 	}
 
 	@Override
-	public int getFileVersionsCount(int status)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getFileVersionsCount(int status) {
 		return _dlFileEntry.getFileVersionsCount(status);
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFolder getFolder()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.getFolder();
 	}
 
@@ -1145,10 +1134,14 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	}
 
 	@Override
+	public java.lang.String getIconCssClass() {
+		return _dlFileEntry.getIconCssClass();
+	}
+
+	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFileVersion getLatestFileVersion(
 		boolean trusted)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _dlFileEntry.getLatestFileVersion(trusted);
 	}
 

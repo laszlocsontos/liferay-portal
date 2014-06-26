@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,8 @@
 <%@ include file="/html/portlet/layouts_admin/init_attributes.jspf" %>
 
 <%
+String cmd = ParamUtil.getString(request, Constants.CMD);
+
 boolean incomplete = ParamUtil.getBoolean(request, "incomplete", true);
 
 String treeLoading = PortalUtil.generateRandomKey(request, "treeLoading");
@@ -64,6 +66,10 @@ if (!selectableTree) {
 	JSONArray checkedNodesJSONArray = JSONFactoryUtil.createJSONArray();
 
 	String checkedLayoutIds = SessionTreeJSClicks.getOpenNodes(request, treeId + "SelectedNode");
+
+	if (cmd.equals(Constants.UPDATE)) {
+		checkedLayoutIds = ParamUtil.getString(request, "selectedLayoutIds");
+	}
 
 	if (Validator.isNotNull(checkedLayoutIds)) {
 		for (long checkedLayoutId : StringUtil.split(checkedLayoutIds, 0L)) {
@@ -128,11 +134,15 @@ if (!selectableTree) {
 			}
 
 			if (!data.uuid) {
-				data.uuid = "";
+				data.uuid = '';
 			}
 
 			if (!data.id) {
-				data.id = "";
+				data.id = '';
+			}
+
+			if (!data.url) {
+				data.url = '';
 			}
 
 			if (<%= checkContentDisplayPage %> && !data.contentDisplayPage) {
@@ -147,7 +157,7 @@ if (!selectableTree) {
 				}
 			);
 
-			return '<a class="' + className + '" data-uuid="' + Util.escapeHTML(data.uuid) + '" href="' + href + '" id="' + Util.escapeHTML(data.id) + '" title="' + data.title + '">' + data.label + '</a>';
+			return '<a class="' + className + '" data-url="' + Util.escapeHTML(data.url) + '" data-uuid="' + Util.escapeHTML(data.uuid) + '" href="' + href + '" id="' + Util.escapeHTML(data.id) + '" title="' + data.title + '">' + data.label + '</a>';
 		},
 
 		extractGroupId: function(node) {
@@ -261,9 +271,13 @@ if (!selectableTree) {
 								data: function(node) {
 									return {
 										cmd: 'get',
+										controlPanelCategory: 'current_site.pages',
+										doAsGroupId: themeDisplay.getScopeGroupId(),
 										groupId: TreeUtil.extractGroupId(node),
 										incomplete: <%= incomplete %>,
 										p_auth: Liferay.authToken,
+										p_l_id: themeDisplay.getPlid(),
+										p_p_id: '88',
 										parentLayoutId: TreeUtil.extractLayoutId(node),
 										privateLayout: <%= privateLayout %>,
 										selPlid: '<%= selPlid %>',
@@ -319,18 +333,18 @@ if (!selectableTree) {
 
 					if (node.layoutRevisionId) {
 						if (!node.layoutRevisionHead) {
-							title = '<%= UnicodeLanguageUtil.get(pageContext, "there-is-not-a-version-of-this-page-marked-as-ready-for-publication") %>';
+							title = '<%= UnicodeLanguageUtil.get(request, "there-is-not-a-version-of-this-page-marked-as-ready-for-publication") %>';
 						}
 						else if (node.layoutBranchName) {
 							node.layoutBranchName = Util.escapeHTML(node.layoutBranchName);
 
-							newNode.label += Lang.sub(' <span class="layout-branch-name" title="<%= UnicodeLanguageUtil.get(pageContext, "this-is-the-page-variation-that-is-marked-as-ready-for-publication") %>">[{layoutBranchName}]</span>', node);
+							newNode.label += Lang.sub(' <span class="layout-branch-name" title="<%= UnicodeLanguageUtil.get(request, "this-is-the-page-variation-that-is-marked-as-ready-for-publication") %>">[{layoutBranchName}]</span>', node);
 						}
 
 						if (node.incomplete) {
 							cssClass = 'incomplete-layout';
 
-							title = '<%= UnicodeLanguageUtil.get(pageContext, "this-page-is-not-enabled-in-this-site-pages-variation,-but-is-available-in-other-variations") %>';
+							title = '<%= UnicodeLanguageUtil.get(request, "this-page-is-not-enabled-in-this-site-pages-variation,-but-is-available-in-other-variations") %>';
 						}
 					}
 
@@ -347,6 +361,7 @@ if (!selectableTree) {
 								label: newNode.label,
 								plid: node.plid,
 								title: title,
+								url: node.friendlyURL,
 								uuid: node.uuid
 							}
 						);
@@ -405,7 +420,11 @@ if (!selectableTree) {
 					data: A.mix(
 						data,
 						{
-							p_auth: Liferay.authToken
+							controlPanelCategory: 'current_site.pages',
+							doAsGroupId: themeDisplay.getScopeGroupId(),
+							p_auth: Liferay.authToken,
+							p_l_id: themeDisplay.getPlid(),
+							p_p_id: '88'
 						}
 					)
 				}
@@ -650,9 +669,14 @@ if (!selectableTree) {
 				cfg: {
 					data: function(node) {
 						return {
+							cmd: 'get',
+							controlPanelCategory: 'current_site.pages',
+							doAsGroupId: themeDisplay.getScopeGroupId(),
 							groupId: TreeUtil.extractGroupId(node),
 							incomplete: <%= incomplete %>,
 							p_auth: Liferay.authToken,
+							p_l_id: themeDisplay.getPlid(),
+							p_p_id: '88',
 							parentLayoutId: TreeUtil.extractLayoutId(node),
 							privateLayout: <%= privateLayout %>,
 							selPlid: '<%= selPlid %>',
@@ -694,15 +718,6 @@ if (!selectableTree) {
 					},
 				</c:if>
 
-				'drop:hit': function(event) {
-					var dropNode = event.drop.get('node').get('parentNode');
-
-					var dropTreeNode = dropNode.getData('tree-node');
-
-					if (!dropTreeNode.get('draggable')) {
-						event.halt();
-					}
-				},
 				dropAppend: function(event) {
 					var tree = event.tree;
 

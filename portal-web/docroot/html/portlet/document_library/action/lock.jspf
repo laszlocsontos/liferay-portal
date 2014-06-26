@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,50 +14,47 @@
  */
 --%>
 
-<c:if test="<%= showActions && fileEntry.isSupportsLocking() %>">
-	<c:choose>
-		<c:when test="<%= !checkedOut && DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE) %>">
-			<portlet:actionURL var="checkOutURL">
-				<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
-				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.CHECKOUT %>" />
-				<portlet:param name="redirect" value="<%= currentURL %>" />
-				<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
-			</portlet:actionURL>
+<c:if test="<%= dlActionsDisplayContext.isShowActions() %>">
+	<c:if test="<%= dlFileEntryActionsDisplayContext.isCheckoutDocumentButtonVisible() %>">
+		<portlet:actionURL var="checkOutURL">
+			<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.CHECKOUT %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
+		</portlet:actionURL>
 
-			<liferay-ui:icon
-				image="lock"
-				message="checkout[document]"
-				url="<%= checkOutURL %>"
-			/>
-		</c:when>
-		<c:otherwise>
-			<c:if test="<%= checkedOut && hasLock %>">
-				<portlet:actionURL var="checkInURL">
-					<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.CHECKIN %>" />
-					<portlet:param name="redirect" value="<%= currentURL %>" />
-					<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
-				</portlet:actionURL>
+		<liferay-ui:icon
+			iconCssClass="icon-unlock"
+			message="checkout[document]"
+			url="<%= checkOutURL %>"
+		/>
+	</c:if>
+	<c:if test="<%= dlFileEntryActionsDisplayContext.isCheckinButtonVisible() %>">
+		<portlet:actionURL var="checkInURL">
+			<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.CHECKIN %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
+		</portlet:actionURL>
 
-				<liferay-ui:icon
-					image="unlock"
-					message="checkin"
-					url="<%= checkInURL %>"
-				/>
+		<liferay-ui:icon
+			iconCssClass="icon-lock"
+			message="checkin"
+			url="<%= checkInURL %>"
+		/>
+	</c:if>
+	<c:if test="<%= dlFileEntryActionsDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
+		<portlet:actionURL var="cancelCheckOutURL">
+			<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.CANCEL_CHECKOUT %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
+		</portlet:actionURL>
 
-				<portlet:actionURL var="cancelCheckOutURL">
-					<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.CANCEL_CHECKOUT %>" />
-					<portlet:param name="redirect" value="<%= currentURL %>" />
-					<portlet:param name="fileEntryId" value="<%= String.valueOf(fileEntry.getFileEntryId()) %>" />
-				</portlet:actionURL>
-
-				<liferay-ui:icon
-					image="undo"
-					message="cancel-checkout[document]"
-					url="<%= cancelCheckOutURL %>"
-				/>
-			</c:if>
-		</c:otherwise>
-	</c:choose>
+		<liferay-ui:icon
+			iconCssClass="icon-remove"
+			message="cancel-checkout[document]"
+			url="<%= cancelCheckOutURL %>"
+		/>
+	</c:if>
 </c:if>

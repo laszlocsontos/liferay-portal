@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,17 +27,29 @@
 
 <%
 String contentsLanguageId = ParamUtil.getString(request, "contentsLanguageId");
+
+Locale contentsLocale = LocaleUtil.fromLanguageId(contentsLanguageId);
+
+contentsLanguageId = LocaleUtil.toLanguageId(contentsLocale);
+
+String colorSchemeCssClass = ParamUtil.getString(request, "colorSchemeCssClass");
 String cssPath = ParamUtil.getString(request, "cssPath");
 String cssClasses = ParamUtil.getString(request, "cssClasses");
 boolean inlineEdit = ParamUtil.getBoolean(request, "inlineEdit");
+
 String languageId = ParamUtil.getString(request, "languageId");
+
+Locale locale = LocaleUtil.fromLanguageId(languageId);
+
+languageId = LocaleUtil.toLanguageId(locale);
+
 String name = ParamUtil.getString(request, "name");
 boolean resizable = ParamUtil.getBoolean(request, "resizable");
 
 response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 %>
 
-;(function() {
+;window['<%= HtmlUtil.escapeJS(name) %>Config'] = function() {
 	var ckEditor = CKEDITOR.instances['<%= HtmlUtil.escapeJS(name) %>'];
 
 	if (!CKEDITOR.stylesSet.get('liferayStyles')) {
@@ -70,33 +82,39 @@ response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 
 	var config = ckEditor.config;
 
+	config.allowedContent = true;
+
 	config.autoParagraph = false;
 
 	config.autoSaveTimeout = 3000;
 
-	config.bodyClass = 'html-editor <%= HtmlUtil.escapeJS(cssClasses) %>';
+	config.bodyClass = 'html-editor <%= HtmlUtil.escapeJS(colorSchemeCssClass) %> <%= HtmlUtil.escapeJS(cssClasses) %>';
 
 	config.closeNoticeTimeout = 8000;
 
 	config.contentsCss = ['<%= HtmlUtil.escapeJS(cssPath) %>/aui.css', '<%= HtmlUtil.escapeJS(cssPath) %>/main.css'];
 
 	<%
-	Locale contentsLocale = LocaleUtil.fromLanguageId(contentsLanguageId);
-
 	String contentsLanguageDir = LanguageUtil.get(contentsLocale, "lang.dir");
 	%>
 
 	config.contentsLangDirection = '<%= HtmlUtil.escapeJS(contentsLanguageDir) %>';
 
-	config.contentsLanguage = '<%= HtmlUtil.escapeJS(contentsLanguageId.replace("iw_", "he_")) %>';
+	config.contentsLanguage = '<%= contentsLanguageId.replace("iw_", "he_") %>';
 
 	config.entities = false;
 
-	config.extraPlugins = 'ajaxsave,media,restore,scayt,wsc';
+	config.extraPlugins = 'lfrpopup,media,scayt,wsc';
+
+	<c:if test="<%= inlineEdit %>">
+		config.extraPlugins += ',ajaxsave,restore';
+	</c:if>
+
+	config.filebrowserWindowFeatures = 'title=<%= LanguageUtil.get(locale, "browse") %>';
 
 	config.height = 265;
 
-	config.language = '<%= HtmlUtil.escapeJS(languageId.replace("iw_", "he_")) %>';
+	config.language = '<%= languageId.replace("iw_", "he_") %>';
 
 	config.pasteFromWordRemoveFontStyles = false;
 
@@ -215,4 +233,6 @@ response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 			}
 		}
 	);
-})();
+};
+
+window['<%= HtmlUtil.escapeJS(name) %>Config']();

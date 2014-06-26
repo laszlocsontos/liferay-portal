@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.expando.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 
@@ -31,13 +30,13 @@ public interface ExpandoColumnPermission {
 
 	public void check(
 			PermissionChecker permissionChecker, long columnId, String actionId)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public void check(
 			PermissionChecker permissionChecker, long companyId,
 			String className, String tableName, String columnName,
 			String actionId)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public boolean contains(
 		PermissionChecker permissionChecker, ExpandoColumn column,
@@ -45,12 +44,10 @@ public interface ExpandoColumnPermission {
 
 	public boolean contains(
 			PermissionChecker permissionChecker, long columnId, String actionId)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public boolean contains(
-			PermissionChecker permissionChecker, long companyId,
-			String className, String tableName, String columnName,
-			String actionId)
-		throws SystemException;
+		PermissionChecker permissionChecker, long companyId, String className,
+		String tableName, String columnName, String actionId);
 
 }

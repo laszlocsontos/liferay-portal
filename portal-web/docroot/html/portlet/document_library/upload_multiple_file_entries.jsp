@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -64,6 +64,13 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 					new Liferay.Upload(
 						{
 							boundingBox: '#<portlet:namespace />fileUpload',
+
+							<%
+							DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
+							%>
+
+							decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+
 							deleteFile: '<liferay-portlet:actionURL doAsUserId="<%= user.getUserId() %>"><portlet:param name="struts_action" value="/document_library/upload_multiple_file_entries" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></liferay-portlet:actionURL>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= DLFileEntryConstants.getClassName() %>" />',
 							fileDescription: '<%= StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA)) %>',
 							maxFileSize: '<%= PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE) %> B',
@@ -92,7 +99,7 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 				<%
 				DLUtil.addPortletBreadcrumbEntries(folderId, request, renderResponse);
 
-				PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "add-multiple-file-entries"), currentURL);
+				PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-multiple-file-entries"), currentURL);
 				%>
 
 				<aui:script>
@@ -108,7 +115,7 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 
 							var inputTpl = '<input id="<portlet:namespace />selectedFileName{0}" name="<portlet:namespace />selectedFileName" type="hidden" value="{1}" />';
 
-							var values = A.all('input[name=<portlet:namespace />selectUploadedFileCheckbox]:checked').val();
+							var values = A.all('input[name=<portlet:namespace />selectUploadedFile]:checked').val();
 
 							var buffer = [];
 							var dataBuffer = [];
@@ -130,7 +137,7 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 							A.io.request(
 								document.<portlet:namespace />fm2.action,
 								{
-									dataType: 'json',
+									dataType: 'JSON',
 									form: {
 										id: document.<portlet:namespace />fm2
 									},
@@ -164,10 +171,10 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 													}
 
 													if (originalFileName === item.fileName) {
-														childHTML = '<span class="success-message"><%= UnicodeLanguageUtil.get(pageContext, "successfully-saved") %></span>';
+														childHTML = '<span class="success-message"><%= UnicodeLanguageUtil.get(request, "successfully-saved") %></span>';
 													}
 													else {
-														childHTML = '<span class="success-message"><%= UnicodeLanguageUtil.get(pageContext, "successfully-saved") %> (' + item.fileName + ')</span>';
+														childHTML = '<span class="success-message"><%= UnicodeLanguageUtil.get(request, "successfully-saved") %> (' + item.fileName + ')</span>';
 													}
 												}
 												else {
@@ -200,7 +207,7 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 
 											selectedItems.removeClass('selectable').removeClass('selected').addClass('upload-error');
 
-											selectedItems.append('<span class="error-message"><%= UnicodeLanguageUtil.get(pageContext, "an-unexpected-error-occurred-while-deleting-the-file") %></span>');
+											selectedItems.append('<span class="error-message"><%= UnicodeLanguageUtil.get(request, "an-unexpected-error-occurred-while-deleting-the-file") %></span>');
 
 											selectedItems.all('input').remove(true);
 
@@ -217,7 +224,7 @@ long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
 		</aui:row>
 	</c:when>
 	<c:otherwise>
-		<div class="alert alert-error">
+		<div class="alert alert-danger">
 			<liferay-ui:message key="you-do-not-have-the-required-permissions-to-access-this-application" />
 		</div>
 	</c:otherwise>

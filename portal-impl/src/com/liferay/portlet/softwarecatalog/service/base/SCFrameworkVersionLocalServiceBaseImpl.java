@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -74,12 +76,11 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 *
 	 * @param scFrameworkVersion the s c framework version
 	 * @return the s c framework version that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public SCFrameworkVersion addSCFrameworkVersion(
-		SCFrameworkVersion scFrameworkVersion) throws SystemException {
+		SCFrameworkVersion scFrameworkVersion) {
 		scFrameworkVersion.setNew(true);
 
 		return scFrameworkVersionPersistence.update(scFrameworkVersion);
@@ -102,12 +103,11 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 * @param frameworkVersionId the primary key of the s c framework version
 	 * @return the s c framework version that was removed
 	 * @throws PortalException if a s c framework version with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SCFrameworkVersion deleteSCFrameworkVersion(long frameworkVersionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scFrameworkVersionPersistence.remove(frameworkVersionId);
 	}
 
@@ -116,12 +116,11 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 *
 	 * @param scFrameworkVersion the s c framework version
 	 * @return the s c framework version that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SCFrameworkVersion deleteSCFrameworkVersion(
-		SCFrameworkVersion scFrameworkVersion) throws SystemException {
+		SCFrameworkVersion scFrameworkVersion) {
 		return scFrameworkVersionPersistence.remove(scFrameworkVersion);
 	}
 
@@ -138,12 +137,10 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return scFrameworkVersionPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -158,12 +155,10 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return scFrameworkVersionPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -180,12 +175,11 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return scFrameworkVersionPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -195,11 +189,9 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return scFrameworkVersionPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -209,18 +201,16 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return scFrameworkVersionPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public SCFrameworkVersion fetchSCFrameworkVersion(long frameworkVersionId)
-		throws SystemException {
+	public SCFrameworkVersion fetchSCFrameworkVersion(long frameworkVersionId) {
 		return scFrameworkVersionPersistence.fetchByPrimaryKey(frameworkVersionId);
 	}
 
@@ -230,17 +220,47 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 * @param frameworkVersionId the primary key of the s c framework version
 	 * @return the s c framework version
 	 * @throws PortalException if a s c framework version with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public SCFrameworkVersion getSCFrameworkVersion(long frameworkVersionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scFrameworkVersionPersistence.findByPrimaryKey(frameworkVersionId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.softwarecatalog.service.SCFrameworkVersionLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SCFrameworkVersion.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("frameworkVersionId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.softwarecatalog.service.SCFrameworkVersionLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(SCFrameworkVersion.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("frameworkVersionId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return scFrameworkVersionLocalService.deleteSCFrameworkVersion((SCFrameworkVersion)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return scFrameworkVersionPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -254,11 +274,9 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 * @param start the lower bound of the range of s c framework versions
 	 * @param end the upper bound of the range of s c framework versions (not inclusive)
 	 * @return the range of s c framework versions
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<SCFrameworkVersion> getSCFrameworkVersions(int start, int end)
-		throws SystemException {
+	public List<SCFrameworkVersion> getSCFrameworkVersions(int start, int end) {
 		return scFrameworkVersionPersistence.findAll(start, end);
 	}
 
@@ -266,10 +284,9 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 * Returns the number of s c framework versions.
 	 *
 	 * @return the number of s c framework versions
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getSCFrameworkVersionsCount() throws SystemException {
+	public int getSCFrameworkVersionsCount() {
 		return scFrameworkVersionPersistence.countAll();
 	}
 
@@ -278,173 +295,160 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 *
 	 * @param scFrameworkVersion the s c framework version
 	 * @return the s c framework version that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public SCFrameworkVersion updateSCFrameworkVersion(
-		SCFrameworkVersion scFrameworkVersion) throws SystemException {
+		SCFrameworkVersion scFrameworkVersion) {
 		return scFrameworkVersionPersistence.update(scFrameworkVersion);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCProductVersionSCFrameworkVersion(long productVersionId,
-		long frameworkVersionId) throws SystemException {
+		long frameworkVersionId) {
 		scProductVersionPersistence.addSCFrameworkVersion(productVersionId,
 			frameworkVersionId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCProductVersionSCFrameworkVersion(long productVersionId,
-		SCFrameworkVersion scFrameworkVersion) throws SystemException {
+		SCFrameworkVersion scFrameworkVersion) {
 		scProductVersionPersistence.addSCFrameworkVersion(productVersionId,
 			scFrameworkVersion);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCProductVersionSCFrameworkVersions(long productVersionId,
-		long[] frameworkVersionIds) throws SystemException {
+		long[] frameworkVersionIds) {
 		scProductVersionPersistence.addSCFrameworkVersions(productVersionId,
 			frameworkVersionIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addSCProductVersionSCFrameworkVersions(long productVersionId,
-		List<SCFrameworkVersion> SCFrameworkVersions) throws SystemException {
+		List<SCFrameworkVersion> SCFrameworkVersions) {
 		scProductVersionPersistence.addSCFrameworkVersions(productVersionId,
 			SCFrameworkVersions);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearSCProductVersionSCFrameworkVersions(long productVersionId)
-		throws SystemException {
+	public void clearSCProductVersionSCFrameworkVersions(long productVersionId) {
 		scProductVersionPersistence.clearSCFrameworkVersions(productVersionId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCProductVersionSCFrameworkVersion(
-		long productVersionId, long frameworkVersionId)
-		throws SystemException {
+		long productVersionId, long frameworkVersionId) {
 		scProductVersionPersistence.removeSCFrameworkVersion(productVersionId,
 			frameworkVersionId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCProductVersionSCFrameworkVersion(
-		long productVersionId, SCFrameworkVersion scFrameworkVersion)
-		throws SystemException {
+		long productVersionId, SCFrameworkVersion scFrameworkVersion) {
 		scProductVersionPersistence.removeSCFrameworkVersion(productVersionId,
 			scFrameworkVersion);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCProductVersionSCFrameworkVersions(
-		long productVersionId, long[] frameworkVersionIds)
-		throws SystemException {
+		long productVersionId, long[] frameworkVersionIds) {
 		scProductVersionPersistence.removeSCFrameworkVersions(productVersionId,
 			frameworkVersionIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteSCProductVersionSCFrameworkVersions(
-		long productVersionId, List<SCFrameworkVersion> SCFrameworkVersions)
-		throws SystemException {
+		long productVersionId, List<SCFrameworkVersion> SCFrameworkVersions) {
 		scProductVersionPersistence.removeSCFrameworkVersions(productVersionId,
 			SCFrameworkVersions);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the productVersionIds of the s c product versions associated with the s c framework version.
+	 *
+	 * @param frameworkVersionId the frameworkVersionId of the s c framework version
+	 * @return long[] the productVersionIds of s c product versions associated with the s c framework version
+	 */
+	@Override
+	public long[] getSCProductVersionPrimaryKeys(long frameworkVersionId) {
+		return scFrameworkVersionPersistence.getSCProductVersionPrimaryKeys(frameworkVersionId);
+	}
+
+	/**
 	 */
 	@Override
 	public List<SCFrameworkVersion> getSCProductVersionSCFrameworkVersions(
-		long productVersionId) throws SystemException {
+		long productVersionId) {
 		return scProductVersionPersistence.getSCFrameworkVersions(productVersionId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<SCFrameworkVersion> getSCProductVersionSCFrameworkVersions(
-		long productVersionId, int start, int end) throws SystemException {
+		long productVersionId, int start, int end) {
 		return scProductVersionPersistence.getSCFrameworkVersions(productVersionId,
 			start, end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<SCFrameworkVersion> getSCProductVersionSCFrameworkVersions(
 		long productVersionId, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return scProductVersionPersistence.getSCFrameworkVersions(productVersionId,
 			start, end, orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public int getSCProductVersionSCFrameworkVersionsCount(
-		long productVersionId) throws SystemException {
+		long productVersionId) {
 		return scProductVersionPersistence.getSCFrameworkVersionsSize(productVersionId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public boolean hasSCProductVersionSCFrameworkVersion(
-		long productVersionId, long frameworkVersionId)
-		throws SystemException {
+		long productVersionId, long frameworkVersionId) {
 		return scProductVersionPersistence.containsSCFrameworkVersion(productVersionId,
 			frameworkVersionId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasSCProductVersionSCFrameworkVersions(long productVersionId)
-		throws SystemException {
+	public boolean hasSCProductVersionSCFrameworkVersions(long productVersionId) {
 		return scProductVersionPersistence.containsSCFrameworkVersions(productVersionId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void setSCProductVersionSCFrameworkVersions(long productVersionId,
-		long[] frameworkVersionIds) throws SystemException {
+		long[] frameworkVersionIds) {
 		scProductVersionPersistence.setSCFrameworkVersions(productVersionId,
 			frameworkVersionIds);
 	}
@@ -792,7 +796,7 @@ public abstract class SCFrameworkVersionLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = scFrameworkVersionPersistence.getDataSource();
 

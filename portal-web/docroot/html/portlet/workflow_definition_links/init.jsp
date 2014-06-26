@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,7 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.NoSuchWorkflowDefinitionLinkException" %><%@
-page import="com.liferay.portal.kernel.workflow.WorkflowHandler" %><%@
+<%@ page import="com.liferay.portal.kernel.workflow.WorkflowHandler" %><%@
 page import="com.liferay.portal.kernel.workflow.comparator.WorkflowComparatorFactoryUtil" %>
 
 <%@ include file="/html/portlet/workflow_definition_links/init-ext.jsp" %>

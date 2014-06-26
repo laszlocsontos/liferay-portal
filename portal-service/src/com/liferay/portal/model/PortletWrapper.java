@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -348,8 +348,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_portlet.persist();
 	}
 
@@ -1485,6 +1484,16 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Returns <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @return <code>true</code> if the portlet uses Single Page Application
+	*/
+	@Override
+	public boolean getSinglePageApplication() {
+		return _portlet.getSinglePageApplication();
+	}
+
+	/**
 	* Returns the names of the classes that represent social activity
 	* interpreters associated with the portlet.
 	*
@@ -1504,6 +1513,18 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public java.util.List<com.liferay.portlet.social.model.SocialActivityInterpreter> getSocialActivityInterpreterInstances() {
 		return _portlet.getSocialActivityInterpreterInstances();
+	}
+
+	/**
+	* Returns <code>true</code> if the portlet uses Social Interactions
+	* Configuration
+	*
+	* @return <code>true</code> if the portlet uses Social Interactions
+	Configuration
+	*/
+	@Override
+	public boolean getSocialInteractionsConfiguration() {
+		return _portlet.getSocialInteractionsConfiguration();
 	}
 
 	/**
@@ -1854,7 +1875,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* @return the workflow handler instances of the portlet
 	*/
 	@Override
-	public java.util.List<com.liferay.portal.kernel.workflow.WorkflowHandler> getWorkflowHandlerInstances() {
+	public java.util.List<com.liferay.portal.kernel.workflow.WorkflowHandler<?>> getWorkflowHandlerInstances() {
 		return _portlet.getWorkflowHandlerInstances();
 	}
 
@@ -2225,6 +2246,28 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public boolean isShowPortletInactive() {
 		return _portlet.isShowPortletInactive();
+	}
+
+	/**
+	* Returns <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @return <code>true</code> if the portlet uses Single Page Application
+	*/
+	@Override
+	public boolean isSinglePageApplication() {
+		return _portlet.isSinglePageApplication();
+	}
+
+	/**
+	* Returns <code>true</code> if the portlet uses Social Interactions
+	* Configuration
+	*
+	* @return <code>true</code> if the portlet uses Social Interactions
+	Configuration
+	*/
+	@Override
+	public boolean isSocialInteractionsConfiguration() {
+		return _portlet.isSocialInteractionsConfiguration();
 	}
 
 	/**
@@ -3186,6 +3229,17 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Set to <code>true</code> if the portlet uses Single Page Application.
+	*
+	* @param singlePageApplication boolean value for whether or not the the
+	portlet uses Single Page Application
+	*/
+	@Override
+	public void setSinglePageApplication(boolean singlePageApplication) {
+		_portlet.setSinglePageApplication(singlePageApplication);
+	}
+
+	/**
 	* Sets the names of the classes that represent social activity interpreters
 	* associated with the portlet.
 	*
@@ -3196,6 +3250,12 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	public void setSocialActivityInterpreterClasses(
 		java.util.List<java.lang.String> socialActivityInterpreterClasses) {
 		_portlet.setSocialActivityInterpreterClasses(socialActivityInterpreterClasses);
+	}
+
+	@Override
+	public void setSocialInteractionsConfiguration(
+		boolean socialInteractionsConfiguration) {
+		_portlet.setSocialInteractionsConfiguration(socialInteractionsConfiguration);
 	}
 
 	/**
@@ -3289,16 +3349,6 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	@Override
 	public void setTemplateHandlerClass(java.lang.String templateHandlerClass) {
 		_portlet.setTemplateHandlerClass(templateHandlerClass);
-	}
-
-	/**
-	* Sets the timestamp of the portlet.
-	*
-	* @param timestamp the timestamp of the portlet
-	*/
-	@Override
-	public void setTimestamp(long timestamp) {
-		_portlet.setTimestamp(timestamp);
 	}
 
 	/**

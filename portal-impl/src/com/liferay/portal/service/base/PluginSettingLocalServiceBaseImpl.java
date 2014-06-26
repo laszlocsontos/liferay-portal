@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -72,12 +74,10 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 *
 	 * @param pluginSetting the plugin setting
 	 * @return the plugin setting that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public PluginSetting addPluginSetting(PluginSetting pluginSetting)
-		throws SystemException {
+	public PluginSetting addPluginSetting(PluginSetting pluginSetting) {
 		pluginSetting.setNew(true);
 
 		return pluginSettingPersistence.update(pluginSetting);
@@ -100,12 +100,11 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 * @param pluginSettingId the primary key of the plugin setting
 	 * @return the plugin setting that was removed
 	 * @throws PortalException if a plugin setting with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public PluginSetting deletePluginSetting(long pluginSettingId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return pluginSettingPersistence.remove(pluginSettingId);
 	}
 
@@ -114,12 +113,10 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 *
 	 * @param pluginSetting the plugin setting
 	 * @return the plugin setting that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public PluginSetting deletePluginSetting(PluginSetting pluginSetting)
-		throws SystemException {
+	public PluginSetting deletePluginSetting(PluginSetting pluginSetting) {
 		return pluginSettingPersistence.remove(pluginSetting);
 	}
 
@@ -136,12 +133,10 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return pluginSettingPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -156,12 +151,10 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return pluginSettingPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -178,12 +171,11 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return pluginSettingPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -193,11 +185,9 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return pluginSettingPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -207,18 +197,16 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return pluginSettingPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public PluginSetting fetchPluginSetting(long pluginSettingId)
-		throws SystemException {
+	public PluginSetting fetchPluginSetting(long pluginSettingId) {
 		return pluginSettingPersistence.fetchByPrimaryKey(pluginSettingId);
 	}
 
@@ -228,17 +216,47 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 * @param pluginSettingId the primary key of the plugin setting
 	 * @return the plugin setting
 	 * @throws PortalException if a plugin setting with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public PluginSetting getPluginSetting(long pluginSettingId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return pluginSettingPersistence.findByPrimaryKey(pluginSettingId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.PluginSettingLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(PluginSetting.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("pluginSettingId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.PluginSettingLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(PluginSetting.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("pluginSettingId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return pluginSettingLocalService.deletePluginSetting((PluginSetting)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return pluginSettingPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -252,11 +270,9 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 * @param start the lower bound of the range of plugin settings
 	 * @param end the upper bound of the range of plugin settings (not inclusive)
 	 * @return the range of plugin settings
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<PluginSetting> getPluginSettings(int start, int end)
-		throws SystemException {
+	public List<PluginSetting> getPluginSettings(int start, int end) {
 		return pluginSettingPersistence.findAll(start, end);
 	}
 
@@ -264,10 +280,9 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 * Returns the number of plugin settings.
 	 *
 	 * @return the number of plugin settings
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getPluginSettingsCount() throws SystemException {
+	public int getPluginSettingsCount() {
 		return pluginSettingPersistence.countAll();
 	}
 
@@ -276,12 +291,10 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 *
 	 * @param pluginSetting the plugin setting
 	 * @return the plugin setting that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public PluginSetting updatePluginSetting(PluginSetting pluginSetting)
-		throws SystemException {
+	public PluginSetting updatePluginSetting(PluginSetting pluginSetting) {
 		return pluginSettingPersistence.update(pluginSetting);
 	}
 
@@ -609,7 +622,7 @@ public abstract class PluginSettingLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = pluginSettingPersistence.getDataSource();
 

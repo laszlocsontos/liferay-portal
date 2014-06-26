@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -81,13 +81,13 @@ userTracker = userTracker.toEscapedModel();
 							<liferay-ui:message key="name" />
 						</dt>
 						<dd>
-							<%= (user2 != null) ? HtmlUtil.escape(user2.getFullName()) : LanguageUtil.get(pageContext, "not-available") %>
+							<%= (user2 != null) ? HtmlUtil.escape(user2.getFullName()) : LanguageUtil.get(request, "not-available") %>
 						</dd>
 						<dt>
 							<liferay-ui:message key="email-address" />
 						</dt>
 						<dd>
-							<%= (user2 != null) ? user2.getEmailAddress() : LanguageUtil.get(pageContext, "not-available") %>
+							<%= (user2 != null) ? user2.getEmailAddress() : LanguageUtil.get(request, "not-available") %>
 						</dd>
 						<dt>
 							<liferay-ui:message key="last-request" />

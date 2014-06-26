@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.portal.RequiredGroupException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.staging.StagingConstants;
 import com.liferay.portal.kernel.staging.StagingUtil;
@@ -151,6 +152,10 @@ public class EditGroupAction extends PortletAction {
 					redirect = siteAdministrationURL.toString();
 
 					hideDefaultSuccessMessage(actionRequest);
+
+					MultiSessionMessages.add(
+						actionRequest,
+						PortletKeys.SITE_SETTINGS + "requestProcessed");
 				}
 				else {
 					String oldFriendlyURL = (String)returnValue[1];
@@ -427,7 +432,7 @@ public class EditGroupAction extends PortletAction {
 	protected String updateCloseRedirect(
 			String closeRedirect, Group group, ThemeDisplay themeDisplay,
 			String oldFriendlyURL, String oldStagingFriendlyURL)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (Validator.isNull(closeRedirect) || (group == null)) {
 			return closeRedirect;
@@ -751,48 +756,55 @@ public class EditGroupAction extends PortletAction {
 
 		// Layout set prototypes
 
-		if (!liveGroup.isStaged()) {
-			long privateLayoutSetPrototypeId = ParamUtil.getLong(
-				actionRequest, "privateLayoutSetPrototypeId");
-			long publicLayoutSetPrototypeId = ParamUtil.getLong(
-				actionRequest, "publicLayoutSetPrototypeId");
+		long privateLayoutSetPrototypeId = ParamUtil.getLong(
+			actionRequest, "privateLayoutSetPrototypeId");
+		long publicLayoutSetPrototypeId = ParamUtil.getLong(
+			actionRequest, "publicLayoutSetPrototypeId");
 
-			boolean privateLayoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
-				actionRequest, "privateLayoutSetPrototypeLinkEnabled",
-				privateLayoutSet.isLayoutSetPrototypeLinkEnabled());
-			boolean publicLayoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
-				actionRequest, "publicLayoutSetPrototypeLinkEnabled",
-				publicLayoutSet.isLayoutSetPrototypeLinkEnabled());
+		boolean privateLayoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
+			actionRequest, "privateLayoutSetPrototypeLinkEnabled",
+			privateLayoutSet.isLayoutSetPrototypeLinkEnabled());
+		boolean publicLayoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
+			actionRequest, "publicLayoutSetPrototypeLinkEnabled",
+			publicLayoutSet.isLayoutSetPrototypeLinkEnabled());
 
-			if ((privateLayoutSetPrototypeId == 0) &&
-				(publicLayoutSetPrototypeId == 0) &&
-				!privateLayoutSetPrototypeLinkEnabled &&
-				!publicLayoutSetPrototypeLinkEnabled) {
+		if ((privateLayoutSetPrototypeId == 0) &&
+			(publicLayoutSetPrototypeId == 0) &&
+			!privateLayoutSetPrototypeLinkEnabled &&
+			!publicLayoutSetPrototypeLinkEnabled) {
 
-				long layoutSetPrototypeId = ParamUtil.getLong(
-					actionRequest, "layoutSetPrototypeId");
-				int layoutSetVisibility = ParamUtil.getInteger(
-					actionRequest, "layoutSetVisibility");
-				boolean layoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
-					actionRequest, "layoutSetPrototypeLinkEnabled",
-					(layoutSetPrototypeId > 0));
+			long layoutSetPrototypeId = ParamUtil.getLong(
+				actionRequest, "layoutSetPrototypeId");
+			int layoutSetVisibility = ParamUtil.getInteger(
+				actionRequest, "layoutSetVisibility");
+			boolean layoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
+				actionRequest, "layoutSetPrototypeLinkEnabled",
+				(layoutSetPrototypeId > 0));
 
-				if (layoutSetVisibility == _LAYOUT_SET_VISIBILITY_PRIVATE) {
-					privateLayoutSetPrototypeId = layoutSetPrototypeId;
+			if (layoutSetVisibility == _LAYOUT_SET_VISIBILITY_PRIVATE) {
+				privateLayoutSetPrototypeId = layoutSetPrototypeId;
 
-					privateLayoutSetPrototypeLinkEnabled =
-						layoutSetPrototypeLinkEnabled;
-				}
-				else {
-					publicLayoutSetPrototypeId = layoutSetPrototypeId;
-
-					publicLayoutSetPrototypeLinkEnabled =
-						layoutSetPrototypeLinkEnabled;
-				}
+				privateLayoutSetPrototypeLinkEnabled =
+					layoutSetPrototypeLinkEnabled;
 			}
+			else {
+				publicLayoutSetPrototypeId = layoutSetPrototypeId;
 
+				publicLayoutSetPrototypeLinkEnabled =
+					layoutSetPrototypeLinkEnabled;
+			}
+		}
+
+		if (!liveGroup.isStaged() || liveGroup.isStagedRemotely()) {
 			SitesUtil.updateLayoutSetPrototypesLinks(
 				liveGroup, publicLayoutSetPrototypeId,
+				privateLayoutSetPrototypeId,
+				publicLayoutSetPrototypeLinkEnabled,
+				privateLayoutSetPrototypeLinkEnabled);
+		}
+		else {
+			SitesUtil.updateLayoutSetPrototypesLinks(
+				liveGroup.getStagingGroup(), publicLayoutSetPrototypeId,
 				privateLayoutSetPrototypeId,
 				publicLayoutSetPrototypeLinkEnabled,
 				privateLayoutSetPrototypeLinkEnabled);

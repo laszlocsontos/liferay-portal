@@ -1,4 +1,6 @@
 <definition component-name="portal-administration">
+	<property name="testray.main.component.name" value="Administration" />
+
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -305,6 +307,10 @@
 
 		<execute macro="UserGroup#addCP">
 			<var name="userGroupName" value="${userGroupName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="User Groups" />
 		</execute>
 
 		<execute macro="UserGroup#editCP">

@@ -1,4 +1,5 @@
 @import "compass";
+@import "mixins";
 
 .portlet-document-library, .portlet-dynamic-data-mapping {
 	.diagram-builder-drop-container {
@@ -40,8 +41,8 @@
 	.lfr-ddm-small-image-preview {
 		background-color: #FFF;
 		border: 1px solid #CCC;
-		padding: 4px;
 		max-width: 120px;
+		padding: 4px;
 	}
 
 	.lfr-ddm-small-image-preview div {
@@ -79,35 +80,14 @@
 
 	.lfr-template-editor-container {
 		.lfr-template-palette-container {
-			width: 275px;
+			width: 265px;
 
 			.lfr-template-palette {
-				height: 372px;
 				overflow: auto;
 				width: 100%;
 
-				.palette-item-header {
+				.title-text {
 					font-weight: bold;
-
-					.palette-item-header-icon {
-						background: url() no-repeat 50%;
-						display: inline-block;
-						height: 10px;
-						width: 9px;
-					}
-				}
-
-				.toggler-header-collapsed .palette-item-header-icon {
-					background-image: url(@theme_image_path@/arrows/05_right.png);
-				}
-
-				.toggler-header-expanded .palette-item-header-icon {
-					background-image: url(@theme_image_path@/arrows/05_down.png);
-					vertical-align: middle;
-				}
-
-				.palette-item-header {
-					cursor: pointer;
 					margin: 0.5em;
 				}
 
@@ -117,6 +97,10 @@
 					overflow: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
+
+					.palette-item {
+						padding-right: 13px;
+					}
 				}
 			}
 		}
@@ -131,6 +115,24 @@
 
 		.lfr-editor-container-full {
 			margin-left: 0;
+		}
+	}
+
+	@include respond-to(phone) {
+		.lfr-template-editor-container {
+			.lfr-template-palette-container {
+				width: 100%;
+
+				.lfr-template-palette {
+					height: auto !important;
+					margin-bottom: 15px;
+				}
+			}
+
+			.lfr-editor-container {
+				clear: left;
+				margin-left: 0;
+			}
 		}
 	}
 

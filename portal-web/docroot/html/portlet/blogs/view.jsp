@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -36,28 +36,20 @@ portletURL.setParameter("struts_action", "/blogs/view");
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 	<%
-	SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, pageDelta, portletURL, null, null);
+	SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, blogsPortletInstanceSettings.getPageDelta(), portletURL, null, null);
 
-	searchContainer.setDelta(pageDelta);
+	searchContainer.setDelta(blogsPortletInstanceSettings.getPageDelta());
 	searchContainer.setDeltaConfigurable(false);
 
 	int total = 0;
 	List results = null;
 
 	if ((assetCategoryId != 0) || Validator.isNotNull(assetTagName)) {
-		AssetEntryQuery assetEntryQuery = new AssetEntryQuery(BlogsEntry.class.getName(), searchContainer);
+		SearchContainerResults<AssetEntry> searchContainerResults = BlogsUtil.getSearchContainerResults(searchContainer);
 
-		assetEntryQuery.setExcludeZeroViewCount(false);
-		assetEntryQuery.setVisible(Boolean.TRUE);
+		searchContainer.setTotal(searchContainerResults.getTotal());
 
-		total = AssetEntryServiceUtil.getEntriesCount(assetEntryQuery);
-
-		searchContainer.setTotal(total);
-
-		assetEntryQuery.setEnd(searchContainer.getEnd());
-		assetEntryQuery.setStart(searchContainer.getStart());
-
-		results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
+		results = searchContainerResults.getResults();
 	}
 	else {
 		int status = WorkflowConstants.STATUS_APPROVED;

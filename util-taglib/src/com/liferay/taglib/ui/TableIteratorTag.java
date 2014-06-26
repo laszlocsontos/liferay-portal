@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,12 +14,12 @@
 
 package com.liferay.taglib.ui;
 
-import com.liferay.portal.kernel.servlet.PortalIncludeUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.taglib.util.PortalIncludeUtil;
 
 import java.util.List;
 
@@ -65,7 +65,7 @@ public class TableIteratorTag extends TagSupport {
 	@Override
 	public int doEndTag() throws JspException {
 		try {
-			if (_list.size() > 0) {
+			if (!_list.isEmpty()) {
 				PortalIncludeUtil.include(pageContext, getEndPage());
 			}
 
@@ -92,7 +92,7 @@ public class TableIteratorTag extends TagSupport {
 	@Override
 	public int doStartTag() throws JspException {
 		try {
-			if (_list.size() > 0) {
+			if (!_list.isEmpty()) {
 				HttpServletRequest request =
 					(HttpServletRequest)pageContext.getRequest();
 

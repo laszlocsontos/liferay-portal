@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.resiliency.spi;
 
-import com.liferay.portal.kernel.process.ProcessExecutor;
+import com.liferay.portal.kernel.process.ProcessLauncher;
 
 import java.util.concurrent.ConcurrentMap;
 
@@ -45,7 +45,7 @@ public class SPIUtil {
 
 	static {
 		ConcurrentMap<String, Object> attributes =
-			ProcessExecutor.ProcessContext.getAttributes();
+			ProcessLauncher.ProcessContext.getAttributes();
 
 		_spi = (SPI)attributes.remove(SPI.SPI_INSTANCE_PUBLICATION_KEY);
 	}

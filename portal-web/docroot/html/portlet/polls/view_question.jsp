@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,7 +92,7 @@ if (viewResults && !PollsQuestionPermission.contains(permissionChecker, question
 					</portlet:renderURL>
 
 					<liferay-ui:icon
-						image="view"
+						iconCssClass="icon-search"
 						label="<%= true %>"
 						message="view-results"
 						url="<%= viewResultsURL %>"
@@ -129,7 +129,7 @@ if (viewResults && !PollsQuestionPermission.contains(permissionChecker, question
 
 				<%
 				PortalUtil.addPortletBreadcrumbEntry(request, HtmlUtil.unescape(question.getTitle(locale)), viewQuestionURL.toString());
-				PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "results"), currentURL);
+				PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "results"), currentURL);
 				%>
 
 			</c:otherwise>

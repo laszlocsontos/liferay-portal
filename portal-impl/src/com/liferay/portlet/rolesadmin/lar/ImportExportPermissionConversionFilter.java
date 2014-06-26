@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.rolesadmin.lar;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.ResourcePermission;
@@ -31,9 +30,7 @@ public class ImportExportPermissionConversionFilter
 	implements PermissionConversionFilter {
 
 	@Override
-	public boolean accept(Role role, ResourcePermission resourcePermission)
-		throws SystemException {
-
+	public boolean accept(Role role, ResourcePermission resourcePermission) {
 		int scope = resourcePermission.getScope();
 
 		if ((scope == ResourceConstants.SCOPE_COMPANY) ||
@@ -57,8 +54,7 @@ public class ImportExportPermissionConversionFilter
 
 	@Override
 	public boolean accept(
-			Role role, ResourceTypePermission resourceTypePermission)
-		throws SystemException {
+		Role role, ResourceTypePermission resourceTypePermission) {
 
 		if (role.getType() != RoleConstants.TYPE_REGULAR) {
 			return true;

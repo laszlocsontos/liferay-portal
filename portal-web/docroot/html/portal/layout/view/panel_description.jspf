@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,7 @@ if (themeDisplay.isStatePopUp() || layoutTypePortlet.hasStateMax()) {
 	}
 
 	if (Validator.isNotNull(velocityTemplateContent)) {
-		RuntimePageUtil.processTemplate(pageContext, ppid, new StringTemplateResource(velocityTemplateId, velocityTemplateContent));
+		RuntimePageUtil.processTemplate(request, response, ppid, new StringTemplateResource(velocityTemplateId, velocityTemplateContent));
 	}
 }
 else {
@@ -42,7 +42,7 @@ else {
 	String description = typeSettingsProperties.getProperty("description");
 
 	if (Validator.isNull(description)) {
-		description = LanguageUtil.get(pageContext, "please-select-a-tool-from-the-left-menu");
+		description = LanguageUtil.get(request, "please-select-a-tool-from-the-left-menu");
 	}
 %>
 

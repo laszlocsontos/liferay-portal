@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.security.auth.PrincipalException;
@@ -78,18 +77,16 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		try {
-			if (Validator.isNull(cmd)) {
-				UploadException uploadException =
-					(UploadException)actionRequest.getAttribute(
-						WebKeys.UPLOAD_EXCEPTION);
+			UploadException uploadException =
+				(UploadException)actionRequest.getAttribute(
+					WebKeys.UPLOAD_EXCEPTION);
 
-				if (uploadException != null) {
-					if (uploadException.isExceededSizeLimit()) {
-						throw new FileSizeException(uploadException.getCause());
-					}
-
-					throw new PortalException(uploadException.getCause());
+			if (uploadException != null) {
+				if (uploadException.isExceededSizeLimit()) {
+					throw new FileSizeException(uploadException.getCause());
 				}
+
+				throw new PortalException(uploadException.getCause());
 			}
 			else if (cmd.equals(Constants.ADD)) {
 				addAttachment(actionRequest);
@@ -109,9 +106,6 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 			}
 			else if (cmd.equals(Constants.EMPTY_TRASH)) {
 				emptyTrash(actionRequest);
-			}
-			else if (cmd.equals(Constants.MOVE_FROM_TRASH)) {
-				restoreAttachmentFromTrash(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteAttachment(actionRequest, true);
@@ -391,24 +385,6 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 			WikiPageServiceUtil.restorePageAttachmentFromTrash(
 				page.getNodeId(), page.getTitle(), fileEntry.getTitle());
 		}
-	}
-
-	protected void restoreAttachmentFromTrash(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
-		String title = ParamUtil.getString(actionRequest, "title");
-		String fileName = ParamUtil.getString(actionRequest, "fileName");
-
-		JSONObject jsonObject =
-			com.liferay.portlet.trash.action.ActionUtil.checkEntry(
-				actionRequest);
-
-		writeJSON(actionRequest, actionResponse, jsonObject);
-
-		WikiPageServiceUtil.restorePageAttachmentFromTrash(
-			nodeId, title, fileName);
 	}
 
 	private static final String _TEMP_FOLDER_NAME =

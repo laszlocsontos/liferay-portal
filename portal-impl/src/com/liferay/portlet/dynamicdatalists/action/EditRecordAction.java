@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -66,8 +66,15 @@ public class EditRecordAction extends PortletAction {
 			else if (cmd.equals(Constants.REVERT)) {
 				revertRecordVersion(actionRequest);
 			}
+			else if (cmd.equals(Constants.TRANSLATE)) {
+				updateRecord(actionRequest);
 
-			if (Validator.isNotNull(cmd)) {
+				setForward(
+					actionRequest,
+					"portlet.dynamic_data_lists.update_translation_redirect");
+			}
+
+			if (Validator.isNotNull(cmd) && !cmd.equals(Constants.TRANSLATE)) {
 				sendRedirect(actionRequest, actionResponse);
 			}
 		}

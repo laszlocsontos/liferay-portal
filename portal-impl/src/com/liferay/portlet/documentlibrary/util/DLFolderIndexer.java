@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -41,11 +40,11 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
-import com.liferay.portlet.documentlibrary.service.persistence.DLFolderActionableDynamicQuery;
 
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
 
@@ -59,6 +58,9 @@ public class DLFolderIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.DOCUMENT_LIBRARY;
 
 	public DLFolderIndexer() {
+		setDefaultSelectedFieldNames(
+			Field.COMPANY_ID, Field.DESCRIPTION, Field.ENTRY_CLASS_NAME,
+			Field.ENTRY_CLASS_PK, Field.TITLE, Field.UID);
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -137,8 +139,8 @@ public class DLFolderIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet,
-		PortletURL portletURL) {
+		Document document, Locale locale, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		LiferayPortletURL liferayPortletURL = (LiferayPortletURL)portletURL;
 
@@ -199,33 +201,40 @@ public class DLFolderIndexer extends BaseIndexer {
 		return PORTLET_ID;
 	}
 
-	protected void reindexFolders(final long companyId)
-		throws PortalException, SystemException {
+	protected void reindexFolders(final long companyId) throws PortalException {
+		final ActionableDynamicQuery actionableDynamicQuery =
+			DLFolderLocalServiceUtil.getActionableDynamicQuery();
 
-		ActionableDynamicQuery actionableDynamicQuery =
-			new DLFolderActionableDynamicQuery() {
+		actionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
 
-			@Override
-			protected void addCriteria(DynamicQuery dynamicQuery) {
-				Property property = PropertyFactoryUtil.forName("mountPoint");
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					Property property = PropertyFactoryUtil.forName(
+						"mountPoint");
 
-				dynamicQuery.add(property.eq(false));
-			}
-
-			@Override
-			protected void performAction(Object object) throws PortalException {
-				DLFolder dlFolder = (DLFolder)object;
-
-				Document document = getDocument(dlFolder);
-
-				if (document != null) {
-					addDocument(document);
+					dynamicQuery.add(property.eq(false));
 				}
-			}
 
-		};
-
+			});
 		actionableDynamicQuery.setCompanyId(companyId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					DLFolder dlFolder = (DLFolder)object;
+
+					Document document = getDocument(dlFolder);
+
+					if (document != null) {
+						actionableDynamicQuery.addDocument(document);
+					}
+				}
+
+			});
 		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		actionableDynamicQuery.performActions();

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,6 @@ NumberFormat integerFormat = NumberFormat.getInstance(locale);
 integerFormat.setMaximumFractionDigits(0);
 %>
 
-<%= LanguageUtil.format(pageContext, "results-of", new Object[] {"<strong>" + ((searchContainer.getResultEnd() > 0) ? searchContainer.getStart() + 1 : 0)+ "</strong> - <strong>" + searchContainer.getResultEnd() + "</strong>", "<strong>" + integerFormat.format(searchContainer.getTotal()) + "</strong>"}, false) %>
+<%= LanguageUtil.format(request, "results-of", new Object[] {"<strong>" + ((searchContainer.getResultEnd() > 0) ? searchContainer.getStart() + 1 : 0)+ "</strong> - <strong>" + searchContainer.getResultEnd() + "</strong>", "<strong>" + integerFormat.format(searchContainer.getTotal()) + "</strong>"}, false) %>
 
-<%= LanguageUtil.format(pageContext, "search-took-x-seconds", new LanguageWrapper("<strong>", doubleFormat.format(hits.getSearchTime()), "</strong>"), false) %>
+<%= LanguageUtil.format(request, "search-took-x-seconds", new LanguageWrapper("<strong>", doubleFormat.format(hits.getSearchTime()), "</strong>"), false) %>

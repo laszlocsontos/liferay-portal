@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -76,9 +76,15 @@ public class SeleniumUtil extends TestPropsValues {
 		String projectDir = absolutePath.substring(
 			0, absolutePath.length() - 1);
 
+		String portalURL = PORTAL_URL;
+
+		if (TCAT_ENABLED) {
+			portalURL = "http://localhost:8180/console";
+		}
+
 		if (SELENIUM_IMPLEMENTATION.equals(Selenium.class.getName())) {
 			LiferaySelenium liferaySelenium = new DefaultSeleniumImpl(
-				projectDir, PORTAL_URL);
+				projectDir, portalURL);
 
 			Class<?> clazz = getClass();
 
@@ -97,25 +103,24 @@ public class SeleniumUtil extends TestPropsValues {
 
 				if (SELENIUM_LOGGER_ENABLED) {
 					_selenium = _wrapWithLoggerHandler(
-						new FirefoxWebDriverImpl(projectDir, PORTAL_URL));
+						new FirefoxWebDriverImpl(projectDir, portalURL));
 				}
 				else {
-					_selenium = new FirefoxWebDriverImpl(
-						projectDir, PORTAL_URL);
+					_selenium = new FirefoxWebDriverImpl(projectDir, portalURL);
 				}
 			}
 			else if (BROWSER_TYPE.equals("*googlechrome")) {
 				System.setProperty(
 					"webdriver.chrome.driver",
-					TestPropsValues.SELENIUM_EXECUTABLE_DIR +
+					TestPropsValues.SELENIUM_EXECUTABLE_DIR_NAME +
 						"\\chromedriver.exe");
 
 				if (SELENIUM_LOGGER_ENABLED) {
 					_selenium = _wrapWithLoggerHandler(
-						new ChromeWebDriverImpl(projectDir, PORTAL_URL));
+						new ChromeWebDriverImpl(projectDir, portalURL));
 				}
 				else {
-					_selenium = new ChromeWebDriverImpl(projectDir, PORTAL_URL);
+					_selenium = new ChromeWebDriverImpl(projectDir, portalURL);
 				}
 			}
 			else if (BROWSER_TYPE.equals("*iehta") ||
@@ -123,26 +128,26 @@ public class SeleniumUtil extends TestPropsValues {
 
 				System.setProperty(
 					"webdriver.ie.driver",
-					TestPropsValues.SELENIUM_EXECUTABLE_DIR +
+					TestPropsValues.SELENIUM_EXECUTABLE_DIR_NAME +
 						"\\IEDriverServer.exe");
 
 				if (SELENIUM_LOGGER_ENABLED) {
 					_selenium = _wrapWithLoggerHandler(
 						new InternetExplorerWebDriverImpl(
-							projectDir, PORTAL_URL));
+							projectDir, portalURL));
 				}
 				else {
 					_selenium = new InternetExplorerWebDriverImpl(
-						projectDir, PORTAL_URL);
+						projectDir, portalURL);
 				}
 			}
 			else if (BROWSER_TYPE.equals("*safari")) {
 				if (SELENIUM_LOGGER_ENABLED) {
 					_selenium = _wrapWithLoggerHandler(
-						new SafariWebDriverImpl(projectDir, PORTAL_URL));
+						new SafariWebDriverImpl(projectDir, portalURL));
 				}
 				else {
-					_selenium = new SafariWebDriverImpl(projectDir, PORTAL_URL);
+					_selenium = new SafariWebDriverImpl(projectDir, portalURL);
 				}
 			}
 			else {

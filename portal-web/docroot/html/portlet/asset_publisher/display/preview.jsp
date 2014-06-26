@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,7 +52,7 @@ AssetRenderer assetRenderer = (AssetRenderer)request.getAttribute("add_panel.jsp
 	</div>
 
 	<div class="asset-summary">
-		<%= HtmlUtil.escape(StringUtil.shorten(assetRenderer.getSummary(locale), 320)) %>
+		<%= HtmlUtil.escape(StringUtil.shorten(assetRenderer.getSummary(liferayPortletRequest, liferayPortletResponse), 320)) %>
 	</div>
 
 	<div class="asset-metadata">
@@ -78,7 +78,10 @@ AssetRenderer assetRenderer = (AssetRenderer)request.getAttribute("add_panel.jsp
 	data.put("class-pk", assetEntry.getClassPK());
 	data.put("instanceable", Boolean.TRUE);
 	data.put("portlet-id", assetRenderer.getAddToPagePortletId());
+	data.put("title", HtmlUtil.escape(assetRenderer.getTitle(themeDisplay.getLocale())));
 	%>
 
-	<aui:button cssClass="add-button-preview" data="<%= data %>" value="add" />
+	<c:if test="<%= PortletPermissionUtil.contains(permissionChecker, layout, assetRenderer.getAddToPagePortletId(), ActionKeys.ADD_TO_PAGE) %>">
+		<aui:button cssClass="add-button-preview" data="<%= data %>" value="add" />
+	</c:if>
 </div>

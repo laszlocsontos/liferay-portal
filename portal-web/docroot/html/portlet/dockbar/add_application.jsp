@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,10 +28,10 @@ refererURL.setParameter("updateLayout", "true");
 	<aui:input name="<%= WebKeys.REFERER %>" type="hidden" value="<%= refererURL.toString() %>" />
 	<aui:input name="refresh" type="hidden" value="<%= true %>" />
 
-	<div class="row-fluid" id="<portlet:namespace />applicationList">
+	<div id="<portlet:namespace />applicationList">
 		<c:if test="<%= layout.isTypePortlet() %>">
-			<div class="search-panel btn-toolbar">
-				<aui:input cssClass="search-query span12" label="" name="searchApplication" type="text"  />
+			<div class="btn-toolbar search-panel">
+				<aui:input cssClass="col-md-12 search-query" label="" name="searchApplication" type="text" />
 			</div>
 		</c:if>
 
@@ -41,7 +41,7 @@ refererURL.setParameter("updateLayout", "true");
 		List<Portlet> portlets = new ArrayList<Portlet>();
 
 		for (String portletId : PropsValues.DOCKBAR_ADD_PORTLETS) {
-			Portlet portlet = PortletLocalServiceUtil.getPortletById(portletId);
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(user.getCompanyId(), portletId);
 
 			if ((portlet != null) && portlet.isInclude() && portlet.isActive() && PortletPermissionUtil.contains(permissionChecker, layout, portlet, ActionKeys.ADD_TO_PAGE)) {
 				portlets.add(portlet);
@@ -51,7 +51,7 @@ refererURL.setParameter("updateLayout", "true");
 		int portletCategoryIndex = 0;
 		%>
 
-		<liferay-ui:panel-container id="<%= panelContainerId %>">
+		<liferay-ui:panel-container accordion="<%= BrowserSnifferUtil.isMobile(request) %>" id="<%= panelContainerId %>">
 			<c:if test="<%= portlets.size() > 0 %>">
 
 				<%
@@ -59,15 +59,11 @@ refererURL.setParameter("updateLayout", "true");
 				%>
 
 				<div class="lfr-add-content">
-					<liferay-ui:panel collapsible="<%= layout.isTypePortlet() %>" cssClass="lfr-content-category lfr-component panel-page-category" extended="<%= true %>" id="<%= panelId %>" persistState="<%= true %>" title='<%= LanguageUtil.get(pageContext, "highlighted") %>'>
-						<aui:nav collapsible="<%= false %>" cssClass="nav-list">
+					<liferay-ui:panel collapsible="<%= layout.isTypePortlet() %>" cssClass="lfr-component lfr-content-category panel-page-category" extended="<%= true %>" id="<%= panelId %>" persistState="<%= true %>" title='<%= LanguageUtil.get(request, "highlighted") %>'>
+						<aui:nav collapsible="<%= false %>">
 
 							<%
 							for (Portlet portlet : portlets) {
-								if (!PortletPermissionUtil.contains(permissionChecker, layout, portlet.getPortletId(), ActionKeys.ADD_TO_PAGE)) {
-									continue;
-								}
-
 								boolean portletInstanceable = portlet.isInstanceable();
 
 								boolean portletUsed = layoutTypePortlet.hasPortletId(portlet.getPortletId());
@@ -150,7 +146,7 @@ refererURL.setParameter("updateLayout", "true");
 		</liferay-ui:panel-container>
 
 		<c:if test="<%= layout.isTypePortlet() %>">
-			<ul class="lfr-add-apps-legend nav-list unstyled">
+			<ul class="lfr-add-apps-legend list-unstyled">
 				<li>
 					<aui:icon image="stop" label="can-be-added-once" />
 				</li>
@@ -179,10 +175,12 @@ refererURL.setParameter("updateLayout", "true");
 	</div>
 </aui:form>
 
-<aui:script use="liferay-dockbar-add-application,liferay-dockbar-portlet-dd">
+<aui:script use="liferay-dockbar-add-application">
+	var Dockbar = Liferay.Dockbar;
+
 	var searchApplication = A.one('#<portlet:namespace />searchApplication');
 
-	var addApplication = new Liferay.Dockbar.AddApplication(
+	var addApplication = new Dockbar.AddApplication(
 		{
 			focusItem: searchApplication,
 			inputNode: searchApplication,
@@ -193,20 +191,24 @@ refererURL.setParameter("updateLayout", "true");
 		}
 	);
 
-	addApplication.plug(
-		Liferay.Dockbar.PortletDragDrop,
-		{
-			on: {
-				dragEnd: function(event) {
-					addApplication.addPortlet(
-						event.portletNode,
-						{
-							item: event.appendNode
-						}
-					);
-				}
-			},
-			srcNode: '#<portlet:namespace />applicationList'
-		}
-	);
+	if (Dockbar.PortletDragDrop) {
+		addApplication.plug(
+			Dockbar.PortletDragDrop,
+			{
+				on: {
+					dragEnd: function(event) {
+						addApplication.addPortlet(
+							event.portletNode,
+							{
+								item: event.appendNode
+							}
+						);
+					}
+				},
+				srcNode: '#<portlet:namespace />applicationList'
+			}
+		);
+	}
+
+	Liferay.component('<portlet:namespace />addApplication', addApplication);
 </aui:script>

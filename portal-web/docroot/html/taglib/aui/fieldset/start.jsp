@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,7 @@
 	<c:if test="<%= Validator.isNotNull(label) %>">
 		<legend class="fieldset-legend">
 			<span class="legend">
-				<liferay-ui:message key="<%= label %>" />
+				<liferay-ui:message key="<%= label %>" localizeKey="<%= localizeLabel %>" />
 
 				<c:if test="<%= Validator.isNotNull(helpMessage) %>">
 					<liferay-ui:icon-help message="<%= helpMessage %>" />

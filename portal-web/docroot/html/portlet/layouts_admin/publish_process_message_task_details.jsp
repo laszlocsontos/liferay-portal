@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,12 +32,12 @@ catch (Exception e) {
 
 <c:choose>
 	<c:when test="<%= jsonObject == null %>">
-		<div class="alert <%= backgroundTask.getStatus() == BackgroundTaskConstants.STATUS_FAILED ? "alert-error" : StringPool.BLANK %> publish-error">
+		<div class="alert <%= backgroundTask.getStatus() == BackgroundTaskConstants.STATUS_FAILED ? "alert-danger" : StringPool.BLANK %> publish-error">
 			<liferay-ui:message arguments="<%= backgroundTask.getStatusMessage() %>" key="unable-to-execute-process-x" translateArguments="<%= false %>" />
 		</div>
 	</c:when>
 	<c:otherwise>
-		<div class="alert alert-error publish-error">
+		<div class="alert alert-danger publish-error">
 			<h4 class="upload-error-message">
 
 				<%
@@ -71,7 +71,9 @@ catch (Exception e) {
 					%>
 
 						<li>
-							<%= messageListItemJSONArray.getString("type") %>:
+							<%= messageListItemJSONArray.getString("type") %>
+
+							<%= messageListItemJSONArray.getString("site") %>:
 
 							<strong><%= HtmlUtil.escape(messageListItemJSONArray.getString("name")) %></strong>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.resiliency.spi;
 
-import com.liferay.portal.kernel.process.ProcessExecutor;
+import com.liferay.portal.kernel.process.ProcessLauncher;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.NewClassLoaderJUnitTestRunner;
 
@@ -36,6 +36,11 @@ public class SPIUtilTest {
 		new CodeCoverageAssertor();
 
 	@Test
+	public void testConstructor() {
+		new SPIUtil();
+	}
+
+	@Test
 	public void testIsNotSPI() {
 		Assert.assertFalse(SPIUtil.isSPI());
 
@@ -55,7 +60,7 @@ public class SPIUtilTest {
 		MockSPI mockSPI = new MockSPI();
 
 		ConcurrentMap<String, Object> attributes =
-			ProcessExecutor.ProcessContext.getAttributes();
+			ProcessLauncher.ProcessContext.getAttributes();
 
 		attributes.put(SPI.SPI_INSTANCE_PUBLICATION_KEY, mockSPI);
 

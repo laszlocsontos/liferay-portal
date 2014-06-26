@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.documentlibrary.antivirus;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 
 import java.io.File;
@@ -43,24 +42,20 @@ public class AntivirusScannerUtil {
 		return antivirusScanner.isActive();
 	}
 
-	public static void scan(byte[] bytes)
-		throws AntivirusScannerException, SystemException {
-
+	public static void scan(byte[] bytes) throws AntivirusScannerException {
 		if (isActive()) {
 			getAntivirusScanner().scan(bytes);
 		}
 	}
 
-	public static void scan(File file)
-		throws AntivirusScannerException, SystemException {
-
+	public static void scan(File file) throws AntivirusScannerException {
 		if (isActive()) {
 			getAntivirusScanner().scan(file);
 		}
 	}
 
 	public static void scan(InputStream inputStream)
-		throws AntivirusScannerException, SystemException {
+		throws AntivirusScannerException {
 
 		if (isActive()) {
 			getAntivirusScanner().scan(inputStream);

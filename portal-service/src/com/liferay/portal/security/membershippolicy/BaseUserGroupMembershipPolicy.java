@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,9 +16,8 @@ package com.liferay.portal.security.membershippolicy;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.UserGroup;
-import com.liferay.portal.service.persistence.UserGroupActionableDynamicQuery;
+import com.liferay.portal.service.UserGroupLocalServiceUtil;
 
 /**
  * @author Roberto Díaz
@@ -30,7 +29,7 @@ public abstract class BaseUserGroupMembershipPolicy
 	@Override
 	@SuppressWarnings("unused")
 	public boolean isMembershipAllowed(long userId, long userGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			checkMembership(
@@ -46,7 +45,7 @@ public abstract class BaseUserGroupMembershipPolicy
 	@Override
 	@SuppressWarnings("unused")
 	public boolean isMembershipRequired(long userId, long userGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			checkMembership(
@@ -60,28 +59,29 @@ public abstract class BaseUserGroupMembershipPolicy
 	}
 
 	@Override
-	public void verifyPolicy() throws PortalException, SystemException {
+	public void verifyPolicy() throws PortalException {
 		ActionableDynamicQuery actionableDynamicQuery =
-			new UserGroupActionableDynamicQuery() {
+			UserGroupLocalServiceUtil.getActionableDynamicQuery();
 
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
 
-				UserGroup userGroup = (UserGroup)object;
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
 
-				verifyPolicy(userGroup);
-			}
+					UserGroup userGroup = (UserGroup)object;
 
-		};
+					verifyPolicy(userGroup);
+				}
+
+			});
 
 		actionableDynamicQuery.performActions();
 	}
 
 	@Override
-	public void verifyPolicy(UserGroup userGroup)
-		throws PortalException, SystemException {
-
+	public void verifyPolicy(UserGroup userGroup) throws PortalException {
 		verifyPolicy(userGroup, null, null);
 	}
 

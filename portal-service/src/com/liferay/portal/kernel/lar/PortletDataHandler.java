@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,16 +32,32 @@ import javax.portlet.PortletPreferences;
 public interface PortletDataHandler {
 
 	/**
-	 * Deletes the data created by the portlet. Can optionally return a modified
-	 * version of <code>preferences</code> if it contains reference to data that
-	 * does not exist anymore.
+	 * Returns the portlet's preferences with default data added.
+	 *
+	 * @param  portletDataContext the context of the data addition
+	 * @param  portletId the portlet ID of the portlet
+	 * @param  portletPreferences the portlet preferences of the portlet
+	 * @return a modified version of the portlet preferences that should be
+	 *         saved, or <code>null</code> if the data handler made no changes
+	 *         to the portlet preferences
+	 * @throws PortletDataException if a portlet data exception occurred
+	 */
+	public PortletPreferences addDefaultData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException;
+
+	/**
+	 * Deletes the data created by the portlet. It can optionally return a
+	 * modified version of the portlet preferences if it contains references to
+	 * data that no longer exists.
 	 *
 	 * @param  portletDataContext the context of the data deletion
 	 * @param  portletId the portlet ID of the portlet
 	 * @param  portletPreferences the portlet preferences of the portlet
-	 * @return A modified version of portlet preferences that should be saved.
-	 *         <code>Null</code> if the portlet preferences were unmodified by
-	 *         this data handler.
+	 * @return a modified version of the portlet preferences that should be
+	 *         saved, or <code>null</code> if the data handler made no changes
+	 *         to the portlet preferences
 	 * @throws PortletDataException if a portlet data exception occurred
 	 */
 	public PortletPreferences deleteData(
@@ -57,9 +73,9 @@ public interface PortletDataHandler {
 	 * @param  portletDataContext the context of the data export
 	 * @param  portletId the portlet ID of the portlet
 	 * @param  portletPreferences the portlet preferences of the portlet
-	 * @return A string of data to be placed in the LAR. It may be XML, but not
-	 *         necessarily. <code>Null</code> should be returned if no portlet
-	 *         data is to be written out.
+	 * @return a string of data to be placed in the LAR, which can be, but not
+	 *         limited to XML, or <code>null</code> if no portlet data is to be
+	 *         written out
 	 * @throws PortletDataException if a portlet data exception occurred
 	 */
 	public String exportData(
@@ -73,7 +89,7 @@ public interface PortletDataHandler {
 	 * Returns an array of the portlet preferences that reference data. These
 	 * preferences should only be updated if the referenced data is imported.
 	 *
-	 * @return A String array
+	 * @return an array of the portlet preferences that reference data
 	 */
 	public String[] getDataPortletPreferences();
 
@@ -94,7 +110,7 @@ public interface PortletDataHandler {
 	 * controls enable the developer to create fine grained controls over export
 	 * behavior. The controls are rendered in the export UI.
 	 *
-	 * @return an array of PortletDataHandlerControls
+	 * @return an array of the controls defined for this data handler
 	 * @throws PortletDataException if a portlet data exception occurred
 	 */
 	public PortletDataHandlerControl[] getExportControls()
@@ -106,7 +122,7 @@ public interface PortletDataHandler {
 	 * export behavior of metadata such as tags, categories, ratings or
 	 * comments. The controls are rendered in the export UI.
 	 *
-	 * @return an array of PortletDataHandlerControls
+	 * @return an array of the metadata controls defined for this data handler
 	 * @throws PortletDataException if a portlet data exception occurred
 	 */
 	public PortletDataHandlerControl[] getExportMetadataControls()
@@ -136,7 +152,7 @@ public interface PortletDataHandler {
 	 * controls enable the developer to create fine grained controls over import
 	 * behavior. The controls are rendered in the import UI.
 	 *
-	 * @return An array of PortletDataHandlerControls
+	 * @return an array of the controls defined for this data handler
 	 * @throws PortletDataException if a portlet data exception occurred
 	 */
 	public PortletDataHandlerControl[] getImportControls()
@@ -148,13 +164,15 @@ public interface PortletDataHandler {
 	 * import behavior of metadata such as tags, categories, ratings or
 	 * comments. The controls are rendered in the export UI.
 	 *
-	 * @return an array of PortletDataHandlerControls
+	 * @return an array of the metadata controls defined for this data handler
 	 * @throws PortletDataException if a portlet data exception occurred
 	 */
 	public PortletDataHandlerControl[] getImportMetadataControls()
 		throws PortletDataException;
 
 	public String getPortletId();
+
+	public String getServiceName();
 
 	/**
 	 * Handles any special processing of the data when the portlet is imported
@@ -166,15 +184,17 @@ public interface PortletDataHandler {
 	 * @param  portletPreferences the portlet preferences of the portlet
 	 * @param  data the string data that was returned by
 	 *         <code>exportData()</code>
-	 * @return A modified version of portlet preferences that should be saved.
-	 *         <code>Null</code> if the portlet preferences were unmodified by
-	 *         this data handler.
+	 * @return a modified version of the portlet preferences that should be
+	 *         saved, or <code>null</code> if the data handler made no changes
+	 *         to the portlet preferences
 	 * @throws PortletDataException if a portlet data exception occurred
 	 */
 	public PortletPreferences importData(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences, String data)
 		throws PortletDataException;
+
+	public boolean isDataAlwaysStaged();
 
 	public boolean isDataLocalized();
 
@@ -193,9 +213,21 @@ public interface PortletDataHandler {
 	 * CMS content, but not for data meant to be input by users such as wiki
 	 * pages or message board posts.
 	 *
-	 * @return <code>true</code> to publish to live by default
+	 * @return <code>true</code> if the data exported by this handler should be
+	 *         included by default when publishing to live; <code>false</code>
+	 *         otherwise
 	 */
 	public boolean isPublishToLiveByDefault();
+
+	/**
+	 * Returns <code>true</code> if the data handler stops operations and rolls
+	 * back their transactions on operations throwing exceptions.
+	 *
+	 * @return <code>true</code> if the data handler stops operations and rolls
+	 *         back their transactions on operations throwing exceptions;
+	 *         <code>false</code> otherwise
+	 */
+	public boolean isRollbackOnException();
 
 	public boolean isSupportsDataStrategyCopyAsNew();
 

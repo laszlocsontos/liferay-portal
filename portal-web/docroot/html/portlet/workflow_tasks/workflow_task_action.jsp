@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,7 +37,7 @@ else {
 long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getCompanyId(), workflowTask.getWorkflowTaskId());
 %>
 
-<liferay-ui:icon-menu showExpanded="<%= (row == null) %>" showWhenSingleIcon="<%= (row == null) %>">
+<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>" showExpanded="<%= (row == null) %>" showWhenSingleIcon="<%= (row == null) %>">
 	<c:if test="<%= !workflowTask.isCompleted() && _isAssignedToUser(workflowTask, user) %>">
 
 		<%
@@ -66,8 +66,8 @@ long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getC
 
 			<liferay-ui:icon
 				cssClass='<%= "workflow-task-" + randomId + " task-change-status-link" %>'
+				iconCssClass="icon-random"
 				id='<%= randomId + HtmlUtil.escapeAttribute(transitionName) + "taskChangeStatusLink" %>'
-				image="../aui/random"
 				message="<%= message %>"
 				method="get"
 				url="<%= editURL %>"
@@ -91,8 +91,8 @@ long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getC
 
 		<liferay-ui:icon
 			cssClass='<%= "workflow-task-" + randomId + " task-assign-to-me-link" %>'
+			iconCssClass="icon-signin"
 			id='<%= randomId + "taskAssignToMeLink" %>'
-			image="assign"
 			message="assign-to-me"
 			method="get"
 			url="<%= assignToMeURL %>"
@@ -110,8 +110,8 @@ long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getC
 
 		<liferay-ui:icon
 			cssClass='<%= "workflow-task-" + randomId + " task-assign-link" %>'
+			iconCssClass="icon-signin"
 			id='<%= randomId + "taskAssignLink" %>'
-			image="assign"
 			message="assign-to-..."
 			method="get"
 			url="<%= assignURL %>"
@@ -128,8 +128,8 @@ long[] pooledActorsIds = WorkflowTaskManagerUtil.getPooledActorsIds(company.getC
 
 		<liferay-ui:icon
 			cssClass='<%= "workflow-task-" + randomId + " task-due-date-link" %>'
+			iconCssClass="icon-time"
 			id='<%= randomId + "taskDueDateLink" %>'
-			image="time"
 			message="update-due-date"
 			method="get"
 			url="<%= updateDueDateURL %>"

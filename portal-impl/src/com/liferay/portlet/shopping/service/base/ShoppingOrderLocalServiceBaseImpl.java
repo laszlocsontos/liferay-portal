@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -80,12 +82,10 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 *
 	 * @param shoppingOrder the shopping order
 	 * @return the shopping order that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public ShoppingOrder addShoppingOrder(ShoppingOrder shoppingOrder)
-		throws SystemException {
+	public ShoppingOrder addShoppingOrder(ShoppingOrder shoppingOrder) {
 		shoppingOrder.setNew(true);
 
 		return shoppingOrderPersistence.update(shoppingOrder);
@@ -108,12 +108,11 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 * @param orderId the primary key of the shopping order
 	 * @return the shopping order that was removed
 	 * @throws PortalException if a shopping order with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public ShoppingOrder deleteShoppingOrder(long orderId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingOrderPersistence.remove(orderId);
 	}
 
@@ -122,12 +121,10 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 *
 	 * @param shoppingOrder the shopping order
 	 * @return the shopping order that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public ShoppingOrder deleteShoppingOrder(ShoppingOrder shoppingOrder)
-		throws SystemException {
+	public ShoppingOrder deleteShoppingOrder(ShoppingOrder shoppingOrder) {
 		return shoppingOrderPersistence.remove(shoppingOrder);
 	}
 
@@ -144,12 +141,10 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return shoppingOrderPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -164,12 +159,10 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return shoppingOrderPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -186,12 +179,11 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return shoppingOrderPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -201,11 +193,9 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return shoppingOrderPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -215,18 +205,16 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return shoppingOrderPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public ShoppingOrder fetchShoppingOrder(long orderId)
-		throws SystemException {
+	public ShoppingOrder fetchShoppingOrder(long orderId) {
 		return shoppingOrderPersistence.fetchByPrimaryKey(orderId);
 	}
 
@@ -236,17 +224,47 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 * @param orderId the primary key of the shopping order
 	 * @return the shopping order
 	 * @throws PortalException if a shopping order with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ShoppingOrder getShoppingOrder(long orderId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingOrderPersistence.findByPrimaryKey(orderId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.shopping.service.ShoppingOrderLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(ShoppingOrder.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("orderId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.shopping.service.ShoppingOrderLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(ShoppingOrder.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("orderId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return shoppingOrderLocalService.deleteShoppingOrder((ShoppingOrder)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingOrderPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -260,11 +278,9 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 * @param start the lower bound of the range of shopping orders
 	 * @param end the upper bound of the range of shopping orders (not inclusive)
 	 * @return the range of shopping orders
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<ShoppingOrder> getShoppingOrders(int start, int end)
-		throws SystemException {
+	public List<ShoppingOrder> getShoppingOrders(int start, int end) {
 		return shoppingOrderPersistence.findAll(start, end);
 	}
 
@@ -272,10 +288,9 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 * Returns the number of shopping orders.
 	 *
 	 * @return the number of shopping orders
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getShoppingOrdersCount() throws SystemException {
+	public int getShoppingOrdersCount() {
 		return shoppingOrderPersistence.countAll();
 	}
 
@@ -284,12 +299,10 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 *
 	 * @param shoppingOrder the shopping order
 	 * @return the shopping order that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public ShoppingOrder updateShoppingOrder(ShoppingOrder shoppingOrder)
-		throws SystemException {
+	public ShoppingOrder updateShoppingOrder(ShoppingOrder shoppingOrder) {
 		return shoppingOrderPersistence.update(shoppingOrder);
 	}
 
@@ -842,7 +855,7 @@ public abstract class ShoppingOrderLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = shoppingOrderPersistence.getDataSource();
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,10 @@
 
 <%@ include file="/html/portlet/breadcrumb/init.jsp" %>
 
+<%
+TemplateHandler templateHandler = TemplateHandlerRegistryUtil.getTemplateHandler(Layout.class.getName());
+%>
+
 <aui:row>
 	<aui:col width="<%= 50 %>">
 		<liferay-portlet:actionURL portletConfiguration="true" var="configurationActionURL" />
@@ -26,10 +30,22 @@
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 			<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
+			<aui:fieldset>
+				<div class="display-template">
+					<liferay-ui:ddm-template-selector
+						classNameId="<%= PortalUtil.getClassNameId(templateHandler.getClassName()) %>"
+						displayStyle="<%= displayStyle %>"
+						displayStyleGroupId="<%= displayStyleGroupId %>"
+						displayStyles="<%= Arrays.asList(PropsValues.BREADCRUMB_DISPLAY_STYLE_OPTIONS) %>"
+						refreshURL="<%= configurationRenderURL %>"
+						showEmptyOption="<%= true %>"
+					/>
+				</div>
+			</aui:fieldset>
+
 			<aui:fieldset cssClass="checkBoxes">
 				<aui:col width="<%= 50 %>">
 					<aui:input data-key='<%= "_" + HtmlUtil.escapeJS(portletResource) + "_showCurrentGroup" %>' label="show-current-site" name="preferences--showCurrentGroup--" type="checkbox" value="<%= showCurrentGroup %>" />
-					<aui:input data-key='<%= "_" + HtmlUtil.escapeJS(portletResource) + "_showCurrentPortlet" %>' label="show-current-application" name="preferences--showCurrentPortlet--" type="checkbox" value="<%= showCurrentPortlet %>" />
 					<aui:input data-key='<%= "_" + HtmlUtil.escapeJS(portletResource) + "_showGuestGroup" %>' label="show-guest-site" name="preferences--showGuestGroup--" type="checkbox" value="<%= showGuestGroup %>" />
 				</aui:col>
 
@@ -46,6 +62,13 @@
 		</aui:form>
 	</aui:col>
 	<aui:col width="<%= 50 %>">
+
+		<%
+		List<BreadcrumbEntry> breadcrumbEntries = BreadcrumbUtil.getPortletBreadcrumbEntries(request);
+
+		breadcrumbEntries.clear();
+		%>
+
 		<liferay-portlet:preview
 			portletName="<%= portletResource %>"
 			queryString="struts_action=/breadcrumb/view"
@@ -59,7 +82,6 @@
 
 	var data = {
 		'_<%= HtmlUtil.escapeJS(portletResource) %>_showCurrentGroup': <%= showCurrentGroup %>,
-		'_<%= HtmlUtil.escapeJS(portletResource) %>_showCurrentPortlet': <%= showCurrentPortlet %>,
 		'_<%= HtmlUtil.escapeJS(portletResource) %>_showGuestGroup': <%= showGuestGroup %>,
 		'_<%= HtmlUtil.escapeJS(portletResource) %>_showLayout': <%= showLayout %>,
 		'_<%= HtmlUtil.escapeJS(portletResource) %>_showParentGroups': <%= showParentGroups %>,

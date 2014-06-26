@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.wiki.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -40,7 +39,7 @@ public class WikiNodeStagedModelDataHandler
 	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		WikiNode wikiNode =
 			WikiNodeLocalServiceUtil.fetchWikiNodeByUuidAndGroupId(
@@ -68,13 +67,13 @@ public class WikiNodeStagedModelDataHandler
 	}
 
 	@Override
-	protected void doImportCompanyStagedModel(
-			PortletDataContext portletDataContext, String uuid, long nodeId)
+	protected void doImportMissingReference(
+			PortletDataContext portletDataContext, String uuid, long groupId,
+			long nodeId)
 		throws Exception {
 
 		WikiNode existingNode =
-			WikiNodeLocalServiceUtil.fetchNodeByUuidAndGroupId(
-				uuid, portletDataContext.getCompanyGroupId());
+			WikiNodeLocalServiceUtil.fetchNodeByUuidAndGroupId(uuid, groupId);
 
 		Map<Long, Long> nodeIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(

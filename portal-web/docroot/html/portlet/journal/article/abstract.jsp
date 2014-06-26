@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,10 +43,10 @@ String toLanguageId = (String)request.getAttribute("edit_article.jsp-toLanguageI
 <liferay-ui:error exception="<%= ArticleSmallImageSizeException.class %>">
 
 	<%
-	long imageMaxSize = PrefsPropsUtil.getLong(PropsKeys.JOURNAL_IMAGE_SMALL_MAX_SIZE) / 1024;
+	long imageMaxSize = PrefsPropsUtil.getLong(PropsKeys.JOURNAL_IMAGE_SMALL_MAX_SIZE);
 	%>
 
-	<liferay-ui:message arguments="<%= imageMaxSize %>" key="please-enter-a-small-image-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
+	<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(imageMaxSize, locale) %>" key="please-enter-a-small-image-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
 </liferay-ui:error>
 
 <aui:fieldset>
@@ -62,7 +62,7 @@ String toLanguageId = (String)request.getAttribute("edit_article.jsp-toLanguageI
 				<aui:row>
 					<c:if test="<%= smallImage && (article != null) %>">
 						<aui:col width="<%= 50 %>">
-							<img alt="<liferay-ui:message key="preview" />" class="lfr-journal-small-image-preview" src="<%= Validator.isNotNull(article.getSmallImageURL()) ? HtmlUtil.escapeAttribute(article.getSmallImageURL()) : themeDisplay.getPathImage() + "/template?img_id=" + article.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(article.getSmallImageId()) %>" />
+							<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="preview" />" class="lfr-journal-small-image-preview" src='<%= Validator.isNotNull(article.getSmallImageURL()) ? HtmlUtil.escapeAttribute(article.getSmallImageURL()) : themeDisplay.getPathImage() + "/template?img_id=" + article.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(article.getSmallImageId()) %>' />
 						</aui:col>
 					</c:if>
 
@@ -70,7 +70,7 @@ String toLanguageId = (String)request.getAttribute("edit_article.jsp-toLanguageI
 						<aui:fieldset>
 							<aui:input cssClass="lfr-journal-small-image-type" inlineField="<%= true %>" label="small-image-url" name="smallImageType" type="radio" />
 
-							<aui:input cssClass="lfr-journal-small-image-value" inlineField="<%= true %>" label="" name="smallImageURL" />
+							<aui:input cssClass="lfr-journal-small-image-value" inlineField="<%= true %>" label="" name="smallImageURL" title="small-image-url" />
 						</aui:fieldset>
 
 						<aui:fieldset>
@@ -90,13 +90,13 @@ String toLanguageId = (String)request.getAttribute("edit_article.jsp-toLanguageI
 			var values = container.all('.lfr-journal-small-image-value');
 
 			var selectSmallImageType = function(index) {
-				types.set('checked', false);
+				types.attr('checked', false);
 
-				types.item(index).set('checked', true);
+				types.item(index).attr('checked', true);
 
-				values.set('disabled', true);
+				values.attr('disabled', true);
 
-				values.item(index).set('disabled', false);
+				values.item(index).attr('disabled', false);
 			};
 
 			container.delegate(
@@ -121,20 +121,19 @@ String toLanguageId = (String)request.getAttribute("edit_article.jsp-toLanguageI
 
 							var expanded = !instance.get('expanded');
 
-							A.one('#<portlet:namespace />smallImage').set('value', expanded);
-							A.one('#<portlet:namespace />smallImageCheckbox').set('checked', expanded);
+							A.one('#<portlet:namespace />smallImage').attr('checked', expanded);
 
 							if (expanded) {
 								types.each(
-									function(item, index, collection) {
+									function(item, index) {
 										if (item.get('checked')) {
-											values.item(index).set('disabled', false);
+											values.item(index).attr('disabled', false);
 										}
 									}
 								);
 							}
 							else {
-								values.set('disabled', true);
+								values.attr('disabled', true);
 							}
 						}
 					}

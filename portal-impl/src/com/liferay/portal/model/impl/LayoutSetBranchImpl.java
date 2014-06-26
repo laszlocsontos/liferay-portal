@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,13 +44,13 @@ public class LayoutSetBranchImpl extends LayoutSetBranchBaseImpl {
 	}
 
 	@Override
-	public ColorScheme getColorScheme() throws SystemException {
+	public ColorScheme getColorScheme() {
 		return ThemeLocalServiceUtil.getColorScheme(
 			getCompanyId(), getTheme().getThemeId(), getColorSchemeId(), false);
 	}
 
 	@Override
-	public Group getGroup() throws PortalException, SystemException {
+	public Group getGroup() throws PortalException {
 		return GroupLocalServiceUtil.getGroup(getGroupId());
 	}
 
@@ -137,15 +137,13 @@ public class LayoutSetBranchImpl extends LayoutSetBranchBaseImpl {
 	}
 
 	@Override
-	public Theme getTheme() throws SystemException {
+	public Theme getTheme() {
 		return ThemeLocalServiceUtil.getTheme(
 			getCompanyId(), getThemeId(), false);
 	}
 
 	@Override
-	public String getThemeSetting(String key, String device)
-		throws SystemException {
-
+	public String getThemeSetting(String key, String device) {
 		UnicodeProperties settingsProperties = getSettingsProperties();
 
 		String value = settingsProperties.getProperty(
@@ -188,14 +186,14 @@ public class LayoutSetBranchImpl extends LayoutSetBranchBaseImpl {
 	}
 
 	@Override
-	public ColorScheme getWapColorScheme() throws SystemException {
+	public ColorScheme getWapColorScheme() {
 		return ThemeLocalServiceUtil.getColorScheme(
 			getCompanyId(), getWapTheme().getThemeId(), getWapColorSchemeId(),
 			true);
 	}
 
 	@Override
-	public Theme getWapTheme() throws SystemException {
+	public Theme getWapTheme() {
 		return ThemeLocalServiceUtil.getTheme(
 			getCompanyId(), getWapThemeId(), true);
 	}

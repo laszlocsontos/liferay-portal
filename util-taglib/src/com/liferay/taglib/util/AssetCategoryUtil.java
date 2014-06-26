@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.taglib.util;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -36,8 +35,7 @@ public class AssetCategoryUtil {
 	public static final String _CATEGORY_SEPARATOR = "_CATEGORY_";
 
 	public static long[] filterCategoryIds(
-			long vocabularyId, long[] categoryIds)
-		throws SystemException {
+		long vocabularyId, long[] categoryIds) {
 
 		List<Long> filteredCategoryIds = new ArrayList<Long>();
 
@@ -59,9 +57,8 @@ public class AssetCategoryUtil {
 	}
 
 	public static String[] getCategoryIdsTitles(
-			String categoryIds, String categoryNames, long vocabularyId,
-			ThemeDisplay themeDisplay)
-		throws SystemException {
+		String categoryIds, String categoryNames, long vocabularyId,
+		ThemeDisplay themeDisplay) {
 
 		if (Validator.isNotNull(categoryIds)) {
 			long[] categoryIdsArray = GetterUtil.getLongValues(
@@ -69,7 +66,7 @@ public class AssetCategoryUtil {
 
 			if (vocabularyId > 0) {
 				categoryIdsArray = filterCategoryIds(
-						vocabularyId, categoryIdsArray);
+					vocabularyId, categoryIdsArray);
 			}
 
 			categoryIds = StringPool.BLANK;

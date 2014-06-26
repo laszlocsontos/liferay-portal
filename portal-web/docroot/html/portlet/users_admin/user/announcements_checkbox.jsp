@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,7 +51,7 @@ else if (index == 3) {
 	disabled="<%= disabled %>"
 	label=""
 	name="<%= param %>"
-	title="<%= LanguageUtil.format(pageContext, messageKey, delivery.getType()) %>"
+	title="<%= LanguageUtil.format(request, messageKey, delivery.getType()) %>"
 	type="checkbox"
 	value="<%= defaultValue %>"
 />

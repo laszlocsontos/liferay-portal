@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -69,12 +71,11 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 *
 	 * @param wikiPageResource the wiki page resource
 	 * @return the wiki page resource that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public WikiPageResource addWikiPageResource(
-		WikiPageResource wikiPageResource) throws SystemException {
+		WikiPageResource wikiPageResource) {
 		wikiPageResource.setNew(true);
 
 		return wikiPageResourcePersistence.update(wikiPageResource);
@@ -97,12 +98,11 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 * @param resourcePrimKey the primary key of the wiki page resource
 	 * @return the wiki page resource that was removed
 	 * @throws PortalException if a wiki page resource with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public WikiPageResource deleteWikiPageResource(long resourcePrimKey)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return wikiPageResourcePersistence.remove(resourcePrimKey);
 	}
 
@@ -111,12 +111,11 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 *
 	 * @param wikiPageResource the wiki page resource
 	 * @return the wiki page resource that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public WikiPageResource deleteWikiPageResource(
-		WikiPageResource wikiPageResource) throws SystemException {
+		WikiPageResource wikiPageResource) {
 		return wikiPageResourcePersistence.remove(wikiPageResource);
 	}
 
@@ -133,12 +132,10 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return wikiPageResourcePersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -153,12 +150,10 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return wikiPageResourcePersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -175,12 +170,11 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return wikiPageResourcePersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -190,11 +184,9 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return wikiPageResourcePersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -204,18 +196,16 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return wikiPageResourcePersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public WikiPageResource fetchWikiPageResource(long resourcePrimKey)
-		throws SystemException {
+	public WikiPageResource fetchWikiPageResource(long resourcePrimKey) {
 		return wikiPageResourcePersistence.fetchByPrimaryKey(resourcePrimKey);
 	}
 
@@ -225,17 +215,47 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 * @param resourcePrimKey the primary key of the wiki page resource
 	 * @return the wiki page resource
 	 * @throws PortalException if a wiki page resource with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public WikiPageResource getWikiPageResource(long resourcePrimKey)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return wikiPageResourcePersistence.findByPrimaryKey(resourcePrimKey);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.wiki.service.WikiPageResourceLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(WikiPageResource.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("resourcePrimKey");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.wiki.service.WikiPageResourceLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(WikiPageResource.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("resourcePrimKey");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return wikiPageResourceLocalService.deleteWikiPageResource((WikiPageResource)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return wikiPageResourcePersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -249,11 +269,9 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 * @param start the lower bound of the range of wiki page resources
 	 * @param end the upper bound of the range of wiki page resources (not inclusive)
 	 * @return the range of wiki page resources
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<WikiPageResource> getWikiPageResources(int start, int end)
-		throws SystemException {
+	public List<WikiPageResource> getWikiPageResources(int start, int end) {
 		return wikiPageResourcePersistence.findAll(start, end);
 	}
 
@@ -261,10 +279,9 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 * Returns the number of wiki page resources.
 	 *
 	 * @return the number of wiki page resources
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getWikiPageResourcesCount() throws SystemException {
+	public int getWikiPageResourcesCount() {
 		return wikiPageResourcePersistence.countAll();
 	}
 
@@ -273,12 +290,11 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 *
 	 * @param wikiPageResource the wiki page resource
 	 * @return the wiki page resource that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public WikiPageResource updateWikiPageResource(
-		WikiPageResource wikiPageResource) throws SystemException {
+		WikiPageResource wikiPageResource) {
 		return wikiPageResourcePersistence.update(wikiPageResource);
 	}
 
@@ -382,7 +398,7 @@ public abstract class WikiPageResourceLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = wikiPageResourcePersistence.getDataSource();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -73,12 +75,10 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 *
 	 * @param trashVersion the trash version
 	 * @return the trash version that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public TrashVersion addTrashVersion(TrashVersion trashVersion)
-		throws SystemException {
+	public TrashVersion addTrashVersion(TrashVersion trashVersion) {
 		trashVersion.setNew(true);
 
 		return trashVersionPersistence.update(trashVersion);
@@ -101,12 +101,11 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * @param versionId the primary key of the trash version
 	 * @return the trash version that was removed
 	 * @throws PortalException if a trash version with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public TrashVersion deleteTrashVersion(long versionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return trashVersionPersistence.remove(versionId);
 	}
 
@@ -115,12 +114,10 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 *
 	 * @param trashVersion the trash version
 	 * @return the trash version that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public TrashVersion deleteTrashVersion(TrashVersion trashVersion)
-		throws SystemException {
+	public TrashVersion deleteTrashVersion(TrashVersion trashVersion) {
 		return trashVersionPersistence.remove(trashVersion);
 	}
 
@@ -137,12 +134,10 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return trashVersionPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -157,12 +152,10 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return trashVersionPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -179,12 +172,11 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return trashVersionPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -194,11 +186,9 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return trashVersionPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -208,18 +198,16 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return trashVersionPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public TrashVersion fetchTrashVersion(long versionId)
-		throws SystemException {
+	public TrashVersion fetchTrashVersion(long versionId) {
 		return trashVersionPersistence.fetchByPrimaryKey(versionId);
 	}
 
@@ -229,17 +217,47 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * @param versionId the primary key of the trash version
 	 * @return the trash version
 	 * @throws PortalException if a trash version with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public TrashVersion getTrashVersion(long versionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return trashVersionPersistence.findByPrimaryKey(versionId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.trash.service.TrashVersionLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(TrashVersion.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("versionId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.trash.service.TrashVersionLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(TrashVersion.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("versionId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return trashVersionLocalService.deleteTrashVersion((TrashVersion)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return trashVersionPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -253,11 +271,9 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * @param start the lower bound of the range of trash versions
 	 * @param end the upper bound of the range of trash versions (not inclusive)
 	 * @return the range of trash versions
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<TrashVersion> getTrashVersions(int start, int end)
-		throws SystemException {
+	public List<TrashVersion> getTrashVersions(int start, int end) {
 		return trashVersionPersistence.findAll(start, end);
 	}
 
@@ -265,10 +281,9 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * Returns the number of trash versions.
 	 *
 	 * @return the number of trash versions
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getTrashVersionsCount() throws SystemException {
+	public int getTrashVersionsCount() {
 		return trashVersionPersistence.countAll();
 	}
 
@@ -277,12 +292,10 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 *
 	 * @param trashVersion the trash version
 	 * @return the trash version that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public TrashVersion updateTrashVersion(TrashVersion trashVersion)
-		throws SystemException {
+	public TrashVersion updateTrashVersion(TrashVersion trashVersion) {
 		return trashVersionPersistence.update(trashVersion);
 	}
 
@@ -593,7 +606,7 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = trashVersionPersistence.getDataSource();
 

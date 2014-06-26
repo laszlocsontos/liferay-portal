@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,10 @@
 int deltaDefault = GetterUtil.getInteger(SessionClicks.get(request, "liferay_addpanel_numitems", "10"));
 
 int delta = ParamUtil.getInteger(request, "delta", deltaDefault);
+
+String displayStyleDefault = GetterUtil.getString(SessionClicks.get(request, "liferay_addpanel_displaystyle", "descriptive"));
+
+String displayStyle = ParamUtil.getString(request, "displayStyle", displayStyleDefault);
 %>
 
 <portlet:resourceURL var="updateContentListURL">
@@ -28,41 +32,35 @@ int delta = ParamUtil.getInteger(request, "delta", deltaDefault);
 </portlet:resourceURL>
 
 <aui:form action="<%= updateContentListURL %>" name="addContentForm" onSubmit="event.preventDefault();">
-	<div class="row-fluid">
-		<div class="btn-toolbar">
-			<aui:input cssClass="input-small search-query" inlineField="<%= true %>" label="" name="searchContent" type="text" />
+	<div class="btn-toolbar">
+		<aui:input cssClass="search-query" inlineField="<%= true %>" label="" name="searchContent" type="text" />
+
+		<aui:select cssClass="input-mini" inlineField="<%= true %>" label="" name="numItems" title="number-of-items-to-display">
 
 			<%
-			String displayStyleDefault = GetterUtil.getString(SessionClicks.get(request, "liferay_addpanel_displaystyle", "descriptive"));
-
-			String displayStyle = ParamUtil.getString(request, "displayStyle", displayStyleDefault);
+			for (int curDelta : PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES) {
+				if (curDelta > SearchContainer.MAX_DELTA) {
+					continue;
+				}
 			%>
 
-			<div class="btn-group" id="<portlet:namespace />styleButtons">
-				<aui:button cssClass='<%= displayStyle.equals("icon") ? "active" : StringPool.BLANK %>' data-style="icon" icon="icon-th-large" />
+				<aui:option label="<%= curDelta %>" selected="<%= delta == curDelta %>" />
 
-				<aui:button cssClass='<%= displayStyle.equals("descriptive") ? "active" : StringPool.BLANK %>' data-style="descriptive" icon="icon-th-list" />
+			<%
+			}
+			%>
 
-				<aui:button cssClass='<%= displayStyle.equals("list") ? "active" : StringPool.BLANK %>' data-style="list" icon="icon-list" />
-			</div>
+		</aui:select>
+	</div>
 
-			<aui:select cssClass="input-mini" inlineField="<%= true %>" label="" name="numItems">
-
-				<%
-				for (int curDelta : PropsValues.SEARCH_CONTAINER_PAGE_DELTA_VALUES) {
-					if (curDelta > SearchContainer.MAX_DELTA) {
-						continue;
-					}
-				%>
-
-					<aui:option label="<%= curDelta %>" selected="<%= delta == curDelta %>" />
-
-				<%
-				}
-				%>
-
-			</aui:select>
-		</div>
+	<aui:nav-bar>
+		<aui:nav collapsible="<%= true %>" cssClass="nav-display-style-buttons navbar-nav" icon="th-list" id="displayStyleButtons">
+			<liferay-ui:app-view-display-style
+				displayStyle="<%= displayStyle %>"
+				displayStyles="<%= _DISPLAY_VIEWS %>"
+				eventName='<%= "AddContent:changeDisplayStyle" %>'
+			/>
+		</aui:nav>
 
 		<span class="add-content-button">
 
@@ -78,47 +76,55 @@ int delta = ParamUtil.getInteger(request, "delta", deltaDefault);
 			redirectURL.setParameter("struts_action", "/dockbar/add_content_redirect");
 			redirectURL.setWindowState(LiferayWindowState.POP_UP);
 
-			Map<String, PortletURL> addPortletURLs = AssetUtil.getAddPortletURLs(liferayPortletRequest, liferayPortletResponse, AssetRendererFactoryRegistryUtil.getClassNameIds(company.getCompanyId()), new long[0], new long[0], new String[0], redirectURL.toString());
+			Map<String, PortletURL> addPortletURLs = AssetUtil.getAddPortletURLs(liferayPortletRequest, liferayPortletResponse, scopeGroupId, AssetRendererFactoryRegistryUtil.getClassNameIds(company.getCompanyId()), new long[0], new long[0], new String[0], redirectURL.toString());
 			%>
 
 			<%@ include file="/html/portlet/asset_publisher/add_asset.jspf" %>
 		</span>
+	</aui:nav-bar>
 
-		<div id="<portlet:namespace />entriesContainer">
-			<liferay-util:include page="/html/portlet/dockbar/view_resources.jsp" />
-		</div>
+	<div id="<portlet:namespace />entriesContainer">
+		<liferay-util:include page="/html/portlet/dockbar/view_resources.jsp" />
 	</div>
 </aui:form>
 
-<aui:script use="liferay-dockbar-add-content,liferay-dockbar-portlet-dd">
+<aui:script use="liferay-dockbar-add-content">
+	var Dockbar = Liferay.Dockbar;
+
 	var searchContent = A.one('#<portlet:namespace />searchContent');
 
-	var addContent = new Liferay.Dockbar.AddContent(
+	var addContent = new Dockbar.AddContent(
 		{
+			displayStyle: '<%= HtmlUtil.escapeJS(displayStyle) %>',
 			focusItem: searchContent,
 			inputNode: searchContent,
 			namespace: '<portlet:namespace />',
-			plugins: [
-				{
-					cfg: {
-						srcNode: '#<portlet:namespace />entriesContainer'
-					},
-					fn: Liferay.Dockbar.PortletDragDrop
-				}
-			],
 			selected: !A.one('#<portlet:namespace />addContentForm').ancestor().hasClass('hide')
 		}
 	);
 
-	addContent.portletdd.on(
-		'dragEnd',
-		function(event) {
-			addContent.addPortlet(
-				event.portletNode,
-				{
-					item: event.appendNode
-				}
-			);
-		}
-	);
+	if (Dockbar.PortletDragDrop) {
+		addContent.plug(
+			Dockbar.PortletDragDrop,
+			{
+				on: {
+					dragEnd: function(event) {
+						addContent.addPortlet(
+							event.portletNode,
+							{
+								item: event.appendNode
+							}
+						);
+					}
+				},
+				srcNode: '#<portlet:namespace />entriesContainer'
+			}
+		);
+	}
+
+	Liferay.component('<portlet:namespace />addContent', addContent);
 </aui:script>
+
+<%!
+private static final String[] _DISPLAY_VIEWS = {"icon", "descriptive", "list"};
+%>

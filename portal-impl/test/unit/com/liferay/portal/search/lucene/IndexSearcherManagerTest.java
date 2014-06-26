@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,6 @@
 
 package com.liferay.portal.search.lucene;
 
-import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
-import com.liferay.portal.kernel.executor.PortalExecutorManager;
-import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.test.AdviseWith;
 import com.liferay.portal.test.AspectJMockingNewClassLoaderJUnitTestRunner;
@@ -26,10 +23,8 @@ import java.io.IOException;
 import java.lang.Thread.State;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -42,6 +37,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.AlreadyClosedException;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 
@@ -68,16 +64,16 @@ public class IndexSearcherManagerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		PortalExecutorManagerUtil portalExecutorManagerUtil =
-			new PortalExecutorManagerUtil();
-
-		portalExecutorManagerUtil.setPortalExecutorManager(
-			new MockPortalExecutorManager());
-
 		IndexWriterConfig indexWriterConfig = new IndexWriterConfig(
 			Version.LUCENE_35, new StandardAnalyzer(Version.LUCENE_35));
 
-		_indexWriter = new IndexWriter(new RAMDirectory(), indexWriterConfig);
+		_directory = new RAMDirectory();
+
+		_indexWriter = new IndexWriter(_directory, indexWriterConfig);
+
+		// Workaround for LUCENE-2386
+
+		_indexWriter.commit();
 
 		_indexSearcherManager = new IndexSearcherManager(_indexWriter);
 	}
@@ -102,7 +98,7 @@ public class IndexSearcherManagerTest {
 
 		_indexSearcherManager.invalidate();
 
-		Thread thread = new Thread() {
+		Thread thread = new Thread("Double Check Locking") {
 
 			@Override
 			public void run() {
@@ -142,7 +138,7 @@ public class IndexSearcherManagerTest {
 
 			});
 
-		thread = new Thread(futureTask1);
+		thread = new Thread(futureTask1, "Concurrent Reopen 1");
 
 		thread.start();
 
@@ -162,7 +158,7 @@ public class IndexSearcherManagerTest {
 
 			});
 
-		thread = new Thread(futureTask2);
+		thread = new Thread(futureTask2, "Concurrent Reopen 2");
 
 		thread.start();
 
@@ -190,6 +186,8 @@ public class IndexSearcherManagerTest {
 
 	@Test
 	public void testClose() throws Exception {
+		_indexSearcherManager = new IndexSearcherManager(_directory);
+
 		IndexSearcher indexSearcher = _indexSearcherManager.acquire();
 
 		IndexReader indexReader = indexSearcher.getIndexReader();
@@ -278,9 +276,11 @@ public class IndexSearcherManagerTest {
 		}
 
 		public static void unblock(int permits) {
-			_semaphore.release(permits);
+			Semaphore semaphore = _semaphore;
 
 			_semaphore = null;
+
+			semaphore.release(permits);
 		}
 
 		public static void waitUntilBlock(int threadCount) {
@@ -338,59 +338,8 @@ public class IndexSearcherManagerTest {
 
 	private static final String _FIELD_NAME = "fieldName";
 
+	private Directory _directory;
 	private IndexSearcherManager _indexSearcherManager;
 	private IndexWriter _indexWriter;
-
-	private class MockPortalExecutorManager implements PortalExecutorManager {
-
-		@Override
-		public <T> Future<T> execute(String name, Callable<T> callable) {
-			return null;
-		}
-
-		@Override
-		public <T> T execute(
-			String name, Callable<T> callable, long timeout,
-			TimeUnit timeUnit) {
-
-			return null;
-		}
-
-		@Override
-		public ThreadPoolExecutor getPortalExecutor(String name) {
-			return null;
-		}
-
-		@Override
-		public ThreadPoolExecutor getPortalExecutor(
-			String name, boolean createIfAbsent) {
-
-			return null;
-		}
-
-		@Override
-		public ThreadPoolExecutor registerPortalExecutor(
-			String name, ThreadPoolExecutor threadPoolExecutor) {
-
-			return null;
-		}
-
-		@Override
-		public void shutdown() {
-		}
-
-		@Override
-		public void shutdown(boolean interrupt) {
-		}
-
-		@Override
-		public void shutdown(String name) {
-		}
-
-		@Override
-		public void shutdown(String name, boolean interrupt) {
-		}
-
-	}
 
 }

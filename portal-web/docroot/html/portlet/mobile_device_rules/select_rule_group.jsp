@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,12 +46,12 @@ portletURL.setParameter("eventName", eventName);
 					<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 				</liferay-portlet:renderURL>
 
-				<aui:nav>
+				<aui:nav cssClass="navbar-nav" searchContainer="<%= ruleGroupSearch %>">
 					<aui:nav-item href="<%= addRuleGroupURL %>" iconCssClass="icon-plus" label="add-device-family" />
 				</aui:nav>
 			</c:if>
 
-			<aui:nav-bar-search cssClass="pull-right" file="/html/portlet/mobile_device_rules/rule_group_search.jsp" searchContainer="<%= ruleGroupSearch %>" />
+			<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/mobile_device_rules/rule_group_search.jsp" searchContainer="<%= ruleGroupSearch %>" />
 		</aui:nav-bar>
 
 		<%

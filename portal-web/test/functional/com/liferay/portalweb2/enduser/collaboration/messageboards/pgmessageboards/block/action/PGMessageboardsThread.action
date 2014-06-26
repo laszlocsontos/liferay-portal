@@ -5,13 +5,15 @@
 		</case>
 	</command>
 
-	<command name="click">
-		<case comparator="startsWith" locator-key1="MESSAGE_EDIT_">
-			<execute function="Click#textClickAtAndWait" value1="Edit" />
+	<command name="assertTextEquals">
+		<case locator-key1="MESSAGE_BODY_2">
+			<execute function="AssertTextEquals#assertPartialText" />
 		</case>
+	</command>
 
-		<case comparator="startsWith" locator-key1="MESSAGE_REPLY_">
-			<execute function="Click#textClickAtAndWait" value1="Reply" />
+	<command name="type">
+		<case locator-key1="QUICK_REPLY_BODY_FIELD">
+			<execute function="Type#typeFrameWaitForCKEditor" />
 		</case>
 	</command>
 </definition>

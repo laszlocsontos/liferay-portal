@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.shopping.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -30,7 +29,7 @@ public class ShoppingOrderPermission {
 	public static void check(
 			PermissionChecker permissionChecker, long groupId, long orderId,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!contains(permissionChecker, groupId, orderId, actionId)) {
 			throw new PrincipalException();
@@ -50,7 +49,7 @@ public class ShoppingOrderPermission {
 	public static boolean contains(
 			PermissionChecker permissionChecker, long groupId, long orderId,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ShoppingOrder order = ShoppingOrderLocalServiceUtil.getOrder(orderId);
 

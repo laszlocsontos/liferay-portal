@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,21 +23,17 @@ import aQute.bnd.annotation.ProviderType;
 public interface MBCategoryFinder {
 	public int countByS_G_U_P(long groupId, long userId,
 		long[] parentCategoryIds,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition);
 
 	public int filterCountByS_G_U_P(long groupId, long userId,
 		long[] parentCategoryIds,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition);
 
 	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> filterFindByS_G_U_P(
 		long groupId, long userId, long[] parentCategoryIds,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition);
 
 	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> findByS_G_U_P(
 		long groupId, long userId, long[] parentCategoryIds,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.QueryDefinition queryDefinition);
 }

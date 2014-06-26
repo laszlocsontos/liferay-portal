@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,7 +43,7 @@ public class JSONWebServiceMappingResolver {
 			return httpMethod;
 		}
 
-		return _jsonWebServiceNaming.convertMethodNameToHttpMethod(method);
+		return _jsonWebServiceNaming.convertMethodToHttpMethod(method);
 	}
 
 	public String resolvePath(Class<?> clazz, Method method) {
@@ -57,7 +57,7 @@ public class JSONWebServiceMappingResolver {
 		}
 
 		if ((path == null) || (path.length() == 0)) {
-			path = _jsonWebServiceNaming.convertMethodNameToPath(method);
+			path = _jsonWebServiceNaming.convertMethodToPath(method);
 		}
 
 		if (path.startsWith(StringPool.SLASH)) {
@@ -75,7 +75,8 @@ public class JSONWebServiceMappingResolver {
 		}
 
 		if ((pathFromClass == null) || (pathFromClass.length() == 0)) {
-			pathFromClass = _jsonWebServiceNaming.convertClassNameToPath(clazz);
+			pathFromClass = _jsonWebServiceNaming.convertServiceClassToPath(
+				clazz);
 		}
 
 		if (!pathFromClass.startsWith(StringPool.SLASH)) {

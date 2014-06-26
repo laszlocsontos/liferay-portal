@@ -356,6 +356,10 @@
 		<priority value="INFO" />
 	</category>
 
+	<category name="com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilter">
+		<priority value="FATAL" />
+	</category>
+
 	<category name="com.liferay.portal.kernel.upgrade">
 		<priority value="INFO" />
 	</category>
@@ -402,6 +406,10 @@
 
 	<category name="com.liferay.portal.metadata.TikaRawMetadataProcessor">
 		<priority value="WARN" />
+	</category>
+
+	<category name="com.liferay.portal.microsofttranslator">
+		<priority value="ERROR" />
 	</category>
 
 	<category name="com.liferay.portal.model.Image">
@@ -853,6 +861,10 @@
 	</category>
 
 	<category name="com.liferay.portal.upgrade.UpgradeProcessUtil">
+		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.upgrade.v7_0_0.UpgradePortletSettings">
 		<priority value="INFO" />
 	</category>
 

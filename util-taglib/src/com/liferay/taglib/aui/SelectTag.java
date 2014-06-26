@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -104,7 +104,7 @@ public class SelectTag extends BaseSelectTag {
 		String label = getLabel();
 
 		if (label == null) {
-			label = TextFormatter.format(name, TextFormatter.K);
+			label = TextFormatter.format(name, TextFormatter.P);
 		}
 
 		String listType = getListType();
@@ -114,6 +114,12 @@ public class SelectTag extends BaseSelectTag {
 			Validator.isNull(listTypeFieldName)) {
 
 			listTypeFieldName = "typeId";
+		}
+
+		String title = getTitle();
+
+		if ((title == null) && Validator.isNull(label)) {
+			title = TextFormatter.format(name, TextFormatter.P);
 		}
 
 		String value = String.valueOf(getValue());
@@ -132,6 +138,7 @@ public class SelectTag extends BaseSelectTag {
 		setNamespacedAttribute(request, "id", id);
 		setNamespacedAttribute(request, "label", label);
 		setNamespacedAttribute(request, "listTypeFieldName", listTypeFieldName);
+		setNamespacedAttribute(request, "title", String.valueOf(title));
 		setNamespacedAttribute(request, "value", value);
 	}
 

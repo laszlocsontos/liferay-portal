@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,21 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -83,12 +93,10 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 *
 	 * @param ratingsEntry the ratings entry
 	 * @return the ratings entry that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public RatingsEntry addRatingsEntry(RatingsEntry ratingsEntry)
-		throws SystemException {
+	public RatingsEntry addRatingsEntry(RatingsEntry ratingsEntry) {
 		ratingsEntry.setNew(true);
 
 		return ratingsEntryPersistence.update(ratingsEntry);
@@ -111,12 +119,11 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * @param entryId the primary key of the ratings entry
 	 * @return the ratings entry that was removed
 	 * @throws PortalException if a ratings entry with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public RatingsEntry deleteRatingsEntry(long entryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ratingsEntryPersistence.remove(entryId);
 	}
 
@@ -125,12 +132,10 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 *
 	 * @param ratingsEntry the ratings entry
 	 * @return the ratings entry that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public RatingsEntry deleteRatingsEntry(RatingsEntry ratingsEntry)
-		throws SystemException {
+	public RatingsEntry deleteRatingsEntry(RatingsEntry ratingsEntry) {
 		return ratingsEntryPersistence.remove(ratingsEntry);
 	}
 
@@ -147,12 +152,10 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return ratingsEntryPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -167,12 +170,10 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return ratingsEntryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -189,12 +190,11 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return ratingsEntryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -204,11 +204,9 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return ratingsEntryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -218,18 +216,16 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return ratingsEntryPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public RatingsEntry fetchRatingsEntry(long entryId)
-		throws SystemException {
+	public RatingsEntry fetchRatingsEntry(long entryId) {
 		return ratingsEntryPersistence.fetchByPrimaryKey(entryId);
 	}
 
@@ -239,11 +235,10 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * @param uuid the ratings entry's UUID
 	 * @param  companyId the primary key of the company
 	 * @return the matching ratings entry, or <code>null</code> if a matching ratings entry could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public RatingsEntry fetchRatingsEntryByUuidAndCompanyId(String uuid,
-		long companyId) throws SystemException {
+		long companyId) {
 		return ratingsEntryPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -253,17 +248,109 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * @param entryId the primary key of the ratings entry
 	 * @return the ratings entry
 	 * @throws PortalException if a ratings entry with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public RatingsEntry getRatingsEntry(long entryId)
-		throws PortalException, SystemException {
+	public RatingsEntry getRatingsEntry(long entryId) throws PortalException {
 		return ratingsEntryPersistence.findByPrimaryKey(entryId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.ratings.service.RatingsEntryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(RatingsEntry.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("entryId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.ratings.service.RatingsEntryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(RatingsEntry.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("entryId");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType.toString(),
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType.toString(),
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+
+					StagedModelType stagedModelType = exportActionableDynamicQuery.getStagedModelType();
+
+					if (stagedModelType.getReferrerClassNameId() >= 0) {
+						Property classNameIdProperty = PropertyFactoryUtil.forName(
+								"classNameId");
+
+						dynamicQuery.add(classNameIdProperty.eq(
+								stagedModelType.getReferrerClassNameId()));
+					}
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+					RatingsEntry stagedModel = (RatingsEntry)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						stagedModel);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(RatingsEntry.class.getName())));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return ratingsEntryLocalService.deleteRatingsEntry((RatingsEntry)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return ratingsEntryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -274,11 +361,10 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * @param  companyId the primary key of the company
 	 * @return the matching ratings entry
 	 * @throws PortalException if a matching ratings entry could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public RatingsEntry getRatingsEntryByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException, SystemException {
+		long companyId) throws PortalException {
 		return ratingsEntryPersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -292,11 +378,9 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of ratings entries
 	 * @param end the upper bound of the range of ratings entries (not inclusive)
 	 * @return the range of ratings entries
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<RatingsEntry> getRatingsEntries(int start, int end)
-		throws SystemException {
+	public List<RatingsEntry> getRatingsEntries(int start, int end) {
 		return ratingsEntryPersistence.findAll(start, end);
 	}
 
@@ -304,10 +388,9 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 * Returns the number of ratings entries.
 	 *
 	 * @return the number of ratings entries
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getRatingsEntriesCount() throws SystemException {
+	public int getRatingsEntriesCount() {
 		return ratingsEntryPersistence.countAll();
 	}
 
@@ -316,12 +399,10 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 *
 	 * @param ratingsEntry the ratings entry
 	 * @return the ratings entry that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public RatingsEntry updateRatingsEntry(RatingsEntry ratingsEntry)
-		throws SystemException {
+	public RatingsEntry updateRatingsEntry(RatingsEntry ratingsEntry) {
 		return ratingsEntryPersistence.update(ratingsEntry);
 	}
 
@@ -951,7 +1032,7 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = ratingsEntryPersistence.getDataSource();
 

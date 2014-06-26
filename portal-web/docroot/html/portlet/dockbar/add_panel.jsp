@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -86,6 +86,10 @@
 							</liferay-ui:section>
 						</c:if>
 					</liferay-ui:tabs>
+
+					<span class="added-message hide" id="<portlet:namespace />addedMessage">
+						<span class="alert-success message"><liferay-ui:icon iconCssClass="icon-ok-sign" /> <span id="<portlet:namespace />portletName"></span> <liferay-ui:message key="added" /></span>
+					</span>
 				</div>
 			</c:if>
 		</c:if>

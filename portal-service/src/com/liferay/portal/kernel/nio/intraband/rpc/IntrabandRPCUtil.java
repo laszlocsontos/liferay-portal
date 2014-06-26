@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,9 +38,8 @@ import java.util.concurrent.FutureTask;
 public class IntrabandRPCUtil {
 
 	public static <V extends Serializable> Future<V> execute(
-			RegistrationReference registrationReference,
-			ProcessCallable<V> processCallable)
-		throws IntrabandRPCException {
+		RegistrationReference registrationReference,
+		ProcessCallable<V> processCallable) {
 
 		Intraband intraband = registrationReference.getIntraband();
 
@@ -50,21 +49,16 @@ public class IntrabandRPCUtil {
 
 		serializer.writeObject(processCallable);
 
-		try {
-			Datagram datagram = Datagram.createRequestDatagram(
-				systemDataType.getValue(), serializer.toByteBuffer());
+		Datagram datagram = Datagram.createRequestDatagram(
+			systemDataType.getValue(), serializer.toByteBuffer());
 
-			FutureResult<V> futureResult = new FutureResult<V>();
+		FutureResult<V> futureResult = new FutureResult<V>();
 
-			intraband.sendDatagram(
-				registrationReference, datagram, null, repliedEnumSet,
-				new FutureCompletionHandler<V>(futureResult));
+		intraband.sendDatagram(
+			registrationReference, datagram, null, repliedEnumSet,
+			new FutureCompletionHandler<V>(futureResult));
 
-			return futureResult;
-		}
-		catch (Exception e) {
-			throw new IntrabandRPCException(e);
-		}
+		return futureResult;
 	}
 
 	protected static Callable<Serializable> emptyCallable =
@@ -102,9 +96,16 @@ public class IntrabandRPCUtil {
 				datagram.getDataByteBuffer());
 
 			try {
-				V v = deserializer.readObject();
+				RPCResponse rpcResponse = deserializer.readObject();
 
-				_futureResult.set(v);
+				Exception exception = rpcResponse.getException();
+
+				if (exception != null) {
+					_futureResult.setException(exception);
+				}
+				else {
+					_futureResult.set((V)rpcResponse.getResult());
+				}
 			}
 			catch (ClassNotFoundException cnfe) {
 				_futureResult.setException(cnfe);

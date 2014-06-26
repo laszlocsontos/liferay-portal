@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,7 +67,7 @@ public class DDMStructureWrapper implements DDMStructure,
 		attributes.put("structureKey", getStructureKey());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
-		attributes.put("xsd", getXsd());
+		attributes.put("definition", getDefinition());
 		attributes.put("storageType", getStorageType());
 		attributes.put("type", getType());
 
@@ -154,10 +154,10 @@ public class DDMStructureWrapper implements DDMStructure,
 			setDescription(description);
 		}
 
-		String xsd = (String)attributes.get("xsd");
+		String definition = (String)attributes.get("definition");
 
-		if (xsd != null) {
-			setXsd(xsd);
+		if (definition != null) {
+			setDefinition(definition);
 		}
 
 		String storageType = (String)attributes.get("storageType");
@@ -297,11 +297,9 @@ public class DDMStructureWrapper implements DDMStructure,
 	* Returns the user uuid of this d d m structure.
 	*
 	* @return the user uuid of this d d m structure
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _ddmStructure.getUserUuid();
 	}
 
@@ -733,23 +731,23 @@ public class DDMStructureWrapper implements DDMStructure,
 	}
 
 	/**
-	* Returns the xsd of this d d m structure.
+	* Returns the definition of this d d m structure.
 	*
-	* @return the xsd of this d d m structure
+	* @return the definition of this d d m structure
 	*/
 	@Override
-	public java.lang.String getXsd() {
-		return _ddmStructure.getXsd();
+	public java.lang.String getDefinition() {
+		return _ddmStructure.getDefinition();
 	}
 
 	/**
-	* Sets the xsd of this d d m structure.
+	* Sets the definition of this d d m structure.
 	*
-	* @param xsd the xsd of this d d m structure
+	* @param definition the definition of this d d m structure
 	*/
 	@Override
-	public void setXsd(java.lang.String xsd) {
-		_ddmStructure.setXsd(xsd);
+	public void setDefinition(java.lang.String definition) {
+		_ddmStructure.setDefinition(definition);
 	}
 
 	/**
@@ -915,88 +913,71 @@ public class DDMStructureWrapper implements DDMStructure,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_ddmStructure.persist();
 	}
 
 	@Override
 	public java.util.List<java.lang.String> getChildrenFieldNames(
 		java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getChildrenFieldNames(fieldName);
 	}
 
 	@Override
-	public java.lang.String getCompleteXsd()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _ddmStructure.getCompleteXsd();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.xml.Document getDocument() {
-		return _ddmStructure.getDocument();
+	public com.liferay.portlet.dynamicdatamapping.model.DDMForm getDDMForm() {
+		return _ddmStructure.getDDMForm();
 	}
 
 	@Override
 	public java.lang.String getFieldDataType(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldDataType(fieldName);
 	}
 
 	@Override
 	public java.lang.String getFieldLabel(java.lang.String fieldName,
 		java.util.Locale locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldLabel(fieldName, locale);
 	}
 
 	@Override
 	public java.lang.String getFieldLabel(java.lang.String fieldName,
 		java.lang.String locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldLabel(fieldName, locale);
 	}
 
 	@Override
 	public java.util.Set<java.lang.String> getFieldNames()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldNames();
 	}
 
 	@Override
 	public java.lang.String getFieldProperty(java.lang.String fieldName,
 		java.lang.String property)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldProperty(fieldName, property);
 	}
 
 	@Override
 	public java.lang.String getFieldProperty(java.lang.String fieldName,
 		java.lang.String property, java.lang.String locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldProperty(fieldName, property, locale);
 	}
 
 	@Override
 	public boolean getFieldRepeatable(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldRepeatable(fieldName);
 	}
 
 	@Override
 	public boolean getFieldRequired(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldRequired(fieldName);
 	}
 
@@ -1017,56 +998,55 @@ public class DDMStructureWrapper implements DDMStructure,
 
 	@Override
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getFieldsMap()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldsMap();
 	}
 
 	@Override
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getFieldsMap(
 		boolean includeTransientFields)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldsMap(includeTransientFields);
 	}
 
 	@Override
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getFieldsMap(
 		java.lang.String locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldsMap(locale);
 	}
 
 	@Override
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getFieldsMap(
 		java.lang.String locale, boolean includeTransientFields)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldsMap(locale, includeTransientFields);
 	}
 
 	@Override
 	public java.lang.String getFieldTip(java.lang.String fieldName,
 		java.util.Locale locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldTip(fieldName, locale);
 	}
 
 	@Override
 	public java.lang.String getFieldTip(java.lang.String fieldName,
 		java.lang.String locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldTip(fieldName, locale);
 	}
 
 	@Override
 	public java.lang.String getFieldType(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getFieldType(fieldName);
+	}
+
+	@Override
+	public com.liferay.portlet.dynamicdatamapping.model.DDMForm getFullHierarchyDDMForm()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmStructure.getFullHierarchyDDMForm();
 	}
 
 	@Override
@@ -1087,30 +1067,34 @@ public class DDMStructureWrapper implements DDMStructure,
 	@Override
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getPersistentFieldsMap(
 		java.lang.String locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getPersistentFieldsMap(locale);
 	}
 
 	@Override
 	public java.util.List<java.lang.String> getRootFieldNames()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getRootFieldNames();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> getTemplates()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> getTemplates() {
 		return _ddmStructure.getTemplates();
 	}
 
 	@Override
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getTransientFieldsMap(
 		java.lang.String locale)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.getTransientFieldsMap(locale);
+	}
+
+	@Override
+	public java.lang.String getUnambiguousName(
+		java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> structures,
+		long groupId, java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _ddmStructure.getUnambiguousName(structures, groupId, locale);
 	}
 
 	/**
@@ -1131,35 +1115,32 @@ public class DDMStructureWrapper implements DDMStructure,
 
 	@Override
 	public boolean hasField(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.hasField(fieldName);
 	}
 
 	@Override
 	public boolean isFieldPrivate(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.isFieldPrivate(fieldName);
 	}
 
 	@Override
 	public boolean isFieldRepeatable(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.isFieldRepeatable(fieldName);
 	}
 
 	@Override
 	public boolean isFieldTransient(java.lang.String fieldName)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmStructure.isFieldTransient(fieldName);
 	}
 
 	@Override
-	public void setDocument(com.liferay.portal.kernel.xml.Document document) {
-		_ddmStructure.setDocument(document);
+	public void setDDMForm(
+		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm) {
+		_ddmStructure.setDDMForm(ddmForm);
 	}
 
 	@Override
@@ -1178,6 +1159,12 @@ public class DDMStructureWrapper implements DDMStructure,
 	public void setLocalizedTransientFieldsMap(
 		java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> localizedTransientFieldsMap) {
 		_ddmStructure.setLocalizedTransientFieldsMap(localizedTransientFieldsMap);
+	}
+
+	@Override
+	public void updateDDMForm(
+		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm) {
+		_ddmStructure.updateDDMForm(ddmForm);
 	}
 
 	@Override

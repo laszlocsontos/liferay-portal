@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -89,7 +89,7 @@ if (selUser != null) {
 				for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
 				%>
 
-					<aui:option label="<%= HtmlUtil.escape(layoutSetPrototype.getName(user.getLanguageId())) %>" value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>" />
+					<aui:option label="<%= HtmlUtil.escape(layoutSetPrototype.getName(locale)) %>" value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>" />
 
 				<%
 				}
@@ -121,7 +121,7 @@ if (selUser != null) {
 						<c:choose>
 							<c:when test="<%= selUser.getPublicLayoutsPageCount() > 0 %>">
 								<liferay-ui:icon
-									image="view"
+									iconCssClass="icon-search"
 									label="<%= true %>"
 									message="open-public-pages"
 									method="get"
@@ -137,7 +137,7 @@ if (selUser != null) {
 						<c:if test="<%= PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED %>">
 							<c:choose>
 								<c:when test="<%= (publicLayoutSetPrototype != null) && hasUnlinkLayoutSetPrototypePermission %>">
-									<aui:input label='<%= LanguageUtil.format(pageContext, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(publicLayoutSetPrototype.getName(user.getLanguageId())), false) %>' name="publicLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
+									<aui:input label='<%= LanguageUtil.format(request, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(publicLayoutSetPrototype.getName(locale)), false) %>' name="publicLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
 								</c:when>
 								<c:when test="<%= publicLayoutSetPrototype != null %>">
 									<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(privateLayoutSetPrototype.getName(locale))} %>" key="these-pages-are-linked-to-site-template-x" translateArguments="<%= false %>" />
@@ -161,7 +161,7 @@ if (selUser != null) {
 				for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
 				%>
 
-					<aui:option label="<%= HtmlUtil.escape(layoutSetPrototype.getName(user.getLanguageId())) %>" value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>" />
+					<aui:option label="<%= HtmlUtil.escape(layoutSetPrototype.getName(locale)) %>" value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>" />
 
 				<%
 				}
@@ -193,7 +193,7 @@ if (selUser != null) {
 						<c:choose>
 							<c:when test="<%= selUser.getPrivateLayoutsPageCount() > 0 %>">
 								<liferay-ui:icon
-									image="view"
+									iconCssClass="icon-search"
 									label="<%= true %>"
 									message="open-private-pages"
 									method="get"
@@ -209,7 +209,7 @@ if (selUser != null) {
 						<c:if test="<%= PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED %>">
 							<c:choose>
 								<c:when test="<%= (privateLayoutSetPrototype != null) && hasUnlinkLayoutSetPrototypePermission %>">
-									<aui:input label='<%= LanguageUtil.format(pageContext, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(privateLayoutSetPrototype.getName(user.getLanguageId())), false) %>' name="privateLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
+									<aui:input label='<%= LanguageUtil.format(request, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(privateLayoutSetPrototype.getName(locale)), false) %>' name="privateLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
 								</c:when>
 								<c:when test="<%= privateLayoutSetPrototype != null %>">
 									<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(privateLayoutSetPrototype.getName(locale))} %>" key="these-pages-are-linked-to-site-template-x" translateArguments="<%= false %>" />

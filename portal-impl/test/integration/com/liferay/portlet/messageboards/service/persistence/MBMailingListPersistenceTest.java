@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,25 +30,29 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.messageboards.NoSuchMailingListException;
 import com.liferay.portlet.messageboards.model.MBMailingList;
 import com.liferay.portlet.messageboards.model.impl.MBMailingListModelImpl;
+import com.liferay.portlet.messageboards.service.MBMailingListLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +64,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class MBMailingListPersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<MBMailingList> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -81,11 +94,15 @@ public class MBMailingListPersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<MBMailingList> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		MBMailingList mbMailingList = _persistence.create(pk);
 
@@ -112,59 +129,59 @@ public class MBMailingListPersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		MBMailingList newMBMailingList = _persistence.create(pk);
 
-		newMBMailingList.setUuid(ServiceTestUtil.randomString());
+		newMBMailingList.setUuid(RandomTestUtil.randomString());
 
-		newMBMailingList.setGroupId(ServiceTestUtil.nextLong());
+		newMBMailingList.setGroupId(RandomTestUtil.nextLong());
 
-		newMBMailingList.setCompanyId(ServiceTestUtil.nextLong());
+		newMBMailingList.setCompanyId(RandomTestUtil.nextLong());
 
-		newMBMailingList.setUserId(ServiceTestUtil.nextLong());
+		newMBMailingList.setUserId(RandomTestUtil.nextLong());
 
-		newMBMailingList.setUserName(ServiceTestUtil.randomString());
+		newMBMailingList.setUserName(RandomTestUtil.randomString());
 
-		newMBMailingList.setCreateDate(ServiceTestUtil.nextDate());
+		newMBMailingList.setCreateDate(RandomTestUtil.nextDate());
 
-		newMBMailingList.setModifiedDate(ServiceTestUtil.nextDate());
+		newMBMailingList.setModifiedDate(RandomTestUtil.nextDate());
 
-		newMBMailingList.setCategoryId(ServiceTestUtil.nextLong());
+		newMBMailingList.setCategoryId(RandomTestUtil.nextLong());
 
-		newMBMailingList.setEmailAddress(ServiceTestUtil.randomString());
+		newMBMailingList.setEmailAddress(RandomTestUtil.randomString());
 
-		newMBMailingList.setInProtocol(ServiceTestUtil.randomString());
+		newMBMailingList.setInProtocol(RandomTestUtil.randomString());
 
-		newMBMailingList.setInServerName(ServiceTestUtil.randomString());
+		newMBMailingList.setInServerName(RandomTestUtil.randomString());
 
-		newMBMailingList.setInServerPort(ServiceTestUtil.nextInt());
+		newMBMailingList.setInServerPort(RandomTestUtil.nextInt());
 
-		newMBMailingList.setInUseSSL(ServiceTestUtil.randomBoolean());
+		newMBMailingList.setInUseSSL(RandomTestUtil.randomBoolean());
 
-		newMBMailingList.setInUserName(ServiceTestUtil.randomString());
+		newMBMailingList.setInUserName(RandomTestUtil.randomString());
 
-		newMBMailingList.setInPassword(ServiceTestUtil.randomString());
+		newMBMailingList.setInPassword(RandomTestUtil.randomString());
 
-		newMBMailingList.setInReadInterval(ServiceTestUtil.nextInt());
+		newMBMailingList.setInReadInterval(RandomTestUtil.nextInt());
 
-		newMBMailingList.setOutEmailAddress(ServiceTestUtil.randomString());
+		newMBMailingList.setOutEmailAddress(RandomTestUtil.randomString());
 
-		newMBMailingList.setOutCustom(ServiceTestUtil.randomBoolean());
+		newMBMailingList.setOutCustom(RandomTestUtil.randomBoolean());
 
-		newMBMailingList.setOutServerName(ServiceTestUtil.randomString());
+		newMBMailingList.setOutServerName(RandomTestUtil.randomString());
 
-		newMBMailingList.setOutServerPort(ServiceTestUtil.nextInt());
+		newMBMailingList.setOutServerPort(RandomTestUtil.nextInt());
 
-		newMBMailingList.setOutUseSSL(ServiceTestUtil.randomBoolean());
+		newMBMailingList.setOutUseSSL(RandomTestUtil.randomBoolean());
 
-		newMBMailingList.setOutUserName(ServiceTestUtil.randomString());
+		newMBMailingList.setOutUserName(RandomTestUtil.randomString());
 
-		newMBMailingList.setOutPassword(ServiceTestUtil.randomString());
+		newMBMailingList.setOutPassword(RandomTestUtil.randomString());
 
-		newMBMailingList.setAllowAnonymous(ServiceTestUtil.randomBoolean());
+		newMBMailingList.setAllowAnonymous(RandomTestUtil.randomBoolean());
 
-		newMBMailingList.setActive(ServiceTestUtil.randomBoolean());
+		newMBMailingList.setActive(RandomTestUtil.randomBoolean());
 
 		_persistence.update(newMBMailingList);
 
@@ -244,7 +261,7 @@ public class MBMailingListPersistenceTest {
 	public void testCountByUUID_G() {
 		try {
 			_persistence.countByUUID_G(StringPool.BLANK,
-				ServiceTestUtil.nextLong());
+				RandomTestUtil.nextLong());
 
 			_persistence.countByUUID_G(StringPool.NULL, 0L);
 
@@ -259,7 +276,7 @@ public class MBMailingListPersistenceTest {
 	public void testCountByUuid_C() {
 		try {
 			_persistence.countByUuid_C(StringPool.BLANK,
-				ServiceTestUtil.nextLong());
+				RandomTestUtil.nextLong());
 
 			_persistence.countByUuid_C(StringPool.NULL, 0L);
 
@@ -273,9 +290,9 @@ public class MBMailingListPersistenceTest {
 	@Test
 	public void testCountByActive() {
 		try {
-			_persistence.countByActive(ServiceTestUtil.randomBoolean());
+			_persistence.countByActive(RandomTestUtil.randomBoolean());
 
-			_persistence.countByActive(ServiceTestUtil.randomBoolean());
+			_persistence.countByActive(RandomTestUtil.randomBoolean());
 		}
 		catch (Exception e) {
 			Assert.fail(e.getMessage());
@@ -285,8 +302,8 @@ public class MBMailingListPersistenceTest {
 	@Test
 	public void testCountByG_C() {
 		try {
-			_persistence.countByG_C(ServiceTestUtil.nextLong(),
-				ServiceTestUtil.nextLong());
+			_persistence.countByG_C(RandomTestUtil.nextLong(),
+				RandomTestUtil.nextLong());
 
 			_persistence.countByG_C(0L, 0L);
 		}
@@ -306,7 +323,7 @@ public class MBMailingListPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -353,7 +370,7 @@ public class MBMailingListPersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		MBMailingList missingMBMailingList = _persistence.fetchByPrimaryKey(pk);
 
@@ -361,19 +378,103 @@ public class MBMailingListPersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		MBMailingList newMBMailingList1 = addMBMailingList();
+		MBMailingList newMBMailingList2 = addMBMailingList();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBMailingList1.getPrimaryKey());
+		primaryKeys.add(newMBMailingList2.getPrimaryKey());
+
+		Map<Serializable, MBMailingList> mbMailingLists = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, mbMailingLists.size());
+		Assert.assertEquals(newMBMailingList1,
+			mbMailingLists.get(newMBMailingList1.getPrimaryKey()));
+		Assert.assertEquals(newMBMailingList2,
+			mbMailingLists.get(newMBMailingList2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, MBMailingList> mbMailingLists = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(mbMailingLists.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		MBMailingList newMBMailingList = addMBMailingList();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBMailingList.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, MBMailingList> mbMailingLists = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, mbMailingLists.size());
+		Assert.assertEquals(newMBMailingList,
+			mbMailingLists.get(newMBMailingList.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, MBMailingList> mbMailingLists = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(mbMailingLists.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		MBMailingList newMBMailingList = addMBMailingList();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBMailingList.getPrimaryKey());
+
+		Map<Serializable, MBMailingList> mbMailingLists = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, mbMailingLists.size());
+		Assert.assertEquals(newMBMailingList,
+			mbMailingLists.get(newMBMailingList.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new MBMailingListActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = MBMailingListLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					MBMailingList mbMailingList = (MBMailingList)object;
 
 					Assert.assertNotNull(mbMailingList);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -406,7 +507,7 @@ public class MBMailingListPersistenceTest {
 				MBMailingList.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("mailingListId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<MBMailingList> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -447,7 +548,7 @@ public class MBMailingListPersistenceTest {
 				"mailingListId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("mailingListId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -479,59 +580,59 @@ public class MBMailingListPersistenceTest {
 	}
 
 	protected MBMailingList addMBMailingList() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		MBMailingList mbMailingList = _persistence.create(pk);
 
-		mbMailingList.setUuid(ServiceTestUtil.randomString());
+		mbMailingList.setUuid(RandomTestUtil.randomString());
 
-		mbMailingList.setGroupId(ServiceTestUtil.nextLong());
+		mbMailingList.setGroupId(RandomTestUtil.nextLong());
 
-		mbMailingList.setCompanyId(ServiceTestUtil.nextLong());
+		mbMailingList.setCompanyId(RandomTestUtil.nextLong());
 
-		mbMailingList.setUserId(ServiceTestUtil.nextLong());
+		mbMailingList.setUserId(RandomTestUtil.nextLong());
 
-		mbMailingList.setUserName(ServiceTestUtil.randomString());
+		mbMailingList.setUserName(RandomTestUtil.randomString());
 
-		mbMailingList.setCreateDate(ServiceTestUtil.nextDate());
+		mbMailingList.setCreateDate(RandomTestUtil.nextDate());
 
-		mbMailingList.setModifiedDate(ServiceTestUtil.nextDate());
+		mbMailingList.setModifiedDate(RandomTestUtil.nextDate());
 
-		mbMailingList.setCategoryId(ServiceTestUtil.nextLong());
+		mbMailingList.setCategoryId(RandomTestUtil.nextLong());
 
-		mbMailingList.setEmailAddress(ServiceTestUtil.randomString());
+		mbMailingList.setEmailAddress(RandomTestUtil.randomString());
 
-		mbMailingList.setInProtocol(ServiceTestUtil.randomString());
+		mbMailingList.setInProtocol(RandomTestUtil.randomString());
 
-		mbMailingList.setInServerName(ServiceTestUtil.randomString());
+		mbMailingList.setInServerName(RandomTestUtil.randomString());
 
-		mbMailingList.setInServerPort(ServiceTestUtil.nextInt());
+		mbMailingList.setInServerPort(RandomTestUtil.nextInt());
 
-		mbMailingList.setInUseSSL(ServiceTestUtil.randomBoolean());
+		mbMailingList.setInUseSSL(RandomTestUtil.randomBoolean());
 
-		mbMailingList.setInUserName(ServiceTestUtil.randomString());
+		mbMailingList.setInUserName(RandomTestUtil.randomString());
 
-		mbMailingList.setInPassword(ServiceTestUtil.randomString());
+		mbMailingList.setInPassword(RandomTestUtil.randomString());
 
-		mbMailingList.setInReadInterval(ServiceTestUtil.nextInt());
+		mbMailingList.setInReadInterval(RandomTestUtil.nextInt());
 
-		mbMailingList.setOutEmailAddress(ServiceTestUtil.randomString());
+		mbMailingList.setOutEmailAddress(RandomTestUtil.randomString());
 
-		mbMailingList.setOutCustom(ServiceTestUtil.randomBoolean());
+		mbMailingList.setOutCustom(RandomTestUtil.randomBoolean());
 
-		mbMailingList.setOutServerName(ServiceTestUtil.randomString());
+		mbMailingList.setOutServerName(RandomTestUtil.randomString());
 
-		mbMailingList.setOutServerPort(ServiceTestUtil.nextInt());
+		mbMailingList.setOutServerPort(RandomTestUtil.nextInt());
 
-		mbMailingList.setOutUseSSL(ServiceTestUtil.randomBoolean());
+		mbMailingList.setOutUseSSL(RandomTestUtil.randomBoolean());
 
-		mbMailingList.setOutUserName(ServiceTestUtil.randomString());
+		mbMailingList.setOutUserName(RandomTestUtil.randomString());
 
-		mbMailingList.setOutPassword(ServiceTestUtil.randomString());
+		mbMailingList.setOutPassword(RandomTestUtil.randomString());
 
-		mbMailingList.setAllowAnonymous(ServiceTestUtil.randomBoolean());
+		mbMailingList.setAllowAnonymous(RandomTestUtil.randomBoolean());
 
-		mbMailingList.setActive(ServiceTestUtil.randomBoolean());
+		mbMailingList.setActive(RandomTestUtil.randomBoolean());
 
 		_persistence.update(mbMailingList);
 
@@ -539,6 +640,7 @@ public class MBMailingListPersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(MBMailingListPersistenceTest.class);
+	private ModelListener<MBMailingList>[] _modelListeners;
 	private MBMailingListPersistence _persistence = (MBMailingListPersistence)PortalBeanLocatorUtil.locate(MBMailingListPersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

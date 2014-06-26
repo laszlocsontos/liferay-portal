@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.staging.LayoutStagingUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ColorSchemeFactoryUtil;
@@ -81,7 +80,7 @@ public class LayoutSetLocalServiceStagingAdvice
 				(String)arguments[3]);
 		}
 		else if (methodName.equals("updateLogo") && (arguments.length == 4)) {
-			updateLogo(
+			returnValue = updateLogo(
 				(LayoutSetLocalService)thisObject, (Long)arguments[0],
 				(Boolean)arguments[1], (Boolean)arguments[2],
 				(byte[])arguments[3]);
@@ -132,7 +131,7 @@ public class LayoutSetLocalServiceStagingAdvice
 			LayoutSetLocalService layoutSetLocalService, long groupId,
 			boolean privateLayout, boolean layoutSetPrototypeLinkEnabled,
 			String layoutSetPrototypeUuid)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
 			groupId, privateLayout);
@@ -173,7 +172,7 @@ public class LayoutSetLocalServiceStagingAdvice
 	public LayoutSet updateLogo(
 			LayoutSetLocalService layoutSetLocalService, long groupId,
 			boolean privateLayout, boolean logo, byte[] logoBytes)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
 			groupId, privateLayout);
@@ -193,13 +192,15 @@ public class LayoutSetLocalServiceStagingAdvice
 		PortalUtil.updateImageId(
 			layoutSetBranch, logo, logoBytes, "logoId", 0, 0, 0);
 
+		layoutSetBranchPersistence.update(layoutSetBranch);
+
 		return layoutSet;
 	}
 
 	public LayoutSet updateLookAndFeel(
 			LayoutSetLocalService target, long groupId, boolean privateLayout,
 			String themeId, String colorSchemeId, String css, boolean wapTheme)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
 			groupId, privateLayout);
@@ -244,7 +245,7 @@ public class LayoutSetLocalServiceStagingAdvice
 	public LayoutSet updateSettings(
 			LayoutSetLocalService target, long groupId, boolean privateLayout,
 			String settings)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
 			groupId, privateLayout);

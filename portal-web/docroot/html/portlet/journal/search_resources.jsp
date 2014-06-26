@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -96,18 +96,18 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 
 				if (advancedSearch) {
 					if (folder != null) {
-						message = LanguageUtil.format(pageContext, "advanced-search-in-x", folder.getName(), false);
+						message = LanguageUtil.format(request, "advanced-search-in-x", folder.getName(), false);
 					}
 					else {
-						message = LanguageUtil.get(pageContext, "advanced-search-everywhere");
+						message = LanguageUtil.get(request, "advanced-search-everywhere");
 					}
 				}
 				else {
 					if (folder != null) {
-						message = LanguageUtil.format(pageContext, "searched-for-x-in-x", new Object[] {HtmlUtil.escape(keywords), folder.getName()}, false);
+						message = LanguageUtil.format(request, "searched-for-x-in-x", new Object[] {HtmlUtil.escape(keywords), folder.getName()}, false);
 					}
 					else {
-						message = LanguageUtil.format(pageContext, "searched-for-x-everywhere", HtmlUtil.escape(keywords), false);
+						message = LanguageUtil.format(request, "searched-for-x-everywhere", HtmlUtil.escape(keywords), false);
 					}
 				}
 				%>
@@ -126,7 +126,13 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 				</span>
 			</c:if>
 
-			<liferay-ui:icon cssClass="close-search" id="closeSearch" image="../aui/remove" url="javascript:;" />
+			<liferay-ui:icon
+				cssClass="close-search"
+				iconCssClass="icon-remove"
+				id="closeSearch"
+				message="remove"
+				url="javascript:;"
+			/>
 		</div>
 
 		<aui:script use="aui-base">
@@ -160,7 +166,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 	</liferay-portlet:renderURL>
 
 	<div class="journal-container" id="<portlet:namespace />entriesContainer">
-		<aui:form action="<%= searchURL %>" method="get" name="fm">
+		<aui:form action="<%= searchURL %>" method="get" name="fm2">
 			<liferay-portlet:renderURLParams varImpl="searchURL" />
 			<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 			<aui:input name="breadcrumbsFolderId" type="hidden" value="<%= breadcrumbsFolderId %>" />
@@ -198,12 +204,12 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 							indexer = IndexerRegistryUtil.nullSafeGetIndexer(JournalArticle.class);
 
 							searchContext.setAndSearch(searchTerms.isAndOperator());
+							searchContext.setAttribute(Field.ARTICLE_ID, searchTerms.getArticleId());
 							searchContext.setAttribute(Field.CONTENT, searchTerms.getContent());
 							searchContext.setAttribute(Field.DESCRIPTION, searchTerms.getDescription());
-							searchContext.setAttribute(Field.STATUS, searchTerms.getStatusCode());
+							searchContext.setAttribute(Field.STATUS, searchTerms.getStatus());
 							searchContext.setAttribute(Field.TITLE, searchTerms.getTitle());
 							searchContext.setAttribute(Field.TYPE, searchTerms.getType());
-							searchContext.setAttribute("articleId", searchTerms.getArticleId());
 						}
 						else {
 							indexer = JournalSearcher.getInstance();
@@ -211,10 +217,10 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 							searchContext.setAttribute(Field.STATUS, WorkflowConstants.STATUS_ANY);
 
 							if (Validator.isNotNull(keywords)) {
+								searchContext.setAttribute(Field.ARTICLE_ID, keywords);
 								searchContext.setAttribute(Field.CONTENT, keywords);
 								searchContext.setAttribute(Field.DESCRIPTION, keywords);
 								searchContext.setAttribute(Field.TITLE, keywords);
-								searchContext.setAttribute("articleId", keywords);
 								searchContext.setKeywords(keywords);
 							}
 							else {
@@ -242,7 +248,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 
 						PortletURL hitURL = liferayPortletResponse.createRenderURL();
 
-						List<SearchResult> searchResultsList = SearchResultUtil.getSearchResults(hits, locale, hitURL);
+						List<SearchResult> searchResultsList = SearchResultUtil.getSearchResults(hits, locale, hitURL, liferayPortletRequest, liferayPortletResponse);
 
 						emptySearchResults = searchResultsList.isEmpty();
 
@@ -337,7 +343,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 
 								<c:otherwise>
 									<div style="float: left; margin: 100px 10px 0px;">
-										<img alt="<liferay-ui:message key="image" />" border="no" src="<%= themeDisplay.getPathThemeImages() %>/application/forbidden_action.png" />
+										<i class="icon-ban-circle"></i>
 									</div>
 								</c:otherwise>
 							</c:choose>
@@ -401,7 +407,7 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 
 								<c:otherwise>
 									<div style="float: left; margin: 100px 10px 0px;">
-										<img alt="<liferay-ui:message key="image" />" border="no" src="<%= themeDisplay.getPathThemeImages() %>/application/forbidden_action.png" />
+										<i class="icon-ban-circle"></i>
 									</div>
 								</c:otherwise>
 							</c:choose>
@@ -417,10 +423,10 @@ ArticleSearch searchContainer = new ArticleSearch(liferayPortletRequest, entryEn
 					<div class="alert alert-info">
 
 						<%
-						String message = LanguageUtil.get(pageContext, "no-web-content-was-found-that-matched-the-specified-filters");
+						String message = LanguageUtil.get(request, "no-web-content-was-found-that-matched-the-specified-filters");
 
 						if (!advancedSearch) {
-							message = LanguageUtil.format(pageContext, "no-web-content-was-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false);
+							message = LanguageUtil.format(request, "no-web-content-was-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false);
 						}
 						%>
 

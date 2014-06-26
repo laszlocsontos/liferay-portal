@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.model.Contact;
@@ -83,7 +82,7 @@ public class UserPermissionImpl
 	public void checkBaseModel(
 			PermissionChecker permissionChecker, long groupId, long primaryKey,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Organization> organizations =
 			OrganizationLocalServiceUtil.getUserOrganizations(primaryKey);

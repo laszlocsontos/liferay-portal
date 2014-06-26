@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
@@ -113,7 +114,7 @@ public class JournalContentPortletDataHandler
 		if (articleId == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"No article id found in preferences of portlet " +
+					"No article ID found in preferences of portlet " +
 						portletId);
 			}
 
@@ -126,7 +127,7 @@ public class JournalContentPortletDataHandler
 		if (articleGroupId <= 0) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"No group id found in preferences of portlet " + portletId);
+					"No group ID found in preferences of portlet " + portletId);
 			}
 
 			return portletPreferences;
@@ -149,6 +150,12 @@ public class JournalContentPortletDataHandler
 		}
 
 		if (article == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Portlet " + portletId +
+						" refers to an invalid article ID " + articleId);
+			}
+
 			portletDataContext.setScopeGroupId(previousScopeGroupId);
 
 			return portletPreferences;
@@ -191,19 +198,16 @@ public class JournalContentPortletDataHandler
 
 		long previousScopeGroupId = portletDataContext.getScopeGroupId();
 
+		Map<Long, Long> groupIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Group.class);
+
 		long importGroupId = GetterUtil.getLong(
 			portletPreferences.getValue("groupId", null));
 
-		if (importGroupId == portletDataContext.getSourceGroupId()) {
-			portletDataContext.setScopeGroupId(portletDataContext.getGroupId());
-		}
+		long groupId = MapUtil.getLong(groupIds, importGroupId, importGroupId);
 
-		if (importGroupId ==
-				portletDataContext.getSourceCompanyGroupId()) {
-
-			portletDataContext.setScopeGroupId(
-				portletDataContext.getCompanyGroupId());
-		}
+		portletDataContext.setScopeGroupId(groupId);
 
 		StagedModelDataHandlerUtil.importReferenceStagedModels(
 			portletDataContext, DDMStructure.class);
@@ -225,16 +229,13 @@ public class JournalContentPortletDataHandler
 
 			portletPreferences.setValue("articleId", articleId);
 
-			String importedArticleGroupId = String.valueOf(
-				portletDataContext.getScopeGroupId());
-
-			portletPreferences.setValue("groupId", importedArticleGroupId);
+			portletPreferences.setValue("groupId", String.valueOf(groupId));
 
 			Layout layout = LayoutLocalServiceUtil.getLayout(
 				portletDataContext.getPlid());
 
 			JournalContentSearchLocalServiceUtil.updateContentSearch(
-				portletDataContext.getScopeGroupId(), layout.isPrivateLayout(),
+				layout.getGroupId(), layout.isPrivateLayout(),
 				layout.getLayoutId(), portletId, articleId, true);
 		}
 		else {

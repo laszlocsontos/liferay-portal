@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,15 +28,14 @@ if (group == null) {
 }
 %>
 
-<liferay-portlet:renderURL varImpl="assignMembersURL">
-	<liferay-portlet:param name="struts_action" value="/sites_admin/edit_site_assignments" />
-	<liferay-portlet:param name="redirect" value="<%= currentURL %>" />
-</liferay-portlet:renderURL>
-
 <aui:nav-bar>
-	<aui:nav>
+	<aui:nav cssClass="navbar-nav">
 		<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.ASSIGN_MEMBERS) %>">
 			<aui:nav-item dropdown="<%= true %>" iconCssClass="icon-plus" label="add-members" selected='<%= toolbarItem.equals("add-members") %>'>
+				<liferay-portlet:renderURL varImpl="assignMembersURL">
+					<liferay-portlet:param name="struts_action" value="/sites_admin/edit_site_assignments" />
+					<liferay-portlet:param name="redirect" value="<%= currentURL %>" />
+				</liferay-portlet:renderURL>
 
 				<%
 				assignMembersURL.setParameter("tabs1", "users");
@@ -61,7 +60,7 @@ if (group == null) {
 			</aui:nav-item>
 		</c:if>
 
-		<c:if test="<%= permissionChecker.isGroupOwner(group.getGroupId()) || GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.ASSIGN_USER_ROLES) %>">
+		<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, group, ActionKeys.ASSIGN_USER_ROLES) %>">
 			<aui:nav-item dropdown="<%= true %>" iconCssClass="icon-plus" label="add-site-roles-to" selected='<%= toolbarItem.equals("assign-user-roles") %>'>
 				<portlet:renderURL var="assignUserRolesURL">
 					<portlet:param name="struts_action" value="/sites_admin/edit_user_roles" />

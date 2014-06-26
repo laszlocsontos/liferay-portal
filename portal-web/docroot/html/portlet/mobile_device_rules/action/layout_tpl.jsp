@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,6 @@ List<LayoutTemplate> layoutTemplates = LayoutTemplateLocalServiceUtil.getLayoutT
 
 <liferay-ui:error-marker key="errorSection" value="layout" />
 
-<h5><%= LanguageUtil.get(pageContext, "layout-template") %></h5>
+<h5><%= LanguageUtil.get(request, "layout-template") %></h5>
 
 <%@ include file="/html/portlet/layouts_admin/layout/layout_templates_list.jspf" %>

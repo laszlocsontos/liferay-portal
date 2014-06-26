@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,14 +17,12 @@ package com.liferay.portal.kernel.lar;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Portlet;
-import com.liferay.portal.model.StagedGroupedModel;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.TypedModel;
 import com.liferay.portal.service.PortletLocalServiceUtil;
@@ -42,7 +40,7 @@ public class StagedModelDataHandlerUtil {
 
 	public static void deleteStagedModel(
 			PortletDataContext portletDataContext, Element deletionElement)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String className = deletionElement.attributeValue("class-name");
 		String extraData = deletionElement.attributeValue("extra-data");
@@ -64,34 +62,23 @@ public class StagedModelDataHandlerUtil {
 			T stagedModel)
 		throws PortletDataException {
 
-		Element referenceElement = null;
-
 		Portlet referrerPortlet = PortletLocalServiceUtil.getPortletById(
 			referrerPortletId);
 
-		if (stagedModel instanceof StagedGroupedModel) {
-			StagedGroupedModel stagedGroupedModel =
-				(StagedGroupedModel)stagedModel;
+		if (!ExportImportHelperUtil.isReferenceWithinExportScope(
+				portletDataContext, stagedModel)) {
 
-			if (portletDataContext.isCompanyStagedGroupedModel(
-					stagedGroupedModel)) {
-
-				referenceElement = portletDataContext.addReferenceElement(
-					referrerPortlet,
-					portletDataContext.getExportDataRootElement(), stagedModel,
-					PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
-
-				return referenceElement;
-			}
+			return portletDataContext.addReferenceElement(
+				referrerPortlet, portletDataContext.getExportDataRootElement(),
+				stagedModel, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
+				true);
 		}
 
 		exportStagedModel(portletDataContext, stagedModel);
 
-		referenceElement = portletDataContext.addReferenceElement(
+		return portletDataContext.addReferenceElement(
 			referrerPortlet, portletDataContext.getExportDataRootElement(),
 			stagedModel, PortletDataContext.REFERENCE_TYPE_DEPENDENCY, false);
-
-		return referenceElement;
 	}
 
 	/**
@@ -139,31 +126,19 @@ public class StagedModelDataHandlerUtil {
 		Element referrerStagedModelElement =
 			portletDataContext.getExportDataElement(referrerStagedModel);
 
-		Element referenceElement = null;
+		if (!ExportImportHelperUtil.isReferenceWithinExportScope(
+				portletDataContext, stagedModel)) {
 
-		if (stagedModel instanceof StagedGroupedModel) {
-			StagedGroupedModel stagedGroupedModel =
-				(StagedGroupedModel)stagedModel;
-
-			if (portletDataContext.isCompanyStagedGroupedModel(
-					stagedGroupedModel)) {
-
-				referenceElement = portletDataContext.addReferenceElement(
-					referrerStagedModel, referrerStagedModelElement,
-					stagedModel, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
-					true);
-
-				return referenceElement;
-			}
+			return portletDataContext.addReferenceElement(
+				referrerStagedModel, referrerStagedModelElement, stagedModel,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
 		}
 
 		exportStagedModel(portletDataContext, stagedModel);
 
-		referenceElement = portletDataContext.addReferenceElement(
+		return portletDataContext.addReferenceElement(
 			referrerStagedModel, referrerStagedModelElement, stagedModel,
 			referenceType, false);
-
-		return referenceElement;
 	}
 
 	public static <T extends StagedModel> void exportStagedModel(
@@ -210,18 +185,15 @@ public class StagedModelDataHandlerUtil {
 			return;
 		}
 
-		long groupId = GetterUtil.getLong(
-			referenceElement.attributeValue("group-id"));
+		boolean missing = GetterUtil.getBoolean(
+			referenceElement.attributeValue("missing"));
 
-		if ((portletDataContext.getSourceCompanyGroupId() == groupId) &&
-			(portletDataContext.getGroupId() !=
-				portletDataContext.getCompanyGroupId())) {
-
+		if (missing) {
 			StagedModelDataHandler<?> stagedModelDataHandler =
 				StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
 					stagedModelClass.getName());
 
-			stagedModelDataHandler.importCompanyStagedModel(
+			stagedModelDataHandler.importMissingReference(
 				portletDataContext, referenceElement);
 
 			return;
@@ -257,28 +229,28 @@ public class StagedModelDataHandlerUtil {
 				continue;
 			}
 
-			long groupId = GetterUtil.getLong(
-				referenceElement.attributeValue("group-id"));
+			boolean missing = GetterUtil.getBoolean(
+				referenceElement.attributeValue("missing"));
 
-			if ((portletDataContext.getSourceCompanyGroupId() == groupId) &&
-				(portletDataContext.getGroupId() !=
-					portletDataContext.getCompanyGroupId())) {
-
+			if (missing) {
 				StagedModelDataHandler<?> stagedModelDataHandler =
 					StagedModelDataHandlerRegistryUtil.
 						getStagedModelDataHandler(stagedModelClass.getName());
 
-				stagedModelDataHandler.importCompanyStagedModel(
+				stagedModelDataHandler.importMissingReference(
 					portletDataContext, referenceElement);
 
 				continue;
 			}
 
+			long groupId = GetterUtil.getLong(
+				referenceElement.attributeValue("group-id"),
+				portletDataContext.getSourceGroupId());
 			long classPK = GetterUtil.getLong(
 				referenceElement.attributeValue("class-pk"));
 
 			String stagedModelPath = ExportImportPathUtil.getModelPath(
-				portletDataContext, stagedModelClass.getName(), classPK);
+				groupId, stagedModelClass.getName(), classPK);
 
 			StagedModel stagedModel =
 				(StagedModel)portletDataContext.getZipEntryAsObject(

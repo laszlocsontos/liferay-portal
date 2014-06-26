@@ -6,10 +6,6 @@
 	</command>
 
 	<command name="assertClick">
-		<case locator-key1="ADD">
-			<execute function="AssertClick#assertTextClickAtClickSidebar" />
-		</case>
-
 		<case locator-key1="ADD_APPLICATION_LINK">
 			<execute function="AssertClick#assertTextClickAtAddApplication" />
 		</case>
@@ -18,12 +14,20 @@
 			<execute function="AssertClick#assertTextClickAtAddApplication" />
 		</case>
 
+		<case locator-key1="ADD_PAGE_BUTTON">
+			<execute function="AssertClick#pauseAssertTextClickAt" />
+		</case>
+
 		<case locator-key1="ADD_PAGE_LINK">
 			<execute function="AssertClick#assertTextClickAtAddApplication" />
 		</case>
 
 		<case locator-key1="ADMIN">
 			<execute function="AssertClick#assertTextClickAtClickDockbar" />
+		</case>
+
+		<case comparator="startsWith" locator-key1="EDIT_">
+			<execute function="AssertClick#assertTextClickAtAndWait" />
 		</case>
 
 		<case locator-key1="USER_MY_DASHBOARD">
@@ -53,13 +57,25 @@
 		</case>
 	</command>
 
+	<command name="assertElementPresent">
+		<case comparator="contains" locator1="//div[@id='_145_embeddedPortletsContent']">
+			<execute function="AssertElementPresent#pauseAssertVisible" />
+		</case>
+	</command>
+
+	<command name="assertTextEquals">
+		<case locator-key1="PAGE_INFO_MESSAGE">
+			<execute function="AssertTextEquals#assertPartialText" />
+		</case>
+	</command>
+
 	<command name="click">
 		<case locator-key1="ADD">
-			<execute function="Click#clickAtSidebarClickAt" />
+			<execute function="Click#clickAtSidebarClickAtWaitForScript" />
 		</case>
 
 		<case locator-key1="ADMIN">
-			<execute function="Click#textClickAtClickDockbar" value1="Admin" />
+			<execute function="Click#textClickAtClickDockbar" />
 		</case>
 
 		<case locator-key1="EDIT">
@@ -67,7 +83,15 @@
 		</case>
 
 		<case locator-key1="MY_SITES">
-			<execute function="Click#textClickAtClickDockbar" value1="My Sites" />
+			<execute function="Click#textClickAtClickDockbar" />
+		</case>
+
+		<case locator-key1="PREVIEW">
+			<execute function="Click#clickAtSidebarClickAt" />
+		</case>
+
+		<case locator-key1="USER_NAME">
+			<execute function="Click#clickAt" />
 		</case>
 
 		<case locator-key1="USER_SIGN_OUT">

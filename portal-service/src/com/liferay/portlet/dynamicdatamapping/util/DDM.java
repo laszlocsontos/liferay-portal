@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.dynamicdatamapping.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -39,20 +38,20 @@ public interface DDM {
 	public Fields getFields(
 			long ddmStructureId, long ddmTemplateId,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public Fields getFields(
 			long ddmStructureId, long ddmTemplateId, String fieldNamespace,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public Fields getFields(long ddmStructureId, ServiceContext serviceContext)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public Fields getFields(
 			long ddmStructureId, String fieldNamespace,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public String[] getFieldsDisplayValues(Field fieldsDisplayField)
 		throws Exception;

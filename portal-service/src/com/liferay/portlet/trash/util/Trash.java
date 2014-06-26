@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,6 @@ package com.liferay.portlet.trash.util;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.model.Group;
@@ -40,23 +38,17 @@ import javax.servlet.http.HttpServletRequest;
 @ProviderType
 public interface Trash {
 
-	public static final String[] SELECTED_FIELD_NAMES = {
-		Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK,
-		Field.REMOVED_BY_USER_NAME, Field.REMOVED_DATE,
-		Field.ROOT_ENTRY_CLASS_NAME, Field.ROOT_ENTRY_CLASS_PK
-	};
-
 	public static final String TRASH_TIME_SEPARATOR = "_TRASH_TIME_";
 
 	public void addBaseModelBreadcrumbEntries(
 			HttpServletRequest request, String className, long classPK,
 			PortletURL containerModelURL)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public void addContainerModelBreadcrumbEntries(
 			HttpServletRequest request, String className, long classPK,
 			PortletURL containerModelURL)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public void addTrashSessionMessages(
 		ActionRequest actionRequest, List<TrashedModel> trashedModels);
@@ -74,22 +66,21 @@ public interface Trash {
 	public void deleteEntriesAttachments(
 			long companyId, long repositoryId, Date date,
 			String[] attachmentFileNames)
-		throws PortalException, SystemException;
+		throws PortalException;
 
-	public List<TrashEntry> getEntries(Hits hits)
-		throws PortalException, SystemException;
+	public List<TrashEntry> getEntries(Hits hits) throws PortalException;
 
 	public OrderByComparator getEntryOrderByComparator(
 		String orderByCol, String orderByType);
 
-	public int getMaxAge(Group group) throws PortalException, SystemException;
+	public int getMaxAge(Group group) throws PortalException;
 
 	public String getNewName(String oldName, String token);
 
 	public String getNewName(
 			ThemeDisplay themeDisplay, String className, long classPK,
 			String oldName)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public String getOriginalTitle(String title);
 
@@ -99,12 +90,11 @@ public interface Trash {
 
 	public PortletURL getViewContentURL(
 			HttpServletRequest request, String className, long classPK)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	public boolean isInTrash(String className, long classPK)
-		throws PortalException, SystemException;
+		throws PortalException;
 
-	public boolean isTrashEnabled(long groupId)
-		throws PortalException, SystemException;
+	public boolean isTrashEnabled(long groupId) throws PortalException;
 
 }

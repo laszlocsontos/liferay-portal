@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,7 @@ package com.liferay.taglib.util;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
-import com.liferay.portal.kernel.servlet.PipingPageContext;
-import com.liferay.portal.kernel.servlet.taglib.TagSupport;
+import com.liferay.portal.kernel.servlet.JSPSupportServlet;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -26,6 +25,7 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.taglib.TagSupport;
 import com.liferay.taglib.aui.ColumnTag;
 import com.liferay.taglib.aui.LayoutTag;
 import com.liferay.taglib.portlet.ActionURLTag;
@@ -46,6 +46,7 @@ import com.liferay.taglib.portletext.IconRefreshTag;
 import com.liferay.taglib.portletext.RuntimeTag;
 import com.liferay.taglib.security.DoAsURLTag;
 import com.liferay.taglib.security.PermissionsURLTag;
+import com.liferay.taglib.servlet.PipingPageContext;
 import com.liferay.taglib.theme.LayoutIconTag;
 import com.liferay.taglib.theme.MetaTagsTag;
 import com.liferay.taglib.theme.WrapPortletTag;
@@ -61,11 +62,11 @@ import com.liferay.taglib.ui.JournalContentSearchTag;
 import com.liferay.taglib.ui.LanguageTag;
 import com.liferay.taglib.ui.MySitesTag;
 import com.liferay.taglib.ui.PngImageTag;
+import com.liferay.taglib.ui.QuickAccessTag;
 import com.liferay.taglib.ui.RatingsTag;
 import com.liferay.taglib.ui.SearchTag;
 import com.liferay.taglib.ui.SitesDirectoryTag;
 import com.liferay.taglib.ui.SocialBookmarksTag;
-import com.liferay.taglib.ui.StagingTag;
 import com.liferay.taglib.ui.ToggleTag;
 
 import java.io.Writer;
@@ -82,6 +83,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.PageContext;
 
 /**
@@ -95,10 +97,9 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 
 	public VelocityTaglibImpl(
 		ServletContext servletContext, HttpServletRequest request,
-		HttpServletResponse response, PageContext pageContext,
-		Template template) {
+		HttpServletResponse response, Template template) {
 
-		init(servletContext, request, response, pageContext, template);
+		init(servletContext, request, response, template);
 	}
 
 	@Override
@@ -271,6 +272,7 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 
 		setUp(breadcrumbTag);
 
+		breadcrumbTag.setDisplayStyle(displayStyle);
 		breadcrumbTag.setShowGuestGroup(showGuestGroup);
 		breadcrumbTag.setShowLayout(showLayout);
 		breadcrumbTag.setShowParentGroups(showParentGroups);
@@ -349,7 +351,7 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 		throws Exception {
 
 		AssetCategoriesSummaryTag assetCategoriesSummaryTag =
-				new AssetCategoriesSummaryTag();
+			new AssetCategoriesSummaryTag();
 
 		setUp(assetCategoriesSummaryTag);
 
@@ -447,12 +449,26 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 	}
 
 	@Override
+	public PageContext getPageContext() {
+		return _pageContext;
+	}
+
+	@Override
 	public PngImageTag getPngImageTag() throws Exception {
 		PngImageTag pngImageTag = new PngImageTag();
 
 		setUp(pngImageTag);
 
 		return pngImageTag;
+	}
+
+	@Override
+	public QuickAccessTag getQuickAccessTag() throws Exception {
+		QuickAccessTag quickAccessTag = new QuickAccessTag();
+
+		setUp(quickAccessTag);
+
+		return quickAccessTag;
 	}
 
 	@Override
@@ -709,7 +725,8 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 
 	@Override
 	public void language(
-			String formName, String formAction, String name, int displayStyle)
+			String formName, String formAction, String name,
+			String displayStyle)
 		throws Exception {
 
 		LanguageTag languageTag = new LanguageTag();
@@ -727,7 +744,7 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 	@Override
 	public void language(
 			String formName, String formAction, String name,
-			String[] languageIds, int displayStyle)
+			String[] languageIds, String displayStyle)
 		throws Exception {
 
 		LanguageTag languageTag = new LanguageTag();
@@ -958,6 +975,26 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 	}
 
 	@Override
+	public void quickAccess() throws Exception {
+		QuickAccessTag quickAccessTag = new QuickAccessTag();
+
+		setUp(quickAccessTag);
+
+		quickAccessTag.runTag();
+	}
+
+	@Override
+	public void quickAccess(String contentId) throws Exception {
+		QuickAccessTag quickAccessTag = new QuickAccessTag();
+
+		setUp(quickAccessTag);
+
+		quickAccessTag.setContentId(contentId);
+
+		quickAccessTag.runTag();
+	}
+
+	@Override
 	public void ratings(
 			String className, long classPK, int numberOfStars, String type,
 			String url)
@@ -1152,13 +1189,12 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 		socialBookmarksTag.runTag();
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void staging() throws Exception {
-		StagingTag stagingTag = new StagingTag();
-
-		setUp(stagingTag);
-
-		stagingTag.runTag();
 	}
 
 	@Override
@@ -1183,14 +1219,18 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 
 	protected VelocityTaglibImpl init(
 		ServletContext servletContext, HttpServletRequest request,
-		HttpServletResponse response, PageContext pageContext,
-		Template template) {
+		HttpServletResponse response, Template template) {
 
 		_servletContext = servletContext;
 		_request = request;
 		_response = response;
-		_pageContext = pageContext;
 		_template = template;
+
+		JspFactory jspFactory = JspFactory.getDefaultFactory();
+
+		_pageContext = jspFactory.getPageContext(
+			new JSPSupportServlet(_servletContext), _request, _response, null,
+			false, 0, false);
 
 		return this;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -125,6 +125,36 @@ public class MathUtil {
 
 	public static boolean isOdd(int x) {
 		return !isEven(x);
+	}
+
+	public static double sum(Double... values) {
+		double sum = 0.0;
+
+		for (double value : values) {
+			sum += value;
+		}
+
+		return sum;
+	}
+
+	public static int sum(Integer... values) {
+		int sum = 0;
+
+		for (int value : values) {
+			sum += value;
+		}
+
+		return sum;
+	}
+
+	public static long sum(Long... values) {
+		long sum = 0;
+
+		for (long value : values) {
+			sum += value;
+		}
+
+		return sum;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(MathUtil.class);

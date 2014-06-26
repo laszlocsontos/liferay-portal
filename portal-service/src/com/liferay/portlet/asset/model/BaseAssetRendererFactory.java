@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,14 +14,10 @@
 
 package com.liferay.portlet.asset.model;
 
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -31,11 +27,12 @@ import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.NoSuchClassTypeException;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -53,30 +50,26 @@ import javax.portlet.WindowState;
 public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 
 	@Override
-	public AssetEntry getAssetEntry(long assetEntryId)
-		throws PortalException, SystemException {
-
+	public AssetEntry getAssetEntry(long assetEntryId) throws PortalException {
 		return AssetEntryLocalServiceUtil.getEntry(assetEntryId);
 	}
 
 	@Override
 	public AssetEntry getAssetEntry(String className, long classPK)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return AssetEntryLocalServiceUtil.getEntry(className, classPK);
 	}
 
 	@Override
-	public AssetRenderer getAssetRenderer(long classPK)
-		throws PortalException, SystemException {
-
+	public AssetRenderer getAssetRenderer(long classPK) throws PortalException {
 		return getAssetRenderer(classPK, TYPE_LATEST_APPROVED);
 	}
 
 	@Override
 	@SuppressWarnings("unused")
 	public AssetRenderer getAssetRenderer(long groupId, String urlTitle)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return null;
 	}
@@ -86,45 +79,88 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 		return PortalUtil.getClassNameId(_className);
 	}
 
+	@Deprecated
 	@Override
 	public Tuple getClassTypeFieldName(
 			long classTypeId, String fieldName, Locale locale)
 		throws Exception {
 
-		List<Tuple> classTypeFieldNames = getClassTypeFieldNames(
-			classTypeId, locale, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		ClassTypeReader classTypeReader = getClassTypeReader();
 
-		for (Tuple classTypeFieldName : classTypeFieldNames) {
-			String curFieldName = (String)classTypeFieldName.getObject(1);
+		ClassType classType = classTypeReader.getClassType(classTypeId, locale);
 
-			if (fieldName.equals(curFieldName)) {
-				return classTypeFieldName;
+		List<ClassTypeField> classTypeFields = classType.getClassTypeFields();
+
+		for (ClassTypeField classTypeField : classTypeFields) {
+			if (fieldName.equals(classTypeField.getName())) {
+				return toTuple(classTypeField);
 			}
 		}
 
 		return null;
 	}
 
+	@Deprecated
 	@Override
 	public List<Tuple> getClassTypeFieldNames(
 			long classTypeId, Locale locale, int start, int end)
 		throws Exception {
 
-		return Collections.emptyList();
+		ClassTypeReader classTypeReader = getClassTypeReader();
+
+		ClassType classType = classTypeReader.getClassType(classTypeId, locale);
+
+		List<ClassTypeField> classTypeFields = classType.getClassTypeFields(
+			start, end);
+
+		List<Tuple> tuples = new ArrayList<Tuple>(classTypeFields.size());
+
+		for (ClassTypeField classTypeField : classTypeFields) {
+			tuples.add(toTuple(classTypeField));
+		}
+
+		return tuples;
 	}
 
+	@Deprecated
 	@Override
 	public int getClassTypeFieldNamesCount(long classTypeId, Locale locale)
 		throws Exception {
 
-		return 0;
+		ClassTypeReader classTypeReader = getClassTypeReader();
+
+		ClassType classType = classTypeReader.getClassType(classTypeId, locale);
+
+		return classType.getClassTypeFieldsCount();
 	}
 
+	@Override
+	public ClassTypeReader getClassTypeReader() {
+		return new NullClassTypeReader();
+	}
+
+	@Deprecated
 	@Override
 	public Map<Long, String> getClassTypes(long[] groupId, Locale locale)
 		throws Exception {
 
-		return Collections.emptyMap();
+		ClassTypeReader classTypeReader = getClassTypeReader();
+
+		List<ClassType> classTypes = classTypeReader.getAvailableClassTypes(
+			groupId, locale);
+
+		Map<Long, String> classTypesMap = new HashMap<Long, String>();
+
+		for (ClassType classType : classTypes) {
+			classTypesMap.put(classType.getClassTypeId(), classType.getName());
+		}
+
+		return classTypesMap;
+	}
+
+	@Override
+	public String getIconCssClass() {
+		return null;
 	}
 
 	@Override
@@ -141,8 +177,22 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 	}
 
 	@Override
-	public String getTypeName(Locale locale, boolean hasSubtypes) {
+	public String getTypeName(Locale locale) {
 		return ResourceActionsUtil.getModelResource(locale, getClassName());
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getTypeName(Locale)}
+	 */
+	@Deprecated
+	@Override
+	public String getTypeName(Locale locale, boolean hasSubtypes) {
+		return getTypeName(locale);
+	}
+
+	@Override
+	public String getTypeName(Locale locale, long subtypeId) {
+		return getTypeName(locale);
 	}
 
 	@Override
@@ -150,7 +200,7 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 	public PortletURL getURLAdd(
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return null;
 	}
@@ -160,7 +210,7 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 	public PortletURL getURLView(
 			LiferayPortletResponse liferayPortletResponse,
 			WindowState windowState)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return null;
 	}
@@ -173,14 +223,20 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 		return false;
 	}
 
+	@Deprecated
 	@Override
 	public boolean hasClassTypeFieldNames(long classTypeId, Locale locale)
 		throws Exception {
 
-		List<Tuple> classTypeFieldNames = getClassTypeFieldNames(
-			classTypeId, locale, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		ClassTypeReader classTypeReader = getClassTypeReader();
 
-		return !classTypeFieldNames.isEmpty();
+		ClassType classType = classTypeReader.getClassType(classTypeId, locale);
+
+		if (classType.getClassTypeFieldsCount() > 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -216,17 +272,22 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 
 	@Override
 	public boolean isCategorizable() {
-		return true;
+		return _categorizable;
 	}
 
 	@Override
 	public boolean isLinkable() {
-		return _LINKABLE;
+		return _linkable;
 	}
 
 	@Override
 	public boolean isSelectable() {
-		return _SELECTABLE;
+		return _selectable;
+	}
+
+	@Override
+	public boolean isSupportsClassTypes() {
+		return _supportsClassTypes;
 	}
 
 	@Override
@@ -240,59 +301,62 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 	}
 
 	protected long getControlPanelPlid(ThemeDisplay themeDisplay)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return PortalUtil.getControlPanelPlid(themeDisplay.getCompanyId());
-	}
-
-	protected List<Tuple> getDDMStructureFieldNames(
-			DDMStructure ddmStructure, Locale locale)
-		throws Exception {
-
-		List<Tuple> fields = new ArrayList<Tuple>();
-
-		Map<String, Map<String, String>> fieldsMap = ddmStructure.getFieldsMap(
-			LocaleUtil.toLanguageId(locale));
-
-		for (Map<String, String> fieldMap : fieldsMap.values()) {
-			String indexType = fieldMap.get("indexType");
-			boolean privateField = GetterUtil.getBoolean(
-				fieldMap.get("private"));
-
-			String type = fieldMap.get("type");
-
-			if (Validator.isNull(indexType) || privateField ||
-				!ArrayUtil.contains(_SELECTABLE_DDM_STRUCTURE_FIELDS, type)) {
-
-				continue;
-			}
-
-			String label = fieldMap.get("label");
-			String name = fieldMap.get("name");
-
-			fields.add(
-				new Tuple(label, name, type, ddmStructure.getStructureId()));
-		}
-
-		return fields;
 	}
 
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/page.png";
 	}
 
-	private static final boolean _LINKABLE = false;
+	protected void setCategorizable(boolean categorizable) {
+		_categorizable = categorizable;
+	}
+
+	protected void setLinkable(boolean linkable) {
+		_linkable = linkable;
+	}
+
+	protected void setSelectable(boolean selectable) {
+		_selectable = selectable;
+	}
+
+	protected void setSupportsClassTypes(boolean supportsClassTypes) {
+		_supportsClassTypes = supportsClassTypes;
+	}
+
+	protected Tuple toTuple(ClassTypeField classTypeField) {
+		return new Tuple(
+			classTypeField.getLabel(), classTypeField.getName(),
+			classTypeField.getType(), classTypeField.getClassTypeId());
+	}
 
 	private static final boolean _PERMISSION = true;
 
-	private static final boolean _SELECTABLE = true;
-
-	private static final String[] _SELECTABLE_DDM_STRUCTURE_FIELDS = {
-		"checkbox", "ddm-date", "ddm-decimal", "ddm-integer", "ddm-number",
-		"radio", "select", "text"
-	};
-
+	private boolean _categorizable = true;
 	private String _className;
+	private boolean _linkable;
 	private String _portletId;
+	private boolean _selectable = true;
+	private boolean _supportsClassTypes;
+
+	private static class NullClassTypeReader implements ClassTypeReader {
+
+		@Override
+		public List<ClassType> getAvailableClassTypes(
+			long[] groupIds, Locale locale) {
+
+			return Collections.emptyList();
+		}
+
+		@Override
+		public ClassType getClassType(long classTypeId, Locale locale)
+			throws PortalException {
+
+			throw new NoSuchClassTypeException();
+		}
+
+	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.wiki.engine.creole;
 
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.parsers.creole.ast.WikiPageNode;
@@ -22,6 +23,7 @@ import com.liferay.portal.parsers.creole.parser.Creole10Lexer;
 import com.liferay.portal.parsers.creole.parser.Creole10Parser;
 import com.liferay.portal.parsers.creole.visitor.impl.XhtmlTranslationVisitor;
 import com.liferay.portal.test.mockito.ReturnArgumentCalledAnswer;
+import com.liferay.portal.util.PropsUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +48,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * @author Miguel Pastor
  * @author Manuel de la Peña
  */
-@PrepareForTest(HtmlUtil.class)
+@PrepareForTest({HtmlUtil.class, PropsUtil.class})
 @RunWith(PowerMockRunner.class)
 public class TranslationToXHTMLTest extends PowerMockito {
 
@@ -58,6 +60,17 @@ public class TranslationToXHTMLTest extends PowerMockito {
 			HtmlUtil.escape(Mockito.anyString())
 		).then(
 			new ReturnArgumentCalledAnswer<String>(0)
+		);
+
+		mockStatic(PropsUtil.class);
+
+		when(
+			PropsUtil.getArray(
+				PropsKeys.WIKI_PARSERS_CREOLE_SUPPORTED_PROTOCOLS)
+		).thenReturn(
+			new String[] {
+				"http://", "https://", "ftp://", "mailto:", "mms://"
+			}
 		);
 	}
 
@@ -459,6 +472,27 @@ public class TranslationToXHTMLTest extends PowerMockito {
 	}
 
 	@Test
+	public void testParseLinkFtp() {
+		Assert.assertEquals(
+			"<p><a href=\"ftp://liferay.com\">Liferay</a> </p>",
+			translate("link-12.creole"));
+	}
+
+	@Test
+	public void testParseLinkHttp() {
+		Assert.assertEquals(
+			"<p><a href=\"http://liferay.com\">Liferay</a> </p>",
+			translate("link-10.creole"));
+	}
+
+	@Test
+	public void testParseLinkHttps() {
+		Assert.assertEquals(
+			"<p><a href=\"https://liferay.com\">Liferay</a> </p>",
+			translate("link-11.creole"));
+	}
+
+	@Test
 	public void testParseLinkInListItem() {
 		Assert.assertEquals(
 			"<ul><li><a href=\"l\">a</a></li></ul>",
@@ -478,6 +512,20 @@ public class TranslationToXHTMLTest extends PowerMockito {
 		Assert.assertEquals(
 			"<ul><li>This is an item with a link <a href=\"l\">a</a></li></ul>",
 			translate("list-11.creole"));
+	}
+
+	@Test
+	public void testParseLinkMailTo() {
+		Assert.assertEquals(
+			"<p><a href=\"mailto:liferay@liferay.com\">Liferay Mail</a> </p>",
+			translate("link-13.creole"));
+	}
+
+	@Test
+	public void testParseLinkMMS() {
+		Assert.assertEquals(
+			"<p><a href=\"mms://liferay.com/file\">Liferay File</a> </p>",
+			translate("link-14.creole"));
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,12 @@
 <%
 boolean includeSelectAll = GetterUtil.getBoolean(request.getAttribute("liferay-ui:app_view_toolbar:includeSelectAll"));
 String searchJsp = (String)request.getAttribute("liferay-ui:app_view_toolbar:searchJsp");
+
+String cssClass = "select-all-entries";
+
+if (!includeSelectAll) {
+	cssClass += " hide";
+}
 %>
 
 <div class="app-view-taglib">
@@ -28,8 +34,6 @@ String searchJsp = (String)request.getAttribute("liferay-ui:app_view_toolbar:sea
 		</c:if>
 
 		<div>
-			<c:if test="<%= includeSelectAll %>">
-				<c:if test="<%= !user.isDefaultUser() %>">
-					<aui:input cssClass="select-all-entries" inline="<%= true %>" label="" name="<%= RowChecker.ALL_ROW_IDS %>" type="checkbox" />
-				</c:if>
+			<c:if test="<%= !user.isDefaultUser() %>">
+				<aui:input cssClass="<%= cssClass %>" inline="<%= true %>" label="" name="<%= RowChecker.ALL_ROW_IDS %>" title="select-all" type="checkbox" />
 			</c:if>

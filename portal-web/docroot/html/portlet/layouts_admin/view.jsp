@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,19 +90,19 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 		/>
 
 		<%
-		PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, TextFormatter.format(tabs1, TextFormatter.O)), redirectURL.toString());
+		PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, TextFormatter.format(tabs1, TextFormatter.O)), redirectURL.toString());
 		%>
 
 	</c:when>
 	<c:otherwise>
-		<liferay-ui:breadcrumb showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" showPortletBreadcrumb="<%= true %>" />
+		<liferay-ui:breadcrumb displayStyle="horizontal" showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" showPortletBreadcrumb="<%= true %>" />
 	</c:otherwise>
 </c:choose>
 
 <div class="container-fluid">
-	<div class="lfr-app-column-view manage-view row-fluid">
+	<div class="lfr-app-column-view manage-view row">
 		<c:if test="<%= !group.isLayoutPrototype() %>">
-			<div class="span3">
+			<div class="col-md-3">
 				<c:if test="<%= stagingGroup != null %>">
 
 					<%
@@ -136,7 +136,7 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 					<c:choose>
 						<c:when test="<%= layoutSetBranches.size() > 1 %>">
 							<aui:nav-bar>
-								<aui:nav>
+								<aui:nav cssClass="navbar-nav">
 									<aui:nav-item dropdown="<%= true %>" label="<%= HtmlUtil.escape(layoutSetBranch.getName()) %>">
 
 										<%
@@ -167,7 +167,7 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 						</c:when>
 					</c:choose>
 
-					<liferay-ui:staging cssClass="manage-pages-branch-menu" extended="<%= true %>" groupId="<%= groupId %>" icon="/common/tool.png" message="" privateLayout="<%= privateLayout %>" selPlid="<%= selPlid %>" showManageBranches="<%= true %>"  />
+					<liferay-staging:menu cssClass="manage-pages-branch-menu" extended="<%= true %>" icon="/common/tool.png" message="" selPlid="<%= selPlid %>" showManageBranches="<%= true %>"  />
 				</c:if>
 
 				<liferay-util:include page="/html/portlet/layouts_admin/tree_js.jsp">
@@ -176,7 +176,7 @@ SitesUtil.addPortletBreadcrumbEntries(group, pagesName, redirectURL, request, re
 			</div>
 		</c:if>
 
-		<div class='<%= !group.isLayoutPrototype() ? "span9" : "span12" %>'>
+		<div class='<%= !group.isLayoutPrototype() ? "col-md-9" : "col-md-12" %>'>
 			<div id="<portlet:namespace />layoutsContainer">
 				<c:choose>
 					<c:when test="<%= selPlid > 0 %>">

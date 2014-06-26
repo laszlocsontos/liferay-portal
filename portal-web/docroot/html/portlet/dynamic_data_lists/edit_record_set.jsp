@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -75,21 +75,27 @@ if (ddmStructureId > 0) {
 	<aui:model-context bean="<%= recordSet %>" model="<%= DDLRecordSet.class %>" />
 
 	<aui:fieldset>
+		<c:if test="<%= (recordSet != null) && (DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(recordSet.getDDMStructureId()) > 0) %>">
+			<div class="alert alert-warning">
+				<liferay-ui:message key="updating-the-data-definition-may-cause-data-loss" />
+			</div>
+		</c:if>
+
 		<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="name" />
 
 		<aui:input name="description" />
 
-		<aui:field-wrapper label="data-definition" required="<%= true %>">
-			<liferay-ui:input-resource id="ddmStructureNameDisplay" url="<%= ddmStructureName %>" />
+		<div class="form-group">
+			<aui:input label="data-definition" name="ddmStructureNameDisplay" required="<%= true %>" type="resource"  value="<%= ddmStructureName %>" />
 
 			<liferay-ui:icon
 				iconCssClass="icon-search"
 				label="<%= true %>"
-				linkCssClass="btn"
+				linkCssClass="btn btn-default"
 				message="select"
 				url='<%= "javascript:" + renderResponse.getNamespace() + "openDDMStructureSelector();" %>'
 			/>
-		</aui:field-wrapper>
+		</div>
 
 		<c:if test="<%= WorkflowEngineManagerUtil.isDeployed() && (WorkflowHandlerRegistryUtil.getWorkflowHandler(DDLRecord.class.getName()) != null) %>">
 			<aui:select label="workflow" name="workflowDefinition">
@@ -104,7 +110,7 @@ if (ddmStructureId > 0) {
 				}
 				%>
 
-				<aui:option><%= LanguageUtil.get(pageContext, "no-workflow") %></aui:option>
+				<aui:option><%= LanguageUtil.get(request, "no-workflow") %></aui:option>
 
 				<%
 				List<WorkflowDefinition> workflowDefinitions = WorkflowDefinitionManagerUtil.getActiveWorkflowDefinitions(company.getCompanyId(), 0, 100, null);
@@ -160,9 +166,9 @@ if (ddmStructureId > 0) {
 
 				refererPortletName: '<%= portlet.getPortletName() %>',
 				refererWebDAVToken: '<%= portlet.getWebDAVStorageToken() %>',
-				showGlobalScope: true,
+				showAncestorScopes: true,
 				struts_action: '/dynamic_data_mapping/select_structure',
-				title: '<%= UnicodeLanguageUtil.get(pageContext, "data-definitions") %>'
+				title: '<%= UnicodeLanguageUtil.get(request, "data-definitions") %>'
 			},
 			function(event) {
 				var A = AUI();
@@ -177,7 +183,7 @@ if (ddmStructureId > 0) {
 	}
 
 	function <portlet:namespace />saveRecordSet() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (recordSet == null) ? Constants.ADD : Constants.UPDATE %>";
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (recordSet == null) ? Constants.ADD : Constants.UPDATE %>';
 
 		submitForm(document.<portlet:namespace />fm);
 	}
@@ -191,9 +197,9 @@ if (recordSet != null) {
 	portletURL.setParameter("recordSetId", String.valueOf(recordSet.getRecordSetId()));
 
 	PortalUtil.addPortletBreadcrumbEntry(request, recordSet.getName(locale), portletURL.toString());
-	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "edit"), currentURL);
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
 }
 else {
-	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "add-list"), currentURL);
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-list"), currentURL);
 }
 %>

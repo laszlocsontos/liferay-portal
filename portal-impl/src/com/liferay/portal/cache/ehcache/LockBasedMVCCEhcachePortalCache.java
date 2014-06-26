@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.model.MVCCModel;
 
 import java.io.Serializable;
 
+import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
 /**
@@ -35,6 +36,8 @@ public class LockBasedMVCCEhcachePortalCache
 
 	@Override
 	public void remove(K key) {
+		Ehcache ehcache = getEhcache();
+
 		ehcache.acquireWriteLockOnKey(key);
 
 		try {
@@ -55,6 +58,8 @@ public class LockBasedMVCCEhcachePortalCache
 		else {
 			newElement = new Element(key, value);
 		}
+
+		Ehcache ehcache = getEhcache();
 
 		ehcache.acquireWriteLockOnKey(key);
 

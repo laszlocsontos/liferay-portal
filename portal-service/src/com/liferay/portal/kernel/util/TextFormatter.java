@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,7 +63,7 @@ public class TextFormatter {
 
 	public static final int J = 9;
 
-	// formatId --> format-id
+	// formatId --> format-id, formatID --> format-i-d
 
 	public static final int K = 10;
 
@@ -83,7 +83,7 @@ public class TextFormatter {
 
 	public static final int O = 14;
 
-	// formatID --> format-id
+	// FormatID --> format-id
 
 	public static final int P = 15;
 
@@ -213,13 +213,13 @@ public class TextFormatter {
 
 		size = size / _STORAGE_SIZE_DENOMINATOR;
 
-		if (size > _STORAGE_SIZE_DENOMINATOR) {
+		if (size >= _STORAGE_SIZE_DENOMINATOR) {
 			suffix = _STORAGE_SIZE_SUFFIX_MB;
 
 			size = size / _STORAGE_SIZE_DENOMINATOR;
 		}
 
-		if (size > _STORAGE_SIZE_DENOMINATOR) {
+		if (size >= _STORAGE_SIZE_DENOMINATOR) {
 			suffix = _STORAGE_SIZE_SUFFIX_GB;
 
 			size = size / _STORAGE_SIZE_DENOMINATOR;
@@ -403,22 +403,24 @@ public class TextFormatter {
 	}
 
 	private static String _formatP(String s) {
-		StringBuilder sb = new StringBuilder(StringUtil.toLowerCase(s));
+		StringBuilder sb = new StringBuilder(s.length() + s.length() / 2);
 
-		for (int i = 0; i < s.length(); i++) {
+		for (int i = 0; i < s.length() - 1; i++) {
 			char c = s.charAt(i);
 
-			if (Character.isUpperCase(c) && (i > 0) && ((i + 1) < s.length())) {
-				int delta = sb.length() - s.length();
+			if (Character.isUpperCase(c)) {
+				sb.append(Character.toLowerCase(c));
+			}
+			else {
+				sb.append(c);
 
-				if (Character.isLowerCase(s.charAt(i + 1))) {
-					sb.insert(i + delta, CharPool.DASH);
-				}
-				else if (Character.isLowerCase(s.charAt(i - 1))) {
-					sb.insert(i + delta, CharPool.DASH);
+				if (Character.isUpperCase(s.charAt(i + 1))) {
+					sb.append(CharPool.DASH);
 				}
 			}
 		}
+
+		sb.append(Character.toLowerCase(s.charAt(s.length() - 1)));
 
 		return sb.toString();
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -28,21 +27,21 @@ public class TeamPermissionUtil {
 
 	public static void check(
 			PermissionChecker permissionChecker, long teamId, String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		getTeamPermission().check(permissionChecker, teamId, actionId);
 	}
 
 	public static void check(
 			PermissionChecker permissionChecker, Team team, String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		getTeamPermission().check(permissionChecker, team, actionId);
 	}
 
 	public static boolean contains(
 			PermissionChecker permissionChecker, long teamId, String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getTeamPermission().contains(
 			permissionChecker, teamId, actionId);
@@ -50,7 +49,7 @@ public class TeamPermissionUtil {
 
 	public static boolean contains(
 			PermissionChecker permissionChecker, Team team, String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getTeamPermission().contains(permissionChecker, team, actionId);
 	}

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,7 @@ PortletURL tempRowURL = (PortletURL)request.getAttribute("view_entries.jsp-tempR
 	rowCheckerId="<%= String.valueOf(folder.getFolderId()) %>"
 	rowCheckerName="<%= Folder.class.getSimpleName() %>"
 	showCheckbox="<%= DLFolderPermission.contains(permissionChecker, folder, ActionKeys.DELETE) || DLFolderPermission.contains(permissionChecker, folder, ActionKeys.UPDATE) %>"
-	thumbnailDivStyle="<%= DLUtil.getThumbnailStyle(false, 4) %>"
+	thumbnailDivStyle="<%= DLUtil.getThumbnailStyle(false, 9) %>"
 	thumbnailSrc='<%= themeDisplay.getPathThemeImages() + "/file_system/large/" + folderImage + ".png" %>'
 	thumbnailStyle="<%= DLUtil.getThumbnailStyle() %>"
 	title="<%= folder.getName() %>"

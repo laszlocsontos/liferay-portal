@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -75,12 +77,10 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param layoutSet the layout set
 	 * @return the layout set that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public LayoutSet addLayoutSet(LayoutSet layoutSet)
-		throws SystemException {
+	public LayoutSet addLayoutSet(LayoutSet layoutSet) {
 		layoutSet.setNew(true);
 
 		return layoutSetPersistence.update(layoutSet);
@@ -103,12 +103,11 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param layoutSetId the primary key of the layout set
 	 * @return the layout set that was removed
 	 * @throws PortalException if a layout set with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public LayoutSet deleteLayoutSet(long layoutSetId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return layoutSetPersistence.remove(layoutSetId);
 	}
 
@@ -117,12 +116,10 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param layoutSet the layout set
 	 * @return the layout set that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public LayoutSet deleteLayoutSet(LayoutSet layoutSet)
-		throws SystemException {
+	public LayoutSet deleteLayoutSet(LayoutSet layoutSet) {
 		return layoutSetPersistence.remove(layoutSet);
 	}
 
@@ -139,12 +136,10 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return layoutSetPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -159,12 +154,10 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return layoutSetPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end);
 	}
@@ -181,12 +174,11 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return layoutSetPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -196,11 +188,9 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return layoutSetPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -210,17 +200,16 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return layoutSetPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public LayoutSet fetchLayoutSet(long layoutSetId) throws SystemException {
+	public LayoutSet fetchLayoutSet(long layoutSetId) {
 		return layoutSetPersistence.fetchByPrimaryKey(layoutSetId);
 	}
 
@@ -230,17 +219,46 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param layoutSetId the primary key of the layout set
 	 * @return the layout set
 	 * @throws PortalException if a layout set with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public LayoutSet getLayoutSet(long layoutSetId)
-		throws PortalException, SystemException {
+	public LayoutSet getLayoutSet(long layoutSetId) throws PortalException {
 		return layoutSetPersistence.findByPrimaryKey(layoutSetId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.LayoutSetLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(LayoutSet.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("layoutSetId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.LayoutSetLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(LayoutSet.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("layoutSetId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return layoutSetLocalService.deleteLayoutSet((LayoutSet)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return layoutSetPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -254,11 +272,9 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of layout sets
 	 * @param end the upper bound of the range of layout sets (not inclusive)
 	 * @return the range of layout sets
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<LayoutSet> getLayoutSets(int start, int end)
-		throws SystemException {
+	public List<LayoutSet> getLayoutSets(int start, int end) {
 		return layoutSetPersistence.findAll(start, end);
 	}
 
@@ -266,10 +282,9 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the number of layout sets.
 	 *
 	 * @return the number of layout sets
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getLayoutSetsCount() throws SystemException {
+	public int getLayoutSetsCount() {
 		return layoutSetPersistence.countAll();
 	}
 
@@ -278,12 +293,10 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param layoutSet the layout set
 	 * @return the layout set that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public LayoutSet updateLayoutSet(LayoutSet layoutSet)
-		throws SystemException {
+	public LayoutSet updateLayoutSet(LayoutSet layoutSet) {
 		return layoutSetPersistence.update(layoutSet);
 	}
 
@@ -762,7 +775,7 @@ public abstract class LayoutSetLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = layoutSetPersistence.getDataSource();
 

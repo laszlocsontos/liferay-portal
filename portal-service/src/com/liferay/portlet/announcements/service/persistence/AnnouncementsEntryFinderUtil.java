@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,8 +29,7 @@ public class AnnouncementsEntryFinderUtil {
 		int displayDateYear, int displayDateHour, int displayDateMinute,
 		int expirationDateMonth, int expirationDateDay, int expirationDateYear,
 		int expirationDateHour, int expirationDateMinute, boolean alert,
-		int flagValue)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int flagValue) {
 		return getFinder()
 				   .countByScope(userId, classNameId, classPKs,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
@@ -44,8 +43,7 @@ public class AnnouncementsEntryFinderUtil {
 		int displayDateMonth, int displayDateDay, int displayDateYear,
 		int displayDateHour, int displayDateMinute, int expirationDateMonth,
 		int expirationDateDay, int expirationDateYear, int expirationDateHour,
-		int expirationDateMinute, boolean alert, int flagValue)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int expirationDateMinute, boolean alert, int flagValue) {
 		return getFinder()
 				   .countByScopes(userId, scopes, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour,
@@ -55,8 +53,7 @@ public class AnnouncementsEntryFinderUtil {
 	}
 
 	public static java.util.List<com.liferay.portlet.announcements.model.AnnouncementsEntry> findByDisplayDate(
-		java.util.Date displayDateLT, java.util.Date displayDateGT)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.Date displayDateLT, java.util.Date displayDateGT) {
 		return getFinder().findByDisplayDate(displayDateLT, displayDateGT);
 	}
 
@@ -66,7 +63,7 @@ public class AnnouncementsEntryFinderUtil {
 		int displayDateMinute, int expirationDateMonth, int expirationDateDay,
 		int expirationDateYear, int expirationDateHour,
 		int expirationDateMinute, boolean alert, int flagValue, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getFinder()
 				   .findByScope(userId, classNameId, classPKs,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
@@ -81,7 +78,7 @@ public class AnnouncementsEntryFinderUtil {
 		int displayDateHour, int displayDateMinute, int expirationDateMonth,
 		int expirationDateDay, int expirationDateYear, int expirationDateHour,
 		int expirationDateMinute, boolean alert, int flagValue, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getFinder()
 				   .findByScopes(userId, scopes, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour,

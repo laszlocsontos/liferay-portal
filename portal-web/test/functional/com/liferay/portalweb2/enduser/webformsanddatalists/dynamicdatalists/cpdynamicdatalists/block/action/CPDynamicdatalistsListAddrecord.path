@@ -29,8 +29,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SUBMIT_FOR_PUBLICATION_BUTTON</td>
+	<td>//button[@id='_167_publishButton']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CANCEL_BUTTON</td>
-	<td>//button[@id='_167_cancelButton']</td>
+	<td>//a[contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -40,7 +45,12 @@
 </tr>
 <tr>
 	<td>FIELD_LABEL</td>
-	<td>//div[@data-fieldname='${key_fieldName}']//label</td>
+	<td>//div[@data-fieldname='${key_fieldName}']//label | //div[@data-fieldname='${key_fieldName}']//span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FIELD_LABEL_HIDDEN</td>
+	<td>//div[@data-fieldname='${key_fieldName}']/../div/input[@type='hidden']</td>
 	<td></td>
 </tr>
 <tr>
@@ -85,7 +95,7 @@
 </tr>
 <tr>
 	<td>LINK_TO_PAGE_SELECT</td>
-	<td>//div[@data-fieldname='${key_fieldName}']/select</td>
+	<td>//div[@data-fieldname='${key_fieldName}']//select</td>
 	<td></td>
 </tr>
 <tr>

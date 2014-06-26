@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -61,6 +61,9 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.model.AssetTagProperty;
+import com.liferay.portlet.asset.model.AssetVocabulary;
+import com.liferay.portlet.asset.model.ClassType;
+import com.liferay.portlet.asset.model.ClassTypeReader;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetCategoryPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
@@ -68,6 +71,7 @@ import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 import com.liferay.portlet.asset.service.permission.AssetTagPermission;
+import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.assetpublisher.util.AssetSearcher;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -113,9 +117,6 @@ public class AssetUtil {
 		CharPool.QUESTION, CharPool.QUOTE, CharPool.RETURN, CharPool.SEMICOLON,
 		CharPool.SLASH, CharPool.STAR, CharPool.TILDE
 	};
-
-	public static final String[] SELECTED_FIELD_NAMES =
-		{Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK};
 
 	public static Set<String> addLayoutTags(
 		HttpServletRequest request, List<AssetTag> tags) {
@@ -184,7 +185,7 @@ public class AssetUtil {
 
 	public static long[] filterCategoryIds(
 			PermissionChecker permissionChecker, long[] categoryIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Long> viewableCategoryIds = new ArrayList<Long>();
 
@@ -206,7 +207,7 @@ public class AssetUtil {
 
 	public static long[] filterTagIds(
 			PermissionChecker permissionChecker, long[] tagIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Long> viewableTagIds = new ArrayList<Long>();
 
@@ -224,7 +225,7 @@ public class AssetUtil {
 
 	public static long[][] filterTagIdsArray(
 			PermissionChecker permissionChecker, long[][] tagIdsArray)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<long[]> viewableTagIdsArray = new ArrayList<long[]>();
 
@@ -248,6 +249,46 @@ public class AssetUtil {
 
 		return viewableTagIdsArray.toArray(
 			new long[viewableTagIdsArray.size()][]);
+	}
+
+	public static List<AssetVocabulary> filterVocabularies(
+		List<AssetVocabulary> vocabularies, String className,
+		final long classTypePK) {
+
+		final long classNameId = PortalUtil.getClassNameId(className);
+
+		PredicateFilter<AssetVocabulary> predicateFilter =
+			new PredicateFilter<AssetVocabulary>() {
+
+				@Override
+				public boolean filter(AssetVocabulary assetVocabulary) {
+					return
+						assetVocabulary.isAssociatedToClassNameIdAndClassTypePK(
+							classNameId, classTypePK);
+				}
+
+			};
+
+		return ListUtil.filter(vocabularies, predicateFilter);
+	}
+
+	public static long[] filterVocabularyIds(
+			PermissionChecker permissionChecker, long[] vocabularyIds)
+		throws PortalException {
+
+		List<Long> viewableVocabularyIds = new ArrayList<Long>();
+
+		for (long vocabularyId : vocabularyIds) {
+			if (AssetVocabularyPermission.contains(
+					permissionChecker, vocabularyId, ActionKeys.VIEW)) {
+
+				viewableVocabularyIds.add(vocabularyId);
+			}
+		}
+
+		return ArrayUtil.toArray(
+			viewableVocabularyIds.toArray(
+				new Long[viewableVocabularyIds.size()]));
 	}
 
 	public static PortletURL getAddPortletURL(
@@ -446,12 +487,14 @@ public class AssetUtil {
 				continue;
 			}
 
-			Map<Long, String> classTypes = assetRendererFactory.getClassTypes(
-				new long[] {
-					themeDisplay.getCompanyGroupId(),
-					themeDisplay.getScopeGroupId()
-				},
-				themeDisplay.getLocale());
+			ClassTypeReader classTypeReader =
+				assetRendererFactory.getClassTypeReader();
+
+			List<ClassType> classTypes =
+				classTypeReader.getAvailableClassTypes(
+					PortalUtil.getCurrentAndAncestorSiteGroupIds(
+						themeDisplay.getScopeGroupId()),
+					themeDisplay.getLocale());
 
 			if ((classTypeIds.length == 0) || classTypes.isEmpty()) {
 				PortletURL addPortletURL = getAddPortletURL(
@@ -464,7 +507,9 @@ public class AssetUtil {
 				}
 			}
 
-			for (long classTypeId : classTypes.keySet()) {
+			for (ClassType classType : classTypes) {
+				long classTypeId = classType.getClassTypeId();
+
 				if (ArrayUtil.contains(classTypeIds, classTypeId) ||
 					(classTypeIds.length == 0)) {
 
@@ -476,7 +521,7 @@ public class AssetUtil {
 					if (addPortletURL != null) {
 						String mesage =
 							className + CLASSNAME_SEPARATOR +
-								classTypes.get(classTypeId);
+								classType.getName();
 
 						addPortletURLs.put(mesage, addPortletURL);
 					}
@@ -533,9 +578,7 @@ public class AssetUtil {
 		return assetEntries;
 	}
 
-	public static String getAssetKeywords(String className, long classPK)
-		throws SystemException {
-
+	public static String getAssetKeywords(String className, long classPK) {
 		List<AssetTag> tags = AssetTagLocalServiceUtil.getTags(
 			className, classPK);
 		List<AssetCategory> categories =
@@ -670,7 +713,7 @@ public class AssetUtil {
 		AssetSearcher assetSearcher = getAssetSearcher(
 			searchContext, assetEntryQuery, start, end);
 
-		Hits hits = assetSearcher.search(searchContext, SELECTED_FIELD_NAMES);
+		Hits hits = assetSearcher.search(searchContext);
 
 		List<AssetEntry> assetEntries = getAssetEntries(hits);
 
@@ -679,8 +722,7 @@ public class AssetUtil {
 	}
 
 	public static String substituteCategoryPropertyVariables(
-			long groupId, long categoryId, String s)
-		throws SystemException {
+		long groupId, long categoryId, String s) {
 
 		String result = s;
 
@@ -707,7 +749,7 @@ public class AssetUtil {
 
 	public static String substituteTagPropertyVariables(
 			long groupId, String tagName, String s)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String result = s;
 

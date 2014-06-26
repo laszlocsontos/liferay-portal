@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.upgrade.v6_1_1;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.sql.Connection;
@@ -87,7 +88,8 @@ public class UpgradeDocumentLibrary extends UpgradeProcess {
 				long groupId = rs.getLong("groupId");
 				long folderId = rs.getLong("folderId");
 				String title = rs.getString("title");
-				String extension = rs.getString("extension");
+				String extension = GetterUtil.getString(
+					rs.getString("extension"));
 				String version = rs.getString("version");
 
 				String periodAndExtension = StringPool.PERIOD.concat(extension);

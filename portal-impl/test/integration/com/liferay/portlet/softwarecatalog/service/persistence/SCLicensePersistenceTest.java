@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,23 +27,27 @@ import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.softwarecatalog.NoSuchLicenseException;
 import com.liferay.portlet.softwarecatalog.model.SCLicense;
+import com.liferay.portlet.softwarecatalog.service.SCLicenseLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +59,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class SCLicensePersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<SCLicense> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -76,11 +89,15 @@ public class SCLicensePersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<SCLicense> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		SCLicense scLicense = _persistence.create(pk);
 
@@ -107,19 +124,19 @@ public class SCLicensePersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		SCLicense newSCLicense = _persistence.create(pk);
 
-		newSCLicense.setName(ServiceTestUtil.randomString());
+		newSCLicense.setName(RandomTestUtil.randomString());
 
-		newSCLicense.setUrl(ServiceTestUtil.randomString());
+		newSCLicense.setUrl(RandomTestUtil.randomString());
 
-		newSCLicense.setOpenSource(ServiceTestUtil.randomBoolean());
+		newSCLicense.setOpenSource(RandomTestUtil.randomBoolean());
 
-		newSCLicense.setActive(ServiceTestUtil.randomBoolean());
+		newSCLicense.setActive(RandomTestUtil.randomBoolean());
 
-		newSCLicense.setRecommended(ServiceTestUtil.randomBoolean());
+		newSCLicense.setRecommended(RandomTestUtil.randomBoolean());
 
 		_persistence.update(newSCLicense);
 
@@ -140,9 +157,9 @@ public class SCLicensePersistenceTest {
 	@Test
 	public void testCountByActive() {
 		try {
-			_persistence.countByActive(ServiceTestUtil.randomBoolean());
+			_persistence.countByActive(RandomTestUtil.randomBoolean());
 
-			_persistence.countByActive(ServiceTestUtil.randomBoolean());
+			_persistence.countByActive(RandomTestUtil.randomBoolean());
 		}
 		catch (Exception e) {
 			Assert.fail(e.getMessage());
@@ -152,11 +169,11 @@ public class SCLicensePersistenceTest {
 	@Test
 	public void testCountByA_R() {
 		try {
-			_persistence.countByA_R(ServiceTestUtil.randomBoolean(),
-				ServiceTestUtil.randomBoolean());
+			_persistence.countByA_R(RandomTestUtil.randomBoolean(),
+				RandomTestUtil.randomBoolean());
 
-			_persistence.countByA_R(ServiceTestUtil.randomBoolean(),
-				ServiceTestUtil.randomBoolean());
+			_persistence.countByA_R(RandomTestUtil.randomBoolean(),
+				RandomTestUtil.randomBoolean());
 		}
 		catch (Exception e) {
 			Assert.fail(e.getMessage());
@@ -174,7 +191,7 @@ public class SCLicensePersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -213,7 +230,7 @@ public class SCLicensePersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		SCLicense missingSCLicense = _persistence.fetchByPrimaryKey(pk);
 
@@ -221,19 +238,103 @@ public class SCLicensePersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		SCLicense newSCLicense1 = addSCLicense();
+		SCLicense newSCLicense2 = addSCLicense();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCLicense1.getPrimaryKey());
+		primaryKeys.add(newSCLicense2.getPrimaryKey());
+
+		Map<Serializable, SCLicense> scLicenses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, scLicenses.size());
+		Assert.assertEquals(newSCLicense1,
+			scLicenses.get(newSCLicense1.getPrimaryKey()));
+		Assert.assertEquals(newSCLicense2,
+			scLicenses.get(newSCLicense2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, SCLicense> scLicenses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(scLicenses.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		SCLicense newSCLicense = addSCLicense();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCLicense.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, SCLicense> scLicenses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, scLicenses.size());
+		Assert.assertEquals(newSCLicense,
+			scLicenses.get(newSCLicense.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, SCLicense> scLicenses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(scLicenses.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		SCLicense newSCLicense = addSCLicense();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCLicense.getPrimaryKey());
+
+		Map<Serializable, SCLicense> scLicenses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, scLicenses.size());
+		Assert.assertEquals(newSCLicense,
+			scLicenses.get(newSCLicense.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new SCLicenseActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = SCLicenseLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					SCLicense scLicense = (SCLicense)object;
 
 					Assert.assertNotNull(scLicense);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -266,7 +367,7 @@ public class SCLicensePersistenceTest {
 				SCLicense.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("licenseId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<SCLicense> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -305,7 +406,7 @@ public class SCLicensePersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("licenseId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("licenseId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -313,19 +414,19 @@ public class SCLicensePersistenceTest {
 	}
 
 	protected SCLicense addSCLicense() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		SCLicense scLicense = _persistence.create(pk);
 
-		scLicense.setName(ServiceTestUtil.randomString());
+		scLicense.setName(RandomTestUtil.randomString());
 
-		scLicense.setUrl(ServiceTestUtil.randomString());
+		scLicense.setUrl(RandomTestUtil.randomString());
 
-		scLicense.setOpenSource(ServiceTestUtil.randomBoolean());
+		scLicense.setOpenSource(RandomTestUtil.randomBoolean());
 
-		scLicense.setActive(ServiceTestUtil.randomBoolean());
+		scLicense.setActive(RandomTestUtil.randomBoolean());
 
-		scLicense.setRecommended(ServiceTestUtil.randomBoolean());
+		scLicense.setRecommended(RandomTestUtil.randomBoolean());
 
 		_persistence.update(scLicense);
 
@@ -333,6 +434,7 @@ public class SCLicensePersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(SCLicensePersistenceTest.class);
+	private ModelListener<SCLicense>[] _modelListeners;
 	private SCLicensePersistence _persistence = (SCLicensePersistence)PortalBeanLocatorUtil.locate(SCLicensePersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

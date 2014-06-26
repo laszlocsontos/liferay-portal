@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.trash.util.TrashUtil;
 
+import java.util.Locale;
+
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -26,6 +28,11 @@ import javax.portlet.RenderResponse;
  * @author Alexander Chow
  */
 public abstract class BaseTrashRenderer implements TrashRenderer {
+
+	@Override
+	public String getIconCssClass() {
+		return "icon-page";
+	}
 
 	@Override
 	public String getIconPath(PortletRequest portletRequest) {
@@ -42,6 +49,16 @@ public abstract class BaseTrashRenderer implements TrashRenderer {
 	@Override
 	public String getNewName(String oldName, String token) {
 		return TrashUtil.getNewName(oldName, token);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getSummary(PortletRequest,
+	 *             PortletResponse)}
+	 */
+	@Deprecated
+	@Override
+	public String getSummary(Locale locale) {
+		return getSummary(null, null);
 	}
 
 	@Override

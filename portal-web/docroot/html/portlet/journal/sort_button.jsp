@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,13 +38,13 @@ if (orderByType.equals("asc")) {
 	String taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'display-date','" + reverseOrderByType + "')";
 	%>
 
-	<aui:nav-item href="<%= taglibURL %>" label="display-date" />
+	<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-calendar" label="display-date" />
 
 	<%
 	taglibURL = "javascript:" + liferayPortletResponse.getNamespace() + "sortEntries('" + folderId + "', 'modified-date','" + reverseOrderByType + "')";
 	%>
 
-	<aui:nav-item href="<%= taglibURL %>" label="modified-date" />
+	<aui:nav-item href="<%= taglibURL %>" iconCssClass="icon-calendar" label="modified-date" />
 </aui:nav-item>
 
 <aui:script>

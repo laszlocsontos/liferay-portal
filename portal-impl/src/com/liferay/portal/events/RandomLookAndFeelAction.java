@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -78,7 +78,7 @@ public class RandomLookAndFeelAction extends Action {
 				themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
 				themeDisplay.getUserId(), wapTheme);
 
-			if (themes.size() > 0) {
+			if (!themes.isEmpty()) {
 				Theme theme = themes.get(RandomUtil.nextInt(themes.size()));
 
 				List<ColorScheme> colorSchemes = theme.getColorSchemes();

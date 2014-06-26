@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.lang.reflect.Constructor;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ import java.util.Map;
 public class MapUtil {
 
 	public static <K, V> void copy(
-		Map<K, V> master, Map<? super K, ? super V> copy) {
+		Map<? extends K, ? extends V> master, Map<? super K, ? super V> copy) {
 
 		copy.clear();
 
@@ -37,16 +38,34 @@ public class MapUtil {
 	}
 
 	public static <K, V> Map<K, V> filter(
-		Map<K, V> inputMap, Map<K, V> outputMap,
+		Map<? extends K, ? extends V> inputMap, Map<K, V> outputMap,
 		PredicateFilter<K> keyPredicateFilter) {
 
-		for (Map.Entry<K, V> entry : inputMap.entrySet()) {
+		for (Map.Entry<? extends K, ? extends V> entry : inputMap.entrySet()) {
 			if (keyPredicateFilter.filter(entry.getKey())) {
 				outputMap.put(entry.getKey(), entry.getValue());
 			}
 		}
 
 		return outputMap;
+	}
+
+	public static <T> Map<T, T> fromArray(T... array) {
+		if ((array.length % 2) != 0) {
+			throw new IllegalArgumentException(
+				"Array length is not an even number");
+		}
+
+		Map<T, T> map = new HashMap<T, T>();
+
+		for (int i = 0; i < array.length; i += 2) {
+			T key = array[i];
+			T value = array[i + 1];
+
+			map.put(key, value);
+		}
+
+		return map;
 	}
 
 	public static boolean getBoolean(Map<String, ?> map, String key) {
@@ -259,7 +278,7 @@ public class MapUtil {
 	}
 
 	public static <K, V> void merge(
-		Map<K, V> master, Map<? super K, ? super V> copy) {
+		Map<? extends K, ? extends V> master, Map<? super K, ? super V> copy) {
 
 		copy.putAll(master);
 	}
@@ -274,6 +293,10 @@ public class MapUtil {
 		String[] params, String delimiter) {
 
 		LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+
+		if (params == null) {
+			return (LinkedHashMap<String, T>)map;
+		}
 
 		for (String param : params) {
 			String[] kvp = StringUtil.split(param, delimiter);
@@ -338,7 +361,7 @@ public class MapUtil {
 	public static String toString(
 		Map<?, ?> map, String hideIncludesRegex, String hideExcludesRegex) {
 
-		if ((map == null) || map.isEmpty()) {
+		if (isEmpty(map)) {
 			return StringPool.OPEN_CURLY_BRACE + StringPool.CLOSE_CURLY_BRACE;
 		}
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,14 +34,6 @@ if ((classPK > 0) && (structureClassNameId == classNameId)) {
 String title = ddmDisplay.getViewTemplatesTitle(structure, locale);
 %>
 
-<c:if test="<%= showToolbar %>">
-	<liferay-util:include page="/html/portlet/dynamic_data_mapping/template_toolbar.jsp">
-		<liferay-util:param name="redirect" value="<%= currentURL %>" />
-		<liferay-util:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
-		<liferay-util:param name="classPK" value="<%= String.valueOf(classPK) %>" />
-	</liferay-util:include>
-</c:if>
-
 <liferay-portlet:renderURL varImpl="portletURL">
 	<portlet:param name="struts_action" value="/dynamic_data_mapping/select_template" />
 	<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
@@ -57,11 +49,24 @@ String title = ddmDisplay.getViewTemplatesTitle(structure, locale);
 		/>
 	</c:if>
 
-	<div class="separator"><!-- --></div>
-
 	<liferay-ui:search-container
 		searchContainer="<%= new TemplateSearch(renderRequest, portletURL) %>"
 	>
+		<c:if test="<%= showToolbar %>">
+
+			<%
+			request.setAttribute(WebKeys.SEARCH_CONTAINER, searchContainer);
+			%>
+
+			<liferay-util:include page="/html/portlet/dynamic_data_mapping/template_toolbar.jsp">
+				<liferay-util:param name="redirect" value="<%= currentURL %>" />
+				<liferay-util:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
+				<liferay-util:param name="classPK" value="<%= String.valueOf(classPK) %>" />
+			</liferay-util:include>
+		</c:if>
+
+		<div class="separator"><!-- --></div>
+
 		<liferay-ui:search-container-results>
 			<%@ include file="/html/portlet/dynamic_data_mapping/template_search_results.jspf" %>
 		</liferay-ui:search-container-results>

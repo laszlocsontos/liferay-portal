@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,8 +18,12 @@
 
 <%
 JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_ARTICLE);
+
+String ddmTemplateKey = ParamUtil.getString(request, "ddmTemplateKey", article.getTemplateId());
 %>
 
-<%= JournalArticleLocalServiceUtil.getArticleContent(article, article.getTemplateId(), null, themeDisplay.getLanguageId(), themeDisplay) %>
+<div class="journal-article-preview">
+	<%= JournalArticleLocalServiceUtil.getArticleContent(article, ddmTemplateKey, null, themeDisplay.getLanguageId(), new PortletRequestModel(renderRequest, renderResponse), themeDisplay) %>
+</div>
 
 <liferay-util:include page="/html/common/themes/bottom.jsp" />

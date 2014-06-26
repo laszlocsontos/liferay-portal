@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,7 +57,7 @@ if (iteratorURL != null) {
 	</c:when>
 	<c:when test="<%= Validator.isNotNull(searchContainer.getEmptyResultsMessage()) %>">
 		<div class="alert alert-info">
-			<%= searchContainer.getEmptyResultsMessage() %>
+			<%= LanguageUtil.get(request, searchContainer.getEmptyResultsMessage()) %>
 		</div>
 	</c:when>
 </c:choose>

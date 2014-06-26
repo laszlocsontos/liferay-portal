@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -35,10 +34,12 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.BaseAssetRenderer;
+import com.liferay.portlet.asset.model.DDMFieldReader;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.portlet.documentlibrary.util.DocumentConversionUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.Date;
@@ -46,6 +47,7 @@ import java.util.Locale;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -87,6 +89,11 @@ public class DLFileEntryAssetRenderer
 	}
 
 	@Override
+	public DDMFieldReader getDDMFieldReader() {
+		return new DLFileEntryDDMFieldReader(_fileEntry, _fileVersion);
+	}
+
+	@Override
 	public String getDiscussionPath() {
 		if (PropsValues.DL_FILE_ENTRY_COMMENTS_ENABLED) {
 			return "edit_file_entry_discussion";
@@ -104,6 +111,11 @@ public class DLFileEntryAssetRenderer
 	@Override
 	public long getGroupId() {
 		return _fileEntry.getGroupId();
+	}
+
+	@Override
+	public String getIconCssClass() {
+		return _fileEntry.getIconCssClass();
 	}
 
 	@Override
@@ -142,8 +154,15 @@ public class DLFileEntryAssetRenderer
 	}
 
 	@Override
-	public String getSummary(Locale locale) {
+	public String getSummary(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
 		return _fileEntry.getDescription();
+	}
+
+	@Override
+	public String[] getSupportedConversions() {
+		return DocumentConversionUtil.getConversions(_fileEntry.getExtension());
 	}
 
 	@Override
@@ -283,7 +302,7 @@ public class DLFileEntryAssetRenderer
 	}
 
 	public boolean hasDeletePermission(PermissionChecker permissionChecker)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return DLFileEntryPermission.contains(
 			permissionChecker, _fileEntry.getFileEntryId(), ActionKeys.DELETE);
@@ -291,7 +310,7 @@ public class DLFileEntryAssetRenderer
 
 	@Override
 	public boolean hasEditPermission(PermissionChecker permissionChecker)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return DLFileEntryPermission.contains(
 			permissionChecker, _fileEntry.getFileEntryId(), ActionKeys.UPDATE);
@@ -299,7 +318,7 @@ public class DLFileEntryAssetRenderer
 
 	@Override
 	public boolean hasViewPermission(PermissionChecker permissionChecker)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return DLFileEntryPermission.contains(
 			permissionChecker, _fileEntry.getFileEntryId(), ActionKeys.VIEW);

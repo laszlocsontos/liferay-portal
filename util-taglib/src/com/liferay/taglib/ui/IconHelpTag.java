@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,9 +15,10 @@
 package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.servlet.taglib.FileAvailabilityUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.taglib.FileAvailabilityUtil;
 
 import javax.servlet.jsp.JspWriter;
 
@@ -39,8 +40,8 @@ public class IconHelpTag extends IconTag {
 
 	@Override
 	protected int processEndTag() throws Exception {
-		ThemeDisplay themeDisplay = (ThemeDisplay)pageContext.getAttribute(
-			"themeDisplay");
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		JspWriter jspWriter = pageContext.getOut();
 
@@ -61,7 +62,7 @@ public class IconHelpTag extends IconTag {
 		jspWriter.write("id=\"");
 		jspWriter.write(id);
 		jspWriter.write("\" >");
-		jspWriter.write(LanguageUtil.get(pageContext, getMessage()));
+		jspWriter.write(LanguageUtil.get(request, getMessage()));
 		jspWriter.write("</span></span>");
 
 		return EVAL_PAGE;

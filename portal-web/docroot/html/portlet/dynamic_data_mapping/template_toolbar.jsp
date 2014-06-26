@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,8 @@
 <%@ include file="/html/portlet/dynamic_data_mapping/init.jsp" %>
 
 <%
+SearchContainer searchContainer = (SearchContainer)request.getAttribute(WebKeys.SEARCH_CONTAINER);
+
 String toolbarItem = ParamUtil.getString(request, "toolbarItem");
 
 String redirect = ParamUtil.getString(request, "redirect");
@@ -27,7 +29,7 @@ long classPK = ParamUtil.getLong(request, "classPK");
 %>
 
 <aui:nav-bar>
-	<aui:nav>
+	<aui:nav cssClass="navbar-nav" searchContainer="<%= searchContainer %>">
 
 		<%
 		String message = "add";
@@ -36,6 +38,13 @@ long classPK = ParamUtil.getLong(request, "classPK");
 		<c:choose>
 			<c:when test="<%= classNameId == PortalUtil.getClassNameId(DDMStructure.class) %>">
 				<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmDisplay.getResourceName(), ddmDisplay.getAddTemplateActionId()) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_FORM)) %>">
+
+					<%
+					if (Validator.isNull(templateTypeValue)) {
+						message = "add-form-template";
+					}
+					%>
+
 					<portlet:renderURL var="addTemplateURL">
 						<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
 						<portlet:param name="redirect" value="<%= redirect %>" />
@@ -45,16 +54,17 @@ long classPK = ParamUtil.getLong(request, "classPK");
 						<portlet:param name="structureAvailableFields" value='<%= renderResponse.getNamespace() + "getAvailableFields" %>' />
 					</portlet:renderURL>
 
-					<%
-					if (Validator.isNull(templateTypeValue)) {
-						message = "add-form-template";
-					}
-					%>
-
 					<aui:nav-item href="<%= addTemplateURL %>" iconCssClass="icon-plus" label="<%= message %>" selected='<%= toolbarItem.equals("add-form-template") %>' />
 				</c:if>
 
 				<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmDisplay.getResourceName(), ddmDisplay.getAddTemplateActionId()) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY)) %>">
+
+					<%
+					if (Validator.isNull(templateTypeValue)) {
+						message = "add-display-template";
+					}
+					%>
+
 					<portlet:renderURL var="addTemplateURL">
 						<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
 						<portlet:param name="redirect" value="<%= redirect %>" />
@@ -63,12 +73,6 @@ long classPK = ParamUtil.getLong(request, "classPK");
 						<portlet:param name="classPK" value="<%= String.valueOf(classPK) %>" />
 						<portlet:param name="type" value="<%= DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY %>" />
 					</portlet:renderURL>
-
-					<%
-					if (Validator.isNull(templateTypeValue)) {
-						message = "add-display-template";
-					}
-					%>
 
 					<aui:nav-item href="<%= addTemplateURL %>" iconCssClass="icon-plus" label="<%= message %>" selected='<%= toolbarItem.equals("add-display-template") %>' />
 				</c:if>
@@ -137,5 +141,5 @@ long classPK = ParamUtil.getLong(request, "classPK");
 		</c:choose>
 	</aui:nav>
 
-	<aui:nav-bar-search cssClass="pull-right" file="/html/portlet/dynamic_data_mapping/template_search.jsp" />
+	<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/dynamic_data_mapping/template_search.jsp" searchContainer="<%= searchContainer %>" />
 </aui:nav-bar>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.messageboards.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -23,13 +22,16 @@ import com.liferay.portal.security.permission.DoAsUserThread;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
-import com.liferay.portal.test.TransactionalCallbackAwareExecutionTestListener;
-import com.liferay.portal.util.GroupTestUtil;
-import com.liferay.portal.util.UserTestUtil;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
+import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBMessageConstants;
 
 import java.io.InputStream;
@@ -45,13 +47,8 @@ import org.junit.runner.RunWith;
 /**
  * @author Alexander Chow
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		TransactionalCallbackAwareExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class MBMessageServiceTest {
 
 	@Before
@@ -81,11 +78,11 @@ public class MBMessageServiceTest {
 
 		for (int i = 0; i < ServiceTestUtil.THREAD_COUNT; i++) {
 			UserTestUtil.addUser(
-				ServiceTestUtil.randomString(), _group.getGroupId());
+				RandomTestUtil.randomString(), _group.getGroupId());
 		}
 
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			_group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		serviceContext.setGroupPermissions(
 			new String[] {ActionKeys.ADD_MESSAGE, ActionKeys.VIEW});
@@ -135,7 +132,10 @@ public class MBMessageServiceTest {
 	}
 
 	private MBCategory _category;
+
+	@DeleteAfterTestRun
 	private Group _group;
+
 	private long[] _userIds;
 
 	private class AddMessageThread extends DoAsUserThread {
@@ -165,10 +165,12 @@ public class MBMessageServiceTest {
 			serviceContext.setAddGroupPermissions(true);
 			serviceContext.setAddGuestPermissions(true);
 
-			MBMessageServiceUtil.addMessage(
+			MBMessage mbMessage = MBMessageServiceUtil.addMessage(
 				_category.getGroupId(), _category.getCategoryId(), _subject,
 				body, MBMessageConstants.DEFAULT_FORMAT, inputStreamOVPs,
 				anonymous, priority, allowPingbacks, serviceContext);
+
+			MBMessageLocalServiceUtil.deleteMessage(mbMessage);
 		}
 
 		private String _subject;

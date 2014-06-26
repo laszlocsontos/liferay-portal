@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,38 +14,32 @@
 
 package com.liferay.portal.util.mail;
 
-import com.dumbster.smtp.SmtpMessage;
-
 import com.liferay.portal.kernel.mail.MailMessage;
+import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.util.MailServiceTestUtil;
+import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.SynchronousMailExecutionTestListener;
+import com.liferay.portal.util.test.MailServiceTestUtil;
 import com.liferay.util.mail.MailEngine;
 
 import java.util.List;
 
 import javax.mail.internet.InternetAddress;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Manuel de la Peña
  */
+@ExecutionTestListeners(
+	listeners = {
+		MainServletExecutionTestListener.class,
+		SynchronousMailExecutionTestListener.class}
+)
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class MailEngineTest {
-
-	@Before
-	public void setUp() {
-		MailServiceTestUtil.start();
-	}
-
-	@After
-	public void tearDown() {
-		MailServiceTestUtil.stop();
-	}
 
 	@Test
 	public void testSendMail() throws Exception {
@@ -58,18 +52,19 @@ public class MailEngineTest {
 
 		Assert.assertEquals(1, MailServiceTestUtil.getInboxSize());
 
-		List<SmtpMessage> messages = MailServiceTestUtil.getMessages(
-			"Body", "My name is Inigo Montoya.");
+		List<com.dumbster.smtp.MailMessage> mailMessages =
+			MailServiceTestUtil.getMailMessages(
+				"Body", "My name is Inigo Montoya.");
 
-		Assert.assertEquals(1, messages.size());
+		Assert.assertEquals(1, mailMessages.size());
 
-		messages = MailServiceTestUtil.getMessages("Subject", "Hello");
+		mailMessages = MailServiceTestUtil.getMailMessages("Subject", "Hello");
 
-		Assert.assertEquals(1, messages.size());
+		Assert.assertEquals(1, mailMessages.size());
 
-		messages = MailServiceTestUtil.getMessages("To", "to@test.com");
+		mailMessages = MailServiceTestUtil.getMailMessages("To", "to@test.com");
 
-		Assert.assertEquals(1, messages.size());
+		Assert.assertEquals(1, mailMessages.size());
 	}
 
 }

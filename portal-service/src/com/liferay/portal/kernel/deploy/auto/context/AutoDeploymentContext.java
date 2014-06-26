@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.deploy.auto.context;
+
+import com.liferay.portal.kernel.plugin.PluginPackage;
 
 import java.io.File;
 
@@ -41,6 +43,10 @@ public class AutoDeploymentContext {
 		return _file;
 	}
 
+	public PluginPackage getPluginPackage() {
+		return _pluginPackage;
+	}
+
 	public void setAppServerType(String appServerType) {
 		_appServerType = appServerType;
 	}
@@ -57,9 +63,14 @@ public class AutoDeploymentContext {
 		_file = file;
 	}
 
+	public void setPluginPackage(PluginPackage pluginPackage) {
+		_pluginPackage = pluginPackage;
+	}
+
 	private String _appServerType;
 	private String _context;
 	private String _destDir;
 	private File _file;
+	private PluginPackage _pluginPackage;
 
 }

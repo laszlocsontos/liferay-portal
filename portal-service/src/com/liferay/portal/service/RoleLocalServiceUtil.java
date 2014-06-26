@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,11 +46,9 @@ public class RoleLocalServiceUtil {
 	*
 	* @param role the role
 	* @return the role that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role addRole(
-		com.liferay.portal.model.Role role)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Role role) {
 		return getService().addRole(role);
 	}
 
@@ -70,11 +68,9 @@ public class RoleLocalServiceUtil {
 	* @param roleId the primary key of the role
 	* @return the role that was removed
 	* @throws PortalException if a role with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role deleteRole(long roleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteRole(roleId);
 	}
 
@@ -84,12 +80,10 @@ public class RoleLocalServiceUtil {
 	* @param role the role
 	* @return the role that was removed
 	* @throws PortalException
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role deleteRole(
 		com.liferay.portal.model.Role role)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteRole(role);
 	}
 
@@ -102,12 +96,10 @@ public class RoleLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -122,12 +114,11 @@ public class RoleLocalServiceUtil {
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,14 +134,12 @@ public class RoleLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -160,11 +149,9 @@ public class RoleLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -174,17 +161,14 @@ public class RoleLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static com.liferay.portal.model.Role fetchRole(long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static com.liferay.portal.model.Role fetchRole(long roleId) {
 		return getService().fetchRole(roleId);
 	}
 
@@ -194,11 +178,9 @@ public class RoleLocalServiceUtil {
 	* @param uuid the role's UUID
 	* @param companyId the primary key of the company
 	* @return the matching role, or <code>null</code> if a matching role could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role fetchRoleByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long companyId) {
 		return getService().fetchRoleByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -208,18 +190,33 @@ public class RoleLocalServiceUtil {
 	* @param roleId the primary key of the role
 	* @return the role
 	* @throws PortalException if a role with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role getRole(long roleId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRole(roleId);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		return getService().getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
@@ -230,12 +227,10 @@ public class RoleLocalServiceUtil {
 	* @param companyId the primary key of the company
 	* @return the matching role
 	* @throws PortalException if a matching role could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role getRoleByUuidAndCompanyId(
 		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRoleByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -249,11 +244,9 @@ public class RoleLocalServiceUtil {
 	* @param start the lower bound of the range of roles
 	* @param end the upper bound of the range of roles (not inclusive)
 	* @return the range of roles
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getRoles(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return getService().getRoles(start, end);
 	}
 
@@ -261,10 +254,8 @@ public class RoleLocalServiceUtil {
 	* Returns the number of roles.
 	*
 	* @return the number of roles
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getRolesCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getRolesCount() {
 		return getService().getRolesCount();
 	}
 
@@ -273,288 +264,185 @@ public class RoleLocalServiceUtil {
 	*
 	* @param role the role
 	* @return the role that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role updateRole(
-		com.liferay.portal.model.Role role)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Role role) {
 		return getService().updateRole(role);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void addGroupRole(long groupId, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void addGroupRole(long groupId, long roleId) {
 		getService().addGroupRole(groupId, roleId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void addGroupRole(long groupId,
-		com.liferay.portal.model.Role role)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Role role) {
 		getService().addGroupRole(groupId, role);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void addGroupRoles(long groupId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void addGroupRoles(long groupId, long[] roleIds) {
 		getService().addGroupRoles(groupId, roleIds);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void addGroupRoles(long groupId,
-		java.util.List<com.liferay.portal.model.Role> Roles)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.List<com.liferay.portal.model.Role> Roles) {
 		getService().addGroupRoles(groupId, Roles);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void clearGroupRoles(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void clearGroupRoles(long groupId) {
 		getService().clearGroupRoles(groupId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void deleteGroupRole(long groupId, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void deleteGroupRole(long groupId, long roleId) {
 		getService().deleteGroupRole(groupId, roleId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void deleteGroupRole(long groupId,
-		com.liferay.portal.model.Role role)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Role role) {
 		getService().deleteGroupRole(groupId, role);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void deleteGroupRoles(long groupId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void deleteGroupRoles(long groupId, long[] roleIds) {
 		getService().deleteGroupRoles(groupId, roleIds);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void deleteGroupRoles(long groupId,
-		java.util.List<com.liferay.portal.model.Role> Roles)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.List<com.liferay.portal.model.Role> Roles) {
 		getService().deleteGroupRoles(groupId, Roles);
 	}
 
 	/**
-	* @throws SystemException if a system exception occurred
+	* Returns the groupIds of the groups associated with the role.
+	*
+	* @param roleId the roleId of the role
+	* @return long[] the groupIds of groups associated with the role
 	*/
+	public static long[] getGroupPrimaryKeys(long roleId) {
+		return getService().getGroupPrimaryKeys(roleId);
+	}
+
 	public static java.util.List<com.liferay.portal.model.Role> getGroupRoles(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId) {
 		return getService().getGroupRoles(groupId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static java.util.List<com.liferay.portal.model.Role> getGroupRoles(
-		long groupId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, int start, int end) {
 		return getService().getGroupRoles(groupId, start, end);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static java.util.List<com.liferay.portal.model.Role> getGroupRoles(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService().getGroupRoles(groupId, start, end, orderByComparator);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static int getGroupRolesCount(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getGroupRolesCount(long groupId) {
 		return getService().getGroupRolesCount(groupId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static boolean hasGroupRole(long groupId, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static boolean hasGroupRole(long groupId, long roleId) {
 		return getService().hasGroupRole(groupId, roleId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static boolean hasGroupRoles(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static boolean hasGroupRoles(long groupId) {
 		return getService().hasGroupRoles(groupId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void setGroupRoles(long groupId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void setGroupRoles(long groupId, long[] roleIds) {
 		getService().setGroupRoles(groupId, roleIds);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void addUserRole(long userId, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void addUserRole(long userId, long roleId) {
 		getService().addUserRole(userId, roleId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void addUserRole(long userId,
-		com.liferay.portal.model.Role role)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Role role) {
 		getService().addUserRole(userId, role);
 	}
 
 	/**
 	* @throws PortalException
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void addUserRoles(long userId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().addUserRoles(userId, roleIds);
 	}
 
 	/**
 	* @throws PortalException
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void addUserRoles(long userId,
 		java.util.List<com.liferay.portal.model.Role> Roles)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().addUserRoles(userId, Roles);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void clearUserRoles(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void clearUserRoles(long userId) {
 		getService().clearUserRoles(userId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void deleteUserRole(long userId, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void deleteUserRole(long userId, long roleId) {
 		getService().deleteUserRole(userId, roleId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void deleteUserRole(long userId,
-		com.liferay.portal.model.Role role)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.Role role) {
 		getService().deleteUserRole(userId, role);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static void deleteUserRoles(long userId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void deleteUserRoles(long userId, long[] roleIds) {
 		getService().deleteUserRoles(userId, roleIds);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static void deleteUserRoles(long userId,
-		java.util.List<com.liferay.portal.model.Role> Roles)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.List<com.liferay.portal.model.Role> Roles) {
 		getService().deleteUserRoles(userId, Roles);
 	}
 
 	/**
-	* @throws SystemException if a system exception occurred
+	* Returns the userIds of the users associated with the role.
+	*
+	* @param roleId the roleId of the role
+	* @return long[] the userIds of users associated with the role
 	*/
+	public static long[] getUserPrimaryKeys(long roleId) {
+		return getService().getUserPrimaryKeys(roleId);
+	}
+
 	public static java.util.List<com.liferay.portal.model.Role> getUserRoles(
-		long userId) throws com.liferay.portal.kernel.exception.SystemException {
+		long userId) {
 		return getService().getUserRoles(userId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static java.util.List<com.liferay.portal.model.Role> getUserRoles(
-		long userId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long userId, int start, int end) {
 		return getService().getUserRoles(userId, start, end);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
 	public static java.util.List<com.liferay.portal.model.Role> getUserRoles(
 		long userId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService().getUserRoles(userId, start, end, orderByComparator);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static int getUserRolesCount(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getUserRolesCount(long userId) {
 		return getService().getUserRolesCount(userId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static boolean hasUserRole(long userId, long roleId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static boolean hasUserRole(long userId, long roleId) {
 		return getService().hasUserRole(userId, roleId);
 	}
 
-	/**
-	* @throws SystemException if a system exception occurred
-	*/
-	public static boolean hasUserRoles(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static boolean hasUserRoles(long userId) {
 		return getService().hasUserRoles(userId);
 	}
 
 	/**
 	* @throws PortalException
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void setUserRoles(long userId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().setUserRoles(userId, roleIds);
 	}
 
@@ -591,7 +479,6 @@ public class RoleLocalServiceUtil {
 	* @throws PortalException if the class name or the role name were
 	invalid, if the role is a duplicate, or if a user with the
 	primary key could not be found
-	* @throws SystemException if a system exception occurred
 	* @deprecated As of 6.2.0, replaced by {@link #addRole(long, String, long,
 	String, Map, Map, int, String, ServiceContext)}
 	*/
@@ -600,9 +487,7 @@ public class RoleLocalServiceUtil {
 		long companyId, java.lang.String name,
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
-		int type)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		int type) throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addRole(userId, companyId, name, titleMap, descriptionMap,
 			type);
@@ -628,7 +513,6 @@ public class RoleLocalServiceUtil {
 	* @throws PortalException if the class name or the role name were
 	invalid, if the role is a duplicate, or if a user with the
 	primary key could not be found
-	* @throws SystemException if a system exception occurred
 	* @deprecated As of 6.2.0, replaced by {@link #addRole(long, String, long,
 	String, Map, Map, int, String, ServiceContext)}
 	*/
@@ -638,8 +522,7 @@ public class RoleLocalServiceUtil {
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		int type, java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addRole(userId, companyId, name, titleMap, descriptionMap,
 			type, className, classPK);
@@ -668,7 +551,6 @@ public class RoleLocalServiceUtil {
 	* @throws PortalException if the class name or the role name were invalid,
 	if the role is a duplicate, or if a user with the primary key
 	could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role addRole(long userId,
 		java.lang.String className, long classPK, java.lang.String name,
@@ -676,8 +558,7 @@ public class RoleLocalServiceUtil {
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		int type, java.lang.String subtype,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addRole(userId, className, classPK, name, titleMap,
 			descriptionMap, type, subtype, serviceContext);
@@ -689,11 +570,9 @@ public class RoleLocalServiceUtil {
 	*
 	* @throws PortalException if the current user did not have permission to
 	set applicable permissions on a role
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void checkSystemRoles()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().checkSystemRoles();
 	}
 
@@ -704,11 +583,9 @@ public class RoleLocalServiceUtil {
 	* @param companyId the primary key of the company
 	* @throws PortalException if the current user did not have permission to
 	set applicable permissions on a role
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void checkSystemRoles(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().checkSystemRoles(companyId);
 	}
 
@@ -724,11 +601,9 @@ public class RoleLocalServiceUtil {
 	* @param name the role's name
 	* @return Returns the role with the name or <code>null</code> if a role
 	with the name could not be found in the company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role fetchRole(long companyId,
-		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String name) {
 		return getService().fetchRole(companyId, name);
 	}
 
@@ -750,26 +625,22 @@ public class RoleLocalServiceUtil {
 	* @return the default role for the group with the primary key
 	* @throws PortalException if a group with the primary key could not be
 	found, or if a default role could not be found for the group
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role getDefaultGroupRole(
 		long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getDefaultGroupRole(groupId);
 	}
 
 	public static java.util.List<com.liferay.portal.model.Role> getGroupRelatedRoles(
 		long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getGroupRelatedRoles(groupId);
 	}
 
 	public static java.util.List<com.liferay.portal.model.Role> getResourceBlockRoles(
 		long resourceBlockId, java.lang.String className,
-		java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String actionId) {
 		return getService()
 				   .getResourceBlockRoles(resourceBlockId, className, actionId);
 	}
@@ -783,14 +654,12 @@ public class RoleLocalServiceUtil {
 	* @param scope the permission scope
 	* @param primKey the primary key of the resource's class
 	* @return the role names and action IDs
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder#findByC_N_S_P(
 	long, String, int, String)
 	*/
 	public static java.util.Map<java.lang.String, java.util.List<java.lang.String>> getResourceRoles(
 		long companyId, java.lang.String name, int scope,
-		java.lang.String primKey)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String primKey) {
 		return getService().getResourceRoles(companyId, name, scope, primKey);
 	}
 
@@ -804,14 +673,12 @@ public class RoleLocalServiceUtil {
 	* @param primKey the primary key of the resource's class
 	* @param actionId the name of the resource action
 	* @return the roles
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder#findByC_N_S_P_A(
 	long, String, int, String, String)
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getResourceRoles(
 		long companyId, java.lang.String name, int scope,
-		java.lang.String primKey, java.lang.String actionId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String primKey, java.lang.String actionId) {
 		return getService()
 				   .getResourceRoles(companyId, name, scope, primKey, actionId);
 	}
@@ -829,12 +696,10 @@ public class RoleLocalServiceUtil {
 	* @return the role with the name
 	* @throws PortalException if a role with the name could not be found in the
 	company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role getRole(long companyId,
 		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRole(companyId, name);
 	}
 
@@ -844,11 +709,9 @@ public class RoleLocalServiceUtil {
 	* @param type the role's type (optionally <code>0</code>)
 	* @param subtype the role's subtype (optionally <code>null</code>)
 	* @return the roles of the type and subtype
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getRoles(
-		int type, java.lang.String subtype)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int type, java.lang.String subtype) {
 		return getService().getRoles(type, subtype);
 	}
 
@@ -857,11 +720,9 @@ public class RoleLocalServiceUtil {
 	*
 	* @param companyId the primary key of the company
 	* @return the roles in the company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getRoles(
-		long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId) {
 		return getService().getRoles(companyId);
 	}
 
@@ -871,11 +732,9 @@ public class RoleLocalServiceUtil {
 	* @param companyId the primary key of the company
 	* @param types the role types (optionally <code>null</code>)
 	* @return the roles with the types
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getRoles(
-		long companyId, int[] types)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, int[] types) {
 		return getService().getRoles(companyId, types);
 	}
 
@@ -886,12 +745,10 @@ public class RoleLocalServiceUtil {
 	* @return the roles with the primary keys
 	* @throws PortalException if any one of the roles with the primary keys
 	could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getRoles(
 		long[] roleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getRoles(roleIds);
 	}
 
@@ -900,11 +757,9 @@ public class RoleLocalServiceUtil {
 	*
 	* @param subtype the role's subtype (optionally <code>null</code>)
 	* @return the roles of the subtype
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getSubtypeRoles(
-		java.lang.String subtype)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String subtype) {
 		return getService().getSubtypeRoles(subtype);
 	}
 
@@ -913,10 +768,8 @@ public class RoleLocalServiceUtil {
 	*
 	* @param subtype the role's subtype (optionally <code>null</code>)
 	* @return the number of roles of the subtype
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getSubtypeRolesCount(java.lang.String subtype)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getSubtypeRolesCount(java.lang.String subtype) {
 		return getService().getSubtypeRolesCount(subtype);
 	}
 
@@ -928,12 +781,9 @@ public class RoleLocalServiceUtil {
 	* @return the team role in the company
 	* @throws PortalException if a role could not be found in the team and
 	company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role getTeamRole(long companyId,
-		long teamId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		long teamId) throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTeamRole(companyId, teamId);
 	}
 
@@ -945,12 +795,10 @@ public class RoleLocalServiceUtil {
 	* @throws PortalException if a group with the primary key could not be
 	found, if a role could not be found in one of the group's teams,
 	or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.Map<com.liferay.portal.model.Team, com.liferay.portal.model.Role> getTeamRoleMap(
 		long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTeamRoleMap(groupId);
 	}
 
@@ -962,12 +810,10 @@ public class RoleLocalServiceUtil {
 	* @throws PortalException if a group with the primary key could not be
 	found, if a role could not be found in one of the group's teams,
 	or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getTeamRoles(
 		long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTeamRoles(groupId);
 	}
 
@@ -981,12 +827,10 @@ public class RoleLocalServiceUtil {
 	* @throws PortalException if a group with the primary key could not be
 	found, if a role could not be found in one of the group's teams,
 	or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getTeamRoles(
 		long groupId, long[] excludedRoleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getTeamRoles(groupId, excludedRoleIds);
 	}
 
@@ -995,10 +839,9 @@ public class RoleLocalServiceUtil {
 	*
 	* @param type the role's type (optionally <code>0</code>)
 	* @return the range of the roles of the type
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getTypeRoles(
-		int type) throws com.liferay.portal.kernel.exception.SystemException {
+		int type) {
 		return getService().getTypeRoles(type);
 	}
 
@@ -1010,11 +853,9 @@ public class RoleLocalServiceUtil {
 	* @param end the upper bound of the range of roles to return (not
 	inclusive)
 	* @return the range of the roles of the type
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getTypeRoles(
-		int type, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int type, int start, int end) {
 		return getService().getTypeRoles(type, start, end);
 	}
 
@@ -1023,10 +864,8 @@ public class RoleLocalServiceUtil {
 	*
 	* @param type the role's type (optionally <code>0</code>)
 	* @return the number of roles of the type
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getTypeRolesCount(int type)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getTypeRolesCount(int type) {
 		return getService().getTypeRolesCount(type);
 	}
 
@@ -1036,13 +875,11 @@ public class RoleLocalServiceUtil {
 	* @param userId the primary key of the user
 	* @param groupId the primary key of the group
 	* @return the user's roles within the user group
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder#findByUserGroupGroupRole(
 	long, long)
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getUserGroupGroupRoles(
-		long userId, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long userId, long groupId) {
 		return getService().getUserGroupGroupRoles(userId, groupId);
 	}
 
@@ -1052,13 +889,11 @@ public class RoleLocalServiceUtil {
 	* @param userId the primary key of the user
 	* @param groupId the primary key of the group
 	* @return the user's roles within the user group
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder#findByUserGroupRole(
 	long, long)
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getUserGroupRoles(
-		long userId, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long userId, long groupId) {
 		return getService().getUserGroupRoles(userId, groupId);
 	}
 
@@ -1068,13 +903,11 @@ public class RoleLocalServiceUtil {
 	* @param userId the primary key of the user
 	* @param groups the groups (optionally <code>null</code>)
 	* @return the union of all the user's roles within the groups
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
 	List)
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getUserRelatedRoles(
-		long userId, java.util.List<com.liferay.portal.model.Group> groups)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long userId, java.util.List<com.liferay.portal.model.Group> groups) {
 		return getService().getUserRelatedRoles(userId, groups);
 	}
 
@@ -1084,13 +917,11 @@ public class RoleLocalServiceUtil {
 	* @param userId the primary key of the user
 	* @param groupId the primary key of the group
 	* @return the user's roles within the group
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
 	long)
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getUserRelatedRoles(
-		long userId, long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long userId, long groupId) {
 		return getService().getUserRelatedRoles(userId, groupId);
 	}
 
@@ -1100,13 +931,11 @@ public class RoleLocalServiceUtil {
 	* @param userId the primary key of the user
 	* @param groupIds the primary keys of the groups
 	* @return the union of all the user's roles within the groups
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
 	long[])
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> getUserRelatedRoles(
-		long userId, long[] groupIds)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long userId, long[] groupIds) {
 		return getService().getUserRelatedRoles(userId, groupIds);
 	}
 
@@ -1123,12 +952,10 @@ public class RoleLocalServiceUtil {
 	role; <code>false</code> otherwise
 	* @throws PortalException if a default user for the company could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static boolean hasUserRole(long userId, long companyId,
 		java.lang.String name, boolean inherited)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().hasUserRole(userId, companyId, name, inherited);
 	}
 
@@ -1146,12 +973,10 @@ public class RoleLocalServiceUtil {
 	* @throws PortalException if any one of the roles with the names could not
 	be found in the company or if the default user for the company
 	could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static boolean hasUserRoles(long userId, long companyId,
 		java.lang.String[] names, boolean inherited)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().hasUserRoles(userId, companyId, names, inherited);
 	}
 
@@ -1162,11 +987,9 @@ public class RoleLocalServiceUtil {
 	* @param name the role's name (optionally <code>null</code>)
 	* @return the role with the name, or <code>null</code> if a role with the
 	name could not be found in the company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role loadFetchRole(long companyId,
-		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String name) {
 		return getService().loadFetchRole(companyId, name);
 	}
 
@@ -1178,12 +1001,10 @@ public class RoleLocalServiceUtil {
 	* @return the role with the name in the company
 	* @throws PortalException if a role with the name could not be found in the
 	company
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role loadGetRole(long companyId,
 		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().loadGetRole(companyId, name);
 	}
 
@@ -1212,13 +1033,11 @@ public class RoleLocalServiceUtil {
 	<code>null</code>)
 	* @return the ordered range of the matching roles, ordered by
 	<code>obc</code>
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> search(
 		long companyId, java.lang.String keywords, java.lang.Integer[] types,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return getService().search(companyId, keywords, types, start, end, obc);
 	}
 
@@ -1250,14 +1069,12 @@ public class RoleLocalServiceUtil {
 	<code>null</code>)
 	* @return the ordered range of the matching roles, ordered by
 	<code>obc</code>
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> search(
 		long companyId, java.lang.String keywords, java.lang.Integer[] types,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return getService()
 				   .search(companyId, keywords, types, params, start, end, obc);
 	}
@@ -1287,14 +1104,12 @@ public class RoleLocalServiceUtil {
 	<code>null</code>)
 	* @return the ordered range of the matching roles, ordered by
 	<code>obc</code>
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> search(
 		long companyId, java.lang.String name, java.lang.String description,
 		java.lang.Integer[] types, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return getService()
 				   .search(companyId, name, description, types, start, end, obc);
 	}
@@ -1327,15 +1142,13 @@ public class RoleLocalServiceUtil {
 	<code>null</code>)
 	* @return the ordered range of the matching roles, ordered by
 	<code>obc</code>
-	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder
 	*/
 	public static java.util.List<com.liferay.portal.model.Role> search(
 		long companyId, java.lang.String name, java.lang.String description,
 		java.lang.Integer[] types,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return getService()
 				   .search(companyId, name, description, types, params, start,
 			end, obc);
@@ -1349,11 +1162,9 @@ public class RoleLocalServiceUtil {
 	role's name or description (optionally <code>null</code>)
 	* @param types the role types (optionally <code>null</code>)
 	* @return the number of matching roles
-	* @throws SystemException if a system exception occurred
 	*/
 	public static int searchCount(long companyId, java.lang.String keywords,
-		java.lang.Integer[] types)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.Integer[] types) {
 		return getService().searchCount(companyId, keywords, types);
 	}
 
@@ -1367,12 +1178,10 @@ public class RoleLocalServiceUtil {
 	* @param params the finder parameters. For more information, see {@link
 	com.liferay.portal.service.persistence.RoleFinder}
 	* @return the number of matching roles
-	* @throws SystemException if a system exception occurred
 	*/
 	public static int searchCount(long companyId, java.lang.String keywords,
 		java.lang.Integer[] types,
-		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params) {
 		return getService().searchCount(companyId, keywords, types, params);
 	}
 
@@ -1384,11 +1193,9 @@ public class RoleLocalServiceUtil {
 	* @param description the role's description (optionally <code>null</code>)
 	* @param types the role types (optionally <code>null</code>)
 	* @return the number of matching roles
-	* @throws SystemException if a system exception occurred
 	*/
 	public static int searchCount(long companyId, java.lang.String name,
-		java.lang.String description, java.lang.Integer[] types)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String description, java.lang.Integer[] types) {
 		return getService().searchCount(companyId, name, description, types);
 	}
 
@@ -1404,12 +1211,10 @@ public class RoleLocalServiceUtil {
 	"usersRoles" key. For more information, see {@link
 	com.liferay.portal.service.persistence.RoleFinder}
 	* @return the number of matching roles
-	* @throws SystemException if a system exception occurred
 	*/
 	public static int searchCount(long companyId, java.lang.String name,
 		java.lang.String description, java.lang.Integer[] types,
-		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params) {
 		return getService()
 				   .searchCount(companyId, name, description, types, params);
 	}
@@ -1422,11 +1227,9 @@ public class RoleLocalServiceUtil {
 	* @param roleIds the primary keys of the roles
 	* @throws PortalException if a user with the primary key could not be found
 	or if a role with any one of the primary keys could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void unsetUserRoles(long userId, long[] roleIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().unsetUserRoles(userId, roleIds);
 	}
 
@@ -1446,7 +1249,6 @@ public class RoleLocalServiceUtil {
 	* @return the role with the primary key
 	* @throws PortalException if a role with the primary could not be found or
 	if the role's name was invalid
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Role updateRole(long roleId,
 		java.lang.String name,
@@ -1454,8 +1256,7 @@ public class RoleLocalServiceUtil {
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String subtype,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateRole(roleId, name, titleMap, descriptionMap, subtype,
 			serviceContext);

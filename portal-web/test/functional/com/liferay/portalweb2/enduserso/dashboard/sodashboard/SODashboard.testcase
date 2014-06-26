@@ -1,12 +1,9 @@
 <definition component-name="social-office-dashboard">
 	<property name="hook.plugins.includes" value="deploy-listener-hook,portal-compat-hook,so-activities-hook,so-hook" />
 	<property name="portlet.plugins.includes" value="calendar-portlet,chat-portlet,contacts-portlet,events-display-portlet,marketplace-portlet,microblogs-portlet,notifications-portlet,private-messaging-portlet,so-announcements-portlet,so-configurations-portlet,so-portlet,tasks-portlet,wysiwyg-portlet" />
+	<property name="testray.main.component.name" value="Social Office" />
 	<property name="theme.plugins.includes" value="so-theme" />
 	<property name="web.plugins.includes" value="resources-importer-web" />
-
-	<set-up>
-		<execute macro="SOUser#firstLoginPG" />
-	</set-up>
 
 	<var name="adminEmailAddress" value="test@liferay.com" />
 	<var name="adminFirstName" value="Test" />
@@ -14,6 +11,31 @@
 	<var name="adminListName" value="Test, Test" />
 	<var name="adminName" value="Test Test" />
 	<var name="adminScreenName" value="test" />
+	<var name="soPage" value="true" />
+
+	<set-up>
+		<execute macro="SOUser#firstLoginPG" />
+	</set-up>
+
+	<tear-down>
+		<execute macro="SOUserBar#tearDownNotifications" />
+
+		<execute macro="SOMicroblogs#tearDownMicroblogsEntry" />
+
+		<execute macro="SOAnnouncementsEntry#tearDownPG" />
+
+		<execute macro="SOUser#tearDownCP" />
+
+		<execute macro="SOCalendarEvent#tearDownPG" />
+
+		<execute macro="SODashboard#tearDownCP" />
+
+		<execute macro="SOTasks#tearDownTask" />
+
+		<execute macro="SOSite#tearDownCP" />
+
+		<execute macro="Role#tearDownCP" />
+	</tear-down>
 
 	<command name="AddSOAnnouncementsEntry" priority="5">
 		<var name="distributionScope" value="General" />
@@ -23,7 +45,7 @@
 		<var name="entryTitleEdit" value="Announcements Entry Title Edit" />
 		<var name="entryURL" value="http://www.liferay.com" />
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#addPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -33,7 +55,7 @@
 			<var name="entryURL" value="${entryURL}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#viewPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -41,6 +63,173 @@
 			<var name="entryContent" value="${entryContent}" />
 			<var name="entryTitle" value="${entryTitle}" />
 			<var name="entryURL" value="${entryURL}" />
+		</execute>
+	</command>
+
+	<command name="AddSOAnnouncementsEntryScheduled" priority="5">
+		<var name="announcementType" value="General" />
+		<var name="distributionScope" value="General" />
+		<var name="entryContent" value="Announcements Entry Content" />
+		<var name="entryTitle" value="Announcements Entry Title" />
+		<var name="entryURL" value="http://www.liferay.com" />
+
+		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+
+		<execute macro="SOAnnouncementsEntry#addPG">
+			<var name="distributionScope" value="General" />
+			<var name="entryContent" value="${entryContent}" />
+			<var name="entryTitle" value="${entryTitle}" />
+			<var name="entryURL" value="${entryURL}" />
+			<var name="scheduled" value="true" />
+			<var name="viewImmediately" value="false" />
+		</execute>
+
+		<execute action="SODashboard#pause" locator1="120000" />
+
+		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+
+		<execute macro="SOAnnouncementsEntry#viewPG">
+			<var name="distributionScope" value="General" />
+			<var name="entryAuthor" value="${adminName}" />
+			<var name="entryContent" value="${entryContent}" />
+			<var name="entryTitle" value="${entryTitle}" />
+			<var name="entryURL" value="${entryURL}" />
+		</execute>
+	</command>
+
+	<command name="AddSOAnnouncementsEntryScopeToUserRole" priority="5">
+		<var name="entryContent" value="Announcements Entry Content" />
+		<var name="entryTitle" value="Announcements Entry Title" />
+		<var name="entryURL" value="http://www.liferay.com" />
+		<var name="roleName" value="SO Forums Role Name" />
+		<var name="roleType" value="Regular" />
+		<var name="userEmailAddress1" value="socialoffice01@liferay.com" />
+		<var name="userEmailAddress2" value="socialoffice02@liferay.com" />
+		<var name="userFirstName1" value="Social01" />
+		<var name="userFirstName2" value="Social02" />
+		<var name="userLastName1" value="User01" />
+		<var name="userLastName2" value="User02" />
+		<var name="userListName1" value="User01, Social01" />
+		<var name="userListName2" value="User02, Social02" />
+		<var name="userMiddleName1" value="Office01" />
+		<var name="userMiddleName2" value="Office02" />
+		<var name="userName1" value="Social01 Office01 User01" />
+		<var name="userName2" value="Social02 Office02 User02" />
+		<var name="userScreenName1" value="socialoffice01" />
+		<var name="userScreenName2" value="socialoffice02" />
+
+		<execute macro="SOUser#addUserWithSORole">
+			<var name="adminEmailAddress" value="test@liferay.com" />
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="${userEmailAddress1}" />
+			<var name="userFirstName" value="${userFirstName1}" />
+			<var name="userLastName" value="${userLastName1}" />
+			<var name="userMiddleName" value="${userMiddleName1}" />
+			<var name="userScreenName" value="${userScreenName1}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#addCP">
+			<var name="roleName" value="${roleName}" />
+			<var name="roleType" value="${roleType}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Roles" />
+		</execute>
+
+		<execute macro="Role#assignRegRoleCP">
+			<var name="roleName" value="${roleName}" />
+			<var name="userScreenName" value="${userScreenName1}" />
+		</execute>
+
+		<execute macro="SOUser#addUserWithSORole">
+			<var name="adminEmailAddress" value="test@liferay.com" />
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="${userEmailAddress2}" />
+			<var name="userFirstName" value="${userFirstName2}" />
+			<var name="userLastName" value="${userLastName2}" />
+			<var name="userMiddleName" value="${userMiddleName2}" />
+			<var name="userScreenName" value="${userScreenName2}" />
+		</execute>
+
+		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+
+		<execute macro="SOAnnouncementsEntry#addPG">
+			<var name="distributionScope" value="${roleName}" />
+			<var name="entryContent" value="${entryContent}" />
+			<var name="entryTitle" value="${entryTitle}" />
+			<var name="entryURL" value="${entryURL}" />
+			<var name="viewImmediately" value="false" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${userEmailAddress1}" />
+			<var name="userLoginFullName" value="${userName1}" />
+		</execute>
+
+		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+
+		<execute macro="SOAnnouncementsEntry#viewPG">
+			<var name="distributionScope" value="${roleName}" />
+			<var name="entryAuthor" value="${adminName}" />
+			<var name="entryContent" value="${entryContent}" />
+			<var name="entryTitle" value="${entryTitle}" />
+			<var name="entryURL" value="${entryURL}" />
+			<var name="viewManageEntries" value="false" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${userEmailAddress2}" />
+			<var name="userLoginFullName" value="${userName2}" />
+		</execute>
+
+		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+
+		<execute macro="SOAnnouncementsEntry#viewEmptyPG">
+			<var name="distributionScope" value="${roleName}" />
+			<var name="entryAuthor" value="${adminName}" />
+			<var name="entryContent" value="${entryContent}" />
+			<var name="entryTitle" value="${entryTitle}" />
+			<var name="entryURL" value="${entryURL}" />
+			<var name="viewManageEntries" value="false" />
+		</execute>
+	</command>
+
+	<command name="AddWhatsHappeningEntry150Characters" priority="4">
+		<var name="whatsHappeningEntryAuthorName" value="${adminName}" />
+		<var name="whatsHappeningEntryAuthorScreenName" value="${adminScreenName}" />
+		<var name="whatsHappeningEntryCharacterCountdown" value="0" />
+		<var name="whatsHappeningEntryContent" value="|||||||||1|||||||||2|||||||||3|||||||||4|||||||||5|||||||||6|||||||||7|||||||||8|||||||||9||||||||10||||||||11||||||||12||||||||13||||||||14||||||||15" />
+
+		<execute macro="SODashboard#addWhatsHappeningEntry">
+			<var name="whatsHappeningEntryCharacterCountdown" value="${whatsHappeningEntryCharacterCountdown}" />
+			<var name="whatsHappeningEntryContent" value="${whatsHappeningEntryContent}" />
+		</execute>
+
+		<execute macro="SOMicroblogs#viewOwnMicroblogsEntry">
+			<var name="microblogsEntryAuthorName" value="${whatsHappeningEntryAuthorName}" />
+			<var name="microblogsEntryContent" value="${whatsHappeningEntryContent}" />
+		</execute>
+	</command>
+
+	<command name="AddWhatsHappeningEntry151Characters" priority="4">
+		<var name="whatsHappeningEntryAuthorName" value="${adminName}" />
+		<var name="whatsHappeningEntryAuthorScreenName" value="${adminScreenName}" />
+		<var name="whatsHappeningEntryCharacterCountdown" value="-1" />
+		<var name="whatsHappeningEntryContent" value="|||||||||1|||||||||2|||||||||3|||||||||4|||||||||5|||||||||6|||||||||7|||||||||8|||||||||9||||||||10||||||||11||||||||12||||||||13||||||||14||||||||15|" />
+
+		<execute macro="SODashboard#addWhatsHappeningEntryInvalid">
+			<var name="whatsHappeningEntryCharacterCountdown" value="${whatsHappeningEntryCharacterCountdown}" />
+			<var name="whatsHappeningEntryContent" value="${whatsHappeningEntryContent}" />
+		</execute>
+
+		<execute macro="SOMicroblogs#viewMicroblogsEntryNone">
+			<var name="whatsHappeningEntryCharacterCountdown" value="${whatsHappeningEntryCharacterCountdown}" />
+			<var name="whatsHappeningEntryContent" value="${whatsHappeningEntryContent}" />
 		</execute>
 	</command>
 
@@ -107,7 +296,7 @@
 			<var name="userName" value="${userName}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SOActivities#assertClick" locator-key1="NAVIGATION_CONNECTIONS" value1="Connections" />
 
@@ -157,6 +346,10 @@
 			<var name="microblogsEntryAuthorName" value="${whatsHappeningEntryAuthorName}" />
 			<var name="microblogsEntryContent" value="${whatsHappeningEntryContent}" />
 		</execute>
+
+		<execute macro="Page#gotoMyProfile" />
+
+		<execute macro="SOProfile#configureWhatsHappeningDisplayPG" />
 
 		<execute macro="User#logoutAndLoginPG">
 			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
@@ -214,12 +407,12 @@
 		<execute macro="SOMicroblogs#viewMicroblogsEntryNone" />
 
 		<execute macro="SOContactsCenter#followUser">
-			<var name="adminEmailAddress" value="${adminEmailAddress}" />
-			<var name="adminListName" value="${adminListName}" />
-			<var name="adminName" value="${adminName}" />
+			<var name="userEmailAddress" value="${adminEmailAddress}" />
+			<var name="userListName" value="${adminListName}" />
+			<var name="userName" value="${adminName}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SOActivities#assertClick" locator-key1="NAVIGATION_FOLLOWING" value1="Following" />
 
@@ -245,7 +438,7 @@
 		<var name="entryTitleEdit" value="Announcements Entry Title Edit" />
 		<var name="entryURL" value="http://www.liferay.com" />
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#addPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -254,7 +447,7 @@
 			<var name="entryURL" value="${entryURL}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#deletePG" />
 	</command>
@@ -267,7 +460,7 @@
 		<var name="entryTitleEdit" value="Announcements Entry Title Edit" />
 		<var name="entryURL" value="http://www.liferay.com" />
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#addPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -277,7 +470,7 @@
 			<var name="entryURL" value="${entryURL}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#editPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -286,7 +479,7 @@
 			<var name="entryURL" value="${entryURL}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#viewPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -305,7 +498,7 @@
 		<var name="entryTitleEdit" value="Announcements Entry Title Edit" />
 		<var name="entryURL" value="http://www.liferay.com" />
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#addPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -314,7 +507,7 @@
 			<var name="entryURL" value="${entryURL}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#markAsReadPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -333,7 +526,7 @@
 		<var name="entryTitleEdit" value="Announcements Entry Title Edit" />
 		<var name="entryURL" value="http://www.liferay.com" />
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#addPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -342,7 +535,7 @@
 			<var name="entryURL" value="${entryURL}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#markAsReadPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -352,7 +545,7 @@
 			<var name="entryURL" value="${entryURL}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute macro="SOAnnouncementsEntry#markAsUnreadPG">
 			<var name="distributionScope" value="${distributionScope}" />
@@ -363,6 +556,210 @@
 		</execute>
 	</command>
 
+	<command name="ViewDeletedEventEventsDisplay" priority="4">
+		<var name="eventTitle" value="Calendar Event Title" />
+		<var name="eventType" value="Regular" />
+		<var name="pageName" value="Calendar Page" />
+		<var name="portletName" value="Calendar" />
+		<var name="soPage" value="true" />
+
+		<execute macro="SOUserBar#gotoDashboardPG" />
+
+		<execute macro="SOUserBar#addPage">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="SOUserBar#addPortlet">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addPG">
+			<var name="eventTitle" value="${eventTitle}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#deletePG">
+			<var name="eventTitle" value="${eventTitle}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SODashboard#viewTodaysEventDeletedEvent">
+			<var name="eventTitle" value="${eventTitle}" />
+		</execute>
+	</command>
+
+	<command name="ViewDeletedSiteEventEventsDisplay" priority="4">
+		<var name="eventTitle" value="Calendar Event Title" />
+		<var name="eventType" value="Regular" />
+		<var name="pageName" value="Calendar" />
+		<var name="siteDescription" value="Open Site Description" />
+		<var name="siteName" value="Open Site Name" />
+		<var name="siteType" value="Open" />
+		<var name="soPage" value="true" />
+
+		<execute macro="SOUserBar#addSOSite">
+			<var name="siteDescription" value="${siteDescription}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteType" value="${siteType}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addPG">
+			<var name="eventTitle" value="${eventTitle}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#deletePG">
+			<var name="eventTitle" value="${eventTitle}" />
+		</execute>
+
+		<execute macro="SODashboard#viewTodaysEventDeletedEvent">
+			<var name="eventTitle" value="${eventTitle}" />
+		</execute>
+	</command>
+
+	<command name="ViewDeletedUpcomingTaskAssignedToMe" priority="4">
+		<var name="pageName" value="Tasks" />
+		<var name="taskDescription" value="Task Description" />
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#addTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#deleteTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="SODashboard#viewUpcomingTaskNone">
+			<var name="taskDescription" value="${taskDescription}" />
+		</execute>
+	</command>
+
+	<command name="ViewEvent2DaysIntoFutureEventsDisplay" priority="3">
+		<var name="eventTitle1" value="Calendar Event1 Title" />
+		<var name="eventTitle2" value="Calendar Event2 Title" />
+		<var name="eventTitle3" value="Calendar Event3 Title" />
+		<var name="eventType" value="Regular" />
+		<var name="pageName" value="Calendar Page" />
+		<var name="portletName" value="Calendar" />
+		<var name="soPage" value="true" />
+
+		<execute macro="SOUserBar#gotoDashboardPG" />
+
+		<execute macro="SOUserBar#addPage">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="SOUserBar#addPortlet">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOCalendarEvent#addRepeatingEventsPG">
+			<var name="eventTitle" value="${eventTitle1}" />
+			<var name="numberOfRepeats" value="3" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOCalendarEvent#editFutureEventPG">
+			<var name="daysIntoFuture" value="1" />
+			<var name="eventTitle" value="${eventTitle2}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOCalendarEvent#editFutureEventPG">
+			<var name="daysIntoFuture" value="2" />
+			<var name="eventTitle" value="${eventTitle3}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOCalendarEvent#deleteFutureEventPG">
+			<var name="daysIntoFuture" value="0" />
+			<var name="eventTitle" value="${eventTitle1}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#deleteViaAgendaViewPG">
+			<var name="eventTitle" value="${eventTitle2}" />
+		</execute>
+
+		<execute macro="SOUserBar#gotoDashboardPG" />
+
+		<execute action="SODashboard#assertTextEquals" locator-key1="EVENTS_DISPLAY_NO_EVENTS_MESSAGE" value1="There are no more events today." />
+		<execute action="SODashboard#assertElementNotPresent" locator-key1="EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE_GENERIC" />
+		<execute action="SODashboard#assertElementNotPresent" locator-key1="EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE_GENERIC" />
+		<execute action="SODashboard#assertTextNotPresent" value1="${eventTitle3}" />
+
+		<execute macro="SOEvents#configureEventsPortletDisplayDays">
+			<var name="maxDisplayDays" value="2" />
+		</execute>
+
+		<execute macro="SODashboard#viewUpcomingEvent">
+			<var name="eventTitle" value="${eventTitle3}" />
+			<var name="userName" value="${adminName}" />
+		</execute>
+
+		<execute action="SODashboard#assertElementNotPresent" locator-key1="EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE_GENERIC" />
+	</command>
+
 	<command name="ViewEventEventsDisplay" priority="5">
 		<var name="eventTitle" value="Calendar Event Title" />
 		<var name="eventType" value="Regular" />
@@ -370,13 +767,13 @@
 		<var name="portletName" value="Calendar" />
 		<var name="soPage" value="true" />
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
-		<execute macro="SODashboard#addPage">
+		<execute macro="SOUserBar#addPage">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="SODashboard#addPortlet">
+		<execute macro="SOUserBar#addPortlet">
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
@@ -401,8 +798,129 @@
 		<execute action="SOSiteHome#assertElementNotPresent" locator-key1="SITE_NAME" />
 	</command>
 
+	<command name="ViewEventsEventsDisplay" priority="4">
+		<var name="eventTitle1" value="Calendar Event1 Title" />
+		<var name="eventTitle2" value="Calendar Event2 Title" />
+		<var name="eventTitle3" value="Calendar Event3 Title" />
+		<var name="eventType" value="Regular" />
+		<var name="pageName" value="Calendar Page" />
+		<var name="portletName" value="Calendar" />
+		<var name="soPage" value="true" />
+
+		<execute macro="SOUserBar#gotoDashboardPG" />
+
+		<execute macro="SOUserBar#addPage">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="SOUserBar#addPortlet">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addPG">
+			<var name="eventTitle" value="${eventTitle1}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addPG">
+			<var name="eventTitle" value="${eventTitle2}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addPG">
+			<var name="eventTitle" value="${eventTitle3}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SODashboard#viewTodaysEvent">
+			<var name="eventTitle" value="${eventTitle1}" />
+			<var name="userName" value="${adminName}" />
+		</execute>
+
+		<execute action="SOSiteHome#assertElementNotPresent" locator-key1="SITE_NAME" />
+
+		<execute macro="SODashboard#viewTodaysEvent">
+			<var name="eventTitle" value="${eventTitle2}" />
+			<var name="userName" value="${adminName}" />
+		</execute>
+
+		<execute action="SOSiteHome#assertElementNotPresent" locator-key1="SITE_NAME" />
+
+		<execute macro="SODashboard#viewTodaysEvent">
+			<var name="eventTitle" value="${eventTitle3}" />
+			<var name="userName" value="${adminName}" />
+		</execute>
+
+		<execute action="SOSiteHome#assertElementNotPresent" locator-key1="SITE_NAME" />
+	</command>
+
+	<command name="ViewEventStartTimeEndTimeEventsDisplay" priority="5">
+		<var name="endDateTime" value="11:59 PM" />
+		<var name="eventTitle" value="Calendar Event Title" />
+		<var name="eventType" value="Regular" />
+		<var name="pageName" value="Calendar Page" />
+		<var name="portletName" value="Calendar" />
+		<var name="soPage" value="true" />
+		<var name="startDateTime" value="12:00 AM" />
+
+		<execute macro="SOUserBar#gotoDashboardPG" />
+
+		<execute macro="SOUserBar#addPage">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="SOUserBar#addPortlet">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addSetTimePG">
+			<var name="eventTitle" value="${eventTitle}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="pageName" value="${pageName}" />
+			<var name="setEndDateTime" value="${endDateTime}" />
+			<var name="setStartDateTime" value="${startDateTime}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SODashboard#viewTodaysEvent">
+			<var name="endDateTime" value="${endDateTime}" />
+			<var name="eventDescription" value="${eventDescription}" />
+			<var name="eventTitle" value="${eventTitle}" />
+			<var name="startDateTime" value="${startDateTime}" />
+			<var name="userName" value="${adminName}" />
+		</execute>
+
+		<execute action="SOSiteHome#assertElementNotPresent" locator-key1="SITE_NAME" />
+	</command>
+
 	<command name="ViewLinkContactscenter" priority="5">
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SODashboard#click" locator-key1="NAVIGATION_CONTACTS_CENTER" value1="Contacts Center" />
 
@@ -410,7 +928,7 @@
 	</command>
 
 	<command name="ViewLinkHome" priority="5">
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SODashboard#click" locator-key1="NAVIGATION_CONTACTS_CENTER" value1="Contacts Center" />
 		<execute action="SODashboard#click" locator-key1="NAVIGATION_DASHBOARD" value1="Dashboard" />
@@ -419,7 +937,7 @@
 	</command>
 
 	<command name="ViewLinkMicroblogs" priority="5">
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SODashboard#click" locator-key1="NAVIGATION_MICROBLOGS" value1="Microblogs" />
 
@@ -427,7 +945,7 @@
 	</command>
 
 	<command name="ViewLinkMydocuments" priority="5">
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SODashboard#click" locator-key1="NAVIGATION_MY_DOCUMENTS" value1="My Documents" />
 
@@ -435,7 +953,7 @@
 	</command>
 
 	<command name="ViewLinkPrivateMessaging" priority="5">
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SODashboard#click" locator-key1="NAVIGATION_MESSAGES" value1="Messages" />
 
@@ -443,11 +961,45 @@
 	</command>
 
 	<command name="ViewLinkTasks" priority="5">
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SODashboard#click" locator-key1="NAVIGATION_TASKS" value1="Tasks" />
 
 		<execute macro="SODashboard#viewLinkTasks" />
+	</command>
+
+	<command name="ViewResolvedUpcomingTaskAssignedToMe" priority="4">
+		<var name="pageName" value="Tasks" />
+		<var name="taskDescription" value="Task Description" />
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#addTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#resolveTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="SODashboard#viewUpcomingTask">
+			<var name="percentCompletion" value="100" />
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
 	</command>
 
 	<command name="ViewSiteEventEventsDisplay" priority="5">
@@ -480,12 +1032,134 @@
 
 		<execute macro="SODashboard#viewTodaysEventSiteEvent">
 			<var name="eventTitle" value="${eventTitle}" />
+			<var name="schedulerEventDialogBox" value="true" />
 		</execute>
 
 		<execute action="SOSiteHome#assertTextEquals" locator-key1="SITE_NAME" value1="${siteName}" />
 	</command>
 
-	<command name="ViewUpcomingTaskAssignedToConnection" priority="5">
+	<command name="ViewSiteEventsEventsDisplay" priority="4">
+		<var name="eventTitle1" value="Calendar Event1 Title" />
+		<var name="eventTitle2" value="Calendar Event2 Title" />
+		<var name="eventTitle3" value="Calendar Event3 Title" />
+		<var name="eventType" value="Regular" />
+		<var name="pageName" value="Calendar" />
+		<var name="siteDescription" value="Open Site Description" />
+		<var name="siteName" value="Open Site Name" />
+		<var name="siteType" value="Open" />
+		<var name="soPage" value="true" />
+
+		<execute macro="SOUserBar#addSOSite">
+			<var name="siteDescription" value="${siteDescription}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteType" value="${siteType}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addPG">
+			<var name="eventTitle" value="${eventTitle1}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addPG">
+			<var name="eventTitle" value="${eventTitle2}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addPG">
+			<var name="eventTitle" value="${eventTitle3}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="SODashboard#viewTodaysEventSiteEvent">
+			<var name="eventTitle" value="${eventTitle1}" />
+			<var name="schedulerEventDialogBox" value="true" />
+		</execute>
+
+		<execute action="SOSiteHome#assertTextEquals" locator-key1="SITE_NAME" value1="${siteName}" />
+
+		<execute macro="SODashboard#viewTodaysEventSiteEvent">
+			<var name="eventTitle" value="${eventTitle2}" />
+			<var name="schedulerEventDialogBox" value="true" />
+		</execute>
+
+		<execute action="SOSiteHome#assertTextEquals" locator-key1="SITE_NAME" value1="${siteName}" />
+
+		<execute macro="SODashboard#viewTodaysEventSiteEvent">
+			<var name="eventTitle" value="${eventTitle3}" />
+			<var name="schedulerEventDialogBox" value="true" />
+		</execute>
+
+		<execute action="SOSiteHome#assertTextEquals" locator-key1="SITE_NAME" value1="${siteName}" />
+	</command>
+
+	<command name="ViewSiteEventStartTimeEndTimeEventsDisplay" priority="5">
+		<var name="endDateTime" value="11:59 PM" />
+		<var name="eventTitle" value="Calendar Event Title" />
+		<var name="eventType" value="Regular" />
+		<var name="pageName" value="Calendar" />
+		<var name="siteDescription" value="Open Site Description" />
+		<var name="siteName" value="Open Site Name" />
+		<var name="siteType" value="Open" />
+		<var name="soPage" value="true" />
+		<var name="startDateTime" value="12:00 AM" />
+
+		<execute macro="SOUserBar#addSOSite">
+			<var name="siteDescription" value="${siteDescription}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteType" value="${siteType}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="CalendarEvent#addSetTimePG">
+			<var name="eventTitle" value="${eventTitle}" />
+			<var name="eventType" value="${eventType}" />
+			<var name="setEndDateTime" value="${endDateTime}" />
+			<var name="setStartDateTime" value="${startDateTime}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="true" />
+		</execute>
+
+		<execute macro="SODashboard#viewTodaysEventSiteEvent">
+			<var name="endDateTime" value="${endDateTime}" />
+			<var name="eventTitle" value="${eventTitle}" />
+			<var name="schedulerEventDialogBox" value="true" />
+			<var name="startDateTime" value="${startDateTime}" />
+		</execute>
+
+		<execute action="SOSiteHome#assertTextEquals" locator-key1="SITE_NAME" value1="${siteName}" />
+	</command>
+
+	<command known-issues="SOS-2326" name="ViewUpcomingTaskAssignedToConnection" priority="5">
+		<var name="pageName" value="Tasks" />
 		<var name="taskDescription" value="Task Description" />
 		<var name="userEmailAddress" value="socialoffice01@liferay.com" />
 		<var name="userFirstName" value="Social01" />
@@ -512,9 +1186,10 @@
 			<var name="userLoginFullName" value="${adminName}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
-
-		<execute action="SODashboard#click" locator-key1="NAVIGATION_TASKS" value1="Tasks" />
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
 
 		<execute macro="SOTasks#addTask">
 			<var name="taskAssignee" value="${userName}" />
@@ -540,12 +1215,14 @@
 		</execute>
 	</command>
 
-	<command name="ViewUpcomingTaskAssignedToMe" priority="5">
+	<command known-issues="SOS-2326" name="ViewUpcomingTaskAssignedToMe" priority="5">
+		<var name="pageName" value="Tasks" />
 		<var name="taskDescription" value="Task Description" />
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
-
-		<execute action="SODashboard#click" locator-key1="NAVIGATION_TASKS" value1="Tasks" />
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
 
 		<execute macro="SOTasks#addTask">
 			<var name="taskAssignee" value="${adminName}" />
@@ -556,6 +1233,153 @@
 		<execute macro="SODashboard#viewUpcomingTask">
 			<var name="taskAssignee" value="${adminName}" />
 			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+	</command>
+
+	<command known-issues="SOS-2326" name="ViewUpcomingTaskReassignedToConnection" priority="5">
+		<var name="pageName" value="Tasks" />
+		<var name="taskDescription" value="Task Description" />
+		<var name="userEmailAddress" value="socialoffice01@liferay.com" />
+		<var name="userFirstName" value="Social01" />
+		<var name="userLastName" value="User01" />
+		<var name="userListName" value="User01, Social01" />
+		<var name="userMiddleName" value="Office01" />
+		<var name="userName" value="Social01 Office01 User01" />
+		<var name="userScreenName" value="socialoffice01" />
+
+		<execute macro="SOContactsCenter#addConnection">
+			<var name="adminEmailAddress" value="${adminEmailAddress}" />
+			<var name="senderName" value="${adminName}" />
+			<var name="userEmailAddress" value="${userEmailAddress}" />
+			<var name="userFirstName" value="${userFirstName}" />
+			<var name="userLastName" value="${userLastName}" />
+			<var name="userListName" value="${userListName}" />
+			<var name="userMiddleName" value="${userMiddleName}" />
+			<var name="userName" value="${userName}" />
+			<var name="userScreenName" value="${userScreenName}" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${adminEmailAddress}" />
+			<var name="userLoginFullName" value="${adminName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+			<var name="soPage" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#addTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+			<var name="soPage" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#completeTask">
+			<var name="percentCompletion" value="60" />
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+			<var name="soPage" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#editTask">
+			<var name="taskAssigneeEdit" value="${userName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+			<var name="soPage" value="true" />
+		</execute>
+
+		<execute macro="SODashboard#viewUpcomingTask">
+			<var name="percentCompletion" value="60" />
+			<var name="taskAssignee" value="${userName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${userEmailAddress}" />
+			<var name="userLoginFullName" value="${userName}" />
+		</execute>
+
+		<execute macro="SODashboard#viewUpcomingTask">
+			<var name="percentCompletion" value="60" />
+			<var name="taskAssignee" value="${userName}" />
+			<var name="taskDescription" value="${taskDescription}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+	</command>
+
+	<command known-issues="SOS-2326" name="ViewUpcomingTasksAssignedToMe" priority="4">
+		<var name="pageName" value="Tasks" />
+		<var name="taskDescription1" value="Task1 Description" />
+		<var name="taskDescription2" value="Task2 Description" />
+		<var name="taskDescription3" value="Task3 Description" />
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#addTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription1}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#addTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription2}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="soDashboard" value="true" />
+		</execute>
+
+		<execute macro="SOTasks#addTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription3}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="SODashboard#viewUpcomingTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription1}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="SODashboard#viewUpcomingTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription2}" />
+			<var name="taskReporter" value="${adminName}" />
+		</execute>
+
+		<execute macro="SODashboard#viewUpcomingTask">
+			<var name="taskAssignee" value="${adminName}" />
+			<var name="taskDescription" value="${taskDescription3}" />
 			<var name="taskReporter" value="${adminName}" />
 		</execute>
 	</command>
@@ -591,7 +1415,11 @@
 			<var name="userLoginFullName" value="${adminName}" />
 		</execute>
 
-		<execute macro="SOMicroblogs#gotoMicroblogsContentField" />
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Microblogs" />
+			<var name="soDashboard" value="true" />
+			<var name="soPage" value="true" />
+		</execute>
 
 		<execute macro="SOMicroblogs#addMicroblogsEntryMention">
 			<var name="mentionUserEmailAddress" value="${userEmailAddress}" />
@@ -601,11 +1429,14 @@
 			<var name="mentionUserMiddleName" value="${userMiddleName}" />
 			<var name="mentionUserName" value="${userName}" />
 			<var name="mentionUserScreenName" value="${userScreenName}" />
+			<var name="microblogsEntryContent" value="${microblogsEntryContent}" />
 		</execute>
 
 		<execute macro="SOMicroblogs#viewOwnMicroblogsEntryMention">
+			<var name="mentionUserEmailAddress" value="${userEmailAddress}" />
 			<var name="mentionUserName" value="${userName}" />
 			<var name="microblogsEntryAuthorName" value="${microblogsEntryAuthorName}" />
+			<var name="microblogsEntryContent" value="${microblogsEntryContent}" />
 		</execute>
 
 		<execute macro="User#logoutAndLoginPG">
@@ -613,23 +1444,29 @@
 			<var name="userLoginFullName" value="${userName}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
 
 		<execute action="SODashboard#click" locator-key1="NAVIGATION_MICROBLOGS" />
 
 		<execute macro="SOMicroblogs#addMicroblogsEntryComment">
 			<var name="microblogsEntryAuthorName" value="${microblogsEntryAuthorName}" />
 			<var name="microblogsEntryCommentContent" value="${microblogsEntryCommentContent}" />
-			<var name="microblogsEntryContent" value="${userName}" />
+			<var name="microblogsEntryContent" value="${microblogsEntryContent} ${userName}" />
 		</execute>
 
-		<execute macro="SOMicroblogs#gotoMicroblogsContentField" />
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Microblogs" />
+			<var name="soDashboard" value="true" />
+			<var name="soPage" value="true" />
+		</execute>
 
 		<execute macro="SOMicroblogs#addMicroblogsEntry">
 			<var name="microblogsEntryContent" value="${microblogsEntryContent}" />
 		</execute>
 
-		<execute action="SOUserBar#click" locator-key1="DASHBOARD" />
+		<execute macro="SOUserBar#gotoDashboardPG" />
+
+		<execute macro="SODashboard#configureWhatsHappeningDisplayPG" />
 
 		<execute action="SODashboard#assertTextEquals" locator-key1="WHATS_HAPPENING_ENTRY_CONTENT" value1="${microblogsEntryContent}" />
 		<execute action="SODashboard#assertTextNotPresent" value1="Microblogs Post Comment" />
@@ -646,26 +1483,8 @@
 		<execute macro="SOMicroblogs#viewMicroblogsEntryCommentLink" />
 
 		<execute action="SOMicroblogs#assertTextEquals" locator1="xpath=(//div[@class='user-name']/span/a)[2]" value1="${adminName}" />
-		<execute action="SOMicroblogs#assertTextEquals" locator1="xpath=(//div[@class='content'])[2]" value1="${userName}" />
+		<execute action="SOMicroblogs#assertTextEquals" locator1="xpath=(//div[@class='content'])[2]" value1="${microblogsEntryContent} ${userName}" />
 		<execute action="SOMicroblogs#assertTextEquals" locator1="xpath=(//span[@class='action comment']/a)[2]" value1="1 Comment" />
-		<execute action="SOMicroblogs#assertTextEquals" locator-key1="MICROBLOGS_ENTRY_REPOST_LINK" value1="Repost" />
+		<execute action="SOMicroblogs#assertTextEquals" locator1="//span[@class='action repost']/a" value1="Repost" />
 	</command>
-
-	<tear-down>
-		<execute macro="SOUserBar#tearDownNotifications" />
-
-		<execute macro="SOMicroblogs#tearDownMicroblogsEntry" />
-
-		<execute macro="SOAnnouncementsEntry#tearDownPG" />
-
-		<execute macro="SOUser#tearDownCP" />
-
-		<execute macro="SOCalendarEvent#tearDownPG" />
-
-		<execute macro="SODashboard#tearDownPG" />
-
-		<execute macro="SOTasks#tearDownTask" />
-
-		<execute macro="SOSite#tearDownCP" />
-	</tear-down>
 </definition>

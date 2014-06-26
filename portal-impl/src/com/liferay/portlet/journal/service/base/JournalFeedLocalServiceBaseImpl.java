@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,19 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -77,12 +85,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 *
 	 * @param journalFeed the journal feed
 	 * @return the journal feed that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public JournalFeed addJournalFeed(JournalFeed journalFeed)
-		throws SystemException {
+	public JournalFeed addJournalFeed(JournalFeed journalFeed) {
 		journalFeed.setNew(true);
 
 		return journalFeedPersistence.update(journalFeed);
@@ -105,12 +111,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param id the primary key of the journal feed
 	 * @return the journal feed that was removed
 	 * @throws PortalException if a journal feed with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public JournalFeed deleteJournalFeed(long id)
-		throws PortalException, SystemException {
+	public JournalFeed deleteJournalFeed(long id) throws PortalException {
 		return journalFeedPersistence.remove(id);
 	}
 
@@ -119,12 +123,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 *
 	 * @param journalFeed the journal feed
 	 * @return the journal feed that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public JournalFeed deleteJournalFeed(JournalFeed journalFeed)
-		throws SystemException {
+	public JournalFeed deleteJournalFeed(JournalFeed journalFeed) {
 		return journalFeedPersistence.remove(journalFeed);
 	}
 
@@ -141,12 +143,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return journalFeedPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -161,12 +161,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return journalFeedPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end);
 	}
@@ -183,12 +181,11 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return journalFeedPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -198,11 +195,9 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return journalFeedPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -212,17 +207,16 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return journalFeedPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public JournalFeed fetchJournalFeed(long id) throws SystemException {
+	public JournalFeed fetchJournalFeed(long id) {
 		return journalFeedPersistence.fetchByPrimaryKey(id);
 	}
 
@@ -232,11 +226,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param uuid the journal feed's UUID
 	 * @param  companyId the primary key of the company
 	 * @return the matching journal feed, or <code>null</code> if a matching journal feed could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public JournalFeed fetchJournalFeedByUuidAndCompanyId(String uuid,
-		long companyId) throws SystemException {
+		long companyId) {
 		return journalFeedPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -246,11 +239,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param uuid the journal feed's UUID
 	 * @param groupId the primary key of the group
 	 * @return the matching journal feed, or <code>null</code> if a matching journal feed could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public JournalFeed fetchJournalFeedByUuidAndGroupId(String uuid,
-		long groupId) throws SystemException {
+		long groupId) {
 		return journalFeedPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -260,17 +252,101 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param id the primary key of the journal feed
 	 * @return the journal feed
 	 * @throws PortalException if a journal feed with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public JournalFeed getJournalFeed(long id)
-		throws PortalException, SystemException {
+	public JournalFeed getJournalFeed(long id) throws PortalException {
 		return journalFeedPersistence.findByPrimaryKey(id);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.journal.service.JournalFeedLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(JournalFeed.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("id");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.journal.service.JournalFeedLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(JournalFeed.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("id");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType.toString(),
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType.toString(),
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+					JournalFeed stagedModel = (JournalFeed)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						stagedModel);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(JournalFeed.class.getName())));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return journalFeedLocalService.deleteJournalFeed((JournalFeed)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return journalFeedPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -281,11 +357,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param  companyId the primary key of the company
 	 * @return the matching journal feed
 	 * @throws PortalException if a matching journal feed could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public JournalFeed getJournalFeedByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException, SystemException {
+		long companyId) throws PortalException {
 		return journalFeedPersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -296,11 +371,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param groupId the primary key of the group
 	 * @return the matching journal feed
 	 * @throws PortalException if a matching journal feed could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public JournalFeed getJournalFeedByUuidAndGroupId(String uuid, long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return journalFeedPersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -314,11 +388,9 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * @param start the lower bound of the range of journal feeds
 	 * @param end the upper bound of the range of journal feeds (not inclusive)
 	 * @return the range of journal feeds
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<JournalFeed> getJournalFeeds(int start, int end)
-		throws SystemException {
+	public List<JournalFeed> getJournalFeeds(int start, int end) {
 		return journalFeedPersistence.findAll(start, end);
 	}
 
@@ -326,10 +398,9 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 * Returns the number of journal feeds.
 	 *
 	 * @return the number of journal feeds
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getJournalFeedsCount() throws SystemException {
+	public int getJournalFeedsCount() {
 		return journalFeedPersistence.countAll();
 	}
 
@@ -338,12 +409,10 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 *
 	 * @param journalFeed the journal feed
 	 * @return the journal feed that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public JournalFeed updateJournalFeed(JournalFeed journalFeed)
-		throws SystemException {
+	public JournalFeed updateJournalFeed(JournalFeed journalFeed) {
 		return journalFeedPersistence.update(journalFeed);
 	}
 
@@ -804,7 +873,7 @@ public abstract class JournalFeedLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = journalFeedPersistence.getDataSource();
 

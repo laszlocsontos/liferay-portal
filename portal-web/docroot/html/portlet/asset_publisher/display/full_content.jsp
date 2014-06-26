@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,11 @@
 <%@ include file="/html/portlet/asset_publisher/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
+String redirect = null;
+
+if (AssetUtil.isDefaultAssetPublisher(layout, portletDisplay.getId(), portletResource)) {
+	redirect = ParamUtil.getString(PortalUtil.getOriginalServletRequest(request), "redirect");
+}
 
 List results = (List)request.getAttribute("view.jsp-results");
 
@@ -240,6 +244,8 @@ request.setAttribute("view.jsp-showIconLabel", true);
 		<div class="asset-metadata">
 
 			<%
+			boolean filterByMetadata = true;
+
 			String[] metadataFields = assetPublisherDisplayContext.getMetadataFields();
 			%>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,11 +52,9 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	*
 	* @param assetTagStats the asset tag stats
 	* @return the asset tag stats that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.asset.model.AssetTagStats addAssetTagStats(
-		com.liferay.portlet.asset.model.AssetTagStats assetTagStats)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portlet.asset.model.AssetTagStats assetTagStats);
 
 	/**
 	* Creates a new asset tag stats with the primary key. Does not add the asset tag stats to the database.
@@ -73,23 +71,19 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param tagStatsId the primary key of the asset tag stats
 	* @return the asset tag stats that was removed
 	* @throws PortalException if a asset tag stats with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.asset.model.AssetTagStats deleteAssetTagStats(
 		long tagStatsId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes the asset tag stats from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetTagStats the asset tag stats
 	* @return the asset tag stats that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.asset.model.AssetTagStats deleteAssetTagStats(
-		com.liferay.portlet.asset.model.AssetTagStats assetTagStats)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portlet.asset.model.AssetTagStats assetTagStats);
 
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
 
@@ -98,12 +92,10 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
 
 	/**
 	* Performs a dynamic query on the database and returns a range of the matching rows.
@@ -116,12 +108,11 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException;
+		int end);
 
 	/**
 	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
@@ -135,25 +126,21 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator);
 
 	/**
 	* Returns the number of rows that match the dynamic query.
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
 
 	/**
 	* Returns the number of rows that match the dynamic query.
@@ -161,17 +148,14 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetTagStats fetchAssetTagStats(
-		long tagStatsId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long tagStatsId);
 
 	/**
 	* Returns the asset tag stats with the primary key.
@@ -179,20 +163,28 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param tagStatsId the primary key of the asset tag stats
 	* @return the asset tag stats
 	* @throws PortalException if a asset tag stats with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetTagStats getAssetTagStats(
 		long tagStatsId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Returns a range of all the asset tag statses.
@@ -204,33 +196,27 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param start the lower bound of the range of asset tag statses
 	* @param end the upper bound of the range of asset tag statses (not inclusive)
 	* @return the range of asset tag statses
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetTagStats> getAssetTagStatses(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		int start, int end);
 
 	/**
 	* Returns the number of asset tag statses.
 	*
 	* @return the number of asset tag statses
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getAssetTagStatsesCount()
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public int getAssetTagStatsesCount();
 
 	/**
 	* Updates the asset tag stats in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param assetTagStats the asset tag stats
 	* @return the asset tag stats that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.asset.model.AssetTagStats updateAssetTagStats(
-		com.liferay.portlet.asset.model.AssetTagStats assetTagStats)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portlet.asset.model.AssetTagStats assetTagStats);
 
 	/**
 	* Returns the Spring bean ID for this bean.
@@ -252,21 +238,17 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param tagId the primary key of the tag
 	* @param classNameId the asset entry's class name ID
 	* @return the asset tag statistics instance
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.asset.model.AssetTagStats addTagStats(
-		long tagId, long classNameId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long tagId, long classNameId);
 
 	/**
 	* Deletes the asset tag statistics instance.
 	*
 	* @param tagStats the asset tag statistics instance
-	* @throws SystemException if a system exception occurred
 	*/
 	public void deleteTagStats(
-		com.liferay.portlet.asset.model.AssetTagStats tagStats)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portlet.asset.model.AssetTagStats tagStats);
 
 	/**
 	* Deletes the asset tag statistics instance matching the tag statistics ID.
@@ -274,30 +256,24 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param tagStatsId the primary key of the asset tag statistics instance
 	* @throws PortalException if the assetTagStats with the primary key could
 	not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public void deleteTagStats(long tagStatsId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	/**
 	* Deletes all asset tag statistics instances associated with the asset
 	* entry matching the class name ID.
 	*
 	* @param classNameId the asset entry's class name ID
-	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteTagStatsByClassNameId(long classNameId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public void deleteTagStatsByClassNameId(long classNameId);
 
 	/**
 	* Deletes all asset tag statistics instances associated with the tag.
 	*
 	* @param tagId the primary key of the tag
-	* @throws SystemException if a system exception occurred
 	*/
-	public void deleteTagStatsByTagId(long tagId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public void deleteTagStatsByTagId(long tagId);
 
 	/**
 	* Returns a range of all the asset tag statistics instances associated with
@@ -318,12 +294,10 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of results (not inclusive)
 	* @return the range of asset tag statistics associated with the asset entry
 	matching the class name ID
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.asset.model.AssetTagStats> getTagStats(
-		long classNameId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long classNameId, int start, int end);
 
 	/**
 	* Returns the asset tag statistics instance with the tag and asset entry
@@ -333,12 +307,10 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @param classNameId the asset entry's class name ID
 	* @return Returns the asset tag statistics instance with the tag and asset
 	entry  matching the class name ID
-	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portlet.asset.model.AssetTagStats getTagStats(
-		long tagId, long classNameId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		long tagId, long classNameId);
 
 	/**
 	* Updates the asset tag statistics instance.
@@ -348,10 +320,8 @@ public interface AssetTagStatsLocalService extends BaseLocalService,
 	* @return the updated asset tag statistics instance
 	* @throws PortalException if an asset tag with the tag ID could not be
 	found
-	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.asset.model.AssetTagStats updateTagStats(
 		long tagId, long classNameId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 }

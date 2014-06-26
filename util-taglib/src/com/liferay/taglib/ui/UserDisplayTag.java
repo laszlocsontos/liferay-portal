@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,11 @@
 
 package com.liferay.taglib.ui;
 
-import com.liferay.portal.kernel.servlet.PortalIncludeUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.taglib.util.PortalIncludeUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -73,10 +74,24 @@ public class UserDisplayTag extends TagSupport {
 				pageContext.removeAttribute("userDisplay");
 			}
 
-			request.setAttribute("liferay-ui:user-display:url", _url);
 			request.setAttribute(
 				"liferay-ui:user-display:displayStyle",
 				String.valueOf(_displayStyle));
+
+			if (Validator.isNull(_imageCssClass)) {
+				_imageCssClass = "img-circle";
+			}
+
+			request.setAttribute(
+				"liferay-ui:user-display:imageCssClass", _imageCssClass);
+
+			request.setAttribute(
+				"liferay-ui:user-display:showUserDetails",
+				String.valueOf(_showUserDetails));
+			request.setAttribute(
+				"liferay-ui:user-display:showUserName",
+				String.valueOf(_showUserName));
+			request.setAttribute("liferay-ui:user-display:url", _url);
 
 			PortalIncludeUtil.include(pageContext, getStartPage());
 
@@ -92,12 +107,24 @@ public class UserDisplayTag extends TagSupport {
 		}
 	}
 
-	public void setDisplayStyle(int displayStyle) {
-		_displayStyle = displayStyle;
+	public void setDisplayStyle(Object displayStyle) {
+		_displayStyle = GetterUtil.getInteger(displayStyle);
 	}
 
 	public void setEndPage(String endPage) {
 		_endPage = endPage;
+	}
+
+	public void setImageCssClass(String imageCssClass) {
+		_imageCssClass = imageCssClass;
+	}
+
+	public void setShowUserDetails(boolean showUserDetails) {
+		_showUserDetails = showUserDetails;
+	}
+
+	public void setShowUserName(boolean showUserName) {
+		_showUserName = showUserName;
 	}
 
 	public void setStartPage(String startPage) {
@@ -142,6 +169,9 @@ public class UserDisplayTag extends TagSupport {
 
 	private int _displayStyle = 1;
 	private String _endPage;
+	private String _imageCssClass;
+	private boolean _showUserDetails = true;
+	private boolean _showUserName = true;
 	private String _startPage;
 	private String _url;
 	private long _userId;

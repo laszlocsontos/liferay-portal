@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,8 @@ public class UserNotificationDeliveryConstants {
 	public static final int TYPE_IM = 10003;
 
 	public static final int TYPE_PRIVATE_MESSAGE = 10004;
+
+	public static final int TYPE_PUSH = 10005;
 
 	public static final int TYPE_SMS = 10001;
 

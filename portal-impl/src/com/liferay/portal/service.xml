@@ -30,7 +30,7 @@
 		<column name="type" type="String" />
 		<column name="size" type="String" />
 	</entity>
-	<entity name="Address" uuid="true" local-service="true" remote-service="true" persistence-class="com.liferay.portal.service.persistence.AddressPersistenceImpl2">
+	<entity name="Address" uuid="true" local-service="true" remote-service="true" persistence-class="com.liferay.portal.service.persistence.impl.AddressPersistenceImpl2">
 
 		<!-- PK fields -->
 
@@ -453,7 +453,7 @@
 		<reference package-path="com.liferay.portal" entity="ListType" />
 		<reference package-path="com.liferay.portal" entity="User" />
 	</entity>
-	<entity name="ExportImportConfiguration" local-service="true" remote-service="false">
+	<entity name="ExportImportConfiguration" local-service="true" remote-service="true" trash-enabled="true">
 
 		<!-- PK fields -->
 
@@ -477,6 +477,10 @@
 		<column name="description" type="String" />
 		<column name="type" type="int" />
 		<column name="settings" type="String" />
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="statusDate" type="Date" />
 
 		<!-- Order -->
 
@@ -496,10 +500,20 @@
 			<finder-column name="groupId" />
 			<finder-column name="type" />
 		</finder>
+		<finder name="G_S" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="status" />
+		</finder>
+		<finder name="G_T_S" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="type" />
+			<finder-column name="status" />
+		</finder>
 
 		<!-- References -->
 
 		<reference package-path="com.liferay.portal" entity="User" />
+		<reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
 	<entity name="Group" uuid="true" local-service="true" remote-service="true">
 
@@ -623,7 +637,6 @@
 		<reference package-path="com.liferay.portal" entity="Organization" />
 		<reference package-path="com.liferay.portal" entity="Portlet" />
 		<reference package-path="com.liferay.portal" entity="PortletPreferences" />
-		<reference package-path="com.liferay.portal" entity="Repository" />
 		<reference package-path="com.liferay.portal" entity="Resource" />
 		<reference package-path="com.liferay.portal" entity="ResourceAction" />
 		<reference package-path="com.liferay.portal" entity="ResourceBlock" />
@@ -642,6 +655,7 @@
 		<reference package-path="com.liferay.portlet.asset" entity="AssetEntry" />
 		<reference package-path="com.liferay.portlet.asset" entity="AssetTag" />
 		<reference package-path="com.liferay.portlet.asset" entity="AssetVocabulary" />
+		<reference package-path="com.liferay.portlet.documentlibrary" entity="DLApp" />
 		<reference package-path="com.liferay.portlet.expando" entity="ExpandoRow" />
 		<reference package-path="com.liferay.portlet.shopping" entity="ShoppingCart" />
 		<reference package-path="com.liferay.portlet.shopping" entity="ShoppingCategory" />
@@ -800,6 +814,9 @@
 		<reference package-path="com.liferay.portal" entity="ResourcePermission" />
 		<reference package-path="com.liferay.portal" entity="Subscription" />
 		<reference package-path="com.liferay.portal" entity="User" />
+		<reference package-path="com.liferay.portlet.asset" entity="AssetCategory" />
+		<reference package-path="com.liferay.portlet.asset" entity="AssetEntry" />
+		<reference package-path="com.liferay.portlet.asset" entity="AssetTag" />
 		<reference package-path="com.liferay.portlet.expando" entity="ExpandoRow" />
 		<reference package-path="com.liferay.portlet.journal" entity="JournalArticle" />
 		<reference package-path="com.liferay.portlet.journal" entity="JournalContentSearch" />
@@ -936,7 +953,7 @@
 		<!-- Other fields -->
 
 		<column name="name" type="String" localized="true" />
-		<column name="description" type="String" />
+		<column name="description" type="String" localized="true" />
 		<column name="settings" type="String" />
 		<column name="active" type="boolean" />
 
@@ -1060,6 +1077,7 @@
 		<!-- References -->
 
 		<reference package-path="com.liferay.portal" entity="Image" />
+		<reference package-path="com.liferay.portal" entity="Layout" />
 		<reference package-path="com.liferay.portal" entity="LayoutBranch" />
 		<reference package-path="com.liferay.portal" entity="LayoutSet" />
 		<reference package-path="com.liferay.portal" entity="LayoutSetBranch" />
@@ -1206,7 +1224,7 @@
 		<!-- Other fields -->
 
 		<column name="name" type="String" localized="true" />
-		<column name="description" type="String" />
+		<column name="description" type="String" localized="true" />
 		<column name="settings" type="String" />
 		<column name="active" type="boolean" />
 
@@ -1429,6 +1447,7 @@
 		<reference package-path="com.liferay.portal" entity="PasswordPolicy" />
 		<reference package-path="com.liferay.portal" entity="PasswordPolicyRel" />
 		<reference package-path="com.liferay.portal" entity="Phone" />
+		<reference package-path="com.liferay.portal" entity="Region" />
 		<reference package-path="com.liferay.portal" entity="Resource" />
 		<reference package-path="com.liferay.portal" entity="Role" />
 		<reference package-path="com.liferay.portal" entity="User" />
@@ -2274,7 +2293,7 @@
 		<column name="classNameId" type="long" />
 		<column name="classPK" type="long" />
 		<column name="name" type="String" accessor="true" />
-		<column name="title" type="String" localized="true" />
+		<column name="title" type="String" accessor="true" localized="true" />
 		<column name="description" type="String" localized="true" />
 		<column name="type" type="int" />
 		<column name="subtype" type="String" />
@@ -2403,6 +2422,7 @@
 
 		<reference package-path="com.liferay.portal" entity="Group" />
 		<reference package-path="com.liferay.portal" entity="Layout" />
+		<reference package-path="com.liferay.portal" entity="LayoutRevision" />
 		<reference package-path="com.liferay.portal" entity="LayoutSet" />
 		<reference package-path="com.liferay.portal" entity="LayoutSetBranch" />
 	</entity>
@@ -2533,7 +2553,7 @@
 		<!-- Other fields -->
 
 		<column name="groupId" type="long" />
-		<column name="name" type="String" />
+		<column name="name" type="String" accessor="true" />
 		<column name="description" type="String" />
 
 		<!-- Relationships -->
@@ -2720,6 +2740,11 @@
 			<finder-column name="createDate" />
 			<finder-column name="modifiedDate" />
 		</finder>
+		<finder name="C_DU_S" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="defaultUser" />
+			<finder-column name="status" />
+		</finder>
 
 		<!-- References -->
 
@@ -2756,6 +2781,7 @@
 		<reference package-path="com.liferay.portlet.messageboards" entity="MBThreadFlag" />
 		<reference package-path="com.liferay.portlet.shopping" entity="ShoppingCart" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialActivity" />
+		<reference package-path="com.liferay.portlet.social" entity="SocialRelation" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialRequest" />
 	</entity>
 	<entity name="UserGroup" uuid="true" local-service="true" remote-service="true">
@@ -2963,9 +2989,11 @@
 
 		<column name="type" type="String" />
 		<column name="timestamp" type="long" />
+		<column name="deliveryType" type="int" />
 		<column name="deliverBy" type="long" />
 		<column name="delivered" type="boolean" />
 		<column name="payload" type="String" />
+		<column name="actionRequired" type="boolean" />
 		<column name="archived" type="boolean" />
 
 		<!-- Order -->
@@ -2979,12 +3007,36 @@
 		<finder name="UserId" return-type="Collection">
 			<finder-column name="userId" />
 		</finder>
+		<finder name="U_DT" return-type="Collection">
+			<finder-column name="userId" />
+			<finder-column name="deliveryType" />
+		</finder>
 		<finder name="U_D" return-type="Collection">
 			<finder-column name="userId" />
 			<finder-column name="delivered" />
 		</finder>
 		<finder name="U_A" return-type="Collection">
 			<finder-column name="userId" />
+			<finder-column name="archived" />
+		</finder>
+		<finder name="U_DT_D" return-type="Collection">
+			<finder-column name="userId" />
+			<finder-column name="deliveryType" />
+			<finder-column name="delivered" />
+		</finder>
+		<finder name="U_DT_A" return-type="Collection">
+			<finder-column name="userId" />
+			<finder-column name="deliveryType" />
+			<finder-column name="archived" />
+		</finder>
+		<finder name="U_D_A" return-type="Collection">
+			<finder-column name="userId" />
+			<finder-column name="delivered" />
+			<finder-column name="actionRequired" />
+		</finder>
+		<finder name="U_A_A" return-type="Collection">
+			<finder-column name="userId" />
+			<finder-column name="actionRequired" />
 			<finder-column name="archived" />
 		</finder>
 
@@ -3199,6 +3251,11 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
+		<finder name="G_C_C" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="companyId" />
+			<finder-column name="classNameId" />
+		</finder>
 		<finder name="C_W_W" return-type="Collection">
 			<finder-column name="companyId" />
 			<finder-column name="workflowDefinitionName" />
@@ -3301,6 +3358,7 @@
 		<exception>InvalidLock</exception>
 		<exception>InvalidRepository</exception>
 		<exception>LARFile</exception>
+		<exception>LARFileName</exception>
 		<exception>LARFileSize</exception>
 		<exception>LARType</exception>
 		<exception>LayoutBranchName</exception>

@@ -27,9 +27,9 @@ AUI.add(
 
 		var STR_PAGINATION_DATA = 'paginationData';
 
-		var STR_ROW_IDS_JOURNAL_FOLDER_CHECKBOX = 'rowIdsJournalFolderCheckbox';
+		var STR_ROW_IDS_JOURNAL_FOLDER_CHECKBOX = 'rowIdsJournalFolder';
 
-		var STR_ROW_IDS_JOURNAL_ARTICLE_CHECKBOX = 'rowIdsJournalArticleCheckbox';
+		var STR_ROW_IDS_JOURNAL_ARTICLE_CHECKBOX = 'rowIdsJournalArticle';
 
 		var STR_SEARCH_ARTICLE_ID = 'searchArticleId';
 
@@ -208,7 +208,7 @@ AUI.add(
 
 						AObject.each(
 							state,
-							function(item, index, collection) {
+							function(item, index) {
 								if (index.indexOf(namespace) === 0) {
 									requestParams[index] = item;
 								}
@@ -335,7 +335,7 @@ AUI.add(
 							instance._onAdvancedSearchFormSubmit(event);
 						}
 						else {
-							instance._onSimpleSearchFormSubmit(event)
+							instance._onSimpleSearchFormSubmit(event);
 						}
 					},
 
@@ -380,8 +380,6 @@ AUI.add(
 
 							entriesContainer.html(searchingTPL);
 						}
-
-						instance._journalContainer.all('.article-entries-pagination').hide();
 
 						var requestParams = {};
 

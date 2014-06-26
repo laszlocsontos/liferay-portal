@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -73,12 +75,11 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 *
 	 * @param shoppingCategory the shopping category
 	 * @return the shopping category that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ShoppingCategory addShoppingCategory(
-		ShoppingCategory shoppingCategory) throws SystemException {
+		ShoppingCategory shoppingCategory) {
 		shoppingCategory.setNew(true);
 
 		return shoppingCategoryPersistence.update(shoppingCategory);
@@ -101,12 +102,11 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 * @param categoryId the primary key of the shopping category
 	 * @return the shopping category that was removed
 	 * @throws PortalException if a shopping category with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public ShoppingCategory deleteShoppingCategory(long categoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingCategoryPersistence.remove(categoryId);
 	}
 
@@ -115,12 +115,11 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 *
 	 * @param shoppingCategory the shopping category
 	 * @return the shopping category that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public ShoppingCategory deleteShoppingCategory(
-		ShoppingCategory shoppingCategory) throws SystemException {
+		ShoppingCategory shoppingCategory) {
 		return shoppingCategoryPersistence.remove(shoppingCategory);
 	}
 
@@ -137,12 +136,10 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return shoppingCategoryPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -157,12 +154,10 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return shoppingCategoryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -179,12 +174,11 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return shoppingCategoryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -194,11 +188,9 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return shoppingCategoryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -208,18 +200,16 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return shoppingCategoryPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public ShoppingCategory fetchShoppingCategory(long categoryId)
-		throws SystemException {
+	public ShoppingCategory fetchShoppingCategory(long categoryId) {
 		return shoppingCategoryPersistence.fetchByPrimaryKey(categoryId);
 	}
 
@@ -229,17 +219,47 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 * @param categoryId the primary key of the shopping category
 	 * @return the shopping category
 	 * @throws PortalException if a shopping category with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public ShoppingCategory getShoppingCategory(long categoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingCategoryPersistence.findByPrimaryKey(categoryId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.shopping.service.ShoppingCategoryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(ShoppingCategory.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("categoryId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.shopping.service.ShoppingCategoryLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(ShoppingCategory.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("categoryId");
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return shoppingCategoryLocalService.deleteShoppingCategory((ShoppingCategory)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return shoppingCategoryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -253,11 +273,9 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of shopping categories
 	 * @param end the upper bound of the range of shopping categories (not inclusive)
 	 * @return the range of shopping categories
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<ShoppingCategory> getShoppingCategories(int start, int end)
-		throws SystemException {
+	public List<ShoppingCategory> getShoppingCategories(int start, int end) {
 		return shoppingCategoryPersistence.findAll(start, end);
 	}
 
@@ -265,10 +283,9 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 * Returns the number of shopping categories.
 	 *
 	 * @return the number of shopping categories
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getShoppingCategoriesCount() throws SystemException {
+	public int getShoppingCategoriesCount() {
 		return shoppingCategoryPersistence.countAll();
 	}
 
@@ -277,12 +294,11 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 *
 	 * @param shoppingCategory the shopping category
 	 * @return the shopping category that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ShoppingCategory updateShoppingCategory(
-		ShoppingCategory shoppingCategory) throws SystemException {
+		ShoppingCategory shoppingCategory) {
 		return shoppingCategoryPersistence.update(shoppingCategory);
 	}
 
@@ -573,7 +589,7 @@ public abstract class ShoppingCategoryLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = shoppingCategoryPersistence.getDataSource();
 

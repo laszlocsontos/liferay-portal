@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,13 +14,12 @@
 
 package com.liferay.portal.repository.liferayrepository.model;
 
-import com.liferay.portal.repository.liferayrepository.util.LiferayBase;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 /**
  * @author Alexander Chow
  */
-public abstract class LiferayModel extends LiferayBase {
+public abstract class LiferayModel {
 
 	public abstract long getCompanyId();
 

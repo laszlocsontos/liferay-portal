@@ -248,7 +248,8 @@ create unique index IX_D27B03E7 on ExpandoValue (tableId, columnId, classPK);
 create index IX_B71E92D5 on ExpandoValue (tableId, rowId_);
 
 create index IX_1827A2E5 on ExportImportConfiguration (companyId);
-create index IX_5095514E on ExportImportConfiguration (groupId, type_);
+create index IX_38FA468D on ExportImportConfiguration (groupId, status);
+create index IX_47CC6234 on ExportImportConfiguration (groupId, type_, status);
 
 create unique index IX_D0D5E397 on Group_ (companyId, classNameId, classPK);
 create unique index IX_5DE0BE11 on Group_ (companyId, classNameId, liveGroupId, name);
@@ -321,6 +322,9 @@ create unique index IX_65026705 on JournalFolder (groupId, parentFolderId, name)
 create index IX_EFD9CAC on JournalFolder (groupId, parentFolderId, status);
 create index IX_54F89E1F on JournalFolder (uuid_, companyId);
 create unique index IX_E002061 on JournalFolder (uuid_, groupId);
+
+create index IX_96F1BE5F on JournalFolders_DDMStructures (folderId);
+create index IX_6159D3DC on JournalFolders_DDMStructures (structureId);
 
 create index IX_C7FBC998 on Layout (companyId);
 create unique index IX_BC2C4231 on Layout (groupId, privateLayout, friendlyURL);
@@ -681,8 +685,11 @@ create unique index IX_D1C44A6E on UserIdMapper (userId, type_);
 
 create unique index IX_8B6E3ACE on UserNotificationDelivery (userId, portletId, classNameId, notificationType, deliveryType);
 
+create index IX_5CE95F03 on UserNotificationEvent (userId, actionRequired, archived);
 create index IX_3DBB361A on UserNotificationEvent (userId, archived);
-create index IX_24F1BF0 on UserNotificationEvent (userId, delivered);
+create index IX_E32CC19 on UserNotificationEvent (userId, delivered, actionRequired);
+create index IX_A87A585C on UserNotificationEvent (userId, deliveryType, archived);
+create index IX_EF7441EE on UserNotificationEvent (userId, deliveryType, delivered);
 create index IX_A6BAFDFE on UserNotificationEvent (uuid_, companyId);
 
 create index IX_29BA1CF5 on UserTracker (companyId);
@@ -692,7 +699,7 @@ create index IX_E4EFBA8D on UserTracker (userId);
 create index IX_14D8BCC0 on UserTrackerPath (userTrackerId);
 
 create index IX_BCFDA257 on User_ (companyId, createDate, modifiedDate);
-create index IX_6EF03E4E on User_ (companyId, defaultUser);
+create index IX_C6EA4F34 on User_ (companyId, defaultUser, status);
 create unique index IX_615E9F7A on User_ (companyId, emailAddress);
 create index IX_1D731F03 on User_ (companyId, facebookId);
 create index IX_EE8ABD19 on User_ (companyId, modifiedDate);

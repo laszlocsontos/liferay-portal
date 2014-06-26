@@ -2,35 +2,55 @@
 	<command name="addChildCP">
 		<var name="key_siteName" value="${siteName}" />
 
-		<execute action="CPSites#type" locator-key1="BASIC_SEARCH_FIELD" value1="${siteName}" />
-		<execute action="CPSites#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
-		<execute action="CPSites#assertClick" locator-key1="SITE_TABLE_ACTIONS" value1="Actions" />
-		<execute action="CPSites#click" locator-key1="SITE_MENULIST_SITE_ADMINISTRATION" value1="Site Administration" />
+		<if>
+			<not>
+				<isset var="siteScopeSelected" />
+			</not>
+			<then>
+				<execute action="CPSites#type" locator-key1="BASIC_SEARCH_FIELD" value1="${siteName}" />
+				<execute action="CPSites#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
+				<execute action="CPSites#click" locator-key1="SITE_TABLE_ACTIONS" />
+				<execute action="CPSites#assertClick" locator-key1="SITE_MENULIST_SITE_ADMINISTRATION" value1="Site Administration" />
+			</then>
+		</if>
 
+		<execute macro="SitePage#addCmd" />
+
+		<execute macro="SitePage#expandRootCP" />
+
+		<if>
+			<isset var="childSitepageName" />
+			<then>
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_2" />
+			</then>
+			<else>
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_1" />
+			</else>
+		</if>
+
+		<execute action="CPSitepages#assertClick" locator-key1="TOOLBAR_ADD_CHILD_PAGE" value1="Add Child Page" />
+
+		<execute action="CPSitepagesAddpage#type" locator-key1="ADD_PAGE_NAME_FIELD" value1="${siteChildPageName}" />
+		<execute action="CPSitepagesAddpage#assertClick" locator-key1="ADD_PAGE_BUTTON" value1="Add Page" />
+		<execute action="CPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
+	<command name="addCmd">
 		<if>
 			<equals arg1="${sitePagePrivacy}" arg2="Private" />
 			<then>
-				<execute action="CPSitepages#click" locator-key1="NAVIGATION_PRIVATE_PAGES" />
+				<execute action="CPSitepages#assertClick" locator-key1="NAVIGATION_PRIVATE_PAGES" value1="Private Pages" />
 			</then>
 			<elseif>
 				<equals arg1="${sitePagePrivacy}" arg2="Public" />
 				<then>
-					<execute action="CPSitepages#click" locator-key1="NAVIGATION_PUBLIC_PAGES" />
+					<execute action="CPSitepages#assertClick" locator-key1="NAVIGATION_PUBLIC_PAGES" value1="Public Pages" />
 				</then>
 			</elseif>
 			<else>
 				<fail message="Invalid var sitePagePrivacy. Must be (Private|Public)." />
 			</else>
 		</if>
-
-		<execute macro="SitePage#expandRootCP" />
-
-		<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_1" />
-		<execute action="CPSitepages#click" locator-key1="TOOLBAR_ADD_CHILD_PAGE" />
-
-		<execute action="CPSitepagesAddpage#type" locator-key1="ADD_PAGE_NAME_FIELD" value1="${siteChildPageName}" />
-		<execute action="CPSitepagesAddpage#click" locator-key1="ADD_PAGE_BUTTON" />
-		<execute action="CPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="addCP">
@@ -43,28 +63,14 @@
 			<then>
 				<execute action="CPSites#type" locator-key1="BASIC_SEARCH_FIELD" value1="${siteName}" />
 				<execute action="CPSites#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
-				<execute action="CPSites#assertClick" locator-key1="SITE_TABLE_ACTIONS" value1="Actions" />
+				<execute action="CPSites#click" locator-key1="SITE_TABLE_ACTIONS" />
 				<execute action="CPSites#assertClick" locator-key1="SITE_MENULIST_SITE_ADMINISTRATION" value1="Site Administration" />
 			</then>
 		</if>
 
-		<if>
-			<equals arg1="${sitePagePrivacy}" arg2="Private" />
-			<then>
-				<execute action="CPSitepages#click" locator-key1="NAVIGATION_PRIVATE_PAGES" />
-			</then>
-			<elseif>
-				<equals arg1="${sitePagePrivacy}" arg2="Public" />
-				<then>
-					<execute action="CPSitepages#click" locator-key1="NAVIGATION_PUBLIC_PAGES" />
-				</then>
-			</elseif>
-			<else>
-				<fail message="Invalid var sitePagePrivacy. Must be (Private|Public)." />
-			</else>
-		</if>
+		<execute macro="SitePage#addCmd" />
 
-		<execute action="CPSitepages#click" locator-key1="TOOLBAR_ADD_PAGE" />
+		<execute action="CPSitepages#assertClick" locator-key1="TOOLBAR_ADD_PAGE" value1="Add Page" />
 
 		<execute action="CPSitepagesAddpage#type" locator-key1="ADD_PAGE_NAME_FIELD" value1="${sitePageName}" />
 
@@ -90,7 +96,7 @@
 			</then>
 		</if>
 
-		<execute action="CPSitepagesAddpage#click" locator-key1="ADD_PAGE_BUTTON" />
+		<execute action="CPSitepagesAddpage#assertClick" locator-key1="ADD_PAGE_BUTTON" value1="Add Page" />
 
 		<execute action="CPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 
@@ -99,6 +105,25 @@
 		<var name="key_sitePageName" value="${sitePageName}" />
 
 		<execute action="CPSitepages#assertTextEquals" locator-key1="PAGE_TREE_PAGE_LINK" value1="${sitePageName}" />
+	</command>
+
+	<command name="addPageTranslations">
+		<if>
+			<isset var="childPageName" />
+			<then>
+				<execute action="CPSitepages#assertClick" locator-key1="PAGE_TREE_PAGE_LINK_2" value1="${childPageName}" />
+			</then>
+			<else>
+				<execute action="CPSitepages#assertClick" locator-key1="PAGE_TREE_PAGE_LINK_1" value1="${sitePageName}" />
+			</else>
+		</if>
+
+		<var name="key_pageTranslation" value="${pageTranslation}" />
+
+		<execute action="CPSitepages#click" locator-key1="DETAILS_LANGAUGE_TRANSLATIONS" />
+		<execute action="CPSitepages#type" locator-key1="DETAILS_NAME_FIELD" value1="${PageTranslationName}" />
+		<execute action="CPSitepages#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="addSitePageTypeEmbeddedCP">
@@ -118,8 +143,34 @@
 		<execute action="CPSitepagesAddpage#assertChecked" locator-key1="PAGE_TYPE_PANEL_CHECKBOX_INPUT" />
 	</command>
 
-	<command name="copyApplicationsFromPageToPagePG">
+	<command name="changePageTypeLayoutCP">
+		<var name="key_pageType" value="${pageType}" />
+
+		<execute action="CPSitepagesAddpage#select" locator-key1="PAGE_TYPE_LAYOUT" value1="${pageType}" />
+
+		<if>
+			<equals arg1="${pageType}" arg2="Link to a Page of This Site" />
+			<then>
+				<var name="key_indexNumber" value="${indexNumber}" />
+
+				<execute action="CPSitepagesAddpage#select" locator-key1="PAGE_TYPE_LINK_TO_PAGE_PAGE_SELECT" value1="index=${indexNumber}" />
+			</then>
+		</if>
+
+		<execute action="CPSitepages#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="CPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
+	<command name="changePageTypeLayoutPG">
+		<var name="key_pageTypeLayout" value="${pageTypeLayout}" />
+
 		<execute action="DockbarEdit#click" locator-key1="DOCKBAR_EDIT" value1="Edit" />
+		<execute action="DockbarEdit#click" locator-key1="ADD_PAGE_TYPE_RADIO" value1="${pageTypeLayout}" />
+		<execute action="DockbarEdit#click" locator-key1="SAVE_BUTTON" value1="Save" />
+	</command>
+
+	<command name="copyApplicationsFromPageToPagePG">
+		<execute action="DockbarEdit#click" locator-key1="DOCKBAR_EDIT" />
 		<execute action="DockbarEdit#assertClick" locator-key1="TOOLBAR_COPY_APPLICATIONS" value1="Copy Applications" />
 		<execute action="DockbarEdit#assertTextEquals" locator-key1="COPY_APPLICATIONS_MESSAGE_INFO" value1="The applications in page ${pageName} will be replaced with the ones in the page you select below." />
 		<execute action="DockbarEdit#assertTextEquals" locator-key1="COPY_APPLICATIONS_COPY_FROM_PAGE_LABEL" value1="Copy from Page" />
@@ -129,9 +180,55 @@
 		<execute action="CPBlogs#assertTextNotPresent" locator-key1="PORTLET_TITLE" value1="Blogs" />
 	</command>
 
+	<command name="deletePrivatePageCP">
+		<execute action="CPSitepages#assertClick" locator-key1="NAVIGATION_PRIVATE_PAGES" value1="Private Pages" />
+
+		<if>
+			<condition action="CPSitepages#isElementPresent" locator-key1="PAGE_TREE_ROOT_ARROW_PLUS" />
+			<then>
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_ROOT_ARROW_PLUS" />
+			</then>
+		</if>
+
+		<if>
+			<condition action="CPSitepages#isElementPresent" locator-key1="PAGE_TREE_PAGE_LINK_1" />
+			<then>
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_1" />
+				<execute action="CPSitepages#click" locator-key1="TOOLBAR_DELETE" />
+				<execute action="CPSitepages#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete the selected page?" />
+				<execute action="CPSitepages#assertTextNotPresent" locator-key1="INFO_MESSAGE_1" value1="Your request failed to complete." />
+				<execute action="CPSitepages#assertTextNotPresent" locator-key1="INFO_MESSAGE_2" value1="You must have at least one page." />
+				<execute action="CPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_ROOT_LINK" />
+			</then>
+		</if>
+	</command>
+
+	<command name="deletePublicPageCP">
+		<if>
+			<condition action="CPSitepages#isVisible" locator-key1="PAGE_TREE_PAGE_LINK_1" />
+			<then>
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_1" />
+				<execute action="CPSitepages#assertClick" locator-key1="TOOLBAR_DELETE" value1="Delete" />
+				<execute action="CPSitepages#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete the selected page?" />
+			</then>
+		</if>
+
+		<if>
+			<isset var="lastPublicSitepage" />
+			<then>
+				<execute action="CPSitepages#assertTextEquals" locator-key1="INFO_MESSAGE_1" value1="Your request failed to complete." />
+				<execute action="CPSitepages#assertTextEquals" locator-key1="INFO_MESSAGE_2" value1="You must have at least one page." />
+			</then>
+			<else>
+				<execute action="CPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+			</else>
+		</if>
+	</command>
+
 	<command name="deleteSitepagesCP">
 		<while>
-			<condition action="CPSitepages#isElementPresent" locator-key1="PAGE_TREE_PAGE_LINK_2" />
+			<condition action="CPSitepages#isVisible" locator-key1="PAGE_TREE_PAGE_LINK_2" />
 			<then>
 				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_2" />
 				<execute action="CPSitepages#assertClick" locator-key1="TOOLBAR_DELETE" value1="Delete" />
@@ -157,6 +254,22 @@
 		</while>
 	</command>
 
+	<command name="disallowEditViaSiteAdminEditCP">
+		<var name="key_sitePageName" value="${sitePageName}" />
+
+		<execute action="CPSitepages#assertClick" locator-key1="PAGE_TREE_PAGE_SPECIFIC_PAGE" value1="${sitePageName}"  />
+
+		<execute action="CPSitepages#uncheck" locator-key1="DETAILS_PAGE_TEMPLATE_UPDATEABLE_CHECKBOX" />
+		<execute action="CPSitepages#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+	</command>
+
+	<command name="editTemplatePagesCP">
+		<var name="key_siteTemplateName" value="${siteTemplateName}" />
+
+		<execute action="CPSitetemplates#click" locator-key1="SITE_TEMPLATE_TABLE_ACTIONS" value1="${siteTemplateName}" />
+		<execute action="CPSitetemplates#click" locator-key1="SITE_TEMPLATE_MENULIST_MANAGE" />
+	</command>
+
 	<command name="embeddedPageTypePG">
 
 		<execute action="DockbarEdit#click" locator-key1="DOCKBAR_EDIT" value1="Edit" />
@@ -168,7 +281,6 @@
 	</command>
 
 	<command name="expandRootCP">
-		<execute action="CPSitepages#click" locator-key1="PAGE_TREE_ROOT_ARROW" />
 		<execute action="CPSitepages#assertElementPresent" locator-key1="PAGE_TREE_PAGE_LINK_1" />
 
 		<if>
@@ -180,6 +292,8 @@
 	</command>
 
 	<command name="expandTreeCP">
+		<var name="key_sitePageName" value="${sitePageName}" />
+
 		<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_ARROW_1" />
 		<execute action="CPSitepages#assertElementPresent" locator-key1="PAGE_TREE_PAGE_LINK_2" />
 
@@ -189,6 +303,30 @@
 				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_ARROW_1" />
 			</then>
 		</if>
+	</command>
+
+	<command name="pageLockCheckPG">
+		<execute action="Dockbar#assertTextEquals" locator-key1="PAGE_INFO_MESSAGE" value1="This page is linked to a site template which does not allow modifications to it." />
+	</command>
+
+	<command name="pageNotLockCheckPG">
+		<if>
+			<condition action="Dockbar#isElementPresent" locator-key1="PAGE_INFO_MESSAGE" />
+			<then>
+				<execute action="Dockbar#assertTextNotEquals" locator-key1="PAGE_INFO_MESSAGE" value1="This page is linked to a site template which does not allow modifications to it." />
+			</then>
+			<else>
+				<execute action="Dockbar#assertElementNotPresent" locator-key1="PAGE_INFO_MESSAGE" />
+			</else>
+		</if>
+	</command>
+
+	<command name="pageTemplateLockCheckPG">
+		<execute action="Dockbar#assertTextEquals" locator-key1="PAGE_INFO_MESSAGE" value1="This page is linked to a page template. Disable the automatic propagation of changes to this page to be able to make modifications." />
+	</command>
+
+	<command name="pageTemplateNotLockedCheckPG">
+		<execute action="Dockbar#assertElementNotPresent" locator-key1="PAGE_INFO_MESSAGE" />
 	</command>
 
 	<command name="selectSitePagesVariationNameCP">
@@ -225,6 +363,33 @@
 			<else>
 				<execute macro="SitePage#addSitePageTypePanelCP" />
 			</else>
+		</if>
+	</command>
+
+	<command name="tearDownPrivateCP">
+		<description message="Delete all pages in the Private tab in Site Pages for Liferay." />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<var name="key_siteName" value="Liferay" />
+
+		<execute action="CPSites#type" locator-key1="BASIC_SEARCH_FIELD" value1="Liferay" />
+		<execute action="CPSites#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
+		<execute action="CPSites#click" locator-key1="SITE_TABLE_ACTIONS" />
+		<execute action="CPSites#assertClick" locator-key1="SITE_MENULIST_SITE_ADMINISTRATION" value1="Site Administration" />
+		<execute action="CPSitepages#assertClick" locator-key1="NAVIGATION_PRIVATE_PAGES" value1="Private Pages" />
+
+		<if>
+			<condition action="CPSitepages#isElementPresent" locator-key1="PAGE_TREE_PAGE_LINK_1" />
+			<then>
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_LINK_1" />
+				<execute action="CPSitepages#click" locator-key1="TOOLBAR_DELETE" />
+				<execute action="CPSitepages#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete the selected page?" />
+				<execute action="CPSitepages#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+				<execute action="CPSitepages#click" locator-key1="PAGE_TREE_ROOT_LINK" />
+			</then>
 		</if>
 	</command>
 
@@ -291,6 +456,19 @@
 					<execute action="Home#assertTextEquals" locator-key1="PAGE_TEMPLATE_3" value1="News" />
 				</then>
 			</elseif>
+			<elseif>
+				<equals arg1="${siteTemplate}" arg2="Zoe Healthcare Theme" />
+				<then>
+					<execute action="Home#assertElementPresent" locator-key1="SITE_NAME_LOGO" />
+					<execute action="Home#assertElementPresent" locator-key1="PAGE_TEMPLATE_1" value1="HOME" />
+					<execute action="Home#assertElementPresent" locator-key1="PAGE_TEMPLATE_2" value1="ABOUT" />
+					<execute action="Home#assertElementPresent" locator-key1="PAGE_TEMPLATE_3" value1="CLINIC" />
+					<execute action="Home#assertElementPresent" locator-key1="PAGE_TEMPLATE_4" value1="SERVICES" />
+					<execute action="Home#assertElementPresent" locator-key1="PAGE_TEMPLATE_5" value1="HEARLTH PLANS" />
+					<execute action="Home#assertElementPresent" locator-key1="PAGE_TEMPLATE_6" value1="LOCATION" />
+					<execute action="Home#assertElementPresent" locator-key1="PAGE_TEMPLATE_7" value1="CONTACT US" />
+				</then>
+			</elseif>
 		</if>
 	</command>
 
@@ -308,11 +486,98 @@
 		<execute action="CPSitepages#assertTextEquals" locator-key1="INCOMPLETE_STAGING_PAGE_VARIATION_DELETE_BUTTON" value1="Delete in All Pages Variations" />
 	</command>
 
+	<command name="viewLoadMoreResultsPages">
+		<var name="key_pageName" value="${pageName}" />
+
+		<if>
+			<equals arg1="${siteChildPages}" arg2="false" />
+			<then>
+				<execute action="CPSitepages#assertClick" locator-key1="PAGE_TREE_LOAD_MORE_RESULTS_LINK" value1="Load more results" />
+				<execute action="CPSitepages#assertTextEquals" locator-key1="PAGE_TREE_PAGE_LINK_4" value1="Page3 Name" />
+				<execute action="CPSitepages#assertTextEquals" locator-key1="PAGE_TREE_PAGE_LINK_5" value1="Page4 Name" />
+			</then>
+			<elseif>
+				<equals arg1="${siteChildPages}" arg2="true" />
+				<then>
+					<execute action="CPSitepages#click" locator-key1="PAGE_TREE_PAGE_ARROW_1" />
+					<execute action="CPSitepages#assertClick" locator-key1="PAGE_TREE_LOAD_MORE_RESULTS_LINK" value1="Load more results" />
+					<execute action="CPSitepages#assertTextEquals" locator-key1="PAGE_TREE_PAGE_LINK_5" value1="Child Page4 Name" />
+					<execute action="CPSitepages#assertTextEquals" locator-key1="PAGE_TREE_PAGE_LINK_6" value1="Child Page5 Name" />
+				</then>
+			</elseif>
+		</if>
+	</command>
+
+	<command name="viewNoDeletePagesAssociatedWithSiteTemplateCP">
+		<var name="key_sitePageName" value="${sitePageName}" />
+
+		<if>
+			<condition action="CPSitepages#isElementPresent" locator-key1="PAGE_TREE_PAGE_LINK" />
+			<then>
+				<execute action="CPSitepages#assertClick" locator-key1="PAGE_TREE_PAGE_LINK" value1="${sitePageName}" />
+				<execute action="CPSitepages#assertElementNotPresent" locator-key1="TOOLBAR_ADD_CHILD_PAGE" value1="Add Child Page" />
+				<execute action="CPSitepages#assertElementNotPresent" locator-key1="TOOLBAR_DELETE" value1="Delete" />
+				<execute action="CPSitepages#assertTextEquals" locator-key1="BLOCK_MESSAGE" value1="This page cannot be deleted and cannot have child pages because it is associated to a site template." />
+			</then>
+		</if>
+	</command>
+
+	<command name="viewOnlyAddOptionViaSiteAdminCP">
+		<execute action="Dockbar#click" locator-key1="ADD" value1="Add" />
+		<execute action="Dockbar#assertElementNotPresent" locator-key1="ADD_CONTENT_LINK" />
+		<execute action="Dockbar#assertElementNotPresent" locator-key1="ADD_APPLICATION_LINK" />
+		<execute action="Dockbar#assertElementPresent" locator-key1="ADD_PAGE_LINK" />
+
+		<execute action="Home#refresh" />
+	</command>
+
+	<command name="viewPageLayoutPG">
+		<if>
+			<equals arg1="${pageLayout}" arg2="1 Column" />
+			<then>
+				<execute action="Home#assertVisible" locator-key1="PAGE_COLUMN_1_LAYOUT_1_COLUMN" />
+				<execute action="Home#assertElementNotPresent" locator-key1="PAGE_COLUMN_2" />
+			</then>
+			<elseif>
+				<equals arg1="${pageLayout}" arg2="2 Column (30/70)" />
+				<then>
+					<execute action="Home#assertVisible" locator-key1="PAGE_COLUMN_1_LAYOUT_2_COLUMNS_30_SPLIT" />
+					<execute action="Home#assertVisible" locator-key1="PAGE_COLUMN_2_LAYOUT_2_COLUMNS_70_SPLIT" />
+				</then>
+			</elseif>
+		</if>
+	</command>
+
+	<command name="viewPagesCP">
+		<var name="key_siteName" value="${siteName}" />
+		<execute action="CPSitepages#assertTextEquals" locator-key1="SITE_NAME" value1="${siteName}" />
+		<execute action="CPSitepages#click" locator-key1="PAGE_TREE_ROOT_LINK" />
+		<execute action="CPSitepages#click" locator-key1="TOOLBAR_VIEW_PAGES" />
+
+		<execute action="BaseLiferay#pause" locator1="5000" />
+	</command>
+
+	<command name="viewPagesOrderCP">
+		<execute action="CPSitepages#assertTextEquals" locator-key1="PAGE_TREE_PAGE_LINK_1" value1="${pageName1}" />
+		<execute action="CPSitepages#assertTextEquals" locator-key1="PAGE_TREE_PAGE_LINK_2" value1="${pageName2}" />
+		<execute action="CPSitepages#assertTextEquals" locator-key1="PAGE_TREE_PAGE_LINK_3" value1="${pageName3}" />
+	</command>
+
 	<command name="viewPageTemplatePG">
 		<execute action="Dockbar#assertTextEquals" locator-key1="PAGE_INFO_MESSAGE" value1="This page is linked to a page template. Disable the automatic propagation of changes to this page to be able to make modifications." />
 		<execute action="Dockbar#click" locator-key1="EDIT" />
 		<execute action="Dockbar#assertTextEquals" locator-key1="EDIT_DETAILS_AUTOMATICALLY_APPLY_CHANGES_TO_PAGE_TEMPLATE_LABEL" value1="Automatically apply changes done to the page template ${pageTemplateName}." />
 		<execute action="Dockbar#assertChecked" locator-key1="EDIT_DETAILS_AUTOMATICALLY_APPLY_CHANGES_TO_PAGE_TEMPLATE_CHECKBOX" />
+	</command>
+
+	<command name="viewPageTypeLayoutCP">
+		<var name="key_pageType" value="${pageType}" />
+
+		<execute action="CPSitepagesAddpage#assertSelectedLabel" locator-key1="PAGE_TYPE_LAYOUT" value1="${pageType}" />
+
+		<var name="key_sitePageName" value="${sitePageName}" />
+
+		<execute action="CPSitepagesAddpage#assertSelectedLabel" locator-key1="PAGE_TYPE_LINK_TO_PAGE_PAGE_SELECT" value1="${sitePageName}" />
 	</command>
 
 	<command name="viewPanelPortletListCP">

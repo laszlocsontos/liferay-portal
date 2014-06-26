@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,9 +15,7 @@
 package com.liferay.portlet.passwordpoliciesadmin.lar;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BasePortletDataHandler;
 import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -27,7 +25,6 @@ import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.PasswordPolicy;
 import com.liferay.portal.service.PasswordPolicyLocalServiceUtil;
-import com.liferay.portal.service.persistence.PasswordPolicyExportActionableDynamicQuery;
 
 import java.util.List;
 
@@ -125,31 +122,32 @@ public class PasswordPolicyPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	protected ActionableDynamicQuery getPasswordPolicyActionableDynamicQuery(
-			final PortletDataContext portletDataContext, final boolean export)
-		throws SystemException {
+		final PortletDataContext portletDataContext, final boolean export) {
 
-		return new PasswordPolicyExportActionableDynamicQuery(
-			portletDataContext) {
+		ActionableDynamicQuery actionableDynamicQuery =
+			PasswordPolicyLocalServiceUtil.getExportActionableDynamicQuery(
+				portletDataContext);
 
-			@Override
-			protected void addCriteria(DynamicQuery dynamicQuery) {
-				portletDataContext.addDateRangeCriteria(
-					dynamicQuery, "modifiedDate");
-			}
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
 
-			@Override
-			protected void performAction(Object object) throws PortalException {
-				if (!export) {
-					return;
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					if (!export) {
+						return;
+					}
+
+					PasswordPolicy passwordPolicy = (PasswordPolicy)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(
+						portletDataContext, passwordPolicy);
 				}
 
-				PasswordPolicy passwordPolicy = (PasswordPolicy)object;
+			});
 
-				StagedModelDataHandlerUtil.exportStagedModel(
-					portletDataContext, passwordPolicy);
-			}
-
-		};
+		return actionableDynamicQuery;
 	}
 
 	protected static final String RESOURCE_NAME =

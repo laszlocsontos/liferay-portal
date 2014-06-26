@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -253,14 +253,7 @@ public class SassFile implements Callable<Void>, SassFragment {
 
 		FileUtil.write(rtlCacheFile, getRtlContent());
 
-		File rtlFile = new File(_docrootDirName, rtlFileName);
-
-		if (rtlFile.exists()) {
-			rtlCacheFile.setLastModified(rtlFile.lastModified());
-		}
-		else {
-			rtlCacheFile.setLastModified(ltrFile.lastModified());
-		}
+		rtlCacheFile.setLastModified(ltrFile.lastModified());
 	}
 
 	private void _addSassString(String fileName, String sassContent)

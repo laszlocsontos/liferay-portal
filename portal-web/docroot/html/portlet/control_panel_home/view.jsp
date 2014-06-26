@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,11 +29,11 @@
 			<aui:col width="<%= 25 %>">
 				<h3 class="control-panel-home-category-header" id="<%= categoryHeaderId %>">
 					<aui:a href='<%= HttpUtil.setParameter(themeDisplay.getURLControlPanel(), "controlPanelCategory", category) %>'>
-						<%= LanguageUtil.get(pageContext, "category." + category) %>
+						<%= LanguageUtil.get(request, "category." + category) %>
 					</aui:a>
 				</h3>
 
-				<ul aria-labelledby="<%= categoryHeaderId %>" class="unstyled" role="menu">
+				<ul aria-labelledby="<%= categoryHeaderId %>" class="list-unstyled" role="menu">
 
 					<%
 					List<Portlet> categoryPortlets = categoriesMap.get(category);

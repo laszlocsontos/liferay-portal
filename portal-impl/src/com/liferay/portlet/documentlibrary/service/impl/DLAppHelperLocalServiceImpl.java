@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,8 +15,8 @@
 package com.liferay.portlet.documentlibrary.service.impl;
 
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
+import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -37,7 +38,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.LayoutConstants;
@@ -46,7 +46,6 @@ import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
@@ -55,6 +54,7 @@ import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLink;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
+import com.liferay.portlet.documentlibrary.DLSettings;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -86,7 +86,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
@@ -104,7 +103,7 @@ public class DLAppHelperLocalServiceImpl
 	public void addFileEntry(
 			long userId, FileEntry fileEntry, FileVersion fileVersion,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (DLAppHelperThreadLocal.isEnabled()) {
 			updateAsset(
@@ -130,19 +129,9 @@ public class DLAppHelperLocalServiceImpl
 
 		try {
 			if (fileVersion instanceof LiferayFileVersion) {
-				DLFileVersion dlFileVersion =
-					(DLFileVersion)fileVersion.getModel();
-
-				Map<String, Serializable> workflowContext =
-					new HashMap<String, Serializable>();
-
-				workflowContext.put("event", DLSyncConstants.EVENT_ADD);
-
-				WorkflowHandlerRegistryUtil.startWorkflowInstance(
-					dlFileVersion.getCompanyId(), dlFileVersion.getGroupId(),
-					userId, DLFileEntryConstants.getClassName(),
-					dlFileVersion.getFileVersionId(), dlFileVersion,
-					serviceContext, workflowContext);
+				DLUtil.startWorkflowInstance(
+					userId, (DLFileVersion)fileVersion.getModel(),
+					DLSyncConstants.EVENT_ADD, serviceContext);
 			}
 		}
 		finally {
@@ -159,7 +148,7 @@ public class DLAppHelperLocalServiceImpl
 	@Override
 	public void addFolder(
 			long userId, Folder folder, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!DLAppHelperThreadLocal.isEnabled()) {
 			return;
@@ -178,7 +167,7 @@ public class DLAppHelperLocalServiceImpl
 			long userId, FileEntry fileEntry, FileVersion sourceFileVersion,
 			FileVersion destinationFileVersion, FileVersion draftFileVersion,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		updateFileEntry(
 			userId, fileEntry, sourceFileVersion, destinationFileVersion,
@@ -200,7 +189,7 @@ public class DLAppHelperLocalServiceImpl
 	@Override
 	public void checkAssetEntry(
 			long userId, FileEntry fileEntry, FileVersion fileVersion)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		AssetEntry fileEntryAssetEntry = assetEntryLocalService.fetchEntry(
 			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
@@ -260,9 +249,7 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	@Override
-	public void deleteFileEntry(FileEntry fileEntry)
-		throws PortalException, SystemException {
-
+	public void deleteFileEntry(FileEntry fileEntry) throws PortalException {
 		if (DLAppHelperThreadLocal.isEnabled()) {
 
 			// Subscriptions
@@ -333,9 +320,7 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	@Override
-	public void deleteFolder(Folder folder)
-		throws PortalException, SystemException {
-
+	public void deleteFolder(Folder folder) throws PortalException {
 		if (!DLAppHelperThreadLocal.isEnabled()) {
 			return;
 		}
@@ -366,9 +351,24 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	@Override
+	public void deleteRepositoryFileEntries(long repositoryId)
+		throws PortalException {
+
+		LocalRepository localRepository =
+			repositoryLocalService.getLocalRepositoryImpl(repositoryId);
+
+		List<FileEntry> fileEntries = localRepository.getRepositoryFileEntries(
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+
+		for (FileEntry fileEntry : fileEntries) {
+			deleteFileEntry(fileEntry);
+		}
+	}
+
+	@Override
 	public void getFileAsStream(
-			long userId, FileEntry fileEntry, boolean incrementCounter)
-		throws SystemException {
+		long userId, FileEntry fileEntry, boolean incrementCounter) {
 
 		if (!incrementCounter) {
 			return;
@@ -401,8 +401,7 @@ public class DLAppHelperLocalServiceImpl
 
 	@Override
 	public List<DLFileShortcut> getFileShortcuts(
-			long groupId, long folderId, boolean active, int status)
-		throws SystemException {
+		long groupId, long folderId, boolean active, int status) {
 
 		return dlFileShortcutPersistence.findByG_F_A_S(
 			groupId, folderId, active, status);
@@ -415,16 +414,14 @@ public class DLAppHelperLocalServiceImpl
 	@Deprecated
 	@Override
 	public List<DLFileShortcut> getFileShortcuts(
-			long groupId, long folderId, int status)
-		throws SystemException {
+		long groupId, long folderId, int status) {
 
 		return getFileShortcuts(groupId, folderId, true, status);
 	}
 
 	@Override
 	public int getFileShortcutsCount(
-			long groupId, long folderId, boolean active, int status)
-		throws SystemException {
+		long groupId, long folderId, boolean active, int status) {
 
 		return dlFileShortcutPersistence.countByG_F_A_S(
 			groupId, folderId, active, status);
@@ -436,9 +433,7 @@ public class DLAppHelperLocalServiceImpl
 	 */
 	@Deprecated
 	@Override
-	public int getFileShortcutsCount(long groupId, long folderId, int status)
-		throws SystemException {
-
+	public int getFileShortcutsCount(long groupId, long folderId, int status) {
 		return getFileShortcutsCount(groupId, folderId, true, status);
 	}
 
@@ -450,7 +445,7 @@ public class DLAppHelperLocalServiceImpl
 	@Override
 	public void moveDependentsToTrash(
 			List<Object> dlFileEntriesAndDLFolders, long trashEntryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		for (Object object : dlFileEntriesAndDLFolders) {
 			if (object instanceof DLFileEntry) {
@@ -603,9 +598,7 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	@Override
-	public void moveFileEntry(FileEntry fileEntry)
-		throws PortalException, SystemException {
-
+	public void moveFileEntry(FileEntry fileEntry) throws PortalException {
 		registerDLSyncEventCallback(DLSyncConstants.EVENT_MOVE, fileEntry);
 	}
 
@@ -613,7 +606,7 @@ public class DLAppHelperLocalServiceImpl
 	public FileEntry moveFileEntryFromTrash(
 			long userId, FileEntry fileEntry, long newFolderId,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		boolean hasLock = dlFileEntryLocalService.hasFileEntryLock(
 			userId, fileEntry.getFileEntryId());
@@ -642,11 +635,10 @@ public class DLAppHelperLocalServiceImpl
 	 * @param  fileEntry the file entry to be moved
 	 * @return the moved file entry
 	 * @throws PortalException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public FileEntry moveFileEntryToTrash(long userId, FileEntry fileEntry)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		boolean hasLock = dlFileEntryLocalService.hasFileEntryLock(
 			userId, fileEntry.getFileEntryId());
@@ -671,7 +663,7 @@ public class DLAppHelperLocalServiceImpl
 	public DLFileShortcut moveFileShortcutFromTrash(
 			long userId, DLFileShortcut dlFileShortcut, long newFolderId,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (dlFileShortcut.isInTrashExplicitly()) {
 			restoreFileShortcutFromTrash(userId, dlFileShortcut);
@@ -729,12 +721,11 @@ public class DLAppHelperLocalServiceImpl
 	 * @param  dlFileShortcut the file shortcut to be moved
 	 * @return the moved file shortcut
 	 * @throws PortalException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public DLFileShortcut moveFileShortcutToTrash(
 			long userId, DLFileShortcut dlFileShortcut)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// File shortcut
 
@@ -768,7 +759,7 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	@Override
-	public void moveFolder(Folder folder) throws SystemException {
+	public void moveFolder(Folder folder) {
 		registerDLSyncEventCallback(DLSyncConstants.EVENT_MOVE, folder);
 	}
 
@@ -776,7 +767,7 @@ public class DLAppHelperLocalServiceImpl
 	public Folder moveFolderFromTrash(
 			long userId, Folder folder, long parentFolderId,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		boolean hasLock = dlFolderLocalService.hasFolderLock(
 			userId, folder.getFolderId());
@@ -807,11 +798,10 @@ public class DLAppHelperLocalServiceImpl
 	 * @param  folder the folder to be moved
 	 * @return the moved folder
 	 * @throws PortalException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Folder moveFolderToTrash(long userId, Folder folder)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		boolean hasLock = dlFolderLocalService.hasFolderLock(
 			userId, folder.getFolderId());
@@ -836,14 +826,16 @@ public class DLAppHelperLocalServiceImpl
 
 	@Override
 	public void registerDLSyncEventCallback(String event, FileEntry fileEntry)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		if (isStagingGroup(fileEntry.getGroupId())) {
+		if (isStagingGroup(fileEntry.getGroupId()) ||
+			!(fileEntry instanceof LiferayFileEntry)) {
+
 			return;
 		}
 
 		if (!event.equals(DLSyncConstants.EVENT_DELETE) &&
-			!event.equals(DLSyncConstants.EVENT_MOVE_TO_TRASH)) {
+			!event.equals(DLSyncConstants.EVENT_TRASH)) {
 
 			FileVersion fileVersion = fileEntry.getFileVersion();
 
@@ -857,10 +849,10 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	@Override
-	public void registerDLSyncEventCallback(String event, Folder folder)
-		throws SystemException {
+	public void registerDLSyncEventCallback(String event, Folder folder) {
+		if (isStagingGroup(folder.getGroupId()) ||
+			!(folder instanceof LiferayFolder)) {
 
-		if (isStagingGroup(folder.getGroupId())) {
 			return;
 		}
 
@@ -871,7 +863,7 @@ public class DLAppHelperLocalServiceImpl
 	@Override
 	public void restoreDependentsFromTrash(
 			List<Object> dlFileEntriesAndDLFolders, long trashEntryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		for (Object object : dlFileEntriesAndDLFolders) {
 			if (object instanceof DLFileEntry) {
@@ -1008,7 +1000,7 @@ public class DLAppHelperLocalServiceImpl
 				// Folders, file entries, and file shortcuts
 
 				QueryDefinition queryDefinition = new QueryDefinition(
-					WorkflowConstants.STATUS_ANY);
+					WorkflowConstants.STATUS_IN_TRASH);
 
 				List<Object> foldersAndFileEntriesAndFileShortcuts =
 					dlFolderLocalService.
@@ -1043,7 +1035,7 @@ public class DLAppHelperLocalServiceImpl
 
 	@Override
 	public void restoreFileEntryFromTrash(long userId, FileEntry fileEntry)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// File entry
 
@@ -1061,7 +1053,7 @@ public class DLAppHelperLocalServiceImpl
 
 		dlFileEntryLocalService.updateStatus(
 			userId, fileVersion.getFileVersionId(), trashEntry.getStatus(),
-			new HashMap<String, Serializable>(), new ServiceContext());
+			new ServiceContext(), new HashMap<String, Serializable>());
 
 		if (DLAppHelperThreadLocal.isEnabled()) {
 
@@ -1077,7 +1069,7 @@ public class DLAppHelperLocalServiceImpl
 			// Sync
 
 			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_RESTORE_FROM_TRASH, fileEntry);
+				DLSyncConstants.EVENT_RESTORE, fileEntry);
 		}
 
 		// Trash
@@ -1117,7 +1109,7 @@ public class DLAppHelperLocalServiceImpl
 	@Override
 	public void restoreFileShortcutFromTrash(
 			long userId, DLFileShortcut dlFileShortcut)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// File shortcut
 
@@ -1147,7 +1139,7 @@ public class DLAppHelperLocalServiceImpl
 
 	@Override
 	public void restoreFolderFromTrash(long userId, Folder folder)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Folder
 
@@ -1183,8 +1175,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_RESTORE_FROM_TRASH, folder);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, folder);
 
 		// Trash
 
@@ -1207,7 +1198,7 @@ public class DLAppHelperLocalServiceImpl
 	public AssetEntry updateAsset(
 			long userId, FileEntry fileEntry, FileVersion fileVersion,
 			long assetClassPk)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long[] assetCategoryIds = assetCategoryLocalService.getCategoryIds(
 			DLFileEntryConstants.getClassName(), assetClassPk);
@@ -1233,7 +1224,7 @@ public class DLAppHelperLocalServiceImpl
 			long userId, FileEntry fileEntry, FileVersion fileVersion,
 			long[] assetCategoryIds, String[] assetTagNames,
 			long[] assetLinkEntryIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		AssetEntry assetEntry = null;
 
@@ -1340,7 +1331,7 @@ public class DLAppHelperLocalServiceImpl
 	public AssetEntry updateAsset(
 			long userId, Folder folder, long[] assetCategoryIds,
 			String[] assetTagNames, long[] assetLinkEntryIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		AssetEntry assetEntry = null;
 
@@ -1377,7 +1368,7 @@ public class DLAppHelperLocalServiceImpl
 	public void updateFileEntry(
 			long userId, FileEntry fileEntry, FileVersion sourceFileVersion,
 			FileVersion destinationFileVersion, long assetClassPk)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!DLAppHelperThreadLocal.isEnabled()) {
 			return;
@@ -1406,7 +1397,7 @@ public class DLAppHelperLocalServiceImpl
 	public void updateFileEntry(
 			long userId, FileEntry fileEntry, FileVersion sourceFileVersion,
 			FileVersion destinationFileVersion, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!DLAppHelperThreadLocal.isEnabled()) {
 			return;
@@ -1426,7 +1417,7 @@ public class DLAppHelperLocalServiceImpl
 	@Override
 	public void updateFolder(
 			long userId, Folder folder, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		updateAsset(
 			userId, folder, serviceContext.getAssetCategoryIds(),
@@ -1439,10 +1430,9 @@ public class DLAppHelperLocalServiceImpl
 	@Override
 	public void updateStatus(
 			long userId, FileEntry fileEntry, FileVersion latestFileVersion,
-			int oldStatus, int newStatus,
-			Map<String, Serializable> workflowContext,
-			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+			int oldStatus, int newStatus, ServiceContext serviceContext,
+			Map<String, Serializable> workflowContext)
+		throws PortalException {
 
 		if (!DLAppHelperThreadLocal.isEnabled()) {
 			return;
@@ -1541,7 +1531,10 @@ public class DLAppHelperLocalServiceImpl
 
 				// Subscriptions
 
-				notifySubscribers(latestFileVersion, serviceContext);
+				notifySubscribers(
+					latestFileVersion,
+					(String)workflowContext.get(WorkflowConstants.CONTEXT_URL),
+					serviceContext);
 			}
 		}
 		else {
@@ -1570,7 +1563,7 @@ public class DLAppHelperLocalServiceImpl
 	protected FileEntry doMoveFileEntryFromTrash(
 			long userId, FileEntry fileEntry, long newFolderId,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// File entry
 
@@ -1613,8 +1606,8 @@ public class DLAppHelperLocalServiceImpl
 		}
 
 		dlFileEntryLocalService.updateStatus(
-			userId, fileVersion.getFileVersionId(), oldStatus,
-			new HashMap<String, Serializable>(), serviceContext);
+			userId, fileVersion.getFileVersionId(), oldStatus, serviceContext,
+			new HashMap<String, Serializable>());
 
 		// File versions
 
@@ -1662,8 +1655,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_RESTORE_FROM_TRASH, fileEntry);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, fileEntry);
 
 		// Social
 
@@ -1681,7 +1673,7 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	protected FileEntry doMoveFileEntryToTrash(long userId, FileEntry fileEntry)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// File versions
 
@@ -1692,14 +1684,21 @@ public class DLAppHelperLocalServiceImpl
 		dlFileVersions = ListUtil.sort(
 			dlFileVersions, new FileVersionVersionComparator());
 
+		List<ObjectValuePair<Long, Integer>> dlFileVersionStatusOVPs =
+			new ArrayList<ObjectValuePair<Long, Integer>>();
+
+		if ((dlFileVersions != null) && !dlFileVersions.isEmpty()) {
+			dlFileVersionStatusOVPs = getDlFileVersionStatuses(dlFileVersions);
+		}
+
 		FileVersion fileVersion = fileEntry.getFileVersion();
 
 		int oldStatus = fileVersion.getStatus();
 
 		dlFileEntryLocalService.updateStatus(
 			userId, fileVersion.getFileVersionId(),
-			WorkflowConstants.STATUS_IN_TRASH,
-			new HashMap<String, Serializable>(), new ServiceContext());
+			WorkflowConstants.STATUS_IN_TRASH, new ServiceContext(),
+			new HashMap<String, Serializable>());
 
 		if (DLAppHelperThreadLocal.isEnabled()) {
 
@@ -1714,24 +1713,14 @@ public class DLAppHelperLocalServiceImpl
 
 			// Sync
 
-			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_MOVE_TO_TRASH, fileEntry);
+			registerDLSyncEventCallback(DLSyncConstants.EVENT_TRASH, fileEntry);
 		}
 
 		// Trash
 
-		int oldDLFileVersionStatus = WorkflowConstants.STATUS_ANY;
-
-		List<ObjectValuePair<Long, Integer>> dlFileVersionStatusOVPs =
-			new ArrayList<ObjectValuePair<Long, Integer>>();
-
 		DLFileVersion oldDLFileVersion = (DLFileVersion)fileVersion.getModel();
 
-		oldDLFileVersionStatus = oldDLFileVersion.getStatus();
-
-		if ((dlFileVersions != null) && !dlFileVersions.isEmpty()) {
-			dlFileVersionStatusOVPs = getDlFileVersionStatuses(dlFileVersions);
-		}
+		int oldDLFileVersionStatus = oldDLFileVersion.getStatus();
 
 		for (DLFileVersion curDLFileVersion : dlFileVersions) {
 			curDLFileVersion.setStatus(WorkflowConstants.STATUS_IN_TRASH);
@@ -1790,7 +1779,7 @@ public class DLAppHelperLocalServiceImpl
 	protected Folder doMoveFolderFromTrash(
 			long userId, Folder folder, long parentFolderId,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		DLFolder dlFolder = (DLFolder)folder.getModel();
 
@@ -1844,8 +1833,7 @@ public class DLAppHelperLocalServiceImpl
 
 			// Sync
 
-			registerDLSyncEventCallback(
-				DLSyncConstants.EVENT_RESTORE_FROM_TRASH, folder);
+			registerDLSyncEventCallback(DLSyncConstants.EVENT_RESTORE, folder);
 
 			// Social
 
@@ -1865,7 +1853,7 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	protected Folder doMoveFolderToTrash(long userId, Folder folder)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Folder
 
@@ -1907,8 +1895,7 @@ public class DLAppHelperLocalServiceImpl
 
 		// Sync
 
-		registerDLSyncEventCallback(
-			DLSyncConstants.EVENT_MOVE_TO_TRASH, folder);
+		registerDLSyncEventCallback(DLSyncConstants.EVENT_TRASH, folder);
 
 		// Social
 
@@ -1949,14 +1936,16 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	protected String getEntryURL(
-			FileVersion fileVersion, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+			long groupId, long fileEntryId, ServiceContext serviceContext)
+		throws PortalException {
 
 		HttpServletRequest request = serviceContext.getRequest();
 
 		if (request == null) {
 			return StringPool.BLANK;
 		}
+
+		String portletId = PortletKeys.DOCUMENT_LIBRARY;
 
 		long plid = serviceContext.getPlid();
 
@@ -1965,21 +1954,20 @@ public class DLAppHelperLocalServiceImpl
 
 		if (plid == controlPanelPlid) {
 			plid = PortalUtil.getPlidFromPortletId(
-				fileVersion.getGroupId(), PortletKeys.DOCUMENT_LIBRARY);
+				groupId, PortletKeys.DOCUMENT_LIBRARY);
 		}
 
 		if (plid == LayoutConstants.DEFAULT_PLID) {
+			portletId = PortletKeys.DOCUMENT_LIBRARY_ADMIN;
 			plid = controlPanelPlid;
 		}
 
 		PortletURL portletURL = PortletURLFactoryUtil.create(
-			request, PortletKeys.DOCUMENT_LIBRARY, plid,
-			PortletRequest.RENDER_PHASE);
+			request, portletId, plid, PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter(
 			"struts_action", "/document_library/view_file_entry");
-		portletURL.setParameter(
-			"fileEntryId", String.valueOf(fileVersion.getFileEntryId()));
+		portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 
 		return portletURL.toString();
 	}
@@ -2006,78 +1994,43 @@ public class DLAppHelperLocalServiceImpl
 		}
 	}
 
-	protected void notify(final SubscriptionSender subscriptionSender) {
-		TransactionCommitCallbackRegistryUtil.registerCallback(
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					subscriptionSender.flushNotificationsAsync();
-
-					return null;
-				}
-
-			}
-		);
-	}
-
 	protected void notifySubscribers(
-			FileVersion fileVersion, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+			FileVersion fileVersion, String entryURL,
+			ServiceContext serviceContext)
+		throws PortalException {
 
-		String layoutFullURL = serviceContext.getLayoutFullURL();
-
-		if (!fileVersion.isApproved() || Validator.isNull(layoutFullURL)) {
+		if (!fileVersion.isApproved() || Validator.isNull(entryURL)) {
 			return;
 		}
 
-		PortletPreferences preferences =
-			ServiceContextUtil.getPortletPreferences(serviceContext);
-
-		if (preferences == null) {
-			long ownerId = fileVersion.getGroupId();
-			int ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
-			long plid = PortletKeys.PREFS_PLID_SHARED;
-			String portletId = PortletKeys.DOCUMENT_LIBRARY;
-			String defaultPreferences = null;
-
-			preferences = portletPreferencesLocalService.getPreferences(
-				fileVersion.getCompanyId(), ownerId, ownerType, plid, portletId,
-				defaultPreferences);
-		}
+		DLSettings dlSettings = DLSettings.getInstance(
+			fileVersion.getGroupId());
 
 		if (serviceContext.isCommandAdd() &&
-			DLUtil.getEmailFileEntryAddedEnabled(preferences)) {
+			dlSettings.isEmailFileEntryAddedEnabled()) {
 		}
 		else if (serviceContext.isCommandUpdate() &&
-				 DLUtil.getEmailFileEntryUpdatedEnabled(preferences)) {
+				 dlSettings.isEmailFileEntryUpdatedEnabled()) {
 		}
 		else {
 			return;
 		}
 
 		String entryTitle = fileVersion.getTitle();
-		String entryURL = getEntryURL(fileVersion, serviceContext);
 
-		String fromName = DLUtil.getEmailFromName(
-			preferences, fileVersion.getCompanyId());
-		String fromAddress = DLUtil.getEmailFromAddress(
-			preferences, fileVersion.getCompanyId());
+		String fromName = dlSettings.getEmailFromName();
+		String fromAddress = dlSettings.getEmailFromAddress();
 
 		Map<Locale, String> localizedSubjectMap = null;
 		Map<Locale, String> localizedBodyMap = null;
 
 		if (serviceContext.isCommandUpdate()) {
-			localizedSubjectMap = DLUtil.getEmailFileEntryUpdatedSubjectMap(
-				preferences);
-			localizedBodyMap = DLUtil.getEmailFileEntryUpdatedBodyMap(
-				preferences);
+			localizedSubjectMap = dlSettings.getEmailFileEntryUpdatedSubject();
+			localizedBodyMap = dlSettings.getEmailFileEntryUpdatedBody();
 		}
 		else {
-			localizedSubjectMap = DLUtil.getEmailFileEntryAddedSubjectMap(
-				preferences);
-			localizedBodyMap = DLUtil.getEmailFileEntryAddedBodyMap(
-				preferences);
+			localizedSubjectMap = dlSettings.getEmailFileEntryAddedSubject();
+			localizedBodyMap = dlSettings.getEmailFileEntryAddedBody();
 		}
 
 		FileEntry fileEntry = fileVersion.getFileEntry();
@@ -2143,17 +2096,14 @@ public class DLAppHelperLocalServiceImpl
 		subscriptionSender.addPersistedSubscribers(
 			Folder.class.getName(), fileVersion.getGroupId());
 
-		List<Long> folderIds = new ArrayList<Long>();
-
 		if (folder != null) {
-			folderIds.add(folder.getFolderId());
-
-			folderIds.addAll(folder.getAncestorFolderIds());
-		}
-
-		for (long curFolderId : folderIds) {
 			subscriptionSender.addPersistedSubscribers(
-				Folder.class.getName(), curFolderId);
+				Folder.class.getName(), folder.getFolderId());
+
+			for (Long ancestorFolderId : folder.getAncestorFolderIds()) {
+				subscriptionSender.addPersistedSubscribers(
+					Folder.class.getName(), ancestorFolderId);
+			}
 		}
 
 		if (dlFileEntryType.getFileEntryTypeId() ==
@@ -2171,7 +2121,7 @@ public class DLAppHelperLocalServiceImpl
 		subscriptionSender.addPersistedSubscribers(
 			DLFileEntry.class.getName(), fileEntry.getFileEntryId());
 
-		notify(subscriptionSender);
+		subscriptionSender.flushNotificationsAsync();
 	}
 
 	protected void registerDLProcessorCallback(
@@ -2192,8 +2142,7 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	protected void registerDLSyncEventCallback(
-			final String event, final String type, final long typePK)
-		throws SystemException {
+		final String event, final String type, final long typePK) {
 
 		DLSyncEvent dlSyncEvent = dlSyncEventLocalService.addDLSyncEvent(
 			event, type, typePK);

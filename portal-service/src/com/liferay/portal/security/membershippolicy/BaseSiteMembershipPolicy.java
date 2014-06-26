@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,16 +19,14 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
-import com.liferay.portal.service.persistence.GroupActionableDynamicQuery;
-import com.liferay.portal.service.persistence.UserGroupRoleActionableDynamicQuery;
 import com.liferay.portal.service.persistence.UserGroupRolePK;
 
 import java.io.Serializable;
@@ -48,13 +46,13 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 	public void checkRoles(
 			List<UserGroupRole> addUserGroupRoles,
 			List<UserGroupRole> removeUserGroupRoles)
-		throws PortalException, SystemException {
+		throws PortalException {
 	}
 
 	@Override
 	@SuppressWarnings("unused")
 	public boolean isMembershipAllowed(long userId, long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			checkMembership(new long[] {userId}, new long[] {groupId}, null);
@@ -69,7 +67,7 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 	@Override
 	public boolean isMembershipProtected(
 			PermissionChecker permissionChecker, long userId, long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (permissionChecker.isGroupOwner(groupId)) {
 			return false;
@@ -99,7 +97,7 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 	@Override
 	@SuppressWarnings("unused")
 	public boolean isMembershipRequired(long userId, long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			checkMembership(new long[] {userId}, null, new long[] {groupId});
@@ -114,7 +112,7 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 	@Override
 	@SuppressWarnings("unused")
 	public boolean isRoleAllowed(long userId, long groupId, long roleId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
 
@@ -140,7 +138,7 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 	public boolean isRoleProtected(
 			PermissionChecker permissionChecker, long userId, long groupId,
 			long roleId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (permissionChecker.isGroupOwner(groupId)) {
 			return false;
@@ -192,58 +190,67 @@ public abstract class BaseSiteMembershipPolicy implements SiteMembershipPolicy {
 	public void propagateRoles(
 			List<UserGroupRole> addUserGroupRoles,
 			List<UserGroupRole> removeUserGroupRoles)
-		throws PortalException, SystemException {
+		throws PortalException {
 	}
 
 	@Override
-	public void verifyPolicy() throws PortalException, SystemException {
+	public void verifyPolicy() throws PortalException {
 		ActionableDynamicQuery groupActionableDynamicQuery =
-			new GroupActionableDynamicQuery() {
+			GroupLocalServiceUtil.getActionableDynamicQuery();
 
-			@Override
-			protected void addCriteria(DynamicQuery dynamicQuery) {
-				Property property = PropertyFactoryUtil.forName("site");
+		groupActionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
 
-				dynamicQuery.add(property.eq(true));
-			}
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					Property property = PropertyFactoryUtil.forName("site");
 
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
+					dynamicQuery.add(property.eq(true));
+				}
 
-				Group group = (Group)object;
+			});
+		groupActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
 
-				verifyPolicy(group);
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
 
-				ActionableDynamicQuery userGroupRoleActionableDynamicQuery =
-					new UserGroupRoleActionableDynamicQuery() {
+					Group group = (Group)object;
 
-					@Override
-					protected void performAction(Object object)
-						throws PortalException, SystemException {
+					verifyPolicy(group);
 
-						UserGroupRole userGroupRole = (UserGroupRole)object;
+					ActionableDynamicQuery userGroupRoleActionableDynamicQuery =
+						UserGroupRoleLocalServiceUtil.
+							getActionableDynamicQuery();
 
-						verifyPolicy(userGroupRole.getRole());
-					}
+					userGroupRoleActionableDynamicQuery.setGroupId(
+						group.getGroupId());
+					userGroupRoleActionableDynamicQuery.setPerformActionMethod(
+						new ActionableDynamicQuery.PerformActionMethod() {
 
-				};
+							@Override
+							public void performAction(Object object)
+								throws PortalException {
 
-				userGroupRoleActionableDynamicQuery.setGroupId(
-					group.getGroupId());
+								UserGroupRole userGroupRole =
+									(UserGroupRole)object;
 
-				userGroupRoleActionableDynamicQuery.performActions();
-			}
+								verifyPolicy(userGroupRole.getRole());
+							}
 
-		};
+						});
+
+					userGroupRoleActionableDynamicQuery.performActions();
+				}
+
+			});
 
 		groupActionableDynamicQuery.performActions();
 	}
 
 	@Override
-	public void verifyPolicy(Group group)
-		throws PortalException, SystemException {
-
+	public void verifyPolicy(Group group) throws PortalException {
 		verifyPolicy(group, null, null, null, null, null);
 	}
 

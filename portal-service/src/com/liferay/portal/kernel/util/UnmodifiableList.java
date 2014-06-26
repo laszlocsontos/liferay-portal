@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,8 +29,11 @@ import java.util.ListIterator;
  * <code>java.lang.UnsupportedOperationException</code>.
  * </p>
  *
- * @author Alexander Chow
+ * @author     Alexander Chow
+ * @deprecated As of 7.0.0, replaced by {@link
+ *             java.util.Collections#unmodifiableList(java.util.List)}
  */
+@Deprecated
 public class UnmodifiableList<E> implements List<E>, Serializable {
 
 	public UnmodifiableList(List<? extends E> list) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -126,9 +126,7 @@ public class ClusterExecutorImpl
 	}
 
 	@Override
-	public FutureClusterResponses execute(ClusterRequest clusterRequest)
-		throws SystemException {
-
+	public FutureClusterResponses execute(ClusterRequest clusterRequest) {
 		if (!isEnabled()) {
 			return null;
 		}
@@ -179,9 +177,8 @@ public class ClusterExecutorImpl
 
 	@Override
 	public void execute(
-			ClusterRequest clusterRequest,
-			ClusterResponseCallback clusterResponseCallback)
-		throws SystemException {
+		ClusterRequest clusterRequest,
+		ClusterResponseCallback clusterResponseCallback) {
 
 		FutureClusterResponses futureClusterResponses = execute(clusterRequest);
 
@@ -194,10 +191,9 @@ public class ClusterExecutorImpl
 
 	@Override
 	public void execute(
-			ClusterRequest clusterRequest,
-			ClusterResponseCallback clusterResponseCallback, long timeout,
-			TimeUnit timeUnit)
-		throws SystemException {
+		ClusterRequest clusterRequest,
+		ClusterResponseCallback clusterResponseCallback, long timeout,
+		TimeUnit timeUnit) {
 
 		FutureClusterResponses futureClusterResponses = execute(clusterRequest);
 

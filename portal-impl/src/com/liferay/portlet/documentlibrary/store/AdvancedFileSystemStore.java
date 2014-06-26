@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * <p>
- * See http://issues.liferay.com/browse/LPS-1976.
+ * See https://issues.liferay.com/browse/LPS-1976.
  * </p>
  *
  * @author Jorge Ferrer
@@ -62,7 +62,7 @@ public class AdvancedFileSystemStore extends FileSystemStore {
 	public void updateFile(
 			long companyId, long repositoryId, String fileName,
 			String newFileName)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		super.updateFile(companyId, repositoryId, fileName, newFileName);
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -453,8 +453,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 
 	@Override
 	public InputStream getLoadIndexesInputStreamFromCluster(
-			long companyId, Address bootupAddress)
-		throws SystemException {
+		long companyId, Address bootupAddress) {
 
 		if (!isLoadIndexFromClusterEnabled()) {
 			return null;
@@ -582,7 +581,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 			return snippet;
 		}
 		catch (InvalidTokenOffsetsException itoe) {
-			throw new IOException(itoe.getMessage());
+			throw new IOException(itoe);
 		}
 	}
 
@@ -626,15 +625,13 @@ public class LuceneHelperImpl implements LuceneHelper {
 			return;
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
+
+		stopWatch.start();
 
 		if (_log.isInfoEnabled()) {
 			_log.info(
 				"Start loading Lucene index files for company " + companyId);
-
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
 		}
 
 		indexAccessor.loadIndex(inputStream);
@@ -647,7 +644,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 	}
 
 	@Override
-	public void loadIndexesFromCluster(long companyId) throws SystemException {
+	public void loadIndexesFromCluster(long companyId) {
 		if (!isLoadIndexFromClusterEnabled()) {
 			return;
 		}
@@ -752,7 +749,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 	public void shutdown(long companyId) {
 		IndexAccessor indexAccessor = getIndexAccessor(companyId);
 
-		_indexAccessors.remove(indexAccessor);
+		_indexAccessors.remove(companyId);
 
 		indexAccessor.close();
 	}
@@ -825,8 +822,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 	}
 
 	private ObjectValuePair<String, URL>
-			_getBootupClusterNodeObjectValuePair(Address bootupAddress)
-		throws SystemException {
+			_getBootupClusterNodeObjectValuePair(Address bootupAddress) {
 
 		ClusterRequest clusterRequest = ClusterRequest.createUnicastRequest(
 			new MethodHandler(
@@ -961,8 +957,7 @@ public class LuceneHelperImpl implements LuceneHelper {
 	}
 
 	private void _loadIndexFromCluster(
-			IndexAccessor indexAccessor, long localLastGeneration)
-		throws SystemException {
+		IndexAccessor indexAccessor, long localLastGeneration) {
 
 		List<Address> clusterNodeAddresses =
 			ClusterExecutorUtil.getClusterNodeAddresses();

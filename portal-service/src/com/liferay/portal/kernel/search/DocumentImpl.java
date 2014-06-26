@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -62,7 +63,7 @@ public class DocumentImpl implements Document {
 	}
 
 	public static String getLocalizedName(String languageId, String name) {
-		return name.concat(StringPool.UNDERLINE).concat(languageId);
+		return LocalizationUtil.getLocalizedName(name, languageId);
 	}
 
 	public static String getSortableFieldName(String name) {
@@ -91,6 +92,11 @@ public class DocumentImpl implements Document {
 	public void addDate(String name, Date[] values) {
 		if (values == null) {
 			return;
+		}
+
+		if (_dateFormat == null) {
+			_dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
+				_INDEX_DATE_FORMAT_PATTERN);
 		}
 
 		String[] dates = new String[values.length];
@@ -810,9 +816,7 @@ public class DocumentImpl implements Document {
 
 	private static final String _UID_PORTLET = "_PORTLET_";
 
-	private static Format _dateFormat =
-		FastDateFormatFactoryUtil.getSimpleDateFormat(
-			_INDEX_DATE_FORMAT_PATTERN);
+	private static Format _dateFormat;
 	private static Set<String> _defaultSortableTextFields = SetUtil.fromArray(
 		PropsUtil.getArray(PropsKeys.INDEX_SORTABLE_TEXT_FIELDS));
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,8 @@ package com.liferay.portal.util;
 
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.service.http.HttpPrincipalTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 
 import java.io.IOException;
 
@@ -94,8 +96,8 @@ public class BaseJsonClientTestCase {
 
 	public String executeRequest(HttpRequest request) throws Exception {
 		return executeRequest(
-			TestPropsValues.getLogin(false), TestPropsValues.USER_PASSWORD,
-			request);
+			HttpPrincipalTestUtil.getLogin(false),
+			TestPropsValues.USER_PASSWORD, request);
 	}
 
 	public String executeRequest(

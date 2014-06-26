@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,9 +33,9 @@ public class DLSyncConstants {
 
 	public static final String EVENT_MOVE = "move";
 
-	public static final String EVENT_MOVE_TO_TRASH = "trash";
+	public static final String EVENT_RESTORE = "restore";
 
-	public static final String EVENT_RESTORE_FROM_TRASH = "restore";
+	public static final String EVENT_TRASH = "trash";
 
 	public static final String EVENT_UPDATE = "update";
 

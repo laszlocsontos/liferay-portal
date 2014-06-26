@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,10 @@
 
 package com.liferay.portal.kernel.process;
 
+import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.util.ObjectValuePair;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -193,32 +195,63 @@ public class ProcessUtilTest {
 	}
 
 	@Test
-	public void testEchoLogging() throws Exception {
-		List<LogRecord> logRecords = JDKLoggerTestUtil.configureJDKLogger(
+	public void testEcho() throws Exception {
+
+		// Logging
+
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
 			LoggingOutputProcessor.class.getName(), Level.INFO);
 
-		Future<?> future = ProcessUtil.execute(
-			ProcessUtil.LOGGING_OUTPUT_PROCESSOR,
-			_buildArguments(Echo.class, "2"));
+		try {
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
-		future.get();
+			Future<ObjectValuePair<Void, Void>> loggingFuture =
+				ProcessUtil.execute(
+					ProcessUtil.LOGGING_OUTPUT_PROCESSOR,
+					_buildArguments(Echo.class, "2"));
 
-		future.cancel(true);
+			loggingFuture.get();
 
-		List<String> messageRecords = new ArrayList<String>();
+			loggingFuture.cancel(true);
 
-		for (LogRecord logRecord : logRecords) {
-			messageRecords.add(logRecord.getMessage());
+			List<String> messageRecords = new ArrayList<String>();
+
+			for (LogRecord logRecord : logRecords) {
+				messageRecords.add(logRecord.getMessage());
+			}
+
+			Assert.assertTrue(
+				messageRecords.contains(Echo.buildMessage(false, 0)));
+			Assert.assertTrue(
+				messageRecords.contains(Echo.buildMessage(false, 1)));
+			Assert.assertTrue(
+				messageRecords.contains(Echo.buildMessage(true, 0)));
+			Assert.assertTrue(
+				messageRecords.contains(Echo.buildMessage(true, 1)));
+		}
+		finally {
+			captureHandler.close();
 		}
 
-		Assert.assertTrue(
-			messageRecords.contains("{stdErr}" + Echo.class.getName() + "0"));
-		Assert.assertTrue(
-			messageRecords.contains("{stdErr}" + Echo.class.getName() + "1"));
-		Assert.assertTrue(
-			messageRecords.contains("{stdOut}" + Echo.class.getName() + "0"));
-		Assert.assertTrue(
-			messageRecords.contains("{stdOut}" + Echo.class.getName() + "1"));
+		// Collector
+
+		Future<ObjectValuePair<byte[], byte[]>> collectorFuture =
+			ProcessUtil.execute(
+				ProcessUtil.COLLECTOR_OUTPUT_PROCESSOR,
+				_buildArguments(Echo.class, "2"));
+
+		ObjectValuePair<byte[], byte[]> objectValuePair = collectorFuture.get();
+
+		collectorFuture.cancel(true);
+
+		Assert.assertEquals(
+			Echo.buildMessage(true, 0) + "\n" + Echo.buildMessage(true, 1) +
+				"\n",
+			new String(objectValuePair.getKey()));
+		Assert.assertEquals(
+			Echo.buildMessage(false, 0) + "\n" + Echo.buildMessage(false, 1) +
+				"\n",
+			new String(objectValuePair.getValue()));
 	}
 
 	@Test
@@ -235,10 +268,17 @@ public class ProcessUtilTest {
 		catch (ExecutionException ee) {
 			Throwable throwable = ee.getCause();
 
-			Assert.assertEquals(ProcessException.class, throwable.getClass());
+			Assert.assertSame(
+				TerminationProcessException.class, throwable.getClass());
 			Assert.assertEquals(
 				"Subprocess terminated with exit code " + ErrorExit.EXIT_CODE,
 				throwable.getMessage());
+
+			TerminationProcessException terminationProcessException =
+				(TerminationProcessException)throwable;
+
+			Assert.assertEquals(
+				ErrorExit.EXIT_CODE, terminationProcessException.getExitCode());
 		}
 	}
 
@@ -543,13 +583,21 @@ public class ProcessUtilTest {
 
 	private static class Echo {
 
+		public static String buildMessage(boolean stdOut, int number) {
+			if (stdOut) {
+				return "{stdOut}" + Echo.class.getName() + number;
+			}
+
+			return "{stdErr}" + Echo.class.getName() + number;
+		}
+
 		@SuppressWarnings("unused")
 		public static void main(String[] arguments) {
 			int times = Integer.parseInt(arguments[0]);
 
 			for (int i = 0; i < times; i++) {
-				System.err.println("{stdErr}" + Echo.class.getName() + i);
-				System.out.println("{stdOut}" + Echo.class.getName() + i);
+				System.err.println(buildMessage(false, i));
+				System.out.println(buildMessage(true, i));
 			}
 		}
 

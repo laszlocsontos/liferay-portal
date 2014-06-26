@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,21 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
+import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -72,11 +82,10 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param address the address
 	 * @return the address that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public Address addAddress(Address address) throws SystemException {
+	public Address addAddress(Address address) {
 		address.setNew(true);
 
 		return addressPersistence.update(address);
@@ -99,12 +108,10 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param addressId the primary key of the address
 	 * @return the address that was removed
 	 * @throws PortalException if a address with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public Address deleteAddress(long addressId)
-		throws PortalException, SystemException {
+	public Address deleteAddress(long addressId) throws PortalException {
 		return addressPersistence.remove(addressId);
 	}
 
@@ -113,11 +120,10 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param address the address
 	 * @return the address that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public Address deleteAddress(Address address) throws SystemException {
+	public Address deleteAddress(Address address) {
 		return addressPersistence.remove(address);
 	}
 
@@ -134,12 +140,10 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery) {
 		return addressPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -154,12 +158,10 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end) {
 		return addressPersistence.findWithDynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -175,12 +177,11 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
 	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+		OrderByComparator orderByComparator) {
 		return addressPersistence.findWithDynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -190,11 +191,9 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return addressPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -204,16 +203,15 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return addressPersistence.countWithDynamicQuery(dynamicQuery, projection);
 	}
 
 	@Override
-	public Address fetchAddress(long addressId) throws SystemException {
+	public Address fetchAddress(long addressId) {
 		return addressPersistence.fetchByPrimaryKey(addressId);
 	}
 
@@ -223,11 +221,9 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param uuid the address's UUID
 	 * @param  companyId the primary key of the company
 	 * @return the matching address, or <code>null</code> if a matching address could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Address fetchAddressByUuidAndCompanyId(String uuid, long companyId)
-		throws SystemException {
+	public Address fetchAddressByUuidAndCompanyId(String uuid, long companyId) {
 		return addressPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -237,17 +233,109 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param addressId the primary key of the address
 	 * @return the address
 	 * @throws PortalException if a address with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public Address getAddress(long addressId)
-		throws PortalException, SystemException {
+	public Address getAddress(long addressId) throws PortalException {
 		return addressPersistence.findByPrimaryKey(addressId);
 	}
 
 	@Override
+	public ActionableDynamicQuery getActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.AddressLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(Address.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("addressId");
+
+		return actionableDynamicQuery;
+	}
+
+	protected void initActionableDynamicQuery(
+		ActionableDynamicQuery actionableDynamicQuery) {
+		actionableDynamicQuery.setBaseLocalService(com.liferay.portal.service.AddressLocalServiceUtil.getService());
+		actionableDynamicQuery.setClass(Address.class);
+		actionableDynamicQuery.setClassLoader(getClassLoader());
+
+		actionableDynamicQuery.setPrimaryKeyPropertyName("addressId");
+	}
+
+	@Override
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		final PortletDataContext portletDataContext) {
+		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+				@Override
+				public long performCount() throws PortalException {
+					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+
+					StagedModelType stagedModelType = getStagedModelType();
+
+					long modelAdditionCount = super.performCount();
+
+					manifestSummary.addModelAdditionCount(stagedModelType.toString(),
+						modelAdditionCount);
+
+					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
+							stagedModelType);
+
+					manifestSummary.addModelDeletionCount(stagedModelType.toString(),
+						modelDeletionCount);
+
+					return modelAdditionCount;
+				}
+			};
+
+		initActionableDynamicQuery(exportActionableDynamicQuery);
+
+		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					portletDataContext.addDateRangeCriteria(dynamicQuery,
+						"modifiedDate");
+
+					StagedModelType stagedModelType = exportActionableDynamicQuery.getStagedModelType();
+
+					if (stagedModelType.getReferrerClassNameId() >= 0) {
+						Property classNameIdProperty = PropertyFactoryUtil.forName(
+								"classNameId");
+
+						dynamicQuery.add(classNameIdProperty.eq(
+								stagedModelType.getReferrerClassNameId()));
+					}
+				}
+			});
+
+		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+
+		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+					Address stagedModel = (Address)object;
+
+					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
+						stagedModel);
+				}
+			});
+		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+				PortalUtil.getClassNameId(Address.class.getName())));
+
+		return exportActionableDynamicQuery;
+	}
+
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return addressLocalService.deleteAddress((Address)persistedModel);
+	}
+
+	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return addressPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -258,11 +346,10 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param  companyId the primary key of the company
 	 * @return the matching address
 	 * @throws PortalException if a matching address could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Address getAddressByUuidAndCompanyId(String uuid, long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return addressPersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
@@ -276,11 +363,9 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param start the lower bound of the range of addresses
 	 * @param end the upper bound of the range of addresses (not inclusive)
 	 * @return the range of addresses
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<Address> getAddresses(int start, int end)
-		throws SystemException {
+	public List<Address> getAddresses(int start, int end) {
 		return addressPersistence.findAll(start, end);
 	}
 
@@ -288,10 +373,9 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * Returns the number of addresses.
 	 *
 	 * @return the number of addresses
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getAddressesCount() throws SystemException {
+	public int getAddressesCount() {
 		return addressPersistence.countAll();
 	}
 
@@ -300,11 +384,10 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param address the address
 	 * @return the address that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public Address updateAddress(Address address) throws SystemException {
+	public Address updateAddress(Address address) {
 		return addressPersistence.update(address);
 	}
 
@@ -631,7 +714,7 @@ public abstract class AddressLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = addressPersistence.getDataSource();
 

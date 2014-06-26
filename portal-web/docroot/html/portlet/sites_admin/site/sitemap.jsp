@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,7 @@ Long liveGroupId = (Long)request.getAttribute("site.liveGroupId");
 
 String host = PortalUtil.getHost(request);
 
-String sitemapUrl = PortalUtil.getPortalURL(host, request.getServerPort(), request.isSecure()) + themeDisplay.getPathContext() + "/sitemap.xml";
+String sitemapUrl = PortalUtil.getPortalURL(request) + themeDisplay.getPathContext() + "/sitemap.xml";
 
 String publicSitemapUrl = sitemapUrl;
 
@@ -54,7 +54,7 @@ if (!host.equals(privateLayoutSet.getVirtualHostname())) {
 <br /><br />
 
 <aui:fieldset label="public-pages">
-	<%= LanguageUtil.format(pageContext, "send-sitemap-information-to-preview", new Object[] {"<a target=\"_blank\" href=\"" + publicSitemapUrl + "\">", "</a>"}, false) %>
+	<%= LanguageUtil.format(request, "send-sitemap-information-to-preview", new Object[] {"<a target=\"_blank\" href=\"" + publicSitemapUrl + "\">", "</a>"}, false) %>
 
 	<ul>
 		<li>
@@ -67,7 +67,7 @@ if (!host.equals(privateLayoutSet.getVirtualHostname())) {
 </aui:fieldset>
 
 <aui:fieldset label="private-pages">
-	<%= LanguageUtil.format(pageContext, "send-sitemap-information-to-preview", new Object[] {"<a target=\"_blank\" href=\"" + privateSitemapUrl + "\">", "</a>"}, false) %>
+	<%= LanguageUtil.format(request, "send-sitemap-information-to-preview", new Object[] {"<a target=\"_blank\" href=\"" + privateSitemapUrl + "\">", "</a>"}, false) %>
 
 	<ul>
 		<li>

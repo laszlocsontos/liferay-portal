@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,7 @@ String ym = selContact.getYmSn();
 %>
 
 <c:if test="<%= Validator.isNotNull(aim) || Validator.isNotNull(icq) || Validator.isNotNull(jabber) || Validator.isNotNull(msn) || Validator.isNotNull(skype) || Validator.isNotNull(ym) %>">
-	<h3><liferay-ui:message key="instant-messenger" /></h3>
+	<h3 class="icon-comments"><liferay-ui:message key="instant-messenger" /></h3>
 
 	<dl class="property-list">
 		<c:if test="<%= Validator.isNotNull(aim) %>">
@@ -66,7 +66,7 @@ String ym = selContact.getYmSn();
 			</dt>
 			<dd>
 				<%= HtmlUtil.escape(skype) %>
-				<a href="callto://<%= HtmlUtil.escapeAttribute(skype) %>"><img alt="<liferay-ui:message key="call-this-user" />" class="instant-messenger-logo" src="http://mystatus.skype.com/smallicon/<%= HtmlUtil.escapeAttribute(skype) %>" /></a>
+				<a href="callto://<%= HtmlUtil.escapeAttribute(skype) %>"><img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="call-this-user" />" class="instant-messenger-logo" src="http://mystatus.skype.com/smallicon/<%= HtmlUtil.escapeAttribute(skype) %>" /></a>
 			</dd>
 		</c:if>
 

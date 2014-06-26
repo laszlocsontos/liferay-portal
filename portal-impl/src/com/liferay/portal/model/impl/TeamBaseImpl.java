@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.model.impl;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 
@@ -37,7 +36,7 @@ public abstract class TeamBaseImpl extends TeamModelImpl implements Team {
 	 * Never modify or reference this class directly. All methods that expect a team model instance should use the {@link Team} interface instead.
 	 */
 	@Override
-	public void persist() throws SystemException {
+	public void persist() {
 		if (this.isNew()) {
 			TeamLocalServiceUtil.addTeam(this);
 		}

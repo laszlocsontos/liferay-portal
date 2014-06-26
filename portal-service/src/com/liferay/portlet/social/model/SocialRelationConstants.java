@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portlet.social.model;
+
+import com.liferay.portlet.social.util.SocialRelationTypesUtil;
 
 /**
  * @author Brian Wing Shun Chan
@@ -44,20 +46,31 @@ public class SocialRelationConstants {
 
 	public static final int TYPE_UNI_SUPERVISOR = 11;
 
-	public static boolean isTypeBi(int type) {
-		return !isTypeUni(type);
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             SocialRelationTypesUtil#getTypeLabel(int)}
+	 */
+	@Deprecated
+	public static String getTypeLabel(int type) {
+		return SocialRelationTypesUtil.getTypeLabel(type);
 	}
 
-	public static boolean isTypeUni(int type) {
-		if ((type == TYPE_UNI_CHILD) || (type == TYPE_UNI_ENEMY) ||
-			(type == TYPE_UNI_FOLLOWER) || (type == TYPE_UNI_PARENT) ||
-			(type == TYPE_UNI_SUBORDINATE) || (type == TYPE_UNI_SUPERVISOR)) {
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             SocialRelationTypesUtil#isTypeBi(int)}
+	 */
+	@Deprecated
+	public static boolean isTypeBi(int type) {
+		return SocialRelationTypesUtil.isTypeBi(type);
+	}
 
-			return true;
-		}
-		else {
-			return false;
-		}
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             SocialRelationTypesUtil#isTypeUni(int)}
+	 */
+	@Deprecated
+	public static boolean isTypeUni(int type) {
+		return SocialRelationTypesUtil.isTypeUni(type);
 	}
 
 }

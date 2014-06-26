@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,7 @@ Sort sort = SortFactoryUtil.getSort(JournalArticle.class, searchContainer.getOrd
 BaseModelSearchResult<JournalArticle> baseModelSearchResult = null;
 
 if (searchTerms.isAdvancedSearch()) {
-	baseModelSearchResult = JournalArticleLocalServiceUtil.searchJournalArticles(company.getCompanyId(), searchTerms.getGroupId(), searchTerms.getFolderIds(), JournalArticleConstants.CLASSNAME_ID_DEFAULT, searchTerms.getArticleId(), searchTerms.getTitle(), searchTerms.getDescription(), searchTerms.getContent(), searchTerms.getType(), StringUtil.valueOf(searchTerms.getStatusCode()), searchTerms.getStructureId(), searchTerms.getTemplateId(), journalParams, searchTerms.isAndOperator(), searchContainer.getStart(), searchContainer.getEnd(), sort);
+	baseModelSearchResult = JournalArticleLocalServiceUtil.searchJournalArticles(company.getCompanyId(), searchTerms.getGroupId(), searchTerms.getFolderIds(), JournalArticleConstants.CLASSNAME_ID_DEFAULT, searchTerms.getArticleId(), searchTerms.getTitle(), searchTerms.getDescription(), searchTerms.getContent(), searchTerms.getType(), searchTerms.getStatus(), searchTerms.getStructureId(), searchTerms.getTemplateId(), journalParams, searchTerms.isAndOperator(), searchContainer.getStart(), searchContainer.getEnd(), sort);
 }
 else {
 	baseModelSearchResult = JournalArticleLocalServiceUtil.searchJournalArticles(company.getCompanyId(), searchTerms.getGroupId(), searchTerms.getFolderIds(), JournalArticleConstants.CLASSNAME_ID_DEFAULT, searchTerms.getStructureId(), searchTerms.getTemplateId(), searchTerms.getKeywords(), journalParams, searchContainer.getStart(), searchContainer.getEnd(), sort);

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,7 +61,7 @@ if (Validator.isNull(displayStyle)) {
 				for (String type : PropsUtil.getArray(PropsKeys.SOCIAL_BOOKMARK_TYPES)) {
 				%>
 
-					<aui:input checked="<%= ArrayUtil.contains(typesArray, type) %>" id='<%= "socialBookmarksTypes" + type %>' ignoreRequestValue="<%= true %>" includeHiddenField="<%= false %>" label="<%= type %>" name="preferences--socialBookmarksTypes--" type="checkbox" value="<%= type %>" />
+					<aui:input checked="<%= ArrayUtil.contains(typesArray, type) %>" id='<%= "socialBookmarksTypes" + type %>' ignoreRequestValue="<%= true %>" label="<%= type %>" name="preferences--socialBookmarksTypes--" type="checkbox" value="<%= type %>" />
 
 				<%
 				}
@@ -73,5 +73,5 @@ if (Validator.isNull(displayStyle)) {
 </aui:fieldset>
 
 <aui:script use="aui-base">
-	Liferay.Util.toggleBoxes('<portlet:namespace />enableSocialBookmarksCheckbox','<portlet:namespace />socialBookmarksOptions');
+	Liferay.Util.toggleBoxes('<portlet:namespace />enableSocialBookmarks','<portlet:namespace />socialBookmarksOptions');
 </aui:script>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -271,7 +271,7 @@ public class BaseCmisSearchQueryBuilder implements CMISSearchQueryBuilder {
 				CMISJunction currentCMISJunction = cmisDisjunction;
 
 				BooleanClauseOccur booleanClauseOccur =
-						booleanClause.getBooleanClauseOccur();
+					booleanClause.getBooleanClauseOccur();
 
 				if (booleanClauseOccur.equals(BooleanClauseOccur.MUST)) {
 					currentCMISJunction = anyCMISConjunction;
@@ -316,7 +316,7 @@ public class BaseCmisSearchQueryBuilder implements CMISSearchQueryBuilder {
 			String value = queryTerm.getValue();
 
 			value = CMISParameterValueUtil.formatParameterValue(
-					field, value, false, queryConfig);
+				field, value, false, queryConfig);
 
 			CMISContainsValueExpression cmisContainsValueExpression =
 				new CMISContainsValueExpression(value);

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,7 @@
 <%
 ListType addressListType = address.getType();
 
-String mailingName = LanguageUtil.get(pageContext, addressListType.getName());
+String mailingName = LanguageUtil.get(request, addressListType.getName());
 
 String street1 = address.getStreet1();
 String street2 = address.getStreet2();

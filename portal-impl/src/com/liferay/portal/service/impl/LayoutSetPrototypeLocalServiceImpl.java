@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.portal.RequiredLayoutSetPrototypeException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -34,6 +33,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutSetPrototypeLocalServiceBaseImpl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,9 +48,9 @@ public class LayoutSetPrototypeLocalServiceImpl
 	@Override
 	public LayoutSetPrototype addLayoutSetPrototype(
 			long userId, long companyId, Map<Locale, String> nameMap,
-			String description, boolean active, boolean layoutsUpdateable,
-			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+			Map<Locale, String> descriptionMap, boolean active,
+			boolean layoutsUpdateable, ServiceContext serviceContext)
+		throws PortalException {
 
 		// Layout set prototype
 
@@ -69,7 +69,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 		layoutSetPrototype.setCreateDate(serviceContext.getCreateDate(now));
 		layoutSetPrototype.setModifiedDate(serviceContext.getModifiedDate(now));
 		layoutSetPrototype.setNameMap(nameMap);
-		layoutSetPrototype.setDescription(description);
+		layoutSetPrototype.setDescriptionMap(descriptionMap);
 		layoutSetPrototype.setActive(active);
 
 		UnicodeProperties settingsProperties =
@@ -117,13 +117,34 @@ public class LayoutSetPrototypeLocalServiceImpl
 		return layoutSetPrototype;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #addLayoutSetPrototype(long,
+	 *             long, Map, Map, boolean, boolean, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public LayoutSetPrototype addLayoutSetPrototype(
+			long userId, long companyId, Map<Locale, String> nameMap,
+			String description, boolean active, boolean layoutsUpdateable,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+
+		descriptionMap.put(LocaleUtil.getDefault(), description);
+
+		return addLayoutSetPrototype(
+			userId, companyId, nameMap, descriptionMap, active,
+			layoutsUpdateable, serviceContext);
+	}
+
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
 		type = SystemEventConstants.TYPE_DELETE)
 	public LayoutSetPrototype deleteLayoutSetPrototype(
 			LayoutSetPrototype layoutSetPrototype)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Group
 
@@ -159,7 +180,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 	@Override
 	public LayoutSetPrototype deleteLayoutSetPrototype(
 			long layoutSetPrototypeId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		LayoutSetPrototype layoutSetPrototype =
 			layoutSetPrototypePersistence.findByPrimaryKey(
@@ -169,8 +190,19 @@ public class LayoutSetPrototypeLocalServiceImpl
 	}
 
 	@Override
+	public void deleteLayoutSetPrototypes() throws PortalException {
+		List<LayoutSetPrototype> layoutSetPrototypes =
+			layoutSetPrototypePersistence.findAll();
+
+		for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
+			layoutSetPrototypeLocalService.deleteLayoutSetPrototype(
+				layoutSetPrototype);
+		}
+	}
+
+	@Override
 	public void deleteNondefaultLayoutSetPrototypes(long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long defaultUserId = userLocalService.getDefaultUserId(companyId);
 
@@ -191,7 +223,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 	@Deprecated
 	@Override
 	public LayoutSetPrototype getLayoutSetPrototypeByUuid(String uuid)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return layoutSetPrototypePersistence.findByUuid_First(uuid, null);
 	}
@@ -199,24 +231,21 @@ public class LayoutSetPrototypeLocalServiceImpl
 	@Override
 	public LayoutSetPrototype getLayoutSetPrototypeByUuidAndCompanyId(
 			String uuid, long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return layoutSetPrototypePersistence.findByUuid_C_First(
 			uuid, companyId, null);
 	}
 
 	@Override
-	public List<LayoutSetPrototype> getLayoutSetPrototypes(long companyId)
-		throws SystemException {
-
+	public List<LayoutSetPrototype> getLayoutSetPrototypes(long companyId) {
 		return layoutSetPrototypePersistence.findByCompanyId(companyId);
 	}
 
 	@Override
 	public List<LayoutSetPrototype> search(
-			long companyId, Boolean active, int start, int end,
-			OrderByComparator obc)
-		throws SystemException {
+		long companyId, Boolean active, int start, int end,
+		OrderByComparator obc) {
 
 		if (active != null) {
 			return layoutSetPrototypePersistence.findByC_A(
@@ -229,9 +258,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 	}
 
 	@Override
-	public int searchCount(long companyId, Boolean active)
-		throws SystemException {
-
+	public int searchCount(long companyId, Boolean active) {
 		if (active != null) {
 			return layoutSetPrototypePersistence.countByC_A(companyId, active);
 		}
@@ -243,9 +270,9 @@ public class LayoutSetPrototypeLocalServiceImpl
 	@Override
 	public LayoutSetPrototype updateLayoutSetPrototype(
 			long layoutSetPrototypeId, Map<Locale, String> nameMap,
-			String description, boolean active, boolean layoutsUpdateable,
-			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+			Map<Locale, String> descriptionMap, boolean active,
+			boolean layoutsUpdateable, ServiceContext serviceContext)
+		throws PortalException {
 
 		// Layout set prototype
 
@@ -256,7 +283,7 @@ public class LayoutSetPrototypeLocalServiceImpl
 		layoutSetPrototype.setModifiedDate(
 			serviceContext.getModifiedDate(new Date()));
 		layoutSetPrototype.setNameMap(nameMap);
-		layoutSetPrototype.setDescription(description);
+		layoutSetPrototype.setDescriptionMap(descriptionMap);
 		layoutSetPrototype.setActive(active);
 
 		UnicodeProperties settingsProperties =
@@ -269,22 +296,35 @@ public class LayoutSetPrototypeLocalServiceImpl
 
 		layoutSetPrototypePersistence.update(layoutSetPrototype);
 
-		// Group
-
-		Group group = groupLocalService.getLayoutSetPrototypeGroup(
-			layoutSetPrototype.getCompanyId(), layoutSetPrototypeId);
-
-		group.setName(layoutSetPrototype.getName(LocaleUtil.getDefault()));
-
-		groupPersistence.update(group);
-
 		return layoutSetPrototype;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #updateLayoutSetPrototype(long, Map, Map, boolean, boolean,
+	 *             ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public LayoutSetPrototype updateLayoutSetPrototype(
+			long layoutSetPrototypeId, Map<Locale, String> nameMap,
+			String description, boolean active, boolean layoutsUpdateable,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+
+		descriptionMap.put(LocaleUtil.getDefault(), description);
+
+		return updateLayoutSetPrototype(
+			layoutSetPrototypeId, nameMap, descriptionMap, active,
+			layoutsUpdateable, serviceContext);
 	}
 
 	@Override
 	public LayoutSetPrototype updateLayoutSetPrototype(
 			long layoutSetPrototypeId, String settings)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Layout set prototype
 

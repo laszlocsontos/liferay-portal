@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,7 @@ if (assetEntryId > 0) {
 
 <c:if test="<%= (assetLinks != null) && !assetLinks.isEmpty() %>">
 	<div class="taglib-asset-links">
-		<h2 class="asset-links-title"><liferay-ui:message key="related-assets" />:</h2>
+		<h2 class="asset-links-title icon-link"><liferay-ui:message key="related-assets" />:</h2>
 
 		<ul class="asset-links-list">
 
@@ -49,13 +49,11 @@ if (assetEntryId > 0) {
 
 				assetLinkEntry = assetLinkEntry.toEscapedModel();
 
-				String className = PortalUtil.getClassName(assetLinkEntry.getClassNameId());
-
-				AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(className);
+				AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(assetLinkEntry.getClassNameId());
 
 				if (Validator.isNull(assetRendererFactory)) {
 					if (_log.isWarnEnabled()) {
-						_log.warn("No asset renderer factory found for class " + className);
+						_log.warn("No asset renderer factory found for class " + PortalUtil.getClassName(assetLinkEntry.getClassNameId()));
 					}
 
 					continue;
@@ -85,7 +83,12 @@ if (assetEntryId > 0) {
 						assetPublisherURL.setParameter("urlTitle", assetRenderer.getUrlTitle());
 					}
 
-					assetPublisherURL.setWindowState(WindowState.MAXIMIZED);
+					if (themeDisplay.isStatePopUp()) {
+						assetPublisherURL.setWindowState(LiferayWindowState.POP_UP);
+					}
+					else {
+						assetPublisherURL.setWindowState(WindowState.MAXIMIZED);
+					}
 
 					String viewFullContentURLString = assetPublisherURL.toString();
 
@@ -98,9 +101,9 @@ if (assetEntryId > 0) {
 
 					<li class="asset-links-list-item">
 						<liferay-ui:icon
+							iconCssClass="<%= assetRenderer.getIconCssClass() %>"
 							label="<%= true %>"
 							message="<%= asseLinktEntryTitle %>"
-							src="<%= assetRenderer.getIconPath(portletRequest) %>"
 							url="<%= urlViewInContext %>"
 						/>
 					</li>

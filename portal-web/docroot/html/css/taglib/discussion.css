@@ -19,7 +19,7 @@
 
 		&:after {
 			clear: both;
-			content: ".";
+			content: '';
 			display: block;
 			height: 0;
 			visibility: hidden;
@@ -47,8 +47,8 @@
 
 			.user-details .user-name, .user-profile-image {
 				clear: none;
-				vertical-align: top;
 				text-align: center;
+				vertical-align: top;
 			}
 
 			.user-profile-image img {
@@ -135,7 +135,6 @@
 				textarea {
 					max-width: 100%;
 					width: 100%;
-					@include box-sizing(border-box);
 				}
 			}
 
@@ -182,7 +181,7 @@
 
 .lfr-discussion-controls:after {
 	clear: both;
-	content: "";
+	content: '';
 	display: block;
 	height: 0;
 }
@@ -197,8 +196,8 @@
 
 .taglib-discussion {
 	table.tree-walker {
-		border-width: 0;
 		border-collapse: collapse;
+		border-width: 0;
 	}
 
 	.lfr-discussion {
@@ -222,7 +221,7 @@
 
 	.lfr-discussion-posted-on {
 		color: #999;
-		font-size: .9em;
+		font-size: 0.9em;
 
 		.lfr-discussion-parent-link {
 			cursor: pointer;

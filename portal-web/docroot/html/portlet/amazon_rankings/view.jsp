@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,7 +42,7 @@
 			<tr>
 				<td>
 					<aui:a href='<%= "http://www.amazon.com/exec/obidos/ASIN/" + amazonRankings.getISBN() %>' target="_blank">
-						<img border="0" src="<%= amazonRankings.getSmallImageURL() %>" />
+						<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="amazon-rankings" />" src="<%= amazonRankings.getSmallImageURL() %>" />
 					</aui:a>
 				</td>
 				<td>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -88,6 +88,8 @@ public class ReleaseInfo {
 	public static final int RELEASE_6_2_10_BUILD_NUMBER = 6210;
 
 	public static final int RELEASE_7_0_0_BUILD_NUMBER = 7000;
+
+	public static final int RELEASE_7_0_10_BUILD_NUMBER = 7010;
 
 	public static final Date getBuildDate() {
 		DateFormat df = DateFormat.getDateInstance(DateFormat.LONG);

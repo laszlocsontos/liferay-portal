@@ -109,7 +109,7 @@ AUI.add(
 						);
 
 						baseRows.each(
-							function(item, index, collection) {
+							function(item, index) {
 								var formRow;
 								var firstChild;
 
@@ -203,7 +203,7 @@ AUI.add(
 
 							AArray.each(
 								CSS_VALIDATION_HELPER_CLASSES,
-								function(item, index, collection) {
+								function(item, index) {
 									var disabledClass = item + '-disabled';
 
 									node.all('.' + item).replaceClass(item, disabledClass);
@@ -222,7 +222,7 @@ AUI.add(
 								rules = formValidator.get('rules');
 
 								node.all('input, select, textarea').each(
-									function(item, index, collection) {
+									function(item, index) {
 										var name = item.attr('name') || item.attr('id');
 
 										if (rules && rules[name]) {
@@ -243,7 +243,7 @@ AUI.add(
 									if (rules) {
 										AObject.each(
 											deletedRules,
-											function(item, index, collection) {
+											function(item, index) {
 												rules[index] = item;
 											}
 										);
@@ -251,7 +251,7 @@ AUI.add(
 
 									AArray.each(
 										CSS_VALIDATION_HELPER_CLASSES,
-										function(item, index, collection) {
+										function(item, index) {
 											var disabledClass = item + '-disabled';
 
 											node.all('.' + disabledClass).replaceClass(disabledClass, item);
@@ -286,7 +286,7 @@ AUI.add(
 						var contentBox = instance._contentBox;
 
 						contentBox.all('.lfr-form-row').each(
-							function(item, index, collection) {
+							function(item, index) {
 								instance.deleteRow(item);
 							}
 						);
@@ -318,7 +318,7 @@ AUI.add(
 						}
 						else {
 							visibleRows.each(
-								function(item, index, collection) {
+								function(item, index) {
 									var formField = item.one('input, textarea, select');
 									var fieldId = formField.attr('id');
 
@@ -358,7 +358,7 @@ AUI.add(
 
 					_clearForm: function(node) {
 						node.all('input, select, textarea').each(
-							function(item, index, collection) {
+							function(item, index) {
 								var type = item.getAttribute('type');
 								var tag = item.get('nodeName').toLowerCase();
 
@@ -382,13 +382,13 @@ AUI.add(
 
 						AArray.each(
 							CSS_VALIDATION_HELPER_CLASSES,
-							function(item, index, collection) {
+							function(item, index) {
 								node.all('.' + item).removeClass(item);
 							}
 						);
 					},
 
-					_clearHiddenRows: function(item, index, collection) {
+					_clearHiddenRows: function(item, index) {
 						var instance = this;
 
 						if (instance._isHiddenRow(item)) {
@@ -404,6 +404,8 @@ AUI.add(
 						var guid = (++instance._guid);
 
 						var formValidator = instance._getFormValidator(node);
+
+						var clonedRow;
 
 						if (instance.url) {
 							clonedRow = instance._createCloneFromURL(clone, guid);
@@ -425,7 +427,7 @@ AUI.add(
 						}
 
 						node.all('input, select, textarea, span').each(
-							function(item, index, collection) {
+							function(item, index) {
 								var oldName = item.attr('name') || item.attr('id');
 								var originalName = oldName.replace(/([0-9]+)$/, '');
 								var newName = originalName + guid;
@@ -538,7 +540,7 @@ AUI.add(
 							'clearList',
 							function(event) {
 								rows.all('.lfr-form-row').each(
-									function(item, index, collection) {
+									function(item, index) {
 										if (instance._isHiddenRow(item)) {
 											A.DD.DDM.getDrag(item).destroy();
 										}

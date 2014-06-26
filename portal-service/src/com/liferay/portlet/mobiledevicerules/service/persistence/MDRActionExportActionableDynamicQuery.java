@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -30,12 +29,14 @@ import com.liferay.portlet.mobiledevicerules.model.MDRAction;
 
 /**
  * @author Edward C. Han
+ * @deprecated As of 7.0.0, replaced by {@link com.liferay.portlet.mobiledevicerules.service.MDRActionLocalServiceUtil#getExportActionableDynamicQuery()}
  * @generated
  */
+@Deprecated
 public class MDRActionExportActionableDynamicQuery
 	extends MDRActionActionableDynamicQuery {
 	public MDRActionExportActionableDynamicQuery(
-		PortletDataContext portletDataContext) throws SystemException {
+		PortletDataContext portletDataContext) {
 		_portletDataContext = portletDataContext;
 
 		setCompanyId(_portletDataContext.getCompanyId());
@@ -44,7 +45,7 @@ public class MDRActionExportActionableDynamicQuery
 	}
 
 	@Override
-	public long performCount() throws PortalException, SystemException {
+	public long performCount() throws PortalException {
 		ManifestSummary manifestSummary = _portletDataContext.getManifestSummary();
 
 		StagedModelType stagedModelType = getStagedModelType();
@@ -82,9 +83,7 @@ public class MDRActionExportActionableDynamicQuery
 	}
 
 	@Override
-	@SuppressWarnings("unused")
-	protected void performAction(Object object)
-		throws PortalException, SystemException {
+	protected void performAction(Object object) throws PortalException {
 		MDRAction stagedModel = (MDRAction)object;
 
 		StagedModelDataHandlerUtil.exportStagedModel(_portletDataContext,

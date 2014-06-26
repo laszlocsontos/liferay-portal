@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,12 +21,10 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.social.model.SocialRequest;
 import com.liferay.portlet.social.service.SocialRequestLocalServiceUtil;
-import com.liferay.portlet.social.service.persistence.SocialRequestActionableDynamicQuery;
 
 /**
  * @author Bryan Engler
@@ -37,38 +35,45 @@ public class VerifySocial extends VerifyProcess {
 	@Override
 	protected void doVerify() throws Exception {
 		ActionableDynamicQuery socialRequestActionableDynamicQuery =
-			new SocialRequestActionableDynamicQuery() {
+			SocialRequestLocalServiceUtil.getActionableDynamicQuery();
 
-			@Override
-			protected void addCriteria(DynamicQuery dynamicQuery) {
-				Property classNameIdProperty = PropertyFactoryUtil.forName(
-					"classNameId");
+		socialRequestActionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
 
-				long classNameId = PortalUtil.getClassNameId(Group.class);
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					Property classNameIdProperty = PropertyFactoryUtil.forName(
+						"classNameId");
 
-				dynamicQuery.add(classNameIdProperty.eq(classNameId));
+					long classNameId = PortalUtil.getClassNameId(Group.class);
 
-				Property classPKProperty = PropertyFactoryUtil.forName(
-					"classPK");
+					dynamicQuery.add(classNameIdProperty.eq(classNameId));
 
-				DynamicQuery groupDynamicQuery =
-					DynamicQueryFactoryUtil.forClass(Group.class);
+					Property classPKProperty = PropertyFactoryUtil.forName(
+						"classPK");
 
-				Projection projection = ProjectionFactoryUtil.property(
-					"groupId");
+					DynamicQuery groupDynamicQuery =
+						DynamicQueryFactoryUtil.forClass(Group.class);
 
-				groupDynamicQuery.setProjection(projection);
+					Projection projection = ProjectionFactoryUtil.property(
+						"groupId");
 
-				dynamicQuery.add(classPKProperty.notIn(groupDynamicQuery));
-			}
+					groupDynamicQuery.setProjection(projection);
 
-			@Override
-			protected void performAction(Object object) throws SystemException {
-				SocialRequestLocalServiceUtil.deleteRequest(
-					(SocialRequest)object);
-			}
+					dynamicQuery.add(classPKProperty.notIn(groupDynamicQuery));
+				}
 
-		};
+			});
+		socialRequestActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object) {
+					SocialRequestLocalServiceUtil.deleteRequest(
+						(SocialRequest)object);
+				}
+
+			});
 
 		socialRequestActionableDynamicQuery.performActions();
 	}

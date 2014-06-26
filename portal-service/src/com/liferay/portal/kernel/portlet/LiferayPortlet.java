@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,12 +18,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -36,13 +36,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.GenericPortlet;
 import javax.portlet.MimeResponse;
-import javax.portlet.PortletConfig;
 import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
@@ -52,6 +52,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.WindowState;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -294,6 +295,17 @@ public class LiferayPortlet extends GenericPortlet {
 		return method;
 	}
 
+	protected String getJSONContentType(PortletRequest portletRequest) {
+		HttpServletRequest request = PortalUtil.getHttpServletRequest(
+			portletRequest);
+
+		if (BrowserSnifferUtil.isIe(request)) {
+			return ContentTypes.TEXT_HTML;
+		}
+
+		return ContentTypes.APPLICATION_JSON;
+	}
+
 	protected String getRedirect(
 		ActionRequest actionRequest, ActionResponse actionResponse) {
 
@@ -358,28 +370,25 @@ public class LiferayPortlet extends GenericPortlet {
 	}
 
 	protected String translate(PortletRequest portletRequest, String key) {
-		PortletConfig portletConfig =
-			(PortletConfig)portletRequest.getAttribute(
-				JavaConstants.JAVAX_PORTLET_CONFIG);
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		return LanguageUtil.get(portletConfig, themeDisplay.getLocale(), key);
+		ResourceBundle resourceBundle = getResourceBundle(
+			themeDisplay.getLocale());
+
+		return LanguageUtil.get(resourceBundle, key);
 	}
 
 	protected String translate(
 		PortletRequest portletRequest, String key, Object... arguments) {
 
-		PortletConfig portletConfig =
-			(PortletConfig)portletRequest.getAttribute(
-				JavaConstants.JAVAX_PORTLET_CONFIG);
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		return LanguageUtil.format(
-			portletConfig, themeDisplay.getLocale(), key, arguments);
+		ResourceBundle resourceBundle = getResourceBundle(
+			themeDisplay.getLocale());
+
+		return LanguageUtil.format(resourceBundle, key, arguments);
 	}
 
 	protected void writeJSON(
@@ -390,7 +399,7 @@ public class LiferayPortlet extends GenericPortlet {
 		HttpServletResponse response = PortalUtil.getHttpServletResponse(
 			actionResponse);
 
-		response.setContentType(ContentTypes.APPLICATION_JSON);
+		response.setContentType(getJSONContentType(portletRequest));
 
 		ServletResponseUtil.write(response, json.toString());
 
@@ -402,7 +411,7 @@ public class LiferayPortlet extends GenericPortlet {
 			Object json)
 		throws IOException {
 
-		mimeResponse.setContentType(ContentTypes.APPLICATION_JSON);
+		mimeResponse.setContentType(getJSONContentType(portletRequest));
 
 		PortletResponseUtil.write(mimeResponse, json.toString());
 

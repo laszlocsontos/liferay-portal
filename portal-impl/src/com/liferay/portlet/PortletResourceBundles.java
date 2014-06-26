@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,7 +31,6 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.PageContext;
 
 import org.apache.struts.util.RequestUtils;
 
@@ -40,12 +39,12 @@ import org.apache.struts.util.RequestUtils;
  */
 public class PortletResourceBundles {
 
-	public static String getString(Locale locale, String key) {
-		return _instance._getString(locale, key);
+	public static String getString(HttpServletRequest request, String key) {
+		return _instance._getString(request, key);
 	}
 
-	public static String getString(PageContext pageContext, String key) {
-		return _instance._getString(pageContext, key);
+	public static String getString(Locale locale, String key) {
+		return _instance._getString(locale, key);
 	}
 
 	public static String getString(String languageId, String key) {
@@ -82,9 +81,8 @@ public class PortletResourceBundles {
 
 		if (resourceBundle == null) {
 			try {
-				resourceBundle = new NullSafeResourceBundle(
-					new PropertyResourceBundle(
-						new UnsyncByteArrayInputStream(new byte[0])));
+				resourceBundle = new PropertyResourceBundle(
+					new UnsyncByteArrayInputStream(new byte[0]));
 
 				resourceBundles.put(languageId, resourceBundle);
 			}
@@ -120,15 +118,14 @@ public class PortletResourceBundles {
 		return resourceBundles;
 	}
 
-	private String _getString(Locale locale, String key) {
-		return _getString(LocaleUtil.toLanguageId(locale), key);
-	}
-
-	private String _getString(PageContext pageContext, String key) {
-		Locale locale = RequestUtils.getUserLocale(
-			(HttpServletRequest)pageContext.getRequest(), null);
+	private String _getString(HttpServletRequest request, String key) {
+		Locale locale = RequestUtils.getUserLocale(request, null);
 
 		return _getString(locale, key);
+	}
+
+	private String _getString(Locale locale, String key) {
+		return _getString(LocaleUtil.toLanguageId(locale), key);
 	}
 
 	private String _getString(String languageId, String key) {
@@ -165,8 +162,6 @@ public class PortletResourceBundles {
 
 		Map<String, ResourceBundle> resourceBundles = _getResourceBundles(
 			servletContextName);
-
-		resourceBundle = new NullSafeResourceBundle(resourceBundle);
 
 		resourceBundles.put(languageId, resourceBundle);
 	}

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -145,7 +145,7 @@ for (int i = 0; i < results.size(); i++) {
 
 	ResultRow row = new ResultRow(new Object[] {role, actionId, curResource, target, scope, supportsFilterByGroup, groups, groupIdsArray, groupNames}, target, i);
 
-	row.addText(_getActionLabel(pageContext, themeDisplay, curResource, actionId));
+	row.addText(_getActionLabel(request, themeDisplay, curResource, actionId));
 
 	if (showScope) {
 		row.addJSP("/html/portlet/roles_admin/edit_role_permissions_resource_scope.jsp");

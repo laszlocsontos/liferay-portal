@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,38 +15,30 @@
 package com.liferay.portal.repository.util;
 
 import com.liferay.portal.kernel.repository.BaseRepository;
-import com.liferay.portal.kernel.util.InstanceFactory;
-import com.liferay.portal.kernel.util.ProxyFactory;
-import com.liferay.portal.repository.proxy.BaseRepositoryProxyBean;
 
 /**
- * @author Mika Koivisto
+ * @author     Mika Koivisto
+ * @deprecated As of 7.0.0, replaced by {@link
+ *             com.liferay.portal.repository.util.ExternalRepositoryFactoryImpl}
  */
+@Deprecated
 public class RepositoryFactoryImpl implements RepositoryFactory {
 
 	public RepositoryFactoryImpl(String className) {
-		_className = className;
+		_externalRepositoryFactory = new ExternalRepositoryFactoryImpl(
+			className);
 	}
 
 	public RepositoryFactoryImpl(String className, ClassLoader classLoader) {
-		_classLoader = classLoader;
-		_className = className;
+		_externalRepositoryFactory = new ExternalRepositoryFactoryImpl(
+			className, classLoader);
 	}
 
 	@Override
 	public BaseRepository getInstance() throws Exception {
-		if (_classLoader == null) {
-			return (BaseRepository)InstanceFactory.newInstance(_className);
-		}
-
-		BaseRepository baseRepository =
-			(BaseRepository)ProxyFactory.newInstance(
-				_classLoader, BaseRepository.class, _className);
-
-		return new BaseRepositoryProxyBean(baseRepository, _classLoader);
+		return _externalRepositoryFactory.getInstance();
 	}
 
-	private ClassLoader _classLoader;
-	private String _className;
+	private ExternalRepositoryFactory _externalRepositoryFactory;
 
 }

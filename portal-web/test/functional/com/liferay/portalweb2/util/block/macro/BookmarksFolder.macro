@@ -19,7 +19,7 @@
 
 		<execute action="CPBookmarksAddfolder#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 		<execute action="CPBookmarksAddfolder#assertTextEquals" locator-key1="NAME_FIELD_REQUIRED" value1="Name" />
-		<execute action="CPBookmarksAddfolder#assertTextEquals" locator-key1="NAME_FIELD_REQUIRED" value1="(Required)" />
+		<execute action="CPBookmarksAddfolder#assertTextEquals" locator-key1="NAME_FIELD_REQUIRED" value1="Required" />
 		<execute action="CPBookmarksAddfolder#assertTextEquals" locator-key1="NAME_FIELD_REQUIRED" value1="This field is required." />
 	</command>
 
@@ -34,7 +34,7 @@
 		<execute action="CPBookmarksAddsubfolder#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 
 		<execute action="CPBookmarksAddsubfolder#assertTextEquals" locator-key1="NAME_FIELD_REQUIRED" value1="Name" />
-		<execute action="CPBookmarksAddsubfolder#assertTextEquals" locator-key1="NAME_FIELD_REQUIRED" value1="(Required)" />
+		<execute action="CPBookmarksAddsubfolder#assertTextEquals" locator-key1="NAME_FIELD_REQUIRED" value1="Required" />
 		<execute action="CPBookmarksAddsubfolder#assertTextEquals" locator-key1="NAME_FIELD_REQUIRED" value1="This field is required." />
 	</command>
 
@@ -79,12 +79,27 @@
 		<execute action="CPBookmarksFolder#assertTextEquals" locator-key1="FOLDER_NAME" value1="${folderName}" />
 	</command>
 
+	<command name="addSubfolderPG">
+		<execute action="PGBookmarks#assertClick" locator-key1="FOLDER_MENU_ADD_SUBFOLDER" value1="Add Subfolder" />
+
+		<execute action="PGBookmarksAddSubfolder#type" locator-key1="NAME_FIELD" value1="${folderName}" />
+		<execute action="PGBookmarksAddSubfolder#type" locator-key1="DESCRIPTION_FIELD" value1="${folderDescription}" />
+		<execute action="PGBookmarksAddSubfolder#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+
+		<execute action="PGBookmarks#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+
+		<var name="key_folderName" value="${folderName}" />
+
+		<execute action="PGBookmarks#assertTextEquals" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${folderName}" />
+		<execute action="PGBookmarks#assertTextEquals" locator-key1="FOLDERS_TABLE_FOLDER_DESCRIPTION" value1="${folderDescription}" />
+	</command>
+
 	<command name="deletePG">
 		<var name="key_folderName" value="${folderName}" />
 
 		<execute action="PGBookmarks#assertTextEquals" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${folderName}" />
-		<execute action="PGBookmarks#assertElementPresent" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" value1="Actions" />
-		<execute action="PGBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" value1="Actions" />
+		<execute action="PGBookmarks#assertElementPresent" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" />
+		<execute action="PGBookmarks#click" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" />
 		<execute action="PGBookmarks#assertClick" locator-key1="FOLDER_ACTION_MENULIST_MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
 		<execute action="PGBookmarks#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="moved to the Recycle Bin. Undo" />
 
@@ -96,7 +111,7 @@
 	</command>
 
 	<command name="editCP">
-		<execute action="CPBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" value1="Actions" />
+		<execute action="CPBookmarks#click" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" />
 		<execute action="CPBookmarks#assertClick" locator-key1="FOLDER_ACTION_MENULIST_EDIT" value1="Edit" />
 
 		<var name="key_folderName" value="${folderName}" />
@@ -115,7 +130,7 @@
 
 		<execute action="PGBookmarks#assertTextEquals" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${folderName}" />
 		<execute action="PGBookmarks#assertTextEquals" locator-key1="FOLDERS_TABLE_FOLDER_DESCRIPTION" value1="${folderDescription}" />
-		<execute action="PGBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" value1="Actions" />
+		<execute action="PGBookmarks#click" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" />
 		<execute action="PGBookmarks#assertClick" locator-key1="FOLDER_ACTION_MENULIST_EDIT" value1="Edit" />
 
 		<execute action="PGBookmarksEditFolder#type" locator-key1="NAME_FIELD" value1="${folderNameEdit}" />
@@ -136,7 +151,7 @@
 		<execute action="CPBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${folderName}" />
 
 		<execute action="CPBookmarksFolder#assertTextEquals" locator-key1="FOLDER_NAME" value1="${folderName}" />
-		<execute action="CPBookmarksFolder#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" value1="Actions" />
+		<execute action="CPBookmarksFolder#click" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" />
 		<execute action="CPBookmarksFolder#assertClick" locator-key1="FOLDER_ACTION_MENULIST_EDIT" value1="Edit" />
 
 		<var name="key_folderName" value="${editSubfolderName}" />
@@ -156,13 +171,29 @@
 		<execute action="PGBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${folderName}" />
 	</command>
 
+	<command name="gotoSubfolderPG">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteURL" value="${siteURL}" />
+		</execute>
+
+		<var name="key_folderName" value="${folderName}" />
+
+		<execute action="PGBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${folderName}" />
+
+		<var name="key_folderName" value="${subfolderName}" />
+
+		<execute action="PGBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${subfolderName}" />
+	</command>
+
 	<command name="mergeSubfolderToFolderCP">
 		<var name="key_folderName" value="${folderName}" />
 
 		<execute action="CPBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${folderName}" />
 
 		<execute action="CPBookmarksFolder#assertTextEquals" locator-key1="FOLDER_NAME" value1="${folderName}" />
-		<execute action="CPBookmarksFolder#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" value1="Actions" />
+		<execute action="CPBookmarksFolder#click" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" />
 		<execute action="CPBookmarksFolder#assertClick" locator-key1="FOLDER_ACTION_MENULIST_EDIT" value1="Edit" />
 
 		<var name="key_folderName" value="${editSubfolderName}" />
@@ -178,6 +209,11 @@
 		<execute action="CPBookmarksFolder#assertTextEquals" locator-key1="BOOKMARKS_TABLE_URL" value1="${bookmarkURL}" />
 	</command>
 
+	<command name="moveSubfolderToRecycleBinPG">
+		<execute action="PGBookmarks#assertClick" locator-key1="FOLDER_MENU_MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
+		<execute action="PGBookmarks#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="The Bookmarks Folder ${subfolderName} was moved to the Recycle Bin." />
+	</command>
+
 	<command name="moveToRecycleBinCP">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Bookmarks" />
@@ -186,8 +222,8 @@
 		<var name="key_folderName" value="${folderName}" />
 
 		<execute action="CPBookmarks#assertTextEquals" locator-key1="FOLDERS_TABLE_FOLDER_NAME" value1="${folderName}" />
-		<execute action="CPBookmarks#assertElementPresent" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" value1="Actions" />
-		<execute action="CPBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" value1="Actions" />
+		<execute action="CPBookmarks#assertElementPresent" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" />
+		<execute action="CPBookmarks#click" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON" />
 		<execute action="CPBookmarks#assertClick" locator-key1="FOLDER_ACTION_MENULIST_MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
 		<execute action="CPBookmarks#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="moved to the Recycle Bin. Undo" />
 	</command>
@@ -200,7 +236,7 @@
 		<while>
 			<condition action="CPBookmarks#isElementPresent" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" />
 			<then>
-				<execute action="CPBookmarks#assertClick" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" value1="Actions" />
+				<execute action="CPBookmarks#click" locator-key1="FOLDERS_TABLE_FOLDER_ACTIONS_BUTTON_GENERIC" />
 				<execute action="CPBookmarks#assertClick" locator-key1="FOLDER_ACTION_MENULIST_MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
 				<execute action="CPBookmarks#assertTextEquals" locator-key1="SUCCESS_MESSAGE_RECYCLE_BIN" value1="moved to the Recycle Bin. Undo" />
 			</then>

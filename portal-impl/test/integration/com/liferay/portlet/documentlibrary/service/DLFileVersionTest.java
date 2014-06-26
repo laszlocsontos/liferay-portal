@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,18 +17,18 @@ package com.liferay.portlet.documentlibrary.service;
 import com.liferay.portal.events.AddDefaultDocumentLibraryStructuresAction;
 import com.liferay.portal.kernel.events.SimpleAction;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -57,7 +57,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Preston Crary
  */
-@ExecutionTestListeners(listeners = {EnvironmentExecutionTestListener.class})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class DLFileVersionTest extends BaseDLAppTestCase {
 
@@ -75,7 +75,8 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 
 		List<DLFileEntryType> dlFileEntryTypes =
 			DLFileEntryTypeLocalServiceUtil.getFileEntryTypes(
-				PortalUtil.getSiteAndCompanyGroupIds(group.getGroupId()));
+				PortalUtil.getCurrentAndAncestorSiteGroupIds(
+					group.getGroupId()));
 
 		for (DLFileEntryType dlFileEntryType : dlFileEntryTypes) {
 			String name = dlFileEntryType.getName(LocaleUtil.getSiteDefault());
@@ -108,13 +109,13 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 	@After
 	@Override
 	public void tearDown() throws Exception {
-		super.tearDown();
-
 		ExpandoTable expandoTable =
 			ExpandoTableLocalServiceUtil.getDefaultTable(
 				PortalUtil.getDefaultCompanyId(), DLFileEntry.class.getName());
 
 		ExpandoTableLocalServiceUtil.deleteTable(expandoTable);
+
+		super.tearDown();
 	}
 
 	@Test
@@ -237,8 +238,8 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 	}
 
 	protected ServiceContext getServiceContext() throws Exception {
-		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
-			group.getGroupId());
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(group.getGroupId());
 
 		serviceContext.setAttribute(
 			"fileEntryTypeId", _contractDLFileEntryTypeId);
@@ -266,7 +267,7 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 					ddmStructure.getStructureId(), name, StringPool.BLANK);
 
 				if (ddmStructure.isFieldPrivate(name)) {
-					field.setValue(ServiceTestUtil.randomString());
+					field.setValue(RandomTestUtil.randomString());
 				}
 
 				fields.put(field);
@@ -281,7 +282,7 @@ public class DLFileVersionTest extends BaseDLAppTestCase {
 
 	protected void updateServiceContext(
 			String expando, long fileEntryTypeId, String metadata)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Map<String, Serializable> expandoBridgeAttributes =
 			_serviceContext.getExpandoBridgeAttributes();

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,7 @@
 
 <%
 String color = portletPreferences.getValue("color", "#FFFFCC");
-String data = portletPreferences.getValue("data", LanguageUtil.get(pageContext, "click-to-edit-me"));
+String data = portletPreferences.getValue("data", LanguageUtil.get(request, "click-to-edit-me"));
 %>
 
 <%@ include file="/html/portlet/quick_note/init-ext.jsp" %>

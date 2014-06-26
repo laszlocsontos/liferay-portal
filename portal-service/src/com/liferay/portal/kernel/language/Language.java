@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,23 +14,53 @@
 
 package com.liferay.portal.kernel.language;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
-import javax.portlet.PortletConfig;
 import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.PageContext;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@ProviderType
 public interface Language {
+
+	public String format(
+		HttpServletRequest request, String pattern, LanguageWrapper argument);
+
+	public String format(
+		HttpServletRequest request, String pattern, LanguageWrapper argument,
+		boolean translateArguments);
+
+	public String format(
+		HttpServletRequest request, String pattern,
+		LanguageWrapper[] arguments);
+
+	public String format(
+		HttpServletRequest request, String pattern, LanguageWrapper[] arguments,
+		boolean translateArguments);
+
+	public String format(
+		HttpServletRequest request, String pattern, Object argument);
+
+	public String format(
+		HttpServletRequest request, String pattern, Object argument,
+		boolean translateArguments);
+
+	public String format(
+		HttpServletRequest request, String pattern, Object[] arguments);
+
+	public String format(
+		HttpServletRequest request, String pattern, Object[] arguments,
+		boolean translateArguments);
 
 	public String format(Locale locale, String pattern, List<Object> arguments);
 
@@ -47,62 +77,32 @@ public interface Language {
 		boolean translateArguments);
 
 	public String format(
-		PageContext pageContext, String pattern, LanguageWrapper argument);
+		ResourceBundle resourceBundle, String pattern, Object argument);
 
 	public String format(
-		PageContext pageContext, String pattern, LanguageWrapper argument,
+		ResourceBundle resourceBundle, String pattern, Object argument,
 		boolean translateArguments);
 
 	public String format(
-		PageContext pageContext, String pattern, LanguageWrapper[] arguments);
+		ResourceBundle resourceBundle, String pattern, Object[] arguments);
 
 	public String format(
-		PageContext pageContext, String pattern, LanguageWrapper[] arguments,
+		ResourceBundle resourceBundle, String pattern, Object[] arguments,
 		boolean translateArguments);
 
-	public String format(
-		PageContext pageContext, String pattern, Object argument);
+	public String get(HttpServletRequest request, String key);
 
-	public String format(
-		PageContext pageContext, String pattern, Object argument,
-		boolean translateArguments);
-
-	public String format(
-		PageContext pageContext, String pattern, Object[] arguments);
-
-	public String format(
-		PageContext pageContext, String pattern, Object[] arguments,
-		boolean translateArguments);
-
-	public String format(
-		PortletConfig portletConfig, Locale locale, String pattern,
-		Object argument);
-
-	public String format(
-		PortletConfig portletConfig, Locale locale, String pattern,
-		Object argument, boolean translateArguments);
-
-	public String format(
-		PortletConfig portletConfig, Locale locale, String pattern,
-		Object[] arguments);
-
-	public String format(
-		PortletConfig portletConfig, Locale locale, String pattern,
-		Object[] arguments, boolean translateArguments);
+	public String get(
+		HttpServletRequest request, String key, String defaultValue);
 
 	public String get(Locale locale, String key);
 
 	public String get(Locale locale, String key, String defaultValue);
 
-	public String get(PageContext pageContext, String key);
-
-	public String get(PageContext pageContext, String key, String defaultValue);
-
-	public String get(PortletConfig portletConfig, Locale locale, String key);
+	public String get(ResourceBundle resourceBundle, String key);
 
 	public String get(
-		PortletConfig portletConfig, Locale locale, String key,
-		String defaultValue);
+		ResourceBundle resourceBundle, String key, String defaultValue);
 
 	public Locale[] getAvailableLocales();
 
@@ -126,21 +126,21 @@ public interface Language {
 
 	public Locale[] getSupportedLocales();
 
+	public String getTimeDescription(
+		HttpServletRequest request, long milliseconds);
+
+	public String getTimeDescription(
+		HttpServletRequest request, long milliseconds, boolean approximate);
+
+	public String getTimeDescription(
+		HttpServletRequest request, Long milliseconds);
+
 	public String getTimeDescription(Locale locale, long milliseconds);
 
 	public String getTimeDescription(
 		Locale locale, long milliseconds, boolean approximate);
 
 	public String getTimeDescription(Locale locale, Long milliseconds);
-
-	public String getTimeDescription(
-		PageContext pageContext, long milliseconds);
-
-	public String getTimeDescription(
-		PageContext pageContext, long milliseconds, boolean approximate);
-
-	public String getTimeDescription(
-		PageContext pageContext, Long milliseconds);
 
 	public void init();
 
@@ -158,8 +158,10 @@ public interface Language {
 
 	public boolean isDuplicateLanguageCode(String languageCode);
 
-	public boolean isInheritLocales(long groupId)
-		throws PortalException, SystemException;
+	public boolean isInheritLocales(long groupId) throws PortalException;
+
+	public String process(
+		ResourceBundle resourceBundle, Locale locale, String content);
 
 	public void resetAvailableGroupLocales(long groupId);
 

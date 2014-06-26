@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,9 +17,7 @@ package com.liferay.portal.kernel.resiliency.spi.provider;
 import com.liferay.portal.kernel.resiliency.spi.MockSPI;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.util.ReflectionUtil;
-
-import java.lang.reflect.Field;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
 import java.util.Map;
 import java.util.concurrent.SynchronousQueue;
@@ -38,6 +36,11 @@ public class SPISynchronousQueueUtilTest {
 		new CodeCoverageAssertor();
 
 	@Test
+	public void testConstructor() {
+		new SPISynchronousQueueUtil();
+	}
+
+	@Test
 	public void testSPISynchronousQueueUtil() throws Exception {
 
 		// Create
@@ -48,7 +51,9 @@ public class SPISynchronousQueueUtilTest {
 			SPISynchronousQueueUtil.createSynchronousQueue(spiUUID);
 
 		Map<String, SynchronousQueue<SPI>> synchronizerRegistry =
-			_getSynchronousQueues();
+			(Map<String, SynchronousQueue<SPI>>)
+				ReflectionTestUtil.getFieldValue(
+					SPISynchronousQueueUtil.class, "_synchronousQueues");
 
 		Assert.assertSame(synchronousQueue, synchronizerRegistry.get(spiUUID));
 
@@ -98,15 +103,6 @@ public class SPISynchronousQueueUtilTest {
 		SPISynchronousQueueUtil.destroySynchronousQueue(spiUUID);
 
 		Assert.assertTrue(synchronizerRegistry.isEmpty());
-	}
-
-	private static Map<String, SynchronousQueue<SPI>> _getSynchronousQueues()
-		throws Exception {
-
-		Field field = ReflectionUtil.getDeclaredField(
-			SPISynchronousQueueUtil.class, "_synchronousQueues");
-
-		return (Map<String, SynchronousQueue<SPI>>)field.get(null);
 	}
 
 }

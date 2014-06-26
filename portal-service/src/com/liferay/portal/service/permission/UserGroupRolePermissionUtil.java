@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,6 @@ package com.liferay.portal.service.permission;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Role;
@@ -32,21 +31,21 @@ public class UserGroupRolePermissionUtil {
 
 	public static void check(
 			PermissionChecker permissionChecker, Group group, Role role)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		getUserGroupRolePermission().check(permissionChecker, group, role);
 	}
 
 	public static void check(
 			PermissionChecker permissionChecker, long groupId, long roleId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		getUserGroupRolePermission().check(permissionChecker, groupId, roleId);
 	}
 
 	public static boolean contains(
 			PermissionChecker permissionChecker, Group group, Role role)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getUserGroupRolePermission().contains(
 			permissionChecker, group, role);
@@ -54,7 +53,7 @@ public class UserGroupRolePermissionUtil {
 
 	public static boolean contains(
 			PermissionChecker permissionChecker, long groupId, long roleId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getUserGroupRolePermission().contains(
 			permissionChecker, groupId, roleId);

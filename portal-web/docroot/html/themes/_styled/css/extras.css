@@ -75,13 +75,13 @@
 
 .dockbar {
 	@include respond-to(phone, tablet) {
-		.navbar-inner .btn-navbar {
+		.navbar-btn {
 			@include box-shadow(none);
 			@include text-shadow(none);
 		}
 	}
 
-	.navbar-inner .nav li.staging-toggle {
+	.nav li.staging-toggle {
 		&.active > a {
 			@include box-shadow(none);
 		}
@@ -100,43 +100,59 @@
 	}
 }
 
-.dockbar .navbar-inner .nav-add-controls > li > ul.dropdown-menu {
-	@include box-shadow(none);
-}
-
-.dockbar-split .dockbar .navbar-inner .container .nav-collapse > .nav {
-	> li > a {
-		@include text-shadow(none);
-
-		@include respond-to(phone) {
-			@include border-radius(4px);
-		}
-	}
-
-	&.nav-add-controls {
-		> li {
-			a {
-				@include border-radius(4px);
-
-				.nav-item-label {
-					@include border-radius(30px);
+.dockbar {
+	.container, .container-fluid {
+		> .nav {
+			@include respond-to(phone, tablet) {
+				&.nav-account-controls .info-link-container .info-link {
+					@include border-radius(3px);
 				}
 			}
 
-			&.open a {
-				@include border-radius(4px);
-			}
+			> li {
+				> a, .info-button > a {
+					@include text-shadow(none);
 
-			> ul {
-				@include box-shadow(none);
+					@include respond-to(phone, tablet) {
+						@include border-radius(4px);
+					}
+				}
 			}
 		}
 	}
+
+	.nav-add-controls > li > ul.dropdown-menu {
+		@include box-shadow(none);
+	}
 }
 
-@include respond-to(phone, tablet) {
-	.navbar .navbar-search .form-search .search-query {
-		@include border-radius(14px);
+.dockbar-split .dockbar {
+	.container, .container-fluid {
+		> .nav {
+			&.nav-add-controls {
+				> li {
+					a {
+						@include respond-to(desktop) {
+							@include border-radius(4px);
+						}
+
+						.nav-item-label {
+							@include border-radius(30px);
+						}
+					}
+
+					&.open a {
+						@include respond-to(desktop) {
+							@include border-radius(4px);
+						}
+					}
+
+					> ul {
+						@include box-shadow(none);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -188,21 +204,47 @@ body > .lfr-menu-list ul, .active-area-proxy, .entry-display-style .entry-thumbn
 	@include border-radius(4px);
 }
 
-.entry-display-style, .lfr-search-combobox, .lfr-upload-container .upload-file, .lfr-upload-container .upload-target, .portlet-document-library .common-file-metadata-container.selected, .portlet-document-library-display .common-file-metadata-container.selected, .portlet-image-gallery-display .image-icon, .select-documents, .select-files {
+.entry-display-style, .lfr-search-combobox, .lfr-upload-container .upload-file, .lfr-upload-container .upload-target, .portlet-asset-tag-admin .merge-tag, .portlet-document-library .common-file-metadata-container.selected, .portlet-document-library-display .common-file-metadata-container.selected, .portlet-image-gallery-display .image-icon, .select-documents, .select-files {
 	@include border-radius(5px);
 }
 
-.portlet-journal .lfr-ddm-container .field-wrapper {
-	@include border-radius(6px);
+.portlet-dynamic-data-list-display, .portlet-journal {
+	.lfr-ddm-container .field-wrapper {
+		@include border-radius(6px);
+	}
 }
 
 .portlet-journal .display-page-item-container .display-page-item, .portlet-journal .display-page-item-container .display-page-item .display-page-item-remove, .taglib-categorization-filter .asset-entry {
 	@include border-radius(14px);
 }
 
+.portlet-journal-content .lfr-icon-actions .lfr-icon-action-add a {
+	@include box-shadow(none);
+	@include text-shadow(none);
+}
+
 .menu-content {
 	@include border-bottom-left-radius(4px);
 	@include border-bottom-right-radius(4px);
+}
+
+.taglib-form-navigator > .form-steps > ul.form-navigator.list-group {
+	@include box-shadow(none);
+
+	.tab .tab-label {
+		&:hover, &:focus {
+			.number {
+				@include box-shadow(0 0 5px 0 #333);
+				@include transition-duration(0.25s);
+				@include transition-property(box-shadow);
+				@include transition-timing-function(ease-out);
+			}
+		}
+
+		.number {
+			@include border-radius(50%);
+		}
+	}
 }
 
 .underlay-content {
@@ -229,12 +271,6 @@ body > .lfr-menu-list ul, .active-area-proxy, .entry-display-style .entry-thumbn
 }
 
 .lfr-add-panel {
-	.add-content-button {
-		.lfr-actions {
-			@include border-radius(2px);
-		}
-	}
-
 	.lfr-panel-content .app-view-entry-taglib {
 		&.display-list, &.display-descriptive {
 			&:hover, &.hover, &.over {
@@ -260,8 +296,16 @@ body > .lfr-menu-list ul, .active-area-proxy, .entry-display-style .entry-thumbn
 }
 
 .lfr-add-dialog, .lfr-add-panel {
-	.add-content-menu .search-query {
-		@include border-radius(15px);
+	.add-content-menu {
+		.search-query {
+			@include border-radius(15px);
+		}
+
+		@include respond-to(phone, tablet) {
+			.add-content-item {
+				@include border-radius(4px);
+			}
+		}
 	}
 }
 
@@ -298,14 +342,11 @@ body > .lfr-menu-list ul, .active-area-proxy, .entry-display-style .entry-thumbn
 	@include border-radius(2px);
 }
 
-.lfr-api-service-search .field-input {
-	@include box-sizing(border-box);
-}
-
 @include keyframes(progress-bar-stripes) {
 	from {
 		background-position: 40px 0;
 	}
+
 	to {
 		background-position: 0 0;
 	}
@@ -332,6 +373,33 @@ body > .lfr-menu-list ul, .active-area-proxy, .entry-display-style .entry-thumbn
 
 .highlight-animation {
 	@include experimental(animation, highlight-animation 0.7s);
+}
+
+.lfr-surface-loading .lfr-surface-loading-bar {
+	@include experimental(animation, shift-rightwards 1s ease-in-out infinite);
+	@include experimental(animation-delay, 0.4s);
+}
+
+.lfr-surface-loading-bar {
+	@include translateX(100%);
+}
+
+@include keyframes(shift-rightwards) {
+	0% {
+		@include translateX(-100%);
+	}
+
+	40% {
+		@include translateX(0%);
+	}
+
+	60% {
+		@include translateX(0%);
+	}
+
+	100% {
+		@include translateX(100%);
+	}
 }
 
 body:first-of-type {
@@ -368,13 +436,25 @@ body:first-of-type {
 		}
 	}
 
-	.portlet-borderless-container:hover {
-		.portlet-borderless-bar {
-			@extend %portlet-action-bar-fx-hover;
+	.portlet-borderless-container {
+		&:hover {
+			.portlet-borderless-bar {
+				@extend %portlet-action-bar-fx-hover;
+
+				.portlet-actions {
+					max-width: 500px;
+				}
+			}
 		}
 
-		.portlet-borderless-bar .portlet-actions {
-			max-width: 500px;
+		@include respond-to(phone, tablet) {
+			.portlet-borderless-bar {
+				@include single-transition(opacity, 0.5s, ease, 0s);
+
+				.portlet-actions {
+					max-width: 500px;
+				}
+			}
 		}
 	}
 
@@ -383,7 +463,7 @@ body:first-of-type {
 			.lfr-icon-actions {
 				@extend %portlet-action-bar-fx-hover;
 
-				.taglib-text {
+				.lfr-icon-menu-text, .taglib-text {
 					@extend %portlet-action-bar-fx-hover-text;
 
 					max-width: 200px;
@@ -394,7 +474,7 @@ body:first-of-type {
 		.lfr-icon-actions {
 			@extend %portlet-action-bar-fx;
 
-			.taglib-text {
+			.lfr-icon-menu-text, .taglib-text {
 				@extend %portlet-action-bar-fx-text;
 
 				@include respond-to(phone, tablet) {
@@ -421,16 +501,19 @@ body:first-of-type {
 		background-color: #EBEBEB;
 		border-color: #DDD;
 	}
+
 	50% {
 		background-color: #DDEDDE;
 		border-color: #7D7;
 
 		@include scale(1.1);
 	}
+
 	75% {
 		background-color: #DDEDDE;
 		border-color: #7D7;
 	}
+
 	100% {
 		background-color: #EBEBEB;
 		border-color: #DDD;
@@ -449,4 +532,10 @@ body:first-of-type {
 
 .upload-drop-intent .lfr-upload-container .upload-target {
 	@include experimental(animation, lfr-drop-active 1s ease 0.2s infinite);
+}
+
+.quick-access-nav {
+	a {
+		@include box-shadow(rgba(0, 0, 0, 0.1) 1px 1px 1px);
+	}
 }

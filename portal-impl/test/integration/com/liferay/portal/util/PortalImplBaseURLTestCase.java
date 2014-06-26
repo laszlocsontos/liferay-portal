@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,30 +14,25 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.portal.RequiredGroupException;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
-import com.liferay.portal.service.ServiceTestUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
-import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.LayoutTestUtil;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 
-import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 
 /**
  * @author Vilmos Papp
  * @author Akos Thurzo
  */
-@ExecutionTestListeners(listeners = {EnvironmentExecutionTestListener.class})
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class PortalImplBaseURLTestCase {
 
 	@Before
@@ -52,25 +47,28 @@ public class PortalImplBaseURLTestCase {
 
 		group = GroupTestUtil.addGroup();
 
-		layout = LayoutTestUtil.addLayout(
-			group.getGroupId(), ServiceTestUtil.randomString());
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		try {
-			GroupLocalServiceUtil.deleteGroup(group);
-		}
-		catch (RequiredGroupException rge) {
-			LayoutLocalServiceUtil.deleteLayout(layout);
-		}
+		privateLayout = LayoutTestUtil.addLayout(
+			group.getGroupId(), RandomTestUtil.randomString(), true);
+		publicLayout = LayoutTestUtil.addLayout(
+			group.getGroupId(), RandomTestUtil.randomString());
 	}
 
 	protected ThemeDisplay initThemeDisplay(
-			Company company, Group group, Layout layout, String virtualHostname)
+			Company company, Group group, Layout layout,
+			String companyVirtualHostname)
 		throws Exception {
 
-		company.setVirtualHostname(virtualHostname);
+		return initThemeDisplay(
+			company, group, layout, companyVirtualHostname,
+			companyVirtualHostname);
+	}
+
+	protected ThemeDisplay initThemeDisplay(
+			Company company, Group group, Layout layout,
+			String companyVirtualHostname, String serverName)
+		throws Exception {
+
+		company.setVirtualHostname(companyVirtualHostname);
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
@@ -79,7 +77,7 @@ public class PortalImplBaseURLTestCase {
 		themeDisplay.setLayout(layout);
 		themeDisplay.setLayoutSet(layout.getLayoutSet());
 		themeDisplay.setSecure(false);
-		themeDisplay.setServerName(virtualHostname);
+		themeDisplay.setServerName(serverName);
 		themeDisplay.setServerPort(8080);
 		themeDisplay.setSiteGroupId(group.getGroupId());
 		themeDisplay.setUser(TestPropsValues.getUser());
@@ -94,7 +92,11 @@ public class PortalImplBaseURLTestCase {
 
 	protected Company company;
 	protected Layout controlPanelLayout;
+
+	@DeleteAfterTestRun
 	protected Group group;
-	protected Layout layout;
+
+	protected Layout privateLayout;
+	protected Layout publicLayout;
 
 }

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,7 @@ Map<ShoppingCartItem, Integer> items = cart.getItems();
 ShoppingCoupon coupon = cart.getCoupon();
 
 int altShipping = cart.getAltShipping();
-String altShippingName = shoppingPrefs.getAlternativeShippingName(altShipping);
+String altShippingName = shoppingSettings.getAlternativeShippingName(altShipping);
 
 ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER);
 %>
@@ -68,187 +68,25 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 		<liferay-util:param name="tabs1" value="cart" />
 	</liferay-util:include>
 
-	<div class="row-fluid">
-		<div class="span6">
+	<div class="row">
+		<div class="col-md-6">
 			<div class="well">
 				<h4><liferay-ui:message key="billing-address" /></h4>
 
-				<table class="lfr-table">
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="first-name" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingFirstName()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="last-name" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingLastName()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="email-address" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingEmailAddress()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="company" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingCompany()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="street" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingStreet()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="city" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingCity()) %>:
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="state" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingState()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="postal-code" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingZip()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-					<liferay-ui:message key="country" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingCountry()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="phone" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getBillingPhone()) %>
-					</td>
-				</tr>
-				</table>
+				<%@ include file="/html/portlet/shopping/checkout_second_billing_address.jspf" %>
 			</div>
 		</div>
 
-		<div class="span6">
+		<div class="col-md-6">
 			<div class="well">
 				<h4><liferay-ui:message key="shipping-address" /></h4>
 
-				<table class="lfr-table">
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="first-name" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingFirstName()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="last-name" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingLastName()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="email-address" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingEmailAddress()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="company" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingCompany()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="street" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingStreet()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="city" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingCity()) %>:
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="state" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingState()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="postal-code" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingZip()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="country" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingCountry()) %>
-					</td>
-				</tr>
-				<tr>
-					<th class="text-left">
-						<liferay-ui:message key="phone" />:
-					</th>
-					<td>
-						<%= HtmlUtil.escape(order.getShippingPhone()) %>
-					</td>
-				</tr>
-				</table>
+				<%@ include file="/html/portlet/shopping/checkout_second_shipping_address.jspf" %>
 			</div>
 		</div>
 	</div>
 
-	<c:if test="<%= !shoppingPrefs.usePayPal() %>">
+	<c:if test="<%= !shoppingSettings.usePayPal() %>">
 		<div class="well">
 			<h4><liferay-ui:message key="credit-card" /></h4>
 
@@ -384,10 +222,10 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 		// Availability
 
 		if (ShoppingUtil.isInStock(item, itemFields, fieldsArray, count)) {
-			row.addText("<div class=\"alert alert-success\">".concat(LanguageUtil.get(pageContext, "in-stock")).concat("</div>"), rowURL);
+			row.addText("<div class=\"alert alert-success\">".concat(LanguageUtil.get(request, "in-stock")).concat("</div>"), rowURL);
 		}
 		else {
-			row.addText("<div class=\"alert alert-error\">".concat(LanguageUtil.get(pageContext, "out-of-stock")).concat("</div>"), rowURL);
+			row.addText("<div class=\"alert alert-danger\">".concat(LanguageUtil.get(request, "out-of-stock")).concat("</div>"), rowURL);
 		}
 
 		// Quantity
@@ -491,6 +329,6 @@ ShoppingOrder order = (ShoppingOrder)request.getAttribute(WebKeys.SHOPPING_ORDER
 	</div>
 
 	<aui:button-row>
-		<aui:button type="submit" value='<%= shoppingPrefs.usePayPal() ? "continue" : "finished" %>' />
+		<aui:button type="submit" value='<%= shoppingSettings.usePayPal() ? "continue" : "finished" %>' />
 	</aui:button-row>
 </aui:form>

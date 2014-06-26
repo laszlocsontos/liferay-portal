@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,15 +22,15 @@ String fieldCss = AUIUtil.buildCss("field-wrapper", false, first, last, cssClass
 
 <div class="<%= controlGroupCss %> <%= fieldCss %>" <%= AUIUtil.buildData(data) %>>
 	<c:if test='<%= Validator.isNotNull(label) && !inlineLabel.equals("right") %>'>
-		<label <%= AUIUtil.buildLabel("wrapper", inlineField, showForLabel, name) %>>
-			<liferay-ui:message key="<%= label %>" />
+		<<%= showForLabel ? "label" : "span" %> <%= AUIUtil.buildLabel("wrapper", inlineField, showForLabel, name) %>>
+			<liferay-ui:message key="<%= label %>" localizeKey="<%= localizeLabel %>" />
 
 			<c:if test="<%= required %>">
-				<span class="label-required">(<liferay-ui:message key="required" />)</span>
+				<span class="label-required"><liferay-ui:message key="required" /></span>
 			</c:if>
 
 			<c:if test="<%= Validator.isNotNull(helpMessage) %>">
 				<liferay-ui:icon-help message="<%= helpMessage %>" />
 			</c:if>
-		</label>
+		</<%= showForLabel ? "label" : "span" %>>
 	</c:if>

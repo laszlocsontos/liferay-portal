@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,8 +44,6 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
-import com.liferay.portal.security.auth.ScreenNameGenerator;
-import com.liferay.portal.security.auth.ScreenNameGeneratorFactory;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LockLocalServiceUtil;
@@ -121,7 +119,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Skipping LDAP import for company " + companyId +
-							"because another LDAP import is in process");
+							" because another LDAP import is in process");
 				}
 
 				return;
@@ -1157,7 +1155,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 	protected void updateLDAPUser(
 			User ldapUser, Contact ldapContact, User user,
 			Properties userMappings, Properties contactMappings)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Contact contact = user.getContact();
 
@@ -1252,17 +1250,10 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 			}
 		}
 
-		if (Validator.isNull(ldapUser.getScreenName())) {
-			ldapUser.setAutoScreenName(true);
-		}
+		if (Validator.isNull(ldapUser.getScreenName()) ||
+			ldapUser.isAutoScreenName()) {
 
-		if (ldapUser.isAutoScreenName()) {
-			ScreenNameGenerator screenNameGenerator =
-				ScreenNameGeneratorFactory.getInstance();
-
-			ldapUser.setScreenName(
-				screenNameGenerator.generate(
-					companyId, user.getUserId(), ldapUser.getEmailAddress()));
+			ldapUser.setScreenName(user.getScreenName());
 		}
 
 		if (ldapUser.isUpdatePassword()) {

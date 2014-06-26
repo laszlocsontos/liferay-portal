@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -46,8 +45,7 @@ public class AssetVocabularyStagedModelDataHandler
 
 	@Override
 	public void deleteStagedModel(
-			String uuid, long groupId, String className, String extraData)
-		throws SystemException {
+		String uuid, long groupId, String className, String extraData) {
 
 		AssetVocabulary vocabulary =
 			AssetVocabularyLocalServiceUtil.
@@ -100,6 +98,23 @@ public class AssetVocabularyStagedModelDataHandler
 			AssetVocabulary.class, vocabulary.getVocabularyId());
 
 		portletDataContext.addZipEntry(vocabularyPath, vocabulary);
+	}
+
+	@Override
+	protected void doImportMissingReference(
+			PortletDataContext portletDataContext, String uuid, long groupId,
+			long vocabularyId)
+		throws Exception {
+
+		AssetVocabulary existingVocabulary =
+			AssetVocabularyLocalServiceUtil.
+				fetchAssetVocabularyByUuidAndGroupId(uuid, groupId);
+
+		Map<Long, Long> vocabularyIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				AssetVocabulary.class);
+
+		vocabularyIds.put(vocabularyId, existingVocabulary.getVocabularyId());
 	}
 
 	@Override
@@ -186,7 +201,7 @@ public class AssetVocabularyStagedModelDataHandler
 
 	protected Map<Locale, String> getVocabularyTitleMap(
 			long groupId, AssetVocabulary vocabulary, String name)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Map<Locale, String> titleMap = vocabulary.getTitleMap();
 

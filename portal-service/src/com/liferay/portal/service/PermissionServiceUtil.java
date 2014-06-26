@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,12 +68,10 @@ public class PermissionServiceUtil {
 	* @throws PortalException if the group did not have permission to the
 	service, if a group with the primary key could not be found or if
 	the permission information was invalid
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void checkPermission(long groupId, java.lang.String name,
 		long primKey)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().checkPermission(groupId, name, primKey);
 	}
 
@@ -86,12 +84,10 @@ public class PermissionServiceUtil {
 	* @throws PortalException if the group did not have permission to the
 	service, if a group with the primary key could not be found or if
 	the permission information was invalid
-	* @throws SystemException if a system exception occurred
 	*/
 	public static void checkPermission(long groupId, java.lang.String name,
 		java.lang.String primKey)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().checkPermission(groupId, name, primKey);
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.util;
+
+import com.liferay.portal.kernel.deploy.hot.HotDeployUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +63,16 @@ public class PortalLifecycleUtil {
 			(method == PortalLifecycle.METHOD_INIT)) {
 
 			if (_portalLifecyclesInit == null) {
-				portalLifecycle.portalInit();
+				Thread currentThread = Thread.currentThread();
+
+				String servletContextName = ClassLoaderPool.getContextName(
+					currentThread.getContextClassLoader());
+
+				if (!HotDeployUtil.registerDependentPortalLifecycle(
+						servletContextName, portalLifecycle)) {
+
+					portalLifecycle.portalInit();
+				}
 			}
 			else {
 				_portalLifecyclesInit.add(portalLifecycle);

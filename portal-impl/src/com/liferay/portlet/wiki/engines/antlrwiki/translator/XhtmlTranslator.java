@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -187,15 +187,13 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 	protected void appendTableOfContents(
 		TreeNode<HeadingNode> tableOfContents, int depth) {
 
-		append("<ol>");
-
 		List<TreeNode<HeadingNode>> treeNodes = tableOfContents.getChildNodes();
 
-		if (treeNodes == null) {
-			append("</ol>");
-
+		if ((treeNodes == null) || treeNodes.isEmpty()) {
 			return;
 		}
+
+		append("<ol>");
 
 		for (TreeNode<HeadingNode> treeNode : treeNodes) {
 			append("<li class=\"toc-level-");

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,8 +44,14 @@ public interface Html {
 
 	public String fromInputSafe(String text);
 
+	public String getAUICompatibleId(String text);
+
 	public String render(String html);
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public String replaceMsWordCharacters(String text);
 
 	public String replaceNewLine(String html);

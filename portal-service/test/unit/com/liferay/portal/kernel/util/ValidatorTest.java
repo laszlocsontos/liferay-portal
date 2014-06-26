@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
-import java.lang.reflect.Method;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,6 +31,16 @@ import org.powermock.modules.junit4.PowerMockRunner;
  */
 @RunWith(PowerMockRunner.class)
 public class ValidatorTest extends PowerMockito {
+
+	@Test
+	public void testIsContent() throws Exception {
+		Assert.assertTrue(Validator.isContent("Hello World\n\t"));
+		Assert.assertTrue(Validator.isContent("\n\tHello World"));
+		Assert.assertTrue(Validator.isContent("Hello\n\t World"));
+		Assert.assertFalse(Validator.isContent("\t"));
+		Assert.assertFalse(Validator.isContent("\n"));
+		Assert.assertFalse(Validator.isContent("\n\t"));
+	}
 
 	@Test
 	public void testIsDomain() throws Exception {
@@ -542,13 +552,12 @@ public class ValidatorTest extends PowerMockito {
 			String methodName, String[] params, boolean valid)
 		throws Exception {
 
-		Method method = ReflectionUtil.getDeclaredMethod(
-			Validator.class, methodName, String.class);
-
 		for (String param : params) {
-			Boolean b = (Boolean)method.invoke(null, param);
-
-			Assert.assertEquals(valid, b);
+			Assert.assertEquals(
+				valid,
+				ReflectionTestUtil.invoke(
+					Validator.class, methodName, new Class<?>[] {String.class},
+					param));
 		}
 	}
 

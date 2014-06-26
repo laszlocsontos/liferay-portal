@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,13 @@ JournalFolder folder = (JournalFolder)request.getAttribute("view.jsp-folder");
 
 long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
 
-List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getStructures(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay), PortalUtil.getClassNameId(JournalArticle.class));
+int restrictionType = JournalFolderConstants.RESTRICTION_TYPE_INHERIT;
+
+if (folder != null) {
+	restrictionType = folder.getRestrictionType();
+}
+
+List<DDMStructure> ddmStructures = DDMStructureServiceUtil.getJournalFolderStructures(PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId), folderId, restrictionType);
 %>
 
 <aui:nav-item dropdown="<%= true %>" id="addButtonContainer" label="add">
@@ -33,18 +39,14 @@ List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getStructures(Po
 			<portlet:param name="parentFolderId" value="<%= String.valueOf(folderId) %>" />
 		</portlet:renderURL>
 
-		<aui:nav-item href="<%= addFolderURL %>" iconCssClass="icon-folder-open" label='<%= (folder != null) ? "subfolder" : "folder" %>' />
+		<%
+		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(JournalFolder.class.getName());
+		%>
+
+		<aui:nav-item href="<%= addFolderURL %>" iconCssClass="<%= assetRendererFactory.getIconCssClass() %>" label='<%= (folder != null) ? "subfolder" : "folder" %>' />
 	</c:if>
 
 	<c:if test="<%= JournalFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.ADD_ARTICLE) %>">
-		<liferay-portlet:renderURL var="addArticleURL" windowState="<%= LiferayWindowState.MAXIMIZED.toString() %>">
-			<portlet:param name="struts_action" value="/journal/edit_article" />
-			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
-			<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
-		</liferay-portlet:renderURL>
-
-		<aui:nav-item href="<%= addArticleURL %>" iconCssClass="icon-tasks" label="basic-web-content" />
 
 		<%
 		for (DDMStructure ddmStructure : ddmStructures) {
@@ -58,7 +60,11 @@ List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getStructures(Po
 				<portlet:param name="structureId" value="<%= ddmStructure.getStructureKey() %>" />
 			</liferay-portlet:renderURL>
 
-			<aui:nav-item href="<%= addArticleURL %>" iconCssClass="icon-tasks" label="<%= HtmlUtil.escape(ddmStructure.getName(themeDisplay.getLocale())) %>" localizeLabel="<%= false %>" />
+			<%
+			AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(JournalArticle.class.getName());
+			%>
+
+			<aui:nav-item href="<%= addArticleURL %>" iconCssClass="<%= assetRendererFactory.getIconCssClass() %>" label="<%= HtmlUtil.escape(ddmStructure.getUnambiguousName(ddmStructures, themeDisplay.getScopeGroupId(), locale)) %>" localizeLabel="<%= false %>" />
 
 		<%
 		}

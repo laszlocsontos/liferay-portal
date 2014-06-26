@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,6 +90,40 @@ public class PortletSessionFactoryImpl extends SessionFactoryImpl {
 		_dataSource = dataSource;
 	}
 
+	protected SessionFactory createSessionFactory(DataSource dataSource) {
+		String servletContextName =
+			PortletClassLoaderUtil.getServletContextName();
+
+		ClassLoader classLoader = getSessionFactoryClassLoader();
+
+		PortletClassLoaderUtil.setServletContextName(
+			ClassLoaderPool.getContextName(classLoader));
+
+		try {
+			PortletHibernateConfiguration portletHibernateConfiguration =
+				new PortletHibernateConfiguration();
+
+			portletHibernateConfiguration.setDataSource(dataSource);
+
+			SessionFactory sessionFactory = null;
+
+			try {
+				sessionFactory =
+					portletHibernateConfiguration.buildSessionFactory();
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+
+				return null;
+			}
+
+			return sessionFactory;
+		}
+		finally {
+			PortletClassLoaderUtil.setServletContextName(servletContextName);
+		}
+	}
+
 	protected DataSource getDataSource() {
 		ShardDataSourceTargetSource shardDataSourceTargetSource =
 			(ShardDataSourceTargetSource)
@@ -114,43 +148,29 @@ public class PortletSessionFactoryImpl extends SessionFactoryImpl {
 
 		DataSource dataSource = shardDataSourceTargetSource.getDataSource();
 
-		SessionFactory sessionFactory = _sessionFactories.get(dataSource);
+		SessionFactory sessionFactory = getSessionFactory(dataSource);
 
 		if (sessionFactory != null) {
 			return sessionFactory;
 		}
 
-		String servletContextName =
-			PortletClassLoaderUtil.getServletContextName();
+		sessionFactory = createSessionFactory(dataSource);
 
-		ClassLoader classLoader = getSessionFactoryClassLoader();
-
-		PortletClassLoaderUtil.setServletContextName(
-			ClassLoaderPool.getContextName(classLoader));
-
-		try {
-			PortletHibernateConfiguration portletHibernateConfiguration =
-				new PortletHibernateConfiguration();
-
-			portletHibernateConfiguration.setDataSource(dataSource);
-
-			try {
-				sessionFactory =
-					portletHibernateConfiguration.buildSessionFactory();
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-
-				return null;
-			}
-
-			_sessionFactories.put(dataSource, sessionFactory);
-
-			return sessionFactory;
+		if (sessionFactory != null) {
+			putSessionFactory(dataSource, sessionFactory);
 		}
-		finally {
-			PortletClassLoaderUtil.setServletContextName(servletContextName);
-		}
+
+		return sessionFactory;
+	}
+
+	protected SessionFactory getSessionFactory(DataSource dataSource) {
+		return _sessionFactories.get(dataSource);
+	}
+
+	protected void putSessionFactory(
+		DataSource dataSource, SessionFactory sessionFactory) {
+
+		_sessionFactories.put(dataSource, sessionFactory);
 	}
 
 	@Override

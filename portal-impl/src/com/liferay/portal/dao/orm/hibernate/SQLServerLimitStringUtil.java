@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -78,6 +78,22 @@ public class SQLServerLimitStringUtil {
 		return sb.toString();
 	}
 
+	private static String _getInnerSelectFrom(
+		String selectFrom, String innerOrderBy, int limit) {
+
+		String innerSelectFrom = selectFrom;
+
+		if (Validator.isNotNull(innerOrderBy)) {
+			Matcher matcher = _selectPattern.matcher(innerSelectFrom);
+
+			innerSelectFrom = matcher.replaceAll(
+				"select top ".concat(String.valueOf(limit)).concat(
+					StringPool.SPACE));
+		}
+
+		return innerSelectFrom;
+	}
+
 	private static final String[] _splitOrderBy(
 		String selectFrom, String orderBy) {
 
@@ -153,22 +169,6 @@ public class SQLServerLimitStringUtil {
 		return new String[] {
 			innerOrderBySB.toString(), outerOrderBySB.toString()
 		};
-	}
-
-	private static String _getInnerSelectFrom(
-		String selectFrom, String innerOrderBy, int limit) {
-
-		String innerSelectFrom = selectFrom;
-
-		if (Validator.isNotNull(innerOrderBy)) {
-			Matcher matcher = _selectPattern.matcher(innerSelectFrom);
-
-			innerSelectFrom = matcher.replaceAll(
-				"select top ".concat(String.valueOf(limit)).concat(
-					StringPool.SPACE));
-		}
-
-		return innerSelectFrom;
 	}
 
 	private static Pattern _qualifiedColumnPattern = Pattern.compile(

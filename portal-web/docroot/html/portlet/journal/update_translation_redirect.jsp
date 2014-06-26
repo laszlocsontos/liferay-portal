@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,12 +35,15 @@ if (cmd.equals(Constants.TRANSLATE)) {
 <aui:script use="aui-base">
 	var openingWindow = Liferay.Util.getOpener();
 
-	openingWindow.<portlet:namespace />postProcessTranslation('<%= System.currentTimeMillis() %>', '<%= HtmlUtil.escapeJS(cmd) %>', '<%= article.getVersion() %>', '<%= HtmlUtil.escapeJS(toLanguageId) %>', '<%= toLanguageDisplayName %>', '<%= WorkflowConstants.getStatusLabel(article.getStatus()) %>');
-
-	Liferay.fire(
-		'closeWindow',
+	openingWindow.Liferay.fire(
+		'<portlet:namespace />postProcessTranslation',
 		{
-			id: '<%= HtmlUtil.escapeJS(renderResponse.getNamespace() + toLanguageId) %>'
+			cmd: '<%= HtmlUtil.escapeJS(cmd) %>',
+			formDate: '<%= System.currentTimeMillis() %>',
+			newLanguage: '<%= toLanguageDisplayName %>',
+			newLanguageId: '<%= HtmlUtil.escapeJS(toLanguageId) %>',
+			newStatusMessage: '<%= WorkflowConstants.getStatusLabel(article.getStatus()) %>',
+			newVersion: '<%= article.getVersion() %>'
 		}
 	);
 </aui:script>

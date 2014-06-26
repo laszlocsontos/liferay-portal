@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,8 +13,6 @@
  */
 
 package com.liferay.portlet.journal.model.impl;
-
-import com.liferay.portal.kernel.exception.SystemException;
 
 import com.liferay.portlet.journal.model.JournalArticleResource;
 import com.liferay.portlet.journal.service.JournalArticleResourceLocalServiceUtil;
@@ -39,7 +37,7 @@ public abstract class JournalArticleResourceBaseImpl
 	 * Never modify or reference this class directly. All methods that expect a journal article resource model instance should use the {@link JournalArticleResource} interface instead.
 	 */
 	@Override
-	public void persist() throws SystemException {
+	public void persist() {
 		if (this.isNew()) {
 			JournalArticleResourceLocalServiceUtil.addJournalArticleResource(this);
 		}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,28 +16,34 @@ package com.liferay.portlet.journal.service.persistence;
 
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portal.util.GroupTestUtil;
+import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
-import com.liferay.portlet.dynamicdatamapping.util.DDMStructureTestUtil;
-import com.liferay.portlet.dynamicdatamapping.util.DDMTemplateTestUtil;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMTemplateTestUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleConstants;
 import com.liferay.portlet.journal.model.JournalFolder;
-import com.liferay.portlet.journal.model.JournalStructure;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
-import com.liferay.portlet.journal.util.JournalTestUtil;
+import com.liferay.portlet.journal.util.comparator.ArticleCreateDateComparator;
+import com.liferay.portlet.journal.util.comparator.ArticleDisplayDateComparator;
+import com.liferay.portlet.journal.util.comparator.ArticleIDComparator;
+import com.liferay.portlet.journal.util.comparator.ArticleModifiedDateComparator;
+import com.liferay.portlet.journal.util.comparator.ArticleReviewDateComparator;
+import com.liferay.portlet.journal.util.comparator.ArticleTitleComparator;
+import com.liferay.portlet.journal.util.comparator.ArticleVersionComparator;
+import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,6 +54,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -57,14 +64,16 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		MainServletExecutionTestListener.class,
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-@Transactional
 public class JournalArticleFinderTest {
+
+	@ClassRule
+	public static TransactionalTestRule transactionalTestRule =
+		new TransactionalTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -75,9 +84,21 @@ public class JournalArticleFinderTest {
 
 		_folder = JournalTestUtil.addFolder(_group.getGroupId(), "Folder 1");
 
-		_article = JournalTestUtil.addArticle(
-			_group.getGroupId(), _folder.getFolderId(), "Article 1",
-			StringPool.BLANK);
+		_basicWebContentDDMStructure =
+			DDMStructureTestUtil.addStructure(
+				_group.getGroupId(), JournalArticle.class.getName());
+
+		DDMTemplate basicWebContentTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), _basicWebContentDDMStructure.getStructureId());
+
+		JournalArticle article = JournalTestUtil.addArticleWithXMLContent(
+			_group.getGroupId(), _folder.getFolderId(),
+			JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+			"<title>Article 1</title>",
+			_basicWebContentDDMStructure.getStructureKey(),
+			basicWebContentTemplate.getTemplateKey());
+
+		_articles.add(article);
 
 		JournalFolder folder = JournalTestUtil.addFolder(
 			_group.getGroupId(), "Folder 2");
@@ -85,15 +106,22 @@ public class JournalArticleFinderTest {
 		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
 			_group.getGroupId(), _ddmStructure.getStructureId());
 
-		JournalTestUtil.addArticleWithXMLContent(
+		article = JournalTestUtil.addArticleWithXMLContent(
 			_group.getGroupId(), folder.getFolderId(),
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT,
 			"<title>Article 2</title>", _ddmStructure.getStructureKey(),
 			ddmTemplate.getTemplateKey());
 
-		JournalArticle article = JournalTestUtil.addArticle(
-			_group.getGroupId(), folder.getFolderId(), "Article 3",
-			StringPool.BLANK);
+		_articles.add(article);
+
+		article = JournalTestUtil.addArticleWithXMLContent(
+			_group.getGroupId(), folder.getFolderId(),
+			JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+			"<title>Article 3</title>",
+			_basicWebContentDDMStructure.getStructureKey(),
+			basicWebContentTemplate.getTemplateKey());
+
+		_articles.add(article);
 
 		article.setUserId(_USER_ID);
 
@@ -109,16 +137,20 @@ public class JournalArticleFinderTest {
 		JournalArticleLocalServiceUtil.moveArticleToTrash(
 			TestPropsValues.getUserId(), article);
 
-		JournalTestUtil.addArticleWithXMLContent(
+		article = JournalTestUtil.addArticleWithXMLContent(
 			_group.getGroupId(), folder.getFolderId(),
-			PortalUtil.getClassNameId(JournalStructure.class),
+			PortalUtil.getClassNameId(DDMStructure.class),
 			"<title>Article 4</title>", _ddmStructure.getStructureKey(),
 			ddmTemplate.getTemplateKey());
+
+		_articles.add(article);
 
 		_folderIds.clear();
 
 		_folderIds.add(_folder.getFolderId());
 		_folderIds.add(folder.getFolderId());
+
+		_article = _articles.get(0);
 	}
 
 	@Test
@@ -197,13 +229,13 @@ public class JournalArticleFinderTest {
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
-		doQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
+		testQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
 			_group.getCompanyId(), _group.getGroupId(), _folderIds,
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, null, null, "Article",
 			null, null, null, (String)null, null, null, null, null, true,
 			queryDefinition, 3);
 
-		doQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
+		testQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
 			_group.getCompanyId(), _group.getGroupId(), _folderIds,
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, null, null, null,
 			null, null, null, _ddmStructure.getStructureKey(), null, null, null,
@@ -211,7 +243,7 @@ public class JournalArticleFinderTest {
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
-		doQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
+		testQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
 			_group.getCompanyId(), _group.getGroupId(), _folderIds,
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, null, null, "Article",
 			null, null, null, (String)null, null, null, null, null, true,
@@ -219,9 +251,9 @@ public class JournalArticleFinderTest {
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
-		doQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
+		testQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
 			_group.getCompanyId(), _group.getGroupId(), _folderIds,
-			PortalUtil.getClassNameId(JournalStructure.class), null, null,
+			PortalUtil.getClassNameId(DDMStructure.class), null, null,
 			"Article", null, null, null, (String)null, null, null, null, null,
 			true, queryDefinition, 1);
 	}
@@ -232,33 +264,30 @@ public class JournalArticleFinderTest {
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
-		doQueryByG_C_S(
+		testQueryByG_C_S(
 			_group.getGroupId(), JournalArticleConstants.CLASSNAME_ID_DEFAULT,
 			_ddmStructure.getStructureKey(), queryDefinition, 1);
-
-		doQueryByG_C_S(
+		testQueryByG_C_S(
 			_group.getGroupId(), JournalArticleConstants.CLASSNAME_ID_DEFAULT,
-			"0", queryDefinition, 2);
+			_basicWebContentDDMStructure.getStructureKey(), queryDefinition, 2);
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
-		doQueryByG_C_S(
+		testQueryByG_C_S(
 			_group.getGroupId(), JournalArticleConstants.CLASSNAME_ID_DEFAULT,
 			_ddmStructure.getStructureKey(), queryDefinition, 0);
-
-		doQueryByG_C_S(
+		testQueryByG_C_S(
 			_group.getGroupId(), JournalArticleConstants.CLASSNAME_ID_DEFAULT,
-			"0", queryDefinition, 1);
+			_basicWebContentDDMStructure.getStructureKey(), queryDefinition, 1);
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
-		doQueryByG_C_S(
+		testQueryByG_C_S(
 			_group.getGroupId(), JournalArticleConstants.CLASSNAME_ID_DEFAULT,
 			_ddmStructure.getStructureKey(), queryDefinition, 1);
-
-		doQueryByG_C_S(
+		testQueryByG_C_S(
 			_group.getGroupId(), JournalArticleConstants.CLASSNAME_ID_DEFAULT,
-			"0", queryDefinition, 1);
+			_basicWebContentDDMStructure.getStructureKey(), queryDefinition, 1);
 	}
 
 	@Test
@@ -267,15 +296,30 @@ public class JournalArticleFinderTest {
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
-		doQueryByG_F(_group.getGroupId(), _folderIds, queryDefinition, 4);
+		testQueryByG_F(_group.getGroupId(), _folderIds, queryDefinition, 4);
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
-		doQueryByG_F(_group.getGroupId(), _folderIds, queryDefinition, 1);
+		testQueryByG_F(_group.getGroupId(), _folderIds, queryDefinition, 1);
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
-		doQueryByG_F(_group.getGroupId(), _folderIds, queryDefinition, 3);
+		testQueryByG_F(_group.getGroupId(), _folderIds, queryDefinition, 3);
+
+		testQueryByG_F(new ArticleCreateDateComparator(true));
+		testQueryByG_F(new ArticleCreateDateComparator(false));
+		testQueryByG_F(new ArticleDisplayDateComparator(true));
+		testQueryByG_F(new ArticleDisplayDateComparator(false));
+		testQueryByG_F(new ArticleIDComparator(true));
+		testQueryByG_F(new ArticleIDComparator(false));
+		testQueryByG_F(new ArticleModifiedDateComparator(true));
+		testQueryByG_F(new ArticleModifiedDateComparator(false));
+		testQueryByG_F(new ArticleReviewDateComparator(true));
+		testQueryByG_F(new ArticleReviewDateComparator(false));
+		testQueryByG_F(new ArticleTitleComparator(true));
+		testQueryByG_F(new ArticleTitleComparator(false));
+		testQueryByG_F(new ArticleVersionComparator(true));
+		testQueryByG_F(new ArticleVersionComparator(false));
 	}
 
 	@Test
@@ -284,25 +328,49 @@ public class JournalArticleFinderTest {
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
-		doQueryByG_U_C(
+		testQueryByG_U_C(
 			_group.getGroupId(), TestPropsValues.getUserId(),
 			Collections.<Long>emptyList(),
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, queryDefinition, 2);
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
-		doQueryByG_U_C(
+		testQueryByG_U_C(
 			_group.getGroupId(), _USER_ID, Collections.<Long>emptyList(),
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, queryDefinition, 1);
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
 
-		doQueryByG_U_C(
+		testQueryByG_U_C(
 			_group.getGroupId(), _USER_ID, Collections.<Long>emptyList(),
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, queryDefinition, 0);
 	}
 
-	protected void doQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
+	protected void prepareSortedArticles() throws Exception {
+		Calendar calendar = new GregorianCalendar();
+
+		calendar.set(Calendar.DATE, 1);
+		calendar.set(Calendar.MONTH, 1);
+		calendar.set(Calendar.YEAR, 2014);
+
+		for (int i = 0; i < _articles.size(); ++i) {
+			calendar.add(Calendar.DATE, 1);
+
+			JournalArticle article = _articles.get(i);
+
+			article.setCreateDate(calendar.getTime());
+			article.setModifiedDate(calendar.getTime());
+			article.setArticleId("a" + i);
+			article.setVersion(i);
+			article.setTitle("a" + i);
+			article.setDisplayDate(calendar.getTime());
+			article.setReviewDate(calendar.getTime());
+
+			JournalArticleLocalServiceUtil.updateJournalArticle(article);
+		}
+	}
+
+	protected void testQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R(
 			long companyId, long groupId, List<Long> folderIds,
 			long classNameId, String articleId, Double version, String title,
 			String description, String content, String type,
@@ -332,7 +400,7 @@ public class JournalArticleFinderTest {
 		Assert.assertEquals(expectedCount, actualCount);
 	}
 
-	protected void doQueryByG_C_S(
+	protected void testQueryByG_C_S(
 			long groupId, long classNameId, String ddmStructureKey,
 			QueryDefinition queryDefinition, int expectedCount)
 		throws Exception {
@@ -350,7 +418,7 @@ public class JournalArticleFinderTest {
 		Assert.assertEquals(expectedCount, actualCount);
 	}
 
-	protected void doQueryByG_F(
+	protected void testQueryByG_F(
 			long groupId, List<Long> folderIds, QueryDefinition queryDefinition,
 			int expectedCount)
 		throws Exception {
@@ -368,7 +436,34 @@ public class JournalArticleFinderTest {
 		Assert.assertEquals(expectedCount, actualCount);
 	}
 
-	protected void doQueryByG_U_C(
+	protected void testQueryByG_F(OrderByComparator orderByComparator)
+		throws Exception {
+
+		prepareSortedArticles();
+
+		QueryDefinition queryDefinition = new QueryDefinition();
+
+		queryDefinition.setOrderByComparator(orderByComparator);
+
+		List<JournalArticle> expectedArticles = null;
+
+		if (orderByComparator.isAscending()) {
+			expectedArticles = _articles;
+		}
+		else {
+			expectedArticles = new ArrayList<JournalArticle>(_articles);
+
+			Collections.reverse(expectedArticles);
+		}
+
+		List<JournalArticle> actualArticles =
+			JournalArticleFinderUtil.findByG_F(
+				_group.getGroupId(), _folderIds, queryDefinition);
+
+		Assert.assertEquals(expectedArticles, actualArticles);
+	}
+
+	protected void testQueryByG_U_C(
 			long groupId, long userId, List<Long> folderIds, long classNameId,
 			QueryDefinition queryDefinition, int expectedCount)
 		throws Exception {
@@ -389,9 +484,13 @@ public class JournalArticleFinderTest {
 	private static final long _USER_ID = 1234L;
 
 	private JournalArticle _article;
+	private List<JournalArticle> _articles = new ArrayList<JournalArticle>();
+	private DDMStructure _basicWebContentDDMStructure;
 	private DDMStructure _ddmStructure;
 	private JournalFolder _folder;
 	private List<Long> _folderIds = new ArrayList<Long>();
+
+	@DeleteAfterTestRun
 	private Group _group;
 
 }

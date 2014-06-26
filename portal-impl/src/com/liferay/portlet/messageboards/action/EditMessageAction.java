@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,12 +17,14 @@ package com.liferay.portlet.messageboards.action;
 import com.liferay.portal.kernel.captcha.CaptchaMaxChallengesException;
 import com.liferay.portal.kernel.captcha.CaptchaTextException;
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.upload.LiferayFileItemException;
+import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -46,13 +48,14 @@ import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.FileExtensionException;
 import com.liferay.portlet.documentlibrary.FileNameException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
+import com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerException;
 import com.liferay.portlet.messageboards.LockedThreadException;
+import com.liferay.portlet.messageboards.MBSettings;
 import com.liferay.portlet.messageboards.MessageBodyException;
 import com.liferay.portlet.messageboards.MessageSubjectException;
 import com.liferay.portlet.messageboards.NoSuchMessageException;
 import com.liferay.portlet.messageboards.RequiredMessageException;
 import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.messageboards.model.MBMessageConstants;
 import com.liferay.portlet.messageboards.service.MBMessageServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
@@ -66,7 +69,6 @@ import java.util.List;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -92,10 +94,26 @@ public class EditMessageAction extends PortletAction {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
-		try {
-			MBMessage message = null;
+		MBMessage message = null;
 
-			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+		try {
+			UploadException uploadException =
+				(UploadException)actionRequest.getAttribute(
+					WebKeys.UPLOAD_EXCEPTION);
+
+			if (uploadException != null) {
+				if (uploadException.isExceededLiferayFileItemSizeLimit()) {
+					throw new LiferayFileItemException();
+				}
+				else if (uploadException.isExceededSizeLimit()) {
+					throw new FileSizeException(uploadException.getCause());
+				}
+
+				throw new PortalException(uploadException.getCause());
+			}
+			else if (cmd.equals(Constants.ADD) ||
+					 cmd.equals(Constants.UPDATE)) {
+
 				message = updateMessage(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
@@ -142,18 +160,36 @@ public class EditMessageAction extends PortletAction {
 
 				setForward(actionRequest, "portlet.message_boards.error");
 			}
-			else if (e instanceof CaptchaMaxChallengesException ||
+			else if (e instanceof AntivirusScannerException ||
+					 e instanceof CaptchaMaxChallengesException ||
 					 e instanceof CaptchaTextException ||
 					 e instanceof DuplicateFileException ||
 					 e instanceof FileExtensionException ||
 					 e instanceof FileNameException ||
 					 e instanceof FileSizeException ||
+					 e instanceof LiferayFileItemException ||
 					 e instanceof LockedThreadException ||
 					 e instanceof MessageBodyException ||
 					 e instanceof MessageSubjectException ||
 					 e instanceof SanitizerException) {
 
-				SessionErrors.add(actionRequest, e.getClass());
+				UploadException uploadException =
+					(UploadException)actionRequest.getAttribute(
+						WebKeys.UPLOAD_EXCEPTION);
+
+				if (uploadException != null) {
+					String uploadExceptionRedirect = ParamUtil.getString(
+						actionRequest, "uploadExceptionRedirect");
+
+					actionResponse.sendRedirect(uploadExceptionRedirect);
+				}
+
+				if (e instanceof AntivirusScannerException) {
+					SessionErrors.add(actionRequest, e.getClass(), e);
+				}
+				else {
+					SessionErrors.add(actionRequest, e.getClass());
+				}
 			}
 			else if (e instanceof AssetCategoryException ||
 					 e instanceof AssetTagException) {
@@ -314,8 +350,6 @@ public class EditMessageAction extends PortletAction {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		PortletPreferences portletPreferences = actionRequest.getPreferences();
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -329,9 +363,7 @@ public class EditMessageAction extends PortletAction {
 		String subject = ParamUtil.getString(actionRequest, "subject");
 		String body = ParamUtil.getString(actionRequest, "body");
 
-		String format = GetterUtil.getString(
-			portletPreferences.getValue("messageFormat", null),
-			MBMessageConstants.DEFAULT_FORMAT);
+		MBSettings mbSettings = MBSettings.getInstance(groupId);
 
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
 			new ArrayList<ObjectValuePair<String, InputStream>>(5);
@@ -385,9 +417,9 @@ public class EditMessageAction extends PortletAction {
 					// Post new thread
 
 					message = MBMessageServiceUtil.addMessage(
-						groupId, categoryId, subject, body, format,
-						inputStreamOVPs, anonymous, priority, allowPingbacks,
-						serviceContext);
+						groupId, categoryId, subject, body,
+						mbSettings.getMessageFormat(), inputStreamOVPs,
+						anonymous, priority, allowPingbacks, serviceContext);
 
 					if (question) {
 						MBThreadLocalServiceUtil.updateQuestion(
@@ -399,7 +431,8 @@ public class EditMessageAction extends PortletAction {
 					// Post reply
 
 					message = MBMessageServiceUtil.addMessage(
-						parentMessageId, subject, body, format, inputStreamOVPs,
+						parentMessageId, subject, body,
+						mbSettings.getMessageFormat(), inputStreamOVPs,
 						anonymous, priority, allowPingbacks, serviceContext);
 				}
 			}

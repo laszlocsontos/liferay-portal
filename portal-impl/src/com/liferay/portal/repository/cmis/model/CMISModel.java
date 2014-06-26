@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portal.repository.cmis.model;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.RepositoryException;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -94,7 +93,7 @@ public abstract class CMISModel {
 	protected abstract CMISRepository getCmisRepository();
 
 	@SuppressWarnings("unused")
-	protected Folder getParentFolder() throws PortalException, SystemException {
+	protected Folder getParentFolder() throws PortalException {
 		return _parentFolder;
 	}
 

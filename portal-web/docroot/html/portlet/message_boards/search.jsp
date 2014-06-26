@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -72,7 +72,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 	%>
 
 	<liferay-ui:search-container
-		emptyResultsMessage='<%= LanguageUtil.format(pageContext, "no-messages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false) %>'
+		emptyResultsMessage='<%= LanguageUtil.format(request, "no-messages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false) %>'
 		iteratorURL="<%= portletURL %>"
 	>
 
@@ -125,9 +125,7 @@ String keywords = ParamUtil.getString(request, "keywords");
 			</portlet:renderURL>
 
 			<liferay-ui:app-view-search-entry
-				containerIcon="../common/conversation"
 				containerName="<%= MBUtil.getAbsolutePath(renderRequest, message.getCategoryId()) %>"
-				containerType='<%= LanguageUtil.get(locale, "category[message-board]") %>'
 				cssClass='<%= MathUtil.isEven(index) ? "search" : "search alt" %>'
 				description="<%= (summary != null) ? summary.getContent() : StringPool.BLANK %>"
 				fileEntryTuples="<%= searchResult.getFileEntryTuples() %>"
@@ -147,5 +145,5 @@ if (breadcrumbsCategoryId > 0) {
 	MBUtil.addPortletBreadcrumbEntries(breadcrumbsCategoryId, request, renderResponse);
 }
 
-PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "search") + ": " + keywords, currentURL);
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "search") + ": " + keywords, currentURL);
 %>

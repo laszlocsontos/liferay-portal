@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 
 MBStatsUser statsUser = (MBStatsUser)row.getObject();
 
-String[] ranks = MBUtil.getUserRank(groupPortletSettings, themeDisplay.getLanguageId(), statsUser);
+String[] ranks = MBUtil.getUserRank(mbSettings, themeDisplay.getLanguageId(), statsUser);
 %>
 
 <liferay-ui:user-display userId="<%= statsUser.getUserId() %>">

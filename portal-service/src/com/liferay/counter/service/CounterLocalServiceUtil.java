@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,11 +46,9 @@ public class CounterLocalServiceUtil {
 	*
 	* @param counter the counter
 	* @return the counter that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.counter.model.Counter addCounter(
-		com.liferay.counter.model.Counter counter)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.counter.model.Counter counter) {
 		return getService().addCounter(counter);
 	}
 
@@ -71,12 +69,10 @@ public class CounterLocalServiceUtil {
 	* @param name the primary key of the counter
 	* @return the counter that was removed
 	* @throws PortalException if a counter with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.counter.model.Counter deleteCounter(
 		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteCounter(name);
 	}
 
@@ -85,11 +81,9 @@ public class CounterLocalServiceUtil {
 	*
 	* @param counter the counter
 	* @return the counter that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.counter.model.Counter deleteCounter(
-		com.liferay.counter.model.Counter counter)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.counter.model.Counter counter) {
 		return getService().deleteCounter(counter);
 	}
 
@@ -102,12 +96,10 @@ public class CounterLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -122,12 +114,11 @@ public class CounterLocalServiceUtil {
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,14 +134,12 @@ public class CounterLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -160,11 +149,9 @@ public class CounterLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -174,18 +161,15 @@ public class CounterLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
 	public static com.liferay.counter.model.Counter fetchCounter(
-		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String name) {
 		return getService().fetchCounter(name);
 	}
 
@@ -195,19 +179,25 @@ public class CounterLocalServiceUtil {
 	* @param name the primary key of the counter
 	* @return the counter
 	* @throws PortalException if a counter with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.counter.model.Counter getCounter(
 		java.lang.String name)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getCounter(name);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
@@ -221,11 +211,9 @@ public class CounterLocalServiceUtil {
 	* @param start the lower bound of the range of counters
 	* @param end the upper bound of the range of counters (not inclusive)
 	* @return the range of counters
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.counter.model.Counter> getCounters(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return getService().getCounters(start, end);
 	}
 
@@ -233,10 +221,8 @@ public class CounterLocalServiceUtil {
 	* Returns the number of counters.
 	*
 	* @return the number of counters
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getCountersCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getCountersCount() {
 		return getService().getCountersCount();
 	}
 
@@ -245,11 +231,9 @@ public class CounterLocalServiceUtil {
 	*
 	* @param counter the counter
 	* @return the counter that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.counter.model.Counter updateCounter(
-		com.liferay.counter.model.Counter counter)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.counter.model.Counter counter) {
 		return getService().updateCounter(counter);
 	}
 
@@ -271,38 +255,31 @@ public class CounterLocalServiceUtil {
 		getService().setBeanIdentifier(beanIdentifier);
 	}
 
-	public static java.util.List<java.lang.String> getNames()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static java.util.List<java.lang.String> getNames() {
 		return getService().getNames();
 	}
 
-	public static long increment()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static long increment() {
 		return getService().increment();
 	}
 
-	public static long increment(java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static long increment(java.lang.String name) {
 		return getService().increment(name);
 	}
 
-	public static long increment(java.lang.String name, int size)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static long increment(java.lang.String name, int size) {
 		return getService().increment(name, size);
 	}
 
-	public static void rename(java.lang.String oldName, java.lang.String newName)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void rename(java.lang.String oldName, java.lang.String newName) {
 		getService().rename(oldName, newName);
 	}
 
-	public static void reset(java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void reset(java.lang.String name) {
 		getService().reset(name);
 	}
 
-	public static void reset(java.lang.String name, long size)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static void reset(java.lang.String name, long size) {
 		getService().reset(name, size);
 	}
 

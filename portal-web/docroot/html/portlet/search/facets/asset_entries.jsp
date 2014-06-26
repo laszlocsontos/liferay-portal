@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -88,10 +88,10 @@ if (dataJSONObject.has("values")) {
 			<li class="facet-value <%= fieldParam.equals(termCollector.getTerm()) ? "active" : StringPool.BLANK %>">
 				<a data-value="<%= HtmlUtil.escapeAttribute(assetType) %>" href="javascript:;">
 					<c:if test="<%= assetRendererFactory != null %>">
-						<img alt="" src="<%= assetRendererFactory.getIconPath(renderRequest) %>" />
+						<i class="<%= assetRendererFactory.getIconCssClass() %>"></i>
 					</c:if>
 
-					<%= assetRendererFactory.getTypeName(locale, false) %>
+					<%= assetRendererFactory.getTypeName(locale) %>
 
 					<c:if test="<%= showAssetCount %>">
 						<span class="badge badge-info frequency"><%= frequency %></span>

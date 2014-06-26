@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
@@ -42,7 +41,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.persistence.GroupActionableDynamicQuery;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.messageboards.NoSuchDiscussionException;
@@ -50,16 +49,17 @@ import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBThread;
+import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBCategoryServiceUtil;
 import com.liferay.portlet.messageboards.service.MBDiscussionLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.permission.MBMessagePermission;
-import com.liferay.portlet.messageboards.service.persistence.MBCategoryActionableDynamicQuery;
-import com.liferay.portlet.messageboards.service.persistence.MBMessageActionableDynamicQuery;
 
 import java.util.List;
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 /**
@@ -75,6 +75,10 @@ public class MBMessageIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.MESSAGE_BOARDS;
 
 	public MBMessageIndexer() {
+		setDefaultSelectedFieldNames(
+			Field.CLASS_NAME_ID, Field.CLASS_PK, Field.COMPANY_ID,
+			Field.CONTENT, Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK,
+			Field.TITLE, Field.UID);
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -203,6 +207,15 @@ public class MBMessageIndexer extends BaseIndexer {
 	}
 
 	@Override
+	public void updateFullQuery(SearchContext searchContext) {
+		if (searchContext.isIncludeDiscussions()) {
+			searchContext.addFullQueryEntryClassName(MBMessage.class.getName());
+
+			searchContext.setAttribute("discussion", Boolean.TRUE);
+		}
+	}
+
+	@Override
 	protected void doDelete(Object obj) throws Exception {
 		SearchContext searchContext = new SearchContext();
 
@@ -313,8 +326,8 @@ public class MBMessageIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet,
-		PortletURL portletURL) {
+		Document document, Locale locale, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		String messageId = document.get(Field.ENTRY_CLASS_PK);
 
@@ -402,118 +415,132 @@ public class MBMessageIndexer extends BaseIndexer {
 	}
 
 	protected void reindexCategories(final long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
-			new MBCategoryActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
-
-				MBCategory category = (MBCategory)object;
-
-				reindexMessages(
-					companyId, category.getGroupId(), category.getCategoryId());
-			}
-
-		};
+			MBCategoryLocalServiceUtil.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setCompanyId(companyId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					MBCategory category = (MBCategory)object;
+
+					reindexMessages(
+						companyId, category.getGroupId(),
+						category.getCategoryId());
+				}
+
+			});
 
 		actionableDynamicQuery.performActions();
 	}
 
 	protected void reindexDiscussions(final long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
-			new GroupActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
-
-				Group group = (Group)object;
-
-				reindexMessages(
-					companyId, group.getGroupId(),
-					MBCategoryConstants.DISCUSSION_CATEGORY_ID);
-			}
-
-		};
+			GroupLocalServiceUtil.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setCompanyId(companyId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					Group group = (Group)object;
+
+					reindexMessages(
+						companyId, group.getGroupId(),
+						MBCategoryConstants.DISCUSSION_CATEGORY_ID);
+				}
+
+			});
 
 		actionableDynamicQuery.performActions();
 	}
 
 	protected void reindexMessages(
 			long companyId, long groupId, final long categoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		ActionableDynamicQuery actionableDynamicQuery =
-			new MBMessageActionableDynamicQuery() {
+		final ActionableDynamicQuery actionableDynamicQuery =
+			MBMessageLocalServiceUtil.getActionableDynamicQuery();
 
-			@Override
-			protected void addCriteria(DynamicQuery dynamicQuery) {
-				Property categoryIdProperty = PropertyFactoryUtil.forName(
-					"categoryId");
+		actionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
 
-				dynamicQuery.add(categoryIdProperty.eq(categoryId));
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					Property categoryIdProperty = PropertyFactoryUtil.forName(
+						"categoryId");
 
-				Property statusProperty = PropertyFactoryUtil.forName("status");
+					dynamicQuery.add(categoryIdProperty.eq(categoryId));
 
-				Integer[] statuses = {
-					WorkflowConstants.STATUS_APPROVED,
-					WorkflowConstants.STATUS_IN_TRASH
-				};
+					Property statusProperty = PropertyFactoryUtil.forName(
+						"status");
 
-				dynamicQuery.add(statusProperty.in(statuses));
-			}
+					Integer[] statuses = {
+						WorkflowConstants.STATUS_APPROVED,
+						WorkflowConstants.STATUS_IN_TRASH
+					};
 
-			@Override
-			protected void performAction(Object object) throws PortalException {
-				MBMessage message = (MBMessage)object;
-
-				if (message.isDiscussion() && message.isRoot()) {
-					return;
+					dynamicQuery.add(statusProperty.in(statuses));
 				}
 
-				Document document = getDocument(message);
-
-				addDocument(document);
-			}
-
-		};
-
+			});
 		actionableDynamicQuery.setCompanyId(companyId);
 		actionableDynamicQuery.setGroupId(groupId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					MBMessage message = (MBMessage)object;
+
+					if (message.isDiscussion() && message.isRoot()) {
+						return;
+					}
+
+					Document document = getDocument(message);
+
+					actionableDynamicQuery.addDocument(document);
+				}
+
+			});
 		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		actionableDynamicQuery.performActions();
 	}
 
-	protected void reindexRoot(final long companyId)
-		throws PortalException, SystemException {
-
+	protected void reindexRoot(final long companyId) throws PortalException {
 		ActionableDynamicQuery actionableDynamicQuery =
-			new GroupActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object)
-				throws PortalException, SystemException {
-
-				Group group = (Group)object;
-
-				reindexMessages(
-					companyId, group.getGroupId(),
-					MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
-			}
-
-		};
+			GroupLocalServiceUtil.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setCompanyId(companyId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					Group group = (Group)object;
+
+					reindexMessages(
+						companyId, group.getGroupId(),
+						MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
+				}
+
+			});
 
 		actionableDynamicQuery.performActions();
 	}

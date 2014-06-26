@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.iframe.action;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -65,7 +64,7 @@ public class ViewAction extends PortletAction {
 
 	protected String getPassword(
 			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletPreferences portletPreferences = renderRequest.getPreferences();
 
@@ -89,7 +88,7 @@ public class ViewAction extends PortletAction {
 
 	protected String getUserName(
 			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletPreferences portletPreferences = renderRequest.getPreferences();
 
@@ -101,7 +100,7 @@ public class ViewAction extends PortletAction {
 
 	protected String transformSrc(
 			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletPreferences portletPreferences = renderRequest.getPreferences();
 

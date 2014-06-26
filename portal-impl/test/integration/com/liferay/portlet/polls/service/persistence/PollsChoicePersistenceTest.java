@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,25 +30,29 @@ import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.polls.NoSuchChoiceException;
 import com.liferay.portlet.polls.model.PollsChoice;
 import com.liferay.portlet.polls.model.impl.PollsChoiceModelImpl;
+import com.liferay.portlet.polls.service.PollsChoiceLocalServiceUtil;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +64,15 @@ import java.util.Set;
 	PersistenceExecutionTestListener.class})
 @RunWith(LiferayPersistenceIntegrationJUnitTestRunner.class)
 public class PollsChoicePersistenceTest {
+	@Before
+	public void setUp() {
+		_modelListeners = _persistence.getListeners();
+
+		for (ModelListener<PollsChoice> modelListener : _modelListeners) {
+			_persistence.unregisterListener(modelListener);
+		}
+	}
+
 	@After
 	public void tearDown() throws Exception {
 		Map<Serializable, BasePersistence<?>> basePersistences = _transactionalPersistenceAdvice.getBasePersistences();
@@ -81,11 +94,15 @@ public class PollsChoicePersistenceTest {
 		}
 
 		_transactionalPersistenceAdvice.reset();
+
+		for (ModelListener<PollsChoice> modelListener : _modelListeners) {
+			_persistence.registerListener(modelListener);
+		}
 	}
 
 	@Test
 	public void testCreate() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		PollsChoice pollsChoice = _persistence.create(pk);
 
@@ -112,29 +129,29 @@ public class PollsChoicePersistenceTest {
 
 	@Test
 	public void testUpdateExisting() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		PollsChoice newPollsChoice = _persistence.create(pk);
 
-		newPollsChoice.setUuid(ServiceTestUtil.randomString());
+		newPollsChoice.setUuid(RandomTestUtil.randomString());
 
-		newPollsChoice.setGroupId(ServiceTestUtil.nextLong());
+		newPollsChoice.setGroupId(RandomTestUtil.nextLong());
 
-		newPollsChoice.setCompanyId(ServiceTestUtil.nextLong());
+		newPollsChoice.setCompanyId(RandomTestUtil.nextLong());
 
-		newPollsChoice.setUserId(ServiceTestUtil.nextLong());
+		newPollsChoice.setUserId(RandomTestUtil.nextLong());
 
-		newPollsChoice.setUserName(ServiceTestUtil.randomString());
+		newPollsChoice.setUserName(RandomTestUtil.randomString());
 
-		newPollsChoice.setCreateDate(ServiceTestUtil.nextDate());
+		newPollsChoice.setCreateDate(RandomTestUtil.nextDate());
 
-		newPollsChoice.setModifiedDate(ServiceTestUtil.nextDate());
+		newPollsChoice.setModifiedDate(RandomTestUtil.nextDate());
 
-		newPollsChoice.setQuestionId(ServiceTestUtil.nextLong());
+		newPollsChoice.setQuestionId(RandomTestUtil.nextLong());
 
-		newPollsChoice.setName(ServiceTestUtil.randomString());
+		newPollsChoice.setName(RandomTestUtil.randomString());
 
-		newPollsChoice.setDescription(ServiceTestUtil.randomString());
+		newPollsChoice.setDescription(RandomTestUtil.randomString());
 
 		_persistence.update(newPollsChoice);
 
@@ -184,7 +201,7 @@ public class PollsChoicePersistenceTest {
 	public void testCountByUUID_G() {
 		try {
 			_persistence.countByUUID_G(StringPool.BLANK,
-				ServiceTestUtil.nextLong());
+				RandomTestUtil.nextLong());
 
 			_persistence.countByUUID_G(StringPool.NULL, 0L);
 
@@ -199,7 +216,7 @@ public class PollsChoicePersistenceTest {
 	public void testCountByUuid_C() {
 		try {
 			_persistence.countByUuid_C(StringPool.BLANK,
-				ServiceTestUtil.nextLong());
+				RandomTestUtil.nextLong());
 
 			_persistence.countByUuid_C(StringPool.NULL, 0L);
 
@@ -213,7 +230,7 @@ public class PollsChoicePersistenceTest {
 	@Test
 	public void testCountByQuestionId() {
 		try {
-			_persistence.countByQuestionId(ServiceTestUtil.nextLong());
+			_persistence.countByQuestionId(RandomTestUtil.nextLong());
 
 			_persistence.countByQuestionId(0L);
 		}
@@ -225,7 +242,7 @@ public class PollsChoicePersistenceTest {
 	@Test
 	public void testCountByQ_N() {
 		try {
-			_persistence.countByQ_N(ServiceTestUtil.nextLong(), StringPool.BLANK);
+			_persistence.countByQ_N(RandomTestUtil.nextLong(), StringPool.BLANK);
 
 			_persistence.countByQ_N(0L, StringPool.NULL);
 
@@ -247,7 +264,7 @@ public class PollsChoicePersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		try {
 			_persistence.findByPrimaryKey(pk);
@@ -287,7 +304,7 @@ public class PollsChoicePersistenceTest {
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		PollsChoice missingPollsChoice = _persistence.fetchByPrimaryKey(pk);
 
@@ -295,19 +312,103 @@ public class PollsChoicePersistenceTest {
 	}
 
 	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		PollsChoice newPollsChoice1 = addPollsChoice();
+		PollsChoice newPollsChoice2 = addPollsChoice();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPollsChoice1.getPrimaryKey());
+		primaryKeys.add(newPollsChoice2.getPrimaryKey());
+
+		Map<Serializable, PollsChoice> pollsChoices = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, pollsChoices.size());
+		Assert.assertEquals(newPollsChoice1,
+			pollsChoices.get(newPollsChoice1.getPrimaryKey()));
+		Assert.assertEquals(newPollsChoice2,
+			pollsChoices.get(newPollsChoice2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, PollsChoice> pollsChoices = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(pollsChoices.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		PollsChoice newPollsChoice = addPollsChoice();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPollsChoice.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, PollsChoice> pollsChoices = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, pollsChoices.size());
+		Assert.assertEquals(newPollsChoice,
+			pollsChoices.get(newPollsChoice.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, PollsChoice> pollsChoices = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(pollsChoices.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		PollsChoice newPollsChoice = addPollsChoice();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPollsChoice.getPrimaryKey());
+
+		Map<Serializable, PollsChoice> pollsChoices = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, pollsChoices.size());
+		Assert.assertEquals(newPollsChoice,
+			pollsChoices.get(newPollsChoice.getPrimaryKey()));
+	}
+
+	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = new PollsChoiceActionableDynamicQuery() {
+		ActionableDynamicQuery actionableDynamicQuery = PollsChoiceLocalServiceUtil.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				protected void performAction(Object object) {
+				public void performAction(Object object) {
 					PollsChoice pollsChoice = (PollsChoice)object;
 
 					Assert.assertNotNull(pollsChoice);
 
 					count.increment();
 				}
-			};
+			});
 
 		actionableDynamicQuery.performActions();
 
@@ -340,7 +441,7 @@ public class PollsChoicePersistenceTest {
 				PollsChoice.class.getClassLoader());
 
 		dynamicQuery.add(RestrictionsFactoryUtil.eq("choiceId",
-				ServiceTestUtil.nextLong()));
+				RandomTestUtil.nextLong()));
 
 		List<PollsChoice> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -379,7 +480,7 @@ public class PollsChoicePersistenceTest {
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("choiceId"));
 
 		dynamicQuery.add(RestrictionsFactoryUtil.in("choiceId",
-				new Object[] { ServiceTestUtil.nextLong() }));
+				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -412,29 +513,29 @@ public class PollsChoicePersistenceTest {
 	}
 
 	protected PollsChoice addPollsChoice() throws Exception {
-		long pk = ServiceTestUtil.nextLong();
+		long pk = RandomTestUtil.nextLong();
 
 		PollsChoice pollsChoice = _persistence.create(pk);
 
-		pollsChoice.setUuid(ServiceTestUtil.randomString());
+		pollsChoice.setUuid(RandomTestUtil.randomString());
 
-		pollsChoice.setGroupId(ServiceTestUtil.nextLong());
+		pollsChoice.setGroupId(RandomTestUtil.nextLong());
 
-		pollsChoice.setCompanyId(ServiceTestUtil.nextLong());
+		pollsChoice.setCompanyId(RandomTestUtil.nextLong());
 
-		pollsChoice.setUserId(ServiceTestUtil.nextLong());
+		pollsChoice.setUserId(RandomTestUtil.nextLong());
 
-		pollsChoice.setUserName(ServiceTestUtil.randomString());
+		pollsChoice.setUserName(RandomTestUtil.randomString());
 
-		pollsChoice.setCreateDate(ServiceTestUtil.nextDate());
+		pollsChoice.setCreateDate(RandomTestUtil.nextDate());
 
-		pollsChoice.setModifiedDate(ServiceTestUtil.nextDate());
+		pollsChoice.setModifiedDate(RandomTestUtil.nextDate());
 
-		pollsChoice.setQuestionId(ServiceTestUtil.nextLong());
+		pollsChoice.setQuestionId(RandomTestUtil.nextLong());
 
-		pollsChoice.setName(ServiceTestUtil.randomString());
+		pollsChoice.setName(RandomTestUtil.randomString());
 
-		pollsChoice.setDescription(ServiceTestUtil.randomString());
+		pollsChoice.setDescription(RandomTestUtil.randomString());
 
 		_persistence.update(pollsChoice);
 
@@ -442,6 +543,7 @@ public class PollsChoicePersistenceTest {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(PollsChoicePersistenceTest.class);
+	private ModelListener<PollsChoice>[] _modelListeners;
 	private PollsChoicePersistence _persistence = (PollsChoicePersistence)PortalBeanLocatorUtil.locate(PollsChoicePersistence.class.getName());
 	private TransactionalPersistenceAdvice _transactionalPersistenceAdvice = (TransactionalPersistenceAdvice)PortalBeanLocatorUtil.locate(TransactionalPersistenceAdvice.class.getName());
 }

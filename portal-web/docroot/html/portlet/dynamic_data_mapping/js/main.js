@@ -37,9 +37,12 @@ AUI.add(
 
 		var TPL_ELEMENT = '<{nodeName}{attributeList}></{nodeName}>';
 
+		var UNLOCALIZABLE_FIELD_ATTRS = ['indexType', 'name', 'required', 'repeatable', 'showLabel'];
+
 		var XML_ATTRIBUTES_FIELD_ATTRS = {
 			dataType: 1,
 			indexType: 1,
+			localizable: 1,
 			multiple: 1,
 			name: 1,
 			options: 1,
@@ -66,9 +69,9 @@ AUI.add(
 					}
 				},
 
-				NAME: 'availableField',
+				EXTENDS: A.FormBuilderAvailableField,
 
-				EXTENDS: A.FormBuilderAvailableField
+				NAME: 'availableField'
 			}
 		);
 
@@ -92,37 +95,6 @@ AUI.add(
 						value: STR_BLANK
 					},
 
-					translationManager: {
-						validator: isObject,
-						value: {}
-					},
-
-					validator: {
-						setter: function(val) {
-							var instance = this;
-
-							var config = A.merge(
-								{
-									rules: {
-										name: {
-											required: true,
-											structureFieldName: true
-										}
-									},
-									fieldStrings: {
-										name: {
-											required: Liferay.Language.get('this-field-is-required')
-										}
-									}
-								},
-								val
-							);
-
-							return config;
-						},
-						value: {}
-					},
-
 					strings: {
 						value: {
 							addNode: Liferay.Language.get('add-field'),
@@ -133,6 +105,7 @@ AUI.add(
 							editMessage: Liferay.Language.get('edit'),
 							label: Liferay.Language.get('field-label'),
 							large: Liferay.Language.get('large'),
+							localizable: Liferay.Language.get('localizable'),
 							medium: Liferay.Language.get('medium'),
 							multiple: Liferay.Language.get('multiple'),
 							name: Liferay.Language.get('name'),
@@ -153,6 +126,37 @@ AUI.add(
 							width: Liferay.Language.get('width'),
 							yes: Liferay.Language.get('yes')
 						}
+					},
+
+					translationManager: {
+						validator: isObject,
+						value: {}
+					},
+
+					validator: {
+						setter: function(val) {
+							var instance = this;
+
+							var config = A.merge(
+								{
+									fieldStrings: {
+										name: {
+											required: Liferay.Language.get('this-field-is-required')
+										}
+									},
+									rules: {
+										name: {
+											required: true,
+											structureFieldName: true
+										}
+									}
+								},
+								val
+							);
+
+							return config;
+						},
+						value: {}
 					}
 				},
 
@@ -164,7 +168,7 @@ AUI.add(
 					initializer: function() {
 						var instance = this;
 
-						instance.LOCALIZABLE_FIELD_ATTRS = A.Array(LOCALIZABLE_FIELD_ATTRS);
+						instance.LOCALIZABLE_FIELD_ATTRS = AArray(LOCALIZABLE_FIELD_ATTRS);
 						instance.MAP_HIDDEN_FIELD_ATTRS = A.clone(MAP_HIDDEN_FIELD_ATTRS);
 
 						var translationManager = instance.translationManager = new Liferay.TranslationManager(instance.get('translationManager'));
@@ -200,23 +204,13 @@ AUI.add(
 						return field;
 					},
 
-					getContentXSD: function() {
+					getContentDefinition: function() {
 						var instance = this;
 
-						return window[instance.get('portletNamespace') + 'getContentXSD']();
+						return window[instance.get('portletNamespace') + 'getContentDefinition']();
 					},
 
-					getFieldLocalizedValue: function(field, attribute, locale) {
-						var instance = this;
-
-						var localizationMap = field.get('localizationMap');
-
-						var value = A.Object.getValue(localizationMap, [locale, attribute]) || field.get(attribute);
-
-						return instance.normalizeValue(value);
-					},
-
-					getXSD: function() {
+					getDefinition: function() {
 						var instance = this;
 
 						var buffer = [];
@@ -238,7 +232,7 @@ AUI.add(
 						buffer.push(root.openTag);
 
 						instance.get('fields').each(
-							function(item, index, collection) {
+							function(item, index) {
 								instance._appendStructureTypeElementAndMetaData(item, buffer);
 							}
 						);
@@ -246,6 +240,16 @@ AUI.add(
 						buffer.push(root.closeTag);
 
 						return buffer.join(STR_BLANK);
+					},
+
+					getFieldLocalizedValue: function(field, attribute, locale) {
+						var instance = this;
+
+						var localizationMap = field.get('localizationMap');
+
+						var value = A.Object.getValue(localizationMap, [locale, attribute]) || field.get(attribute);
+
+						return instance.normalizeValue(value);
 					},
 
 					normalizeValue: function(value) {
@@ -261,11 +265,7 @@ AUI.add(
 					_afterEditingLocaleChange: function(event) {
 						var instance = this;
 
-						var editingField = instance.editingField;
-
-						if (editingField) {
-							editingField.set('readOnlyAttributes', instance._getReadOnlyFieldAttributes(editingField));
-						}
+						instance._syncFieldsReadOnlyAttributes();
 
 						instance._updateFieldsLocalizationMap(event.prevVal);
 
@@ -278,7 +278,7 @@ AUI.add(
 						var instance = this;
 
 						field.get('fields').each(
-							function(item, index, collection) {
+							function(item, index) {
 								instance._appendStructureTypeElementAndMetaData(item, buffer);
 							}
 						);
@@ -292,7 +292,7 @@ AUI.add(
 						if (options) {
 							AArray.each(
 								options,
-								function(item, index, collection) {
+								function(item, index) {
 									var name = item.name;
 
 									if (!name) {
@@ -332,7 +332,7 @@ AUI.add(
 
 						A.each(
 							localizationMap,
-							function(item, index, collection) {
+							function(item, index) {
 								if (isObject(item)) {
 									var metadataTag = instance._createDynamicNode(
 										'meta-data',
@@ -364,6 +364,7 @@ AUI.add(
 								dataType: field.get('dataType'),
 								fieldNamespace: field.get('fieldNamespace'),
 								indexType: field.get('indexType'),
+								localizable: field.get('localizable'),
 								multiple: field.get('multiple'),
 								name: field.get('name'),
 								readOnly: field.get('readOnly'),
@@ -385,7 +386,7 @@ AUI.add(
 
 						AArray.each(
 							availableLocales,
-							function(item1, index1, collection1) {
+							function(item1, index1) {
 								var metadata = instance._createDynamicNode(
 									'meta-data',
 									{
@@ -397,7 +398,7 @@ AUI.add(
 
 								AArray.each(
 									field.getProperties(),
-									function(item2, index2, collection2) {
+									function(item2, index2) {
 										var attributeName = item2.attributeName;
 
 										if (!XML_ATTRIBUTES_FIELD_ATTRS[attributeName]) {
@@ -446,7 +447,7 @@ AUI.add(
 						if (attributeMap) {
 							A.each(
 								attributeMap,
-								function(item, index, collection) {
+								function(item, index) {
 									if (item !== undefined) {
 										attrs.push([index, '="', item, '" '].join(STR_BLANK));
 									}
@@ -470,18 +471,24 @@ AUI.add(
 
 						var translationManager = instance.translationManager;
 
+						var defaultLocale = translationManager.get('defaultLocale');
 						var editingLocale = translationManager.get('editingLocale');
 
 						var readOnlyAttributes = field.get('readOnlyAttributes');
 
-						if (editingLocale === translationManager.get('defaultLocale')) {
-							AArray.removeItem(readOnlyAttributes, 'name');
-						}
-						else if (AArray.indexOf(readOnlyAttributes, 'name') === -1) {
-							readOnlyAttributes.push('name');
-						}
+						AArray.each(
+							UNLOCALIZABLE_FIELD_ATTRS,
+							function(item, index) {
+								if (defaultLocale === editingLocale) {
+									AArray.removeItem(readOnlyAttributes, item);
+								}
+								else {
+									readOnlyAttributes.push(item);
+								}
+							}
+						);
 
-						return readOnlyAttributes;
+						return AArray.dedupe(readOnlyAttributes);
 					},
 
 					_onPropertyModelChange: function(event) {
@@ -495,7 +502,7 @@ AUI.add(
 
 						var readOnlyAttributes = editingField.get('readOnlyAttributes');
 
-						if (changed.hasOwnProperty('value') && (A.Array.indexOf(readOnlyAttributes, 'name') === -1)) {
+						if (changed.hasOwnProperty('value') && (AArray.indexOf(readOnlyAttributes, 'name') === -1)) {
 							if (attributeName === 'name') {
 								editingField.set('autoGeneratedName', event.autoGeneratedName === true);
 							}
@@ -510,7 +517,7 @@ AUI.add(
 									var modelList = instance.propertyList.get('data');
 
 									var nameModel = modelList.filter(
-										function(item, index, collection) {
+										function(item, index) {
 											return (item.get('attributeName') === 'name');
 										}
 									);
@@ -542,7 +549,7 @@ AUI.add(
 
 						var fields = AArray.map(
 							val,
-							function(item, index, collection) {
+							function(item, index) {
 								return A.instanceOf(item, A.AvailableField) ? item : new A.LiferayAvailableField(item);
 							}
 						);
@@ -563,7 +570,7 @@ AUI.add(
 
 						AArray.each(
 							options,
-							function(item, index, collection) {
+							function(item, index) {
 								var localizationMap = item.localizationMap;
 
 								if (isObject(localizationMap)) {
@@ -596,7 +603,7 @@ AUI.add(
 								if (isObject(localizationMap) && isObject(localeMap)) {
 									AArray.each(
 										instance.LOCALIZABLE_FIELD_ATTRS,
-										function(item, index, collection) {
+										function(item, index) {
 											field.set(item, localeMap[item]);
 										}
 									);
@@ -609,6 +616,20 @@ AUI.add(
 								}
 
 								instance._syncFieldsLocaleUI(locale, field.get('fields'));
+							}
+						);
+					},
+
+					_syncFieldsReadOnlyAttributes: function(fields) {
+						var instance = this;
+
+						fields = fields || instance.get('fields');
+
+						fields.each(
+							function(field) {
+								field.set('readOnlyAttributes', instance._getReadOnlyFieldAttributes(field));
+
+								instance._syncFieldsReadOnlyAttributes(field.get('fields'));
 							}
 						);
 					},
@@ -627,7 +648,7 @@ AUI.add(
 
 						AArray.each(
 							options,
-							function(item, index, collection) {
+							function(item, index) {
 								var localizationMap = item.localizationMap;
 
 								if (!isObject(localizationMap)) {
@@ -651,7 +672,7 @@ AUI.add(
 						fields = fields || instance.get('fields');
 
 						fields.each(
-							function(item, index, collection) {
+							function(item, index) {
 								var localizationMap = {};
 
 								localizationMap[locale] = item.getAttrs(instance.LOCALIZABLE_FIELD_ATTRS);
@@ -677,8 +698,8 @@ AUI.add(
 				normalizeKey: function(str) {
 					A.each(
 						str,
-						function(item, index, collection) {
-							if (!A.Text.Unicode.test(item, 'L') && !A.Text.Unicode.test(item, 'N') && !A.Text.Unicode.test(item,'Pd')) {
+						function(item, index) {
+							if (!A.Text.Unicode.test(item, 'L') && !A.Text.Unicode.test(item, 'N') && !A.Text.Unicode.test(item, 'Pd')) {
 								str = str.replace(item, STR_SPACE);
 							}
 						}
@@ -689,54 +710,54 @@ AUI.add(
 			}
 		);
 
+		LiferayFormBuilder.Util = {
+			getFileEntry: function(fileJSON, callback) {
+				var instance = this;
+
+				fileJSON = instance.parseJSON(fileJSON);
+
+				Liferay.Service(
+					'/dlapp/get-file-entry-by-uuid-and-group-id',
+					{
+						groupId: fileJSON.groupId,
+						uuid: fileJSON.uuid
+					},
+					callback
+				);
+			},
+
+			getFileEntryURL: function(fileEntry) {
+				var instance = this;
+
+				var buffer = [
+					themeDisplay.getPathContext(),
+					'documents',
+					fileEntry.groupId,
+					fileEntry.folderId,
+					encodeURIComponent(fileEntry.title)
+				];
+
+				return buffer.join('/');
+			},
+
+			parseJSON: function(value) {
+				var instance = this;
+
+				var data = {};
+
+				try {
+					data = JSON.parse(value);
+				}
+				catch (e) {
+				}
+
+				return data;
+			}
+		};
+
 		LiferayFormBuilder.DEFAULT_ICON_CLASS = 'icon-fb-custom-field';
 
 		var AVAILABLE_FIELDS = {
-			DEFAULT: [
-				{
-					fieldLabel: Liferay.Language.get('button'),
-					iconClass: 'form-builder-field-icon form-builder-field-icon-button',
-					label: Liferay.Language.get('button'),
-					type: 'button'
-				},
-				{
-					fieldLabel: Liferay.Language.get('checkbox'),
-					iconClass: 'icon-fb-boolean',
-					label: Liferay.Language.get('checkbox'),
-					type: 'checkbox'
-				},
-				{
-					fieldLabel: Liferay.Language.get('fieldset'),
-					iconClass: 'form-builder-field-icon form-builder-field-icon-fieldset',
-					label: Liferay.Language.get('fieldset'),
-					type: 'fieldset'
-				},
-				{
-					fieldLabel: Liferay.Language.get('text-box'),
-					iconClass: 'icon-fb-text',
-					label: Liferay.Language.get('text-box'),
-					type: 'text'
-				},
-				{
-					fieldLabel: Liferay.Language.get('text-area'),
-					iconClass: 'icon-fb-text-box',
-					label: Liferay.Language.get('text-area'),
-					type: 'textarea'
-				},
-				{
-					fieldLabel: Liferay.Language.get('radio-buttons'),
-					iconClass: 'icon-fb-radio',
-					label: Liferay.Language.get('radio-buttons'),
-					type: 'radio'
-				},
-				{
-					fieldLabel: Liferay.Language.get('select-option'),
-					iconClass: 'icon-fb-select',
-					label: Liferay.Language.get('select-option'),
-					type: 'select'
-				}
-			],
-
 			DDM_STRUCTURE: [
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.checkbox,
@@ -767,6 +788,12 @@ AUI.add(
 					iconClass: 'icon-edit-sign',
 					label: Liferay.Language.get('html'),
 					type: 'ddm-text-html'
+				},
+				{
+					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
+					iconClass: 'icon-globe',
+					label: Liferay.Language.get('geolocation'),
+					type: 'ddm-geolocation'
 				},
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
@@ -833,12 +860,57 @@ AUI.add(
 				}
 			],
 
+			DEFAULT: [
+				{
+					fieldLabel: Liferay.Language.get('button'),
+					iconClass: 'form-builder-field-icon form-builder-field-icon-button',
+					label: Liferay.Language.get('button'),
+					type: 'button'
+				},
+				{
+					fieldLabel: Liferay.Language.get('checkbox'),
+					iconClass: 'icon-fb-boolean',
+					label: Liferay.Language.get('checkbox'),
+					type: 'checkbox'
+				},
+				{
+					fieldLabel: Liferay.Language.get('fieldset'),
+					iconClass: 'form-builder-field-icon form-builder-field-icon-fieldset',
+					label: Liferay.Language.get('fieldset'),
+					type: 'fieldset'
+				},
+				{
+					fieldLabel: Liferay.Language.get('text-box'),
+					iconClass: 'icon-fb-text',
+					label: Liferay.Language.get('text-box'),
+					type: 'text'
+				},
+				{
+					fieldLabel: Liferay.Language.get('text-area'),
+					iconClass: 'icon-fb-text-box',
+					label: Liferay.Language.get('text-area'),
+					type: 'textarea'
+				},
+				{
+					fieldLabel: Liferay.Language.get('radio-buttons'),
+					iconClass: 'icon-fb-radio',
+					label: Liferay.Language.get('radio-buttons'),
+					type: 'radio'
+				},
+				{
+					fieldLabel: Liferay.Language.get('select-option'),
+					iconClass: 'icon-fb-select',
+					label: Liferay.Language.get('select-option'),
+					type: 'select'
+				}
+			],
+
 			WCM_STRUCTURE: [
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
 					iconClass: 'icon-picture',
 					label: Liferay.Language.get('image'),
-					type: 'wcm-image'
+					type: 'ddm-image'
 				},
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.separator,
@@ -857,6 +929,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-form-builder', 'aui-form-validator', 'aui-text-unicode', 'json', 'liferay-menu', 'liferay-translation-manager', 'text']
+		requires: ['arraysort', 'aui-form-builder', 'aui-form-validator', 'aui-text-unicode', 'json', 'liferay-menu', 'liferay-translation-manager', 'liferay-util-window', 'text']
 	}
 );

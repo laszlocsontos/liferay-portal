@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -93,6 +93,23 @@ public class DataAccess {
 		}
 	}
 
+	public static void deepCleanUp(ResultSet resultSet) {
+		try {
+			if (resultSet != null) {
+				Statement statement = resultSet.getStatement();
+
+				Connection con = statement.getConnection();
+
+				cleanUp(con, statement, resultSet);
+			}
+		}
+		catch (SQLException sqle) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(sqle.getMessage());
+			}
+		}
+	}
+
 	public static Connection getConnection() throws SQLException {
 		DataSource dataSource = _pacl.getDataSource();
 
@@ -121,7 +138,7 @@ public class DataAccess {
 			new UpgradeOptimizedConnectionHandler(con));
 	}
 
-	public static interface PACL {
+	public interface PACL {
 
 		public DataSource getDataSource();
 

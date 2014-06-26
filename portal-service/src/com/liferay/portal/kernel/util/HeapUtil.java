@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ProcessUtil;
 
 import java.lang.management.ManagementFactory;
@@ -21,14 +23,35 @@ import java.lang.management.RuntimeMXBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * @author Shuyang Zhou
  */
 public class HeapUtil {
 
-	public static void heapDump(boolean live, boolean binary, String file) {
-		int processId = _getProcessId();
+	public static int getProcessId() {
+		if (!_supported) {
+			throw new IllegalStateException(
+				HeapUtil.class.getName() + " does not support the current JVM");
+		}
+
+		return _processId;
+	}
+
+	public static Future<ObjectValuePair<Void, Void>> heapDump(
+		boolean live, boolean binary, String file) {
+
+		return heapDump(_processId, live, binary, file);
+	}
+
+	public static Future<ObjectValuePair<Void, Void>> heapDump(
+		int processId, boolean live, boolean binary, String file) {
+
+		if (!_supported) {
+			throw new IllegalStateException(
+				HeapUtil.class.getName() + " does not support the current JVM");
+		}
 
 		StringBundler sb = new StringBundler(5);
 
@@ -52,11 +75,59 @@ public class HeapUtil {
 		arguments.add(String.valueOf(processId));
 
 		try {
-			ProcessUtil.execute(
+			return ProcessUtil.execute(
 				ProcessUtil.LOGGING_OUTPUT_PROCESSOR, arguments);
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Unable to perform heap dump", e);
+		}
+	}
+
+	public static boolean isSupported() {
+		return _supported;
+	}
+
+	private static void _checkJMap(int processId) throws Exception {
+		Future<ObjectValuePair<byte[], byte[]>> future =
+			ProcessUtil.execute(
+				ProcessUtil.COLLECTOR_OUTPUT_PROCESSOR, "jmap", "-histo:live",
+				String.valueOf(processId));
+
+		ObjectValuePair<byte[], byte[]> objectValuePair = future.get();
+
+		String stdOutString = new String(objectValuePair.getKey());
+
+		if (!stdOutString.contains("#instances")) {
+			throw new IllegalStateException(
+				"JMap cannot connect to process ID " + processId);
+		}
+
+		byte[] stdErrBytes = objectValuePair.getValue();
+
+		if (stdErrBytes.length != 0) {
+			throw new IllegalStateException(
+				"JMap returns with error: " + new String(stdErrBytes));
+		}
+	}
+
+	private static void _checkJPS(int processId) throws Exception {
+		Future<ObjectValuePair<byte[], byte[]>> future = ProcessUtil.execute(
+			ProcessUtil.COLLECTOR_OUTPUT_PROCESSOR, "jps");
+
+		ObjectValuePair<byte[], byte[]> objectValuePair = future.get();
+
+		String stdOutString = new String(objectValuePair.getKey());
+
+		if (!stdOutString.contains(String.valueOf(processId))) {
+			throw new IllegalStateException(
+				"JPS cannot detect expected process ID " + processId);
+		}
+
+		byte[] stdErrBytes = objectValuePair.getValue();
+
+		if (stdErrBytes.length != 0) {
+			throw new IllegalStateException(
+				"JPS returns with error: " + new String(stdErrBytes));
 		}
 	}
 
@@ -78,6 +149,39 @@ public class HeapUtil {
 		}
 
 		return pid;
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(HeapUtil.class);
+
+	private static int _processId;
+	private static boolean _supported;
+
+	static {
+		int processId = -1;
+		boolean supported = false;
+
+		if (JavaDetector.isOracle()) {
+			try {
+				processId = _getProcessId();
+
+				_checkJPS(processId);
+				_checkJMap(processId);
+
+				supported = true;
+			}
+			catch (Exception e) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(HeapUtil.class.getName() + " is disabled", e);
+				}
+			}
+		}
+		else if (_log.isDebugEnabled()) {
+			_log.debug(
+				HeapUtil.class.getName() + " is only supported on Oracle JVMs");
+		}
+
+		_processId = processId;
+		_supported = supported;
 	}
 
 }

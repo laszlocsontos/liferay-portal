@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,10 @@
 
 package com.liferay.portlet.journal.util;
 
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -26,34 +26,44 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.User;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.LayoutTestUtil;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portal.xml.XMLSchemaImpl;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormFieldOptions;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
-import com.liferay.portlet.dynamicdatamapping.model.impl.DDMStructureImpl;
+import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.service.BaseDDMServiceTestCase;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
+import com.liferay.portlet.dynamicdatamapping.util.DDMFormXSDDeserializerUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMImpl;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLImpl;
 import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
 import java.io.InputStream;
 import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -64,13 +74,8 @@ import org.junit.runner.RunWith;
  * @author Bruno Basto
  * @author Marcellus Tavares
  */
-@ExecutionTestListeners(
-	listeners = {
-		EnvironmentExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 	@Before
@@ -80,10 +85,10 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		long classNameId = PortalUtil.getClassNameId(JournalArticle.class);
 
-		String xsd = readText("test-ddm-structure-all-fields.xml");
+		String definition = readText("test-ddm-structure-all-fields.xml");
 
 		_ddmStructure = addStructure(
-			classNameId, null, "Test Structure", xsd,
+			classNameId, null, "Test Structure", definition,
 			StorageType.XML.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 	}
 
@@ -115,8 +120,8 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		Fields fields = new Fields();
 
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			TestPropsValues.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, true, "Test 2.txt");
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"Test 2.txt");
 
 		Field docLibrary = getDocumentLibraryField(
 			fileEntry, _ddmStructure.getStructureId());
@@ -154,18 +159,28 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 	public void testGetContentFromLinkToLayoutField() throws Exception {
 		Fields fields = new Fields();
 
+		Map<String, Layout> layouts = getLayoutsMap();
+
 		Field linkToLayoutField = getLinkToLayoutField(
-			_ddmStructure.getStructureId());
+			_ddmStructure.getStructureId(), layouts);
 
 		fields.put(linkToLayoutField);
 
 		Field fieldsDisplayField = getFieldsDisplayField(
-			_ddmStructure.getStructureId(), "link_to_layout_INSTANCE_MiO7vIJu");
+			_ddmStructure.getStructureId(),
+			"link_to_layout_INSTANCE_MiO7vIJu," +
+			"link_to_layout_INSTANCE_9FLzJNUX," +
+			"link_to_layout_INSTANCE_WqABvmxw," +
+			"link_to_layout_INSTANCE_31abnWkB," +
+			"link_to_layout_INSTANCE_pWIUF15B," +
+			"link_to_layout_INSTANCE_OGQypdcj," +
+			"link_to_layout_INSTANCE_TB2XZ3wn," +
+			"link_to_layout_INSTANCE_3IRNS4jM");
 
 		fields.put(fieldsDisplayField);
 
-		String expectedContent = readText(
-			"test-journal-content-link-to-page-field.xml");
+		String expectedContent = replaceLinksToLayoutsParameters(
+			readText("test-journal-content-link-to-page-field.xml"), layouts);
 
 		String actualContent = JournalConverterUtil.getContent(
 			_ddmStructure, fields);
@@ -301,23 +316,20 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 	@Test
 	public void testGetDDMXSD() throws Exception {
-		DDMStructure expectedDDMStructure = new DDMStructureImpl();
+		String expectedXSD = readText("test-ddm-structure-all-fields.xml");
 
-		expectedDDMStructure.setXsd(
-			readText("test-ddm-structure-all-fields.xml"));
+		DDMForm expectedDDMForm = DDMFormXSDDeserializerUtil.deserialize(
+			expectedXSD);
 
 		String actualXSD = JournalConverterUtil.getDDMXSD(
 			readText("test-journal-structure-all-fields.xml"));
 
 		validateDDMXSD(actualXSD);
 
-		DDMStructure actualDDMStructure = new DDMStructureImpl();
+		DDMForm actualDDMForm = DDMFormXSDDeserializerUtil.deserialize(
+			actualXSD);
 
-		actualDDMStructure.setXsd(actualXSD);
-
-		Assert.assertEquals(
-			expectedDDMStructure.getFieldsMap(),
-			actualDDMStructure.getFieldsMap());
+		assertEquals(expectedDDMForm, actualDDMForm);
 	}
 
 	@Test
@@ -350,8 +362,8 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		Fields expectedFields = new Fields();
 
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			TestPropsValues.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, true, "Test 1.txt");
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"Test 1.txt");
 
 		Field documentLibraryField = getDocumentLibraryField(
 			fileEntry, _ddmStructure.getStructureId());
@@ -397,18 +409,32 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		Fields expectedFields = new Fields();
 
+		Map<String, Layout> layoutsMap = getLayoutsMap();
+
 		Field linkToLayoutField = getLinkToLayoutField(
-			_ddmStructure.getStructureId());
+			_ddmStructure.getStructureId(), layoutsMap);
 
 		expectedFields.put(linkToLayoutField);
 
+		StringBundler sb = new StringBundler();
+
+		sb.append("link_to_layout_INSTANCE_MiO7vIJu,");
+		sb.append("link_to_layout_INSTANCE_9FLzJNUX,");
+		sb.append("link_to_layout_INSTANCE_WqABvmxw,");
+		sb.append("link_to_layout_INSTANCE_31abnWkB,");
+		sb.append("link_to_layout_INSTANCE_pWIUF15B,");
+		sb.append("link_to_layout_INSTANCE_OGQypdcj,");
+		sb.append("link_to_layout_INSTANCE_TB2XZ3wn,");
+		sb.append("link_to_layout_INSTANCE_3IRNS4jM");
+
 		Field fieldsDisplayField = getFieldsDisplayField(
-			_ddmStructure.getStructureId(), "link_to_layout_INSTANCE_MiO7vIJu");
+			_ddmStructure.getStructureId(), sb.toString());
 
 		expectedFields.put(fieldsDisplayField);
 
-		String content = readText(
-			"test-journal-content-link-to-page-field.xml");
+		String content = replaceLinksToLayoutsParameters(
+			readText("test-journal-content-link-to-page-field.xml"),
+			layoutsMap);
 
 		Fields actualFields = JournalConverterUtil.getDDMFields(
 			_ddmStructure, content);
@@ -489,6 +515,75 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		Assert.assertEquals(expectedMap, actualMap);
 	}
 
+	protected void assertEquals(
+		DDMForm expectedDDMForm, DDMForm actualDDMForm) {
+
+		Map<String, DDMFormField> expectedDDMFormFieldsMap =
+			expectedDDMForm.getDDMFormFieldsMap(true);
+
+		Map<String, DDMFormField> actualDDMFormFieldsMap =
+			actualDDMForm.getDDMFormFieldsMap(true);
+
+		for (Map.Entry<String, DDMFormField> expectedEntry :
+				expectedDDMFormFieldsMap.entrySet()) {
+
+			DDMFormField actualDDMFormField = actualDDMFormFieldsMap.get(
+				expectedEntry.getKey());
+
+			assertEquals(expectedEntry.getValue(), actualDDMFormField);
+		}
+	}
+
+	protected void assertEquals(
+		DDMFormField expectedDDMFormField, DDMFormField actualDDMFormField) {
+
+		Assert.assertEquals(
+			expectedDDMFormField.getDataType(),
+			actualDDMFormField.getDataType());
+		assertEquals(
+			expectedDDMFormField.getDDMFormFieldOptions(),
+			actualDDMFormField.getDDMFormFieldOptions());
+		Assert.assertEquals(
+			expectedDDMFormField.getIndexType(),
+			actualDDMFormField.getIndexType());
+		assertEquals(
+			expectedDDMFormField.getLabel(), actualDDMFormField.getLabel());
+		Assert.assertEquals(
+			expectedDDMFormField.getName(),  actualDDMFormField.getName());
+		assertEquals(
+			expectedDDMFormField.getStyle(), actualDDMFormField.getStyle());
+		assertEquals(
+			expectedDDMFormField.getTip(), actualDDMFormField.getTip());
+		Assert.assertEquals(
+			expectedDDMFormField.getType(), actualDDMFormField.getType());
+		Assert.assertEquals(
+			expectedDDMFormField.isMultiple(), actualDDMFormField.isMultiple());
+		Assert.assertEquals(
+			expectedDDMFormField.isRepeatable(),
+			actualDDMFormField.isRepeatable());
+		Assert.assertEquals(
+			expectedDDMFormField.isRequired(), actualDDMFormField.isRequired());
+	}
+
+	protected void assertEquals(
+		DDMFormFieldOptions expectedDDMFormFieldOptions,
+		DDMFormFieldOptions actualDDMFormFieldOptions) {
+
+		Set<String> expectedOptionValues =
+			expectedDDMFormFieldOptions.getOptionsValues();
+
+		for (String expectedOptionValue : expectedOptionValues) {
+			LocalizedValue expectedOptionLabels =
+				expectedDDMFormFieldOptions.getOptionLabels(
+					expectedOptionValue);
+
+			LocalizedValue actualOptionLabels =
+				actualDDMFormFieldOptions.getOptionLabels(expectedOptionValue);
+
+			assertEquals(expectedOptionLabels, actualOptionLabels);
+		}
+	}
+
 	protected void assertEquals(Fields expectedFields, Fields actualFields) {
 		Field expectedFieldsDisplayField = expectedFields.get(
 			DDMImpl.FIELDS_DISPLAY_NAME);
@@ -515,6 +610,23 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		actualFieldsDisplayField.setValue(actualFieldsDisplayFieldValue);
 
 		Assert.assertEquals(expectedFields, actualFields);
+	}
+
+	protected void assertEquals(
+		LocalizedValue expectedLocalizedValue,
+		LocalizedValue actualLocalizedValue) {
+
+		Set<Locale> expectedAvailableLocales =
+			expectedLocalizedValue.getAvailableLocales();
+
+		for (Locale expectedLocale : expectedAvailableLocales) {
+			String expectedValue = expectedLocalizedValue.getValue(
+				expectedLocale);
+
+			String actualValue = actualLocalizedValue.getValue(expectedLocale);
+
+			Assert.assertEquals(expectedValue, actualValue);
+		}
 	}
 
 	protected void assertEquals(String expectedContent, String actualContent)
@@ -553,17 +665,13 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		docLibraryField.setDDMStructureId(ddmStructureId);
 		docLibraryField.setName("document_library");
 
-		StringBundler sb = new StringBundler(7);
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		sb.append("{\"groupId\":");
-		sb.append(fileEntry.getGroupId());
-		sb.append(",\"uuid\":\"");
-		sb.append(fileEntry.getUuid());
-		sb.append("\",\"version\":\"");
-		sb.append(fileEntry.getVersion());
-		sb.append("\"}");
+		jsonObject.put("groupId", fileEntry.getGroupId());
+		jsonObject.put("uuid", fileEntry.getUuid());
+		jsonObject.put("version", fileEntry.getVersion());
 
-		docLibraryField.addValue(_enLocale, sb.toString());
+		docLibraryField.addValue(_enLocale, jsonObject.toString());
 
 		return docLibraryField;
 	}
@@ -599,16 +707,64 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		return fieldsMap;
 	}
 
-	protected Field getLinkToLayoutField(long ddmStructureId) {
+	protected Map<String, Layout> getLayoutsMap() throws Exception {
+		Map<String, Layout> layouts = new LinkedHashMap<String, Layout>(4);
+
+		User user = TestPropsValues.getUser();
+
+		layouts.put(
+			_PRIVATE_LAYOUT,
+			LayoutTestUtil.addLayout(
+				group.getGroupId(), RandomTestUtil.randomString(), true));
+		layouts.put(
+			_PRIVATE_USER_LAYOUT,
+			LayoutTestUtil.addLayout(
+				user.getGroupId(), RandomTestUtil.randomString(), true));
+		layouts.put(
+			_PUBLIC_LAYOUT,
+			LayoutTestUtil.addLayout(
+				group.getGroupId(), RandomTestUtil.randomString(), false));
+		layouts.put(
+			_PUBLIC_USER_LAYOUT,
+			LayoutTestUtil.addLayout(
+				user.getGroupId(), RandomTestUtil.randomString(), false));
+
+		return layouts;
+	}
+
+	protected Field getLinkToLayoutField(
+		long ddmStructureId, Map<String, Layout> layoutsMap) {
+
 		Field field = new Field();
 
 		field.setDDMStructureId(ddmStructureId);
 		field.setName("link_to_layout");
 
-		field.addValue(
-			_enLocale, "{\"layoutId\":\"1\",\"privateLayout\":false}");
+		List<Serializable> enValues = new ArrayList<Serializable>();
+
+		for (Layout layout : layoutsMap.values()) {
+			enValues.add(getLinkToLayoutFieldValue(layout, false));
+			enValues.add(getLinkToLayoutFieldValue(layout, true));
+		}
+
+		field.addValues(_enLocale, enValues);
 
 		return field;
+	}
+
+	protected String getLinkToLayoutFieldValue(
+		Layout layout, boolean includeGroupId) {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		if (includeGroupId) {
+			jsonObject.put("groupId", String.valueOf(layout.getGroupId()));
+		}
+
+		jsonObject.put("layoutId", String.valueOf(layout.getLayoutId()));
+		jsonObject.put("privateLayout", layout.isPrivateLayout());
+
+		return jsonObject.toString();
 	}
 
 	protected Field getListField(long ddmStructureId) {
@@ -623,7 +779,6 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 	}
 
 	protected Field getMultiListField(long ddmStructureId) {
-
 		Field field =  new Field();
 
 		field.setDDMStructureId(ddmStructureId);
@@ -784,6 +939,32 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		return StringUtil.read(inputStream);
 	}
 
+	protected String replaceLinksToLayoutsParameters(
+			String content, Map<String, Layout> layoutsMap)
+		throws Exception {
+
+		Layout privateLayout = layoutsMap.get(_PRIVATE_LAYOUT);
+		Layout privateUserLayout = layoutsMap.get(_PRIVATE_USER_LAYOUT);
+		Layout publicLayout = layoutsMap.get(_PUBLIC_LAYOUT);
+		Layout publicUserLayout = layoutsMap.get(_PUBLIC_USER_LAYOUT);
+
+		return StringUtil.replace(
+			content,
+			new String[] {
+				"[$GROUP_ID$]", "[$GROUP_ID_USER$]", "[$LAYOUT_ID_PRIVATE$]",
+				"[$LAYOUT_ID_PRIVATE_USER$]", "[$LAYOUT_ID_PUBLIC$]",
+				"[$LAYOUT_ID_PUBLIC_USER$]"
+			},
+			new String[] {
+				String.valueOf(privateLayout.getGroupId()),
+				String.valueOf(privateUserLayout.getGroupId()),
+				String.valueOf(privateLayout.getLayoutId()),
+				String.valueOf(privateUserLayout.getLayoutId()),
+				String.valueOf(publicLayout.getLayoutId()),
+				String.valueOf(publicUserLayout.getLayoutId()),
+			});
+	}
+
 	protected void udpateFieldsMap(
 		Element dynamicElementElement,
 		Map<String, Map<Locale, List<String>>> fieldsMap) {
@@ -819,7 +1000,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 			List<Element> optionElements = dynamicContentElement.elements(
 				"option");
 
-			if (optionElements.size() > 0) {
+			if (!optionElements.isEmpty()) {
 				for (Element optionElement : optionElements) {
 					values.add(optionElement.getText());
 				}
@@ -830,7 +1011,7 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		}
 	}
 
-	protected void validateDDMXSD(String xsd) throws PortalException {
+	protected void validateDDMXSD(String xsd) throws Exception {
 		DDMXMLImpl ddmXMLImpl = new DDMXMLImpl();
 
 		XMLSchemaImpl xmlSchema = new XMLSchemaImpl();
@@ -843,6 +1024,14 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 
 		ddmXMLImpl.validateXML(xsd);
 	}
+
+	private static final String _PRIVATE_LAYOUT = "privateLayout";
+
+	private static final String _PRIVATE_USER_LAYOUT = "privateUserLayout";
+
+	private static final String _PUBLIC_LAYOUT = "publicLayout";
+
+	private static final String _PUBLIC_USER_LAYOUT = "publicUserLayout";
 
 	private DDMStructure _ddmStructure;
 	private Locale _enLocale = LocaleUtil.fromLanguageId("en_US");

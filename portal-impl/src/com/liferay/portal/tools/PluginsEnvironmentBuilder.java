@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,15 +82,30 @@ public class PluginsEnvironmentBuilder {
 		for (String fileName : directoryScanner.getIncludedFiles()) {
 			String content = _fileUtil.read(dirName + "/" + fileName);
 
-			boolean osgiProject = content.contains(
-				"<import file=\"../../build-common-osgi-plugin.xml\" />");
-			boolean sharedProject = content.contains(
-				"<import file=\"../build-common-shared.xml\" />");
+			boolean osgiProject = false;
+
+			if (content.contains(
+					"<import file=\"../../build-common-osgi-plugin.xml\" />") ||
+				content.contains(
+					"../tools/sdk/build-common-osgi-plugin.xml\" />")) {
+
+				osgiProject = true;
+			}
+
+			boolean sharedProject = false;
+
+			if (content.contains(
+					"<import file=\"../build-common-shared.xml\" />") ||
+				content.contains(
+					"../tools/sdk/build-common-shared.xml\" />")) {
+
+				sharedProject = true;
+			}
 
 			List<String> dependencyJars = Collections.emptyList();
 
 			if (osgiProject) {
-				int x = content.indexOf("osgi.plugin.portal.lib.jars");
+				int x = content.indexOf("osgi.ide.dependencies");
 
 				if (x != -1) {
 					x = content.indexOf("value=\"", x);
@@ -451,7 +466,9 @@ public class PluginsEnvironmentBuilder {
 			addClasspathEntry(
 				sb, "/portal/lib/development/powermock-mockito.jar");
 			addClasspathEntry(sb, "/portal/lib/development/spring-test.jar");
-			addClasspathEntry(sb, "/portal/lib/portal/commons-io.jar");
+
+			portalJars.add("commons-io.jar");
+			portalJars.add("commons-lang.jar");
 		}
 
 		addClasspathEntry(sb, "/portal/lib/development/activation.jar");
@@ -469,6 +486,8 @@ public class PluginsEnvironmentBuilder {
 		for (String jar : globalJars) {
 			addClasspathEntry(sb, "/portal/lib/global/" + jar, attributes);
 		}
+
+		Collections.sort(portalJars);
 
 		for (String jar : portalJars) {
 			if (!jar.equals("util-slf4j.jar")) {

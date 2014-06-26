@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,7 @@
  */
 --%>
 
-<aui:nav collapsible="<%= true %>" cssClass='<%= portalMessageUseAnimation ? "nav-account-controls" : "nav-account-controls nav-account-controls-notice" %>' icon="user" id="navAccountControls">
+<aui:nav collapsible="<%= false %>" cssClass='<%= portalMessageUseAnimation ? "nav-account-controls navbar-nav" : "nav-account-controls nav-account-controls-notice navbar-nav" %>' icon="user" id="navAccountControls">
 	<c:if test="<%= userSetupComplete %>">
 		<%@ include file="/html/portlet/dockbar/view_page_customization_bar.jspf" %>
 

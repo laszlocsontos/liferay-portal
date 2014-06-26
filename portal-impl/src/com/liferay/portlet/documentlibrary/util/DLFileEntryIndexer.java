@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -52,7 +51,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.persistence.GroupActionableDynamicQuery;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PrefsPropsUtil;
@@ -65,9 +64,8 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
-import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryActionableDynamicQuery;
-import com.liferay.portlet.documentlibrary.service.persistence.DLFolderActionableDynamicQuery;
 import com.liferay.portlet.dynamicdatamapping.StructureFieldException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
@@ -89,6 +87,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
 
@@ -104,6 +103,9 @@ public class DLFileEntryIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.DOCUMENT_LIBRARY;
 
 	public DLFileEntryIndexer() {
+		setDefaultSelectedFieldNames(
+			Field.COMPANY_ID, Field.CONTENT, Field.ENTRY_CLASS_NAME,
+			Field.ENTRY_CLASS_PK, Field.TITLE, Field.UID);
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -279,9 +281,17 @@ public class DLFileEntryIndexer extends BaseIndexer {
 		}
 	}
 
+	@Override
+	public void updateFullQuery(SearchContext searchContext) {
+		if (searchContext.isIncludeAttachments()) {
+			searchContext.addFullQueryEntryClassName(
+				DLFileEntry.class.getName());
+		}
+	}
+
 	protected void addFileEntryTypeAttributes(
 			Document document, DLFileVersion dlFileVersion)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<DLFileEntryMetadata> dlFileEntryMetadatas =
 			DLFileEntryMetadataLocalServiceUtil.
@@ -462,8 +472,8 @@ public class DLFileEntryIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet,
-		PortletURL portletURL) {
+		Document document, Locale locale, String snippet, PortletURL portletURL,
+		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		LiferayPortletURL liferayPortletURL = (LiferayPortletURL)portletURL;
 
@@ -586,95 +596,107 @@ public class DLFileEntryIndexer extends BaseIndexer {
 
 	protected void reindexFileEntries(
 			long companyId, final long groupId, final long dataRepositoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		ActionableDynamicQuery actionableDynamicQuery =
-			new DLFileEntryActionableDynamicQuery() {
+		final ActionableDynamicQuery actionableDynamicQuery =
+			DLFileEntryLocalServiceUtil.getActionableDynamicQuery();
 
-			@Override
-			protected void addCriteria(DynamicQuery dynamicQuery) {
-				Property property = PropertyFactoryUtil.forName("folderId");
+		actionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
 
-				long folderId = DLFolderConstants.getFolderId(
-					groupId, dataRepositoryId);
+				@Override
+				public void addCriteria(DynamicQuery dynamicQuery) {
+					Property property = PropertyFactoryUtil.forName("folderId");
 
-				dynamicQuery.add(property.eq(folderId));
-			}
+					long folderId = DLFolderConstants.getFolderId(
+						groupId, dataRepositoryId);
 
-			@Override
-			protected void performAction(Object object) throws PortalException {
-				DLFileEntry dlFileEntry = (DLFileEntry)object;
-
-				Document document = getDocument(dlFileEntry);
-
-				if (document != null) {
-					addDocument(document);
+					dynamicQuery.add(property.eq(folderId));
 				}
-			}
 
-		};
-
+			});
 		actionableDynamicQuery.setCompanyId(companyId);
 		actionableDynamicQuery.setGroupId(groupId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					DLFileEntry dlFileEntry = (DLFileEntry)object;
+
+					Document document = getDocument(dlFileEntry);
+
+					if (document != null) {
+						actionableDynamicQuery.addDocument(document);
+					}
+				}
+
+			});
 		actionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		actionableDynamicQuery.performActions();
 	}
 
-	protected void reindexFolders(final long companyId)
-		throws PortalException, SystemException {
-
+	protected void reindexFolders(final long companyId) throws PortalException {
 		ActionableDynamicQuery actionableDynamicQuery =
-			new DLFolderActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object) throws PortalException {
-				DLFolder dlFolder = (DLFolder)object;
-
-				String portletId = PortletKeys.DOCUMENT_LIBRARY;
-				long groupId = dlFolder.getGroupId();
-				long folderId = dlFolder.getFolderId();
-
-				String[] newIds = {
-					String.valueOf(companyId), portletId,
-					String.valueOf(groupId), String.valueOf(folderId)
-				};
-
-				reindex(newIds);
-			}
-
-		};
+			DLFolderLocalServiceUtil.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setCompanyId(companyId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					DLFolder dlFolder = (DLFolder)object;
+
+					String portletId = PortletKeys.DOCUMENT_LIBRARY;
+					long groupId = dlFolder.getGroupId();
+					long folderId = dlFolder.getFolderId();
+
+					String[] newIds = {
+						String.valueOf(companyId), portletId,
+						String.valueOf(groupId), String.valueOf(folderId)
+					};
+
+					reindex(newIds);
+				}
+
+			});
 
 		actionableDynamicQuery.performActions();
 	}
 
-	protected void reindexRoot(final long companyId)
-		throws PortalException, SystemException {
-
+	protected void reindexRoot(final long companyId) throws PortalException {
 		ActionableDynamicQuery actionableDynamicQuery =
-			new GroupActionableDynamicQuery() {
-
-			@Override
-			protected void performAction(Object object) throws PortalException {
-				Group group = (Group)object;
-
-				String portletId = PortletKeys.DOCUMENT_LIBRARY;
-				long groupId = group.getGroupId();
-				long folderId = groupId;
-
-				String[] newIds = {
-					String.valueOf(companyId), portletId,
-					String.valueOf(groupId), String.valueOf(folderId)
-				};
-
-				reindex(newIds);
-			}
-
-		};
+			GroupLocalServiceUtil.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setCompanyId(companyId);
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod() {
+
+				@Override
+				public void performAction(Object object)
+					throws PortalException {
+
+					Group group = (Group)object;
+
+					String portletId = PortletKeys.DOCUMENT_LIBRARY;
+					long groupId = group.getGroupId();
+					long folderId = groupId;
+
+					String[] newIds = {
+						String.valueOf(companyId), portletId,
+						String.valueOf(groupId), String.valueOf(folderId)
+					};
+
+					reindex(newIds);
+				}
+
+			});
 
 		actionableDynamicQuery.performActions();
 	}

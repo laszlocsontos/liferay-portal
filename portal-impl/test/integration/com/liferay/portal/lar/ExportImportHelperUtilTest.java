@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.lar;
 
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.MissingReference;
@@ -23,40 +22,45 @@ import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
+import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.StagedModel;
+import com.liferay.portal.model.User;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
-import com.liferay.portal.util.GroupTestUtil;
-import com.liferay.portal.util.LayoutTestUtil;
 import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.test.GroupTestUtil;
+import com.liferay.portal.util.test.LayoutTestUtil;
+import com.liferay.portal.util.test.RandomTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
-import com.liferay.portlet.journal.util.JournalTestUtil;
+import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
+import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.util.test.JournalTestUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -73,7 +77,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,26 +91,22 @@ import org.powermock.api.mockito.PowerMockito;
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-@Transactional
 public class ExportImportHelperUtilTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
-		FinderCacheUtil.clearCache();
-
 		_liveGroup = GroupTestUtil.addGroup();
 		_stagingGroup = GroupTestUtil.addGroup();
 
 		_fileEntry = DLAppTestUtil.addFileEntry(
 			_stagingGroup.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			ServiceTestUtil.randomString() + ".txt",
-			ServiceTestUtil.randomString(), true);
+			RandomTestUtil.randomString() + ".txt",
+			RandomTestUtil.randomString(), true);
 
 		LiferayFileEntry liferayFileEntry = (LiferayFileEntry)_fileEntry;
 
@@ -126,14 +125,22 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 				new Date(System.currentTimeMillis() - Time.HOUR), new Date(),
 				testReaderWriter);
 
+		Document document = SAXReaderUtil.createDocument();
+
+		Element manifestRootElement = document.addElement("root");
+
+		manifestRootElement.addElement("header");
+
+		testReaderWriter.addEntry("/manifest.xml", document.asXML());
+
 		Element rootElement = SAXReaderUtil.createElement("root");
 
 		_portletDataContextExport.setExportDataRootElement(rootElement);
 
 		_stagingPrivateLayout = LayoutTestUtil.addLayout(
-			_stagingGroup.getGroupId(), ServiceTestUtil.randomString(), true);
+			_stagingGroup.getGroupId(), RandomTestUtil.randomString(), true);
 		_stagingPublicLayout = LayoutTestUtil.addLayout(
-			_stagingGroup.getGroupId(), ServiceTestUtil.randomString(), false);
+			_stagingGroup.getGroupId(), RandomTestUtil.randomString(), false);
 
 		_portletDataContextExport.setPlid(_stagingPublicLayout.getPlid());
 
@@ -147,7 +154,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		_portletDataContextImport.setImportDataRootElement(rootElement);
 
 		_livePublicLayout = LayoutTestUtil.addLayout(
-			_liveGroup.getGroupId(), ServiceTestUtil.randomString(), false);
+			_liveGroup.getGroupId(), RandomTestUtil.randomString(), false);
 
 		_portletDataContextImport.setPlid(_livePublicLayout.getPlid());
 
@@ -156,21 +163,12 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		rootElement.addElement("entry");
 
 		_referrerStagedModel = JournalTestUtil.addArticle(
-			_stagingGroup.getGroupId(), ServiceTestUtil.randomString(),
-			ServiceTestUtil.randomString());
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		GroupLocalServiceUtil.deleteGroup(_liveGroup);
-		GroupLocalServiceUtil.deleteGroup(_stagingGroup);
+			_stagingGroup.getGroupId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString());
 	}
 
 	@Test
 	public void testDeleteTimestampFromDLReferenceURLs() throws Exception {
-		Element rootElement =
-			_portletDataContextExport.getExportDataRootElement();
-
 		String content = replaceParameters(
 			getContent("dl_references.txt"), _fileEntry);
 
@@ -179,8 +177,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		String urlContent = StringUtil.merge(urls, StringPool.NEW_LINE);
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel,
-			rootElement.element("entry"), urlContent, true);
+			_portletDataContextExport, _referrerStagedModel, urlContent, true);
 
 		String[] exportedURLs = content.split(StringPool.NEW_LINE);
 
@@ -204,8 +201,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 
 	@Test
 	public void testExportDLReferences() throws Exception {
-		Element rootElement =
-			_portletDataContextExport.getExportDataRootElement();
+		_portletDataContextExport.setZipWriter(new TestReaderWriter());
 
 		String content = replaceParameters(
 			getContent("dl_references.txt"), _fileEntry);
@@ -213,8 +209,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		List<String> urls = getURLs(content);
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel,
-			rootElement.element("entry"), content, true);
+			_portletDataContextExport, _referrerStagedModel, content, true);
 
 		for (String url : urls) {
 			Assert.assertFalse(content.contains(url));
@@ -235,6 +230,27 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			Assert.assertTrue(
 				content.contains("[$dl-reference=" + entry + "$]"));
 		};
+	}
+
+	@Test
+	public void testExportDLReferencesInvalidReference() throws Exception {
+		_portletDataContextExport.setZipWriter(new TestReaderWriter());
+
+		StringBundler sb = new StringBundler(9);
+
+		sb.append("{{/documents/}}");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("[[/documents/]]");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("<a href=/documents/>Link</a>");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("<a href=\"/documents/\">Link</a>");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("<a href='/documents/'>Link</a>");
+
+		ExportImportHelperUtil.replaceExportDLReferences(
+			_portletDataContextExport, _referrerStagedModel, sb.toString(),
+			true);
 	}
 
 	@Test
@@ -264,15 +280,11 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 				"_PRIVATE_USER_SERVLET_MAPPING"),
 			"/en/");
 
-		Element rootElement =
-			_portletDataContextExport.getExportDataRootElement();
-
 		String content = replaceParameters(
 			getContent("layout_references.txt"), _fileEntry);
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel,
-			rootElement.element("entry"), content, true);
+			_portletDataContextExport, _referrerStagedModel, content, true);
 
 		Assert.assertFalse(
 			content.contains(
@@ -310,17 +322,14 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 
 		setFinalStaticField(
 			ExportImportHelperImpl.class.getDeclaredField(
-				"_PRIVATE_USER_SERVLET_MAPPING"), "/en/");
-
-		Element rootElement =
-			_portletDataContextExport.getExportDataRootElement();
+				"_PRIVATE_USER_SERVLET_MAPPING"),
+			"/en/");
 
 		String content = replaceParameters(
 			getContent("layout_references.txt"), _fileEntry);
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel,
-			rootElement.element("entry"), content, true);
+			_portletDataContextExport, _referrerStagedModel, content, true);
 
 		Assert.assertFalse(
 			content.contains(
@@ -345,40 +354,59 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 
 	@Test
 	public void testExportLinksToLayouts() throws Exception {
-		Element rootElement =
-			_portletDataContextExport.getExportDataRootElement();
-
 		String content = replaceLinksToLayoutsParameters(
 			getContent("layout_links.txt"), _stagingPrivateLayout,
 			_stagingPublicLayout);
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel,
-			rootElement.element("entry"), content, true);
+			_portletDataContextExport, _referrerStagedModel, content, true);
 
-		StringBundler sb = new StringBundler(5);
+		assertLinksToLayouts(content, _stagingPrivateLayout, 0);
+		assertLinksToLayouts(
+			content, _stagingPrivateLayout, _stagingPrivateLayout.getGroupId());
+		assertLinksToLayouts(content, _stagingPublicLayout, 0);
+		assertLinksToLayouts(
+			content, _stagingPublicLayout, _stagingPublicLayout.getGroupId());
+	}
 
-		sb.append(StringPool.OPEN_BRACKET);
-		sb.append(_stagingPrivateLayout.getLayoutId());
-		sb.append("@private@");
-		sb.append(_stagingPrivateLayout.getUuid());
-		sb.append(StringPool.AT);
-		sb.append(_stagingPrivateLayout.getFriendlyURL());
-		sb.append(StringPool.CLOSE_BRACKET);
+	@Test
+	public void testExportLinksToUserLayouts() throws Exception {
+		User user = TestPropsValues.getUser();
 
-		Assert.assertTrue(content.contains(sb.toString()));
+		Group group = user.getGroup();
 
-		sb.setIndex(0);
+		Layout privateLayout = LayoutTestUtil.addLayout(
+			group.getGroupId(), RandomTestUtil.randomString(), true);
+		Layout publicLayout = LayoutTestUtil.addLayout(
+			group.getGroupId(), RandomTestUtil.randomString(), false);
 
-		sb.append(StringPool.OPEN_BRACKET);
-		sb.append(_stagingPublicLayout.getLayoutId());
-		sb.append("@public@");
-		sb.append(_stagingPublicLayout.getUuid());
-		sb.append(StringPool.AT);
-		sb.append(_stagingPublicLayout.getFriendlyURL());
-		sb.append(StringPool.CLOSE_BRACKET);
+		PortletDataContext portletDataContextExport =
+			PortletDataContextFactoryUtil.createExportPortletDataContext(
+				group.getCompanyId(), group.getGroupId(),
+				new HashMap<String, String[]>(),
+				new Date(System.currentTimeMillis() - Time.HOUR), new Date(),
+				new TestReaderWriter());
 
-		Assert.assertTrue(content.contains(sb.toString()));
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			group.getGroupId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString());
+
+		Element rootElement = SAXReaderUtil.createElement("root");
+
+		rootElement.addElement("entry");
+
+		String content = replaceLinksToLayoutsParameters(
+			getContent("layout_links_user_group.txt"), privateLayout,
+			publicLayout);
+
+		content = ExportImportHelperUtil.replaceExportContentReferences(
+			portletDataContextExport, journalArticle, content, true);
+
+		assertLinksToLayouts(content, privateLayout, 0);
+		assertLinksToLayouts(
+			content, privateLayout, privateLayout.getGroupId());
+		assertLinksToLayouts(content, publicLayout, 0);
+		assertLinksToLayouts(content, publicLayout, publicLayout.getGroupId());
 	}
 
 	@Test
@@ -397,31 +425,25 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			getContent("dl_references.txt"), _fileEntry);
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel,
-			referrerStagedModelElement, content, true);
+			_portletDataContextExport, _referrerStagedModel, content, true);
+
+		_portletDataContextImport.setScopeGroupId(_fileEntry.getGroupId());
+
 		content = ExportImportHelperUtil.replaceImportContentReferences(
-			_portletDataContextImport, _referrerStagedModel,
-			referrerStagedModelElement, content, true);
+			_portletDataContextImport, _referrerStagedModel, content);
 
 		Assert.assertFalse(content.contains("[$dl-reference="));
 	}
 
 	@Test
 	public void testImportLayoutReferences() throws Exception {
-		Element rootElement =
-			_portletDataContextExport.getExportDataRootElement();
-
-		Element entryElement = rootElement.element("entry");
-
 		String content = replaceParameters(
 			getContent("layout_references.txt"), _fileEntry);
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel, entryElement,
-			content, true);
+			_portletDataContextExport, _referrerStagedModel, content, true);
 		content = ExportImportHelperUtil.replaceImportContentReferences(
-			_portletDataContextImport, _referrerStagedModel, entryElement,
-			content, true);
+			_portletDataContextImport, _referrerStagedModel, content);
 
 		Assert.assertFalse(
 			content.contains("@data_handler_group_friendly_url@"));
@@ -436,11 +458,6 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 
 	@Test
 	public void testImportLinksToLayouts() throws Exception {
-		Element rootElement =
-			_portletDataContextImport.getImportDataRootElement();
-
-		Element entryElement = rootElement.element("entry");
-
 		String content = replaceLinksToLayoutsParameters(
 			getContent("layout_links.txt"), _stagingPrivateLayout,
 			_stagingPublicLayout);
@@ -448,15 +465,48 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		String originalContent = content;
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel, entryElement,
-			content, true);
+			_portletDataContextExport, _referrerStagedModel, content, true);
 
 		String importedContent =
 			ExportImportHelperUtil.replaceImportContentReferences(
-				_portletDataContextImport, _referrerStagedModel, entryElement,
-				content, true);
+				_portletDataContextImport, _referrerStagedModel, content);
 
 		Assert.assertEquals(originalContent, importedContent);
+	}
+
+	@Test
+	public void testImportLinksToLayoutsIdsReplacement() throws Exception {
+		LayoutTestUtil.addLayout(
+			_liveGroup.getGroupId(), RandomTestUtil.randomString(), true);
+		LayoutTestUtil.addLayout(
+			_liveGroup.getGroupId(), RandomTestUtil.randomString(), false);
+
+		exportImportLayouts(true);
+		exportImportLayouts(false);
+
+		Layout importedPrivateLayout =
+			LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+				_stagingPrivateLayout.getUuid(), _liveGroup.getGroupId(), true);
+		Layout importedPublicLayout =
+			LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+				_stagingPublicLayout.getUuid(), _liveGroup.getGroupId(), false);
+
+		String content = getContent("layout_links_ids_replacement.txt");
+
+		String expectedContent = replaceLinksToLayoutsParameters(
+			content, importedPrivateLayout, importedPublicLayout);
+
+		content = replaceLinksToLayoutsParameters(
+			content, _stagingPrivateLayout, _stagingPublicLayout);
+
+		content = ExportImportHelperUtil.replaceExportContentReferences(
+			_portletDataContextExport, _referrerStagedModel, content, true);
+
+		String importedContent =
+			ExportImportHelperUtil.replaceImportContentReferences(
+				_portletDataContextImport, _referrerStagedModel, content);
+
+		Assert.assertEquals(expectedContent, importedContent);
 	}
 
 	@Test
@@ -468,10 +518,14 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 
 		zipWriter.addEntry("/manifest.xml", xml);
 
+		ZipReader zipReader = ZipReaderFactoryUtil.getZipReader(
+			zipWriter.getFile());
+
+		_portletDataContextImport.setZipReader(zipReader);
+
 		MissingReferences missingReferences =
 			ExportImportHelperUtil.validateMissingReferences(
-				TestPropsValues.getUserId(), _stagingGroup.getGroupId(),
-				new HashMap<String, String[]>(), zipWriter.getFile());
+				_portletDataContextImport);
 
 		Map<String, MissingReference> dependencyMissingReferences =
 			missingReferences.getDependencyMissingReferences();
@@ -479,10 +533,61 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		Map<String, MissingReference> weakMissingReferences =
 			missingReferences.getWeakMissingReferences();
 
-		Assert.assertEquals(2, dependencyMissingReferences.size());
+		Assert.assertEquals(3, dependencyMissingReferences.size());
 		Assert.assertEquals(1, weakMissingReferences.size());
 
 		FileUtil.delete(zipWriter.getFile());
+	}
+
+	protected void assertLinksToLayouts(
+		String content, Layout layout, long groupId) {
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(StringPool.OPEN_BRACKET);
+		sb.append(layout.getLayoutId());
+		sb.append(CharPool.AT);
+
+		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+		if (layout.isPrivateLayout()) {
+			if (group == null) {
+				sb.append("private");
+			}
+			else if (group.isUser()) {
+				sb.append("private-user");
+			}
+			else {
+				sb.append("private-group");
+			}
+		}
+		else {
+			sb.append("public");
+		}
+
+		sb.append(CharPool.AT);
+		sb.append(layout.getUuid());
+		sb.append(StringPool.AT);
+		sb.append(layout.getFriendlyURL());
+
+		if (group != null) {
+			sb.append(CharPool.AT);
+			sb.append(String.valueOf(groupId));
+		}
+
+		sb.append(StringPool.CLOSE_BRACKET);
+
+		Assert.assertTrue(content.contains(sb.toString()));
+	}
+
+	protected void exportImportLayouts(boolean privateLayout) throws Exception {
+		File larFile = LayoutLocalServiceUtil.exportLayoutsAsFile(
+			_stagingGroup.getGroupId(), privateLayout, null,
+			new HashMap<String, String[]>(), null, null);
+
+		LayoutLocalServiceUtil.importLayouts(
+			TestPropsValues.getUserId(), _liveGroup.getGroupId(), privateLayout,
+			new HashMap<String, String[]>(), larFile);
 	}
 
 	protected String getContent(String fileName) throws Exception {
@@ -499,9 +604,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 	}
 
 	protected List<String> getURLs(String content) {
-		Pattern pattern = Pattern.compile("href=|\\{|\\[");
-
-		Matcher matcher = pattern.matcher(StringPool.BLANK);
+		Matcher matcher = _pattern.matcher(StringPool.BLANK);
 
 		String[] lines = StringUtil.split(content, StringPool.NEW_LINE);
 
@@ -540,7 +643,8 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			content,
 			new String[] {
 				"[$GROUP_FRIENDLY_URL$]", "[$GROUP_ID$]", "[$IMAGE_ID$]",
-				"[$PATH_CONTEXT$]", "[$PATH_FRIENDLY_URL_PRIVATE_GROUP$]",
+				"[$LIVE_GROUP_ID$]", "[$PATH_CONTEXT$]",
+				"[$PATH_FRIENDLY_URL_PRIVATE_GROUP$]",
 				"[$PATH_FRIENDLY_URL_PRIVATE_USER$]",
 				"[$PATH_FRIENDLY_URL_PUBLIC$]", "[$TITLE$]", "[$UUID$]"
 			},
@@ -548,6 +652,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 				_stagingGroup.getFriendlyURL(),
 				String.valueOf(fileEntry.getGroupId()),
 				String.valueOf(fileEntry.getFileEntryId()),
+				String.valueOf(fileEntry.getGroupId()),
 				PortalUtil.getPathContext(),
 				PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING,
 				PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_USER_SERVLET_MAPPING,
@@ -618,12 +723,19 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 	private static String _OLD_LAYOUT_FRIENDLY_URL_PRIVATE_USER_SERVLET_MAPPING;
 
 	private FileEntry _fileEntry;
+
+	@DeleteAfterTestRun
 	private Group _liveGroup;
+
 	private Layout _livePublicLayout;
+	private Pattern _pattern = Pattern.compile("href=|\\{|\\[");
 	private PortletDataContext _portletDataContextExport;
 	private PortletDataContext _portletDataContextImport;
 	private StagedModel _referrerStagedModel;
+
+	@DeleteAfterTestRun
 	private Group _stagingGroup;
+
 	private Layout _stagingPrivateLayout;
 	private Layout _stagingPublicLayout;
 

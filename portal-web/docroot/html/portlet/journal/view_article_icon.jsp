@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,7 +33,7 @@ String articleImageURL = article.getArticleImageURL(themeDisplay);
 	rowCheckerName="<%= JournalArticle.class.getSimpleName() %>"
 	showCheckbox="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, article, ActionKeys.EXPIRE) || JournalArticlePermission.contains(permissionChecker, article, ActionKeys.UPDATE) %>"
 	status="<%= article.getStatus() %>"
-	thumbnailDivStyle="height: 136px; width: 136px;"
+	thumbnailDivStyle="height: 146px; width: 146px;"
 	thumbnailSrc='<%= Validator.isNotNull(articleImageURL) ? articleImageURL : themeDisplay.getPathThemeImages() + "/file_system/large/article.png" %>'
 	thumbnailStyle="max-height: 128px; max-width: 128px;"
 	title="<%= article.getTitle(locale) %>"

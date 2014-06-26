@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portlet.dynamicdatamapping.storage;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -228,7 +227,7 @@ public class ExpandoStorageAdapter extends BaseStorageAdapter {
 	}
 
 	private void _checkExpandoColumns(ExpandoTable expandoTable, Fields fields)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		for (String name : fields.getNames()) {
 			ExpandoColumn expandoColumn =
@@ -347,9 +346,7 @@ public class ExpandoStorageAdapter extends BaseStorageAdapter {
 		return fieldsList;
 	}
 
-	private long[] _getExpandoRowIds(long ddmStructureId)
-		throws SystemException {
-
+	private long[] _getExpandoRowIds(long ddmStructureId) {
 		List<Long> expandoRowIds = new ArrayList<Long>();
 
 		List<DDMStorageLink> ddmStorageLinks =
@@ -366,7 +363,7 @@ public class ExpandoStorageAdapter extends BaseStorageAdapter {
 
 	private ExpandoTable _getExpandoTable(
 			long companyId, long ddmStructureId, Fields fields)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ExpandoTable expandoTable = null;
 
@@ -552,7 +549,7 @@ public class ExpandoStorageAdapter extends BaseStorageAdapter {
 
 	private void _updateFields(
 			ExpandoTable expandoTable, long classPK, Fields fields)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Iterator<Field> itr = fields.iterator(true);
 

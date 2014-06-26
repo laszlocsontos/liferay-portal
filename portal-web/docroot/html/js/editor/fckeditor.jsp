@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -168,7 +168,17 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 			if (Validator.isNotNull(onChangeMethod)) {
 			%>
 
-				setInterval(
+				var clearContentChangeHandle = function(event) {
+					if (event.portletId === '<%= portletId %>') {
+						clearInterval(contentChangeHandle);
+
+						Liferay.detach('destroyPortlet', clearContentChangeHandle);
+					}
+				};
+
+				Liferay.on('destroyPortlet', clearContentChangeHandle);
+
+				var contentChangeHandle = setInterval(
 					function() {
 						try {
 							window['<%= name %>'].onChangeCallback();
@@ -183,7 +193,10 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 			}
 			%>
 
+			window['<%= name %>'].instanceReady = true;
 		},
+
+		instanceReady: false,
 
 		<%
 		if (Validator.isNotNull(onChangeMethod)) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -54,8 +54,7 @@ public class PortletPreferencesServiceWrapper
 
 	@Override
 	public void deleteArchivedPreferences(long portletItemId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_portletPreferencesService.deleteArchivedPreferences(portletItemId);
 	}
 
@@ -63,8 +62,7 @@ public class PortletPreferencesServiceWrapper
 	public void restoreArchivedPreferences(long groupId,
 		com.liferay.portal.model.Layout layout, java.lang.String portletId,
 		long portletItemId, javax.portlet.PortletPreferences preferences)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_portletPreferencesService.restoreArchivedPreferences(groupId, layout,
 			portletId, portletItemId, preferences);
 	}
@@ -74,8 +72,7 @@ public class PortletPreferencesServiceWrapper
 		com.liferay.portal.model.Layout layout, java.lang.String portletId,
 		com.liferay.portal.model.PortletItem portletItem,
 		javax.portlet.PortletPreferences preferences)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_portletPreferencesService.restoreArchivedPreferences(groupId, layout,
 			portletId, portletItem, preferences);
 	}
@@ -84,8 +81,7 @@ public class PortletPreferencesServiceWrapper
 	public void restoreArchivedPreferences(long groupId, java.lang.String name,
 		com.liferay.portal.model.Layout layout, java.lang.String portletId,
 		javax.portlet.PortletPreferences preferences)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_portletPreferencesService.restoreArchivedPreferences(groupId, name,
 			layout, portletId, preferences);
 	}
@@ -94,8 +90,7 @@ public class PortletPreferencesServiceWrapper
 	public void updateArchivePreferences(long userId, long groupId,
 		java.lang.String name, java.lang.String portletId,
 		javax.portlet.PortletPreferences preferences)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_portletPreferencesService.updateArchivePreferences(userId, groupId,
 			name, portletId, preferences);
 	}

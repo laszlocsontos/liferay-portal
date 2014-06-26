@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,9 +16,23 @@ package com.liferay.portal.upgrade;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ReleaseInfo;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeAsset;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeBookmarksPreferences;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeCalEvent;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeDLPreferences;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeDynamicDataMapping;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeEmailNotificationPreferences;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeExpando;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeJournal;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeLanguagePreferences;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeMessageBoards;
+import com.liferay.portal.upgrade.v7_0_0.UpgradePortletSettings;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeRepositoryEntry;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeSchema;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeShopping;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeShoppingPreferences;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeSubscription;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeWiki;
 
 /**
  * @author Julio Camarero
@@ -33,8 +47,27 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 	@Override
 	protected void doUpgrade() throws Exception {
 		upgrade(UpgradeSchema.class);
+		upgrade(UpgradeAsset.class);
+		upgrade(UpgradeBookmarksPreferences.class);
+		upgrade(UpgradeCalEvent.class);
+		upgrade(UpgradeDLPreferences.class);
+		upgrade(UpgradeDynamicDataMapping.class);
+		upgrade(UpgradeEmailNotificationPreferences.class);
+		upgrade(UpgradeExpando.class);
+		upgrade(UpgradeLanguagePreferences.class);
+		upgrade(UpgradeJournal.class);
+		upgrade(UpgradeMessageBoards.class);
 		upgrade(UpgradeRepositoryEntry.class);
 		upgrade(UpgradeShopping.class);
+		upgrade(UpgradeShoppingPreferences.class);
+		upgrade(UpgradeSubscription.class);
+		upgrade(UpgradeWiki.class);
+
+		// This must be the last upgrade process. Otherwise, upgrades based on
+		// BaseUpgradePortletPreferences will fail because the portlet
+		// preferences will be in the new settings format.
+
+		upgrade(UpgradePortletSettings.class);
 	}
 
 }

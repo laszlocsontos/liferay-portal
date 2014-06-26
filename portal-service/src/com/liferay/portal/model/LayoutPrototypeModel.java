@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.bean.AutoEscape;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.ServiceContext;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -44,7 +43,7 @@ import java.util.Map;
  */
 @ProviderType
 public interface LayoutPrototypeModel extends BaseModel<LayoutPrototype>,
-	MVCCModel, StagedAuditedModel {
+	LocalizedModel, MVCCModel, StagedAuditedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -148,10 +147,9 @@ public interface LayoutPrototypeModel extends BaseModel<LayoutPrototype>,
 	 * Returns the user uuid of this layout prototype.
 	 *
 	 * @return the user uuid of this layout prototype
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public String getUserUuid() throws SystemException;
+	public String getUserUuid();
 
 	/**
 	 * Sets the user uuid of this layout prototype.
@@ -314,8 +312,58 @@ public interface LayoutPrototypeModel extends BaseModel<LayoutPrototype>,
 	 *
 	 * @return the description of this layout prototype
 	 */
-	@AutoEscape
 	public String getDescription();
+
+	/**
+	 * Returns the localized description of this layout prototype in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized description of this layout prototype
+	 */
+	@AutoEscape
+	public String getDescription(Locale locale);
+
+	/**
+	 * Returns the localized description of this layout prototype in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized description of this layout prototype. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@AutoEscape
+	public String getDescription(Locale locale, boolean useDefault);
+
+	/**
+	 * Returns the localized description of this layout prototype in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized description of this layout prototype
+	 */
+	@AutoEscape
+	public String getDescription(String languageId);
+
+	/**
+	 * Returns the localized description of this layout prototype in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized description of this layout prototype
+	 */
+	@AutoEscape
+	public String getDescription(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getDescriptionCurrentLanguageId();
+
+	@AutoEscape
+	public String getDescriptionCurrentValue();
+
+	/**
+	 * Returns a map of the locales and localized descriptions of this layout prototype.
+	 *
+	 * @return the locales and localized descriptions of this layout prototype
+	 */
+	public Map<Locale, String> getDescriptionMap();
 
 	/**
 	 * Sets the description of this layout prototype.
@@ -323,6 +371,42 @@ public interface LayoutPrototypeModel extends BaseModel<LayoutPrototype>,
 	 * @param description the description of this layout prototype
 	 */
 	public void setDescription(String description);
+
+	/**
+	 * Sets the localized description of this layout prototype in the language.
+	 *
+	 * @param description the localized description of this layout prototype
+	 * @param locale the locale of the language
+	 */
+	public void setDescription(String description, Locale locale);
+
+	/**
+	 * Sets the localized description of this layout prototype in the language, and sets the default locale.
+	 *
+	 * @param description the localized description of this layout prototype
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
+	public void setDescription(String description, Locale locale,
+		Locale defaultLocale);
+
+	public void setDescriptionCurrentLanguageId(String languageId);
+
+	/**
+	 * Sets the localized descriptions of this layout prototype from the map of locales and localized descriptions.
+	 *
+	 * @param descriptionMap the locales and localized descriptions of this layout prototype
+	 */
+	public void setDescriptionMap(Map<Locale, String> descriptionMap);
+
+	/**
+	 * Sets the localized descriptions of this layout prototype from the map of locales and localized descriptions, and sets the default locale.
+	 *
+	 * @param descriptionMap the locales and localized descriptions of this layout prototype
+	 * @param defaultLocale the default locale
+	 */
+	public void setDescriptionMap(Map<Locale, String> descriptionMap,
+		Locale defaultLocale);
 
 	/**
 	 * Returns the settings of this layout prototype.
@@ -393,12 +477,16 @@ public interface LayoutPrototypeModel extends BaseModel<LayoutPrototype>,
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext);
 
+	@Override
 	public String[] getAvailableLanguageIds();
 
+	@Override
 	public String getDefaultLanguageId();
 
+	@Override
 	public void prepareLocalizedFieldsForImport() throws LocaleException;
 
+	@Override
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException;
 

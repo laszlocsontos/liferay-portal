@@ -1,4 +1,6 @@
 <definition component-name="portal-wcm">
+	<property name="testray.main.component.name" value="WCM" />
+
 	<var name="pageName" value="Web Content Display Page" />
 	<var name="portletName" value="Web Content Display" />
 
@@ -26,8 +28,8 @@
 		<execute macro="Page#tearDownPG" />
 	</tear-down>
 
-	<command name="AddNewWebContentViaAddContentPanel" priority="5">
-		<var name="assetType" value="Web Content Article" />
+	<command known-issues="LIFERAYQA-6795" name="AddNewWebContentViaAddContentPanel" priority="5">
+		<var name="assetType" value="Basic Web Content" />
 		<var name="pageName" value="Web Content Page" />
 		<var name="webContentContent" value="WC WebContent Content" />
 		<var name="webContentTitle" value="WC WebContent Title" />
@@ -47,6 +49,11 @@
 		<execute macro="WebContent#addPGViaPanel">
 			<var name="webContentContent" value="${webContentContent}" />
 			<var name="webContentTitle" value="${webContentTitle}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Web Content Page" />
+			<var name="siteName" value="Liferay" />
 		</execute>
 
 		<execute macro="WebContent#viewPGViaWCD">
@@ -102,7 +109,7 @@
 		</execute>
 	</command>
 
-	<command name="AddWebContentPortalScopeCurrentPage" priority="5">
+	<command known-issues="LPS-41756" name="AddWebContentPortalScopeCurrentPage" priority="5">
 		<var name="pageName1" value="Web Content Display Page1" />
 		<var name="pageName2" value="Web Content Display Page2" />
 		<var name="pageName3" value="Web Content Display Page3" />
@@ -281,6 +288,7 @@
 	</command>
 
 	<command name="LocalizeWebContent" priority="5">
+		<var name="languageKey" value="zh_CN" />
 		<var name="webContentContent" value="WC WebContent Content" />
 		<var name="webContentTitle" value="WC WebContent Title" />
 		<var name="webContentTranslationContent" value="世界您好 Content" />
@@ -302,6 +310,7 @@
 		</execute>
 
 		<execute macro="WebContent#addTranslationPGViaWCD">
+			<var name="lowercaseLanguageCode" value="zh" />
 			<var name="webContentTranslationContent" value="${webContentTranslationContent}" />
 			<var name="webContentTranslationLanguage" value="${webContentTranslationLanguage}" />
 			<var name="webContentTranslationTitle" value="${webContentTranslationTitle}" />
@@ -449,6 +458,7 @@
 	</command>
 
 	<command name="ViewPortletWCDShowAvailableLocales" priority="5">
+		<var name="languageKey" value="zh_CN" />
 		<var name="webContentContent" value="WC WebContent Content" />
 		<var name="webContentTitle" value="WC WebContent Title" />
 		<var name="webContentTranslationContent" value="世界您好 Content" />
@@ -470,6 +480,7 @@
 		</execute>
 
 		<execute macro="WebContent#addTranslationPGViaWCD">
+			<var name="lowercaseLanguageCode" value="zh" />
 			<var name="webContentTranslationContent" value="${webContentTranslationContent}" />
 			<var name="webContentTranslationLanguage" value="${webContentTranslationLanguage}" />
 			<var name="webContentTranslationTitle" value="${webContentTranslationTitle}" />

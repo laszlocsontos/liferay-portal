@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -69,6 +69,11 @@ public class StringUtil_IW {
 
 	public boolean endsWith(java.lang.String s, java.lang.String end) {
 		return StringUtil.endsWith(s, end);
+	}
+
+	public boolean equalsIgnoreBreakLine(java.lang.String s1,
+		java.lang.String s2) {
+		return StringUtil.equalsIgnoreBreakLine(s1, s2);
 	}
 
 	public boolean equalsIgnoreCase(java.lang.String s1, java.lang.String s2) {

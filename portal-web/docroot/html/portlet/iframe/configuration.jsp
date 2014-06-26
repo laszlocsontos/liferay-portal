@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -140,8 +140,8 @@ String htmlAttributes =
 </aui:form>
 
 <aui:script>
-	Liferay.Util.toggleBoxes('<portlet:namespace />authCheckbox','<portlet:namespace />authenticationOptions');
-	Liferay.Util.toggleBoxes('<portlet:namespace />resizeAutomaticallyCheckbox','<portlet:namespace />displaySettings', true);
+	Liferay.Util.toggleBoxes('<portlet:namespace />auth','<portlet:namespace />authenticationOptions');
+	Liferay.Util.toggleBoxes('<portlet:namespace />resizeAutomatically','<portlet:namespace />displaySettings', true);
 	Liferay.Util.toggleSelectBox('<portlet:namespace />authType', 'form', '<portlet:namespace />formAuthOptions');
 	Liferay.Util.toggleSelectBox('<portlet:namespace />authType', 'basic', '<portlet:namespace />basicAuthOptions');
 </aui:script>

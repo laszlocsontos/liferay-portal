@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,5 +16,9 @@
 
 <%@ include file="/html/taglib/aui/form/init.jsp" %>
 
-<form action="<%= HtmlUtil.escape(action) %>" class="form <%= cssClass %> <%= inlineLabels ? "field-labels-inline" : StringPool.BLANK %>" id="<%= namespace + name %>" method="<%= method %>" name="<%= namespace + name %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
-	<input name="<%= namespace %>formDate" type="hidden" value="<%= System.currentTimeMillis() %>" />
+<form action="<%= HtmlUtil.escape(action) %>" class="form <%= cssClass %> <%= inlineLabels ? "field-labels-inline" : StringPool.BLANK %>"  id="<%= namespace + name %>" method="<%= method %>" name="<%= namespace + name %>" <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
+	<c:if test="<%= Validator.isNotNull(onSubmit) %>">
+		<fieldset class="input-container" disabled="disabled">
+	</c:if>
+
+	<aui:input name="formDate" type="hidden" value="<%= System.currentTimeMillis() %>" />

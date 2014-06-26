@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,14 +16,12 @@ package com.liferay.portal.kernel.io;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
-import com.liferay.portal.kernel.util.ReflectionUtil;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.Writer;
-
-import java.lang.reflect.Field;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -131,8 +129,19 @@ public class WriterOutputStreamTest {
 		Assert.assertEquals(32, _getOutputBufferSize(writerOutputStream));
 		Assert.assertTrue(_isAutoFlush(writerOutputStream));
 
+		writerOutputStream = new WriterOutputStream(
+			dummyWriter, encoding, 0, true);
+
+		Assert.assertSame(dummyWriter, _getWriter(writerOutputStream));
+		Assert.assertSame(encoding, writerOutputStream.getEncoding());
+		Assert.assertEquals(1, _getInputBufferSize(writerOutputStream));
+		Assert.assertEquals(
+			_getDefaultOutputBufferSize(),
+			_getOutputBufferSize(writerOutputStream));
+		Assert.assertTrue(_isAutoFlush(writerOutputStream));
+
 		try {
-			new WriterOutputStream(dummyWriter, encoding, 0, true);
+			new WriterOutputStream(dummyWriter, encoding, 0, false);
 
 			Assert.fail();
 		}
@@ -141,6 +150,55 @@ public class WriterOutputStreamTest {
 				"Output buffer size 0 must be a positive number",
 				iae.getMessage());
 		}
+	}
+
+	@Test
+	public void testFlush() throws IOException {
+		final AtomicBoolean flushed = new AtomicBoolean();
+
+		CharArrayWriter charArrayWriter = new CharArrayWriter() {
+
+			@Override
+			public void flush() {
+				flushed.set(true);
+			}
+
+		};
+
+		WriterOutputStream writerOutputStream = new WriterOutputStream(
+			charArrayWriter, StringPool.UTF8, 2);
+
+		Assert.assertFalse(flushed.get());
+
+		writerOutputStream.write('a');
+
+		Assert.assertFalse(flushed.get());
+
+		Assert.assertEquals(0, charArrayWriter.size());
+
+		writerOutputStream.write('b');
+
+		Assert.assertFalse(flushed.get());
+
+		Assert.assertEquals(0, charArrayWriter.size());
+
+		writerOutputStream.write('c');
+
+		Assert.assertFalse(flushed.get());
+
+		Assert.assertEquals("ab", charArrayWriter.toString());
+
+		writerOutputStream.write('d');
+
+		Assert.assertFalse(flushed.get());
+
+		Assert.assertEquals("ab", charArrayWriter.toString());
+
+		writerOutputStream.flush();
+
+		Assert.assertTrue(flushed.get());
+
+		Assert.assertEquals("abcd", charArrayWriter.toString());
 	}
 
 	@Test
@@ -202,7 +260,9 @@ public class WriterOutputStreamTest {
 		WriterOutputStream writerOutputStream = new WriterOutputStream(
 			new DummyWriter(), "US-ASCII");
 
-		CharsetDecoder charsetDecoder = _getCharsetDecoder(writerOutputStream);
+		CharsetDecoder charsetDecoder =
+			(CharsetDecoder)ReflectionTestUtil.getFieldValue(
+				writerOutputStream, "_charsetDecoder");
 
 		charsetDecoder.onMalformedInput(CodingErrorAction.REPORT);
 
@@ -217,30 +277,17 @@ public class WriterOutputStreamTest {
 		}
 	}
 
-	private CharsetDecoder _getCharsetDecoder(
-			WriterOutputStream writerOutputStream)
-		throws Exception {
-
-		Field field = ReflectionUtil.getDeclaredField(
-			WriterOutputStream.class, "_charsetDecoder");
-
-		return (CharsetDecoder)field.get(writerOutputStream);
-	}
-
 	private int _getDefaultOutputBufferSize() throws Exception {
-		Field field = ReflectionUtil.getDeclaredField(
+		return (Integer)ReflectionTestUtil.getFieldValue(
 			WriterOutputStream.class, "_DEFAULT_OUTPUT_BUFFER_SIZE");
-
-		return field.getInt(null);
 	}
 
 	private int _getInputBufferSize(WriterOutputStream writerOutputStream)
 		throws Exception {
 
-		Field field = ReflectionUtil.getDeclaredField(
-			WriterOutputStream.class, "_inputByteBuffer");
-
-		ByteBuffer inputByteBuffer = (ByteBuffer)field.get(writerOutputStream);
+		ByteBuffer inputByteBuffer =
+			(ByteBuffer)ReflectionTestUtil.getFieldValue(
+				writerOutputStream, "_inputByteBuffer");
 
 		return inputByteBuffer.capacity();
 	}
@@ -248,10 +295,8 @@ public class WriterOutputStreamTest {
 	private int _getOutputBufferSize(WriterOutputStream writerOutputStream)
 		throws Exception {
 
-		Field field = ReflectionUtil.getDeclaredField(
-			WriterOutputStream.class, "_outputCharBuffer");
-
-		CharBuffer outputBuffer = (CharBuffer)field.get(writerOutputStream);
+		CharBuffer outputBuffer = (CharBuffer)ReflectionTestUtil.getFieldValue(
+			writerOutputStream, "_outputCharBuffer");
 
 		return outputBuffer.capacity();
 	}
@@ -259,23 +304,28 @@ public class WriterOutputStreamTest {
 	private Writer _getWriter(WriterOutputStream writerOutputStream)
 		throws Exception {
 
-		Field field = ReflectionUtil.getDeclaredField(
-			WriterOutputStream.class, "_writer");
-
-		return (Writer)field.get(writerOutputStream);
+		return (Writer)ReflectionTestUtil.getFieldValue(
+			writerOutputStream, "_writer");
 	}
 
 	private boolean _isAutoFlush(WriterOutputStream writerOutputStream)
 		throws Exception {
 
-		Field field = ReflectionUtil.getDeclaredField(
-			WriterOutputStream.class, "_autoFlush");
-
-		return field.getBoolean(writerOutputStream);
+		return (Boolean)ReflectionTestUtil.getFieldValue(
+			writerOutputStream, "_autoFlush");
 	}
 
 	private void _testWriteBlock(boolean autoFlush) throws IOException {
-		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+		final AtomicBoolean flushed = new AtomicBoolean();
+
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter() {
+
+			@Override
+			public void flush() {
+				flushed.set(true);
+			}
+
+		};
 
 		WriterOutputStream writerOutputStream = new WriterOutputStream(
 			unsyncStringWriter, "US-ASCII", 2, autoFlush);
@@ -286,13 +336,19 @@ public class WriterOutputStreamTest {
 				(byte)'f', (byte)'g'},
 			1, 5);
 
+		Assert.assertFalse(flushed.get());
+
 		if (!autoFlush) {
 			writerOutputStream.flush();
+
+			Assert.assertTrue(flushed.get());
+
+			flushed.set(false);
 		}
 
 		Assert.assertEquals("bcdef", unsyncStringWriter.toString());
 
-		unsyncStringWriter = new UnsyncStringWriter();
+		unsyncStringWriter.reset();
 
 		writerOutputStream = new WriterOutputStream(
 			unsyncStringWriter, "US-ASCII", 4, autoFlush);
@@ -303,21 +359,33 @@ public class WriterOutputStreamTest {
 				(byte)'f', (byte)'g'},
 			1, 5);
 
+		Assert.assertFalse(flushed.get());
+
 		if (!autoFlush) {
 			writerOutputStream.flush();
+
+			Assert.assertTrue(flushed.get());
+
+			flushed.set(false);
 		}
 
 		Assert.assertEquals("bcdef", unsyncStringWriter.toString());
 
-		unsyncStringWriter = new UnsyncStringWriter();
+		unsyncStringWriter.reset();
 
 		writerOutputStream = new WriterOutputStream(
 			unsyncStringWriter, "US-ASCII", autoFlush);
 
 		writerOutputStream.write(new byte[]{(byte)'a', (byte)'b', (byte)'c'});
 
+		Assert.assertFalse(flushed.get());
+
 		if (!autoFlush) {
 			writerOutputStream.flush();
+
+			Assert.assertTrue(flushed.get());
+
+			flushed.set(false);
 		}
 
 		Assert.assertEquals("abc", unsyncStringWriter.toString());

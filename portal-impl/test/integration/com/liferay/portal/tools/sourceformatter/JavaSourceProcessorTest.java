@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,10 +82,10 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 				"line break:", "line break:", "line break:", "line break:",
 				"line break:", "line break:", "line break:", "line break:",
 				"line break:", "line break:", "line break:", "line break:",
-				"line break:", "line break:"
+				"line break:", "line break:", "line break:"
 			},
 			new Integer[] {
-				23, 27, 31, 38, 42, 45, 48, 52, 55, 60, 66, 70, 74, 77
+				23, 27, 31, 38, 42, 45, 48, 52, 55, 55, 60, 66, 70, 74, 77
 			});
 	}
 
@@ -94,7 +94,7 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 		test(
 			"IncorrectTabs.testjava",
 			new String[] {"tab:", "tab:", "tab:", "tab:", "tab:"},
-			new Integer[] {23, 27, 31, 37, 44});
+			new Integer[] {23, 27, 33, 40, 23});
 	}
 
 	@Test
@@ -184,6 +184,11 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	@Test
 	public void testStaticFinalLog() throws Exception {
 		test("StaticFinalLog.testjava");
+	}
+
+	@Test
+	public void testThrowsSystemException() throws Exception {
+		test("ThrowsSystemException.testjava");
 	}
 
 	@Test

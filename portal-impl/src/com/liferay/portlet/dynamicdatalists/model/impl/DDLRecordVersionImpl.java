@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.dynamicdatalists.model.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalServiceUtil;
@@ -30,12 +29,12 @@ public class DDLRecordVersionImpl extends DDLRecordVersionBaseImpl {
 	}
 
 	@Override
-	public DDLRecord getRecord() throws PortalException, SystemException {
+	public DDLRecord getRecord() throws PortalException {
 		return DDLRecordLocalServiceUtil.getRecord(getRecordId());
 	}
 
 	@Override
-	public DDLRecordSet getRecordSet() throws PortalException, SystemException {
+	public DDLRecordSet getRecordSet() throws PortalException {
 		return DDLRecordSetLocalServiceUtil.getRecordSet(getRecordSetId());
 	}
 

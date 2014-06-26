@@ -193,10 +193,6 @@
 		<display-name>Message Boards</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
 		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/message_boards/configuration.jsp</value>
-		</init-param>
-		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/message_boards/</value>
 		</init-param>
@@ -209,28 +205,6 @@
 			<mime-type>text/html</mime-type>
 		</supports>
 		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<portlet-preferences>
-			<preference>
-				<name>priorities</name>
-				<value>Urgent,/message_boards/priority_urgent.png,3.0</value>
-				<value>Sticky,/message_boards/priority_sticky.png,2.0</value>
-				<value>Announcement,/message_boards/priority_announcement.png,1.0</value>
-			</preference>
-			<preference>
-				<name>ranks</name>
-				<value>Youngling=0</value>
-				<value>Padawan=25</value>
-				<value>Jedi Knight=100</value>
-				<value>Jedi Master=250</value>
-				<value>Jedi Council Member=500</value>
-				<value>Yoda=1000</value>
-				<value>Moderator=organization:Message Boards Administrator</value>
-				<value>Moderator=organization-role:Message Boards Administrator</value>
-				<value>Moderator=regular-role:Message Boards Administrator</value>
-				<value>Moderator=site-role:Message Boards Administrator</value>
-				<value>Moderator=user-group:Message Boards Administrator</value>
-			</preference>
-		</portlet-preferences>
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>
@@ -374,10 +348,6 @@
 		<display-name>Bookmarks</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
 		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/bookmarks/configuration.jsp</value>
-		</init-param>
-		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/bookmarks/</value>
 		</init-param>
@@ -520,10 +490,6 @@
 		<portlet-name>34</portlet-name>
 		<display-name>Shopping</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/shopping/configuration.jsp</value>
-		</init-param>
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/shopping/</value>
@@ -1338,7 +1304,7 @@
 	<portlet>
 		<portlet-name>86</portlet-name>
 		<display-name>Portlet Configuration</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.portletconfiguration.PortletConfigurationPortlet</portlet-class>
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/portlet_configuration/</value>
@@ -1638,24 +1604,6 @@
 			<mime-type>text/html</mime-type>
 		</supports>
 		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<portlet-preferences>
-			<preference>
-				<name>fileEntryColumns</name>
-				<value>name,size</value>
-			</preference>
-			<preference>
-				<name>folderColumns</name>
-				<value>name,num-of-folders,num-of-documents</value>
-			</preference>
-			<preference>
-				<name>showFoldersSearch</name>
-				<value>false</value>
-			</preference>
-			<preference>
-				<name>showSubfolders</name>
-				<value>true</value>
-			</preference>
-		</portlet-preferences>
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>
@@ -2501,7 +2449,7 @@
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
 		<init-param>
 			<name>config-template</name>
-			<value>/html/portlet/wiki/configuration.jsp</value>
+			<value>/html/portlet/wiki_admin/configuration.jsp</value>
 		</init-param>
 		<init-param>
 			<name>template-path</name>
@@ -2609,6 +2557,10 @@
 		<display-name>Blogs</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
 		<init-param>
+			<name>config-template</name>
+			<value>/html/portlet/blogs_admin/configuration.jsp</value>
+		</init-param>
+		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/blogs_admin/</value>
 		</init-param>
@@ -2629,6 +2581,10 @@
 		<portlet-name>162</portlet-name>
 		<display-name>Message Boards Admin</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/portlet/message_boards_admin/configuration.jsp</value>
+		</init-param>
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/message_boards_admin/</value>
@@ -3445,6 +3401,108 @@
 		<portlet-name>196</portlet-name>
 		<display-name>Comments</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+		</supports>
+		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
+		<security-role-ref>
+			<role-name>guest</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>power-user</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>user</role-name>
+		</security-role-ref>
+	</portlet>
+	<portlet>
+		<portlet-name>197</portlet-name>
+		<display-name>Shopping Admin</display-name>
+		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/portlet/shopping_admin/configuration.jsp</value>
+		</init-param>
+		<init-param>
+			<name>template-path</name>
+			<value>/html/portlet/shopping_admin/</value>
+		</init-param>
+		<init-param>
+			<name>view-action</name>
+			<value>/shopping_admin/view</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+		</supports>
+		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+	</portlet>
+	<portlet>
+		<portlet-name>198</portlet-name>
+		<display-name>Bookmarks Admin</display-name>
+		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/portlet/bookmarks_admin/configuration.jsp</value>
+		</init-param>
+		<init-param>
+			<name>template-path</name>
+			<value>/html/portlet/bookmarks_admin/</value>
+		</init-param>
+		<init-param>
+			<name>view-action</name>
+			<value>/bookmarks_admin/view</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+		</supports>
+		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+	</portlet>
+	<portlet>
+		<portlet-name>199</portlet-name>
+		<display-name>Documents and Media Admin</display-name>
+		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<init-param>
+			<name>config-template</name>
+			<value>/html/portlet/document_library_admin/configuration.jsp</value>
+		</init-param>
+		<init-param>
+			<name>template-path</name>
+			<value>/html/portlet/document_library_admin/</value>
+		</init-param>
+		<init-param>
+			<name>view-action</name>
+			<value>/document_library_admin/view</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+		</supports>
+		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+	</portlet>
+	<portlet>
+		<portlet-name>200</portlet-name>
+		<display-name>Document Selector</display-name>
+		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<init-param>
+			<name>template-path</name>
+			<value>/html/portlet/document_selector/</value>
+		</init-param>
+		<init-param>
+			<name>view-action</name>
+			<value>/document_selector/view</value>
+		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
 			<mime-type>text/html</mime-type>

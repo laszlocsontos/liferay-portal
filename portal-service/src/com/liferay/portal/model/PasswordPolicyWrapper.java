@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -430,11 +430,9 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	* Returns the user uuid of this password policy.
 	*
 	* @return the user uuid of this password policy
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _passwordPolicy.getUserUuid();
 	}
 
@@ -1237,8 +1235,7 @@ public class PasswordPolicyWrapper implements PasswordPolicy,
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_passwordPolicy.persist();
 	}
 

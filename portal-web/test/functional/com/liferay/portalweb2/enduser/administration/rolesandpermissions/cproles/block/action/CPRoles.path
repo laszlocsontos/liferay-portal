@@ -20,7 +20,7 @@
 </tr>
 <tr>
 	<td>ADD</td>
-	<td>//div[@class='navbar-inner']//li/a[contains(.,'Add')]</td>
+	<td>//ul[@role='menubar']/li/a[@title='Add']/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -51,17 +51,17 @@
 <!--ADD_MENULIST-->
 <tr>
 	<td>ADD_MENULIST_REGULAR_ROLE</td>
-	<td>//ul[@class='dropdown-menu ']/li/a[contains(.,'Regular Role')]</td>
+	<td>//a[@role='menuitem' and contains(.,'Regular Role')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ADD_MENULIST_SITE_ROLE</td>
-	<td>//ul[@class='dropdown-menu ']/li/a[contains(.,'Site Role')]</td>
+	<td>//a[@role='menuitem' and contains(.,'Site Role')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ADD_MENULIST_ORGANIZATION_ROLE</td>
-	<td>//ul[@class='dropdown-menu ']/li/a[contains(.,'Organization Role')]</td>
+	<td>//a[@role='menuitem' and contains(.,'Organization Role')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -76,6 +76,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ROLE_TABLE_DESCRIPTION</td>
+	<td>//tr[contains(.,'${key_roleName}')]/td[3]/a</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PERMISSION_TABLE_PERMISSIONS</td>
 	<td>//tr[contains(.,'${key_permissionNavigationValue}') and contains(.,'${key_permissionDefinitionValue}')]/td</td>
 	<td></td>
@@ -87,12 +92,12 @@
 </tr>
 <tr>
 	<td>ROLE_TABLE_ACTIONS_1</td>
-	<td>//tr/td[4]/div/a[@title='Actions']</td>
+	<td>//tr/td[4]/div/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ROLE_TABLE_ACTIONS</td>
-	<td>//tr[contains(.,'${key_roleName}')]/td[4]/div/a[@title='Actions']</td>
+	<td>//tr[contains(.,'${key_roleName}')]/td[4]/div/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -129,22 +134,22 @@
 <!--PAGINATION-->
 <tr>
 	<td>PAGINATION_FIRST_BUTTON</td>
-	<td>//ul[@class='pager lfr-pagination-buttons']/li/a[contains(.,'First')]</td>
+	<td>//ul[contains(@class,'lfr-pagination-buttons')]/li/a[contains(.,'First')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGINATION_PREVIOUS_BUTTON</td>
-	<td>//ul[@class='pager lfr-pagination-buttons']/li/a[contains(.,'Previous')]</td>
+	<td>//ul[contains(@class,'lfr-pagination-buttons')]/li/a[contains(.,'Previous')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGINATION_NEXT_BUTTON</td>
-	<td>//ul[@class='pager lfr-pagination-buttons']/li/a[contains(.,'Next')]</td>
+	<td>//ul[contains(@class,'lfr-pagination-buttons')]/li/a[contains(.,'Next')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGINATION_LAST_BUTTON</td>
-	<td>//ul[@class='pager lfr-pagination-buttons']/li/a[contains(.,'Last')]</td>
+	<td>//ul[contains(@class,'lfr-pagination-buttons')]/li/a[contains(.,'Last')]</td>
 	<td></td>
 </tr>
 </tbody>

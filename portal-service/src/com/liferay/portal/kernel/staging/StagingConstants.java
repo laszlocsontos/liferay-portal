@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,6 +26,8 @@ public class StagingConstants {
 		PropsUtil.get("lock.expiration.time." + Staging.class.getName()));
 
 	public static final String STAGED_PORTLET = "staged-portlet_";
+
+	public static final String STAGED_PREFIX = "staged--";
 
 	public static final int TYPE_LOCAL_STAGING = 1;
 

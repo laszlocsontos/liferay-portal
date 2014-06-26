@@ -25,12 +25,12 @@
 </tr>
 <tr>
 	<td>PRIVATE_PAGE_PROPAGATION_CHECKBOX</td>
-	<td>//input[@id='_165_privateLayoutSetPrototypeLinkEnabledCheckbox']</td>
+	<td>//input[@id='_165_privateLayoutSetPrototypeLinkEnabled']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PUBLIC_PAGE_PROPAGATION_CHECKBOX</td>
-	<td>//input[@id='_165_publicLayoutSetPrototypeLinkEnabledCheckbox']</td>
+	<td>//input[@id='_165_publicLayoutSetPrototypeLinkEnabled']</td>
 	<td></td>
 </tr>
 <tr>
@@ -46,6 +46,33 @@
 <tr>
 	<td>SUCCESS_MESSAGE</td>
 	<td>//div[contains(@class,'alert') and contains(@class,'alert-success')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--ACTIVE-->
+<tr>
+	<td>ACTIVE_LABEL</td>
+	<td>//label[@for='_165_active']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ACTIVE_CHECKBOX</td>
+	<td>//input[@id='_165_active']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--PARENT_SITE-->
+<tr>
+	<td>PARENT_SITE_SELECT</td>
+	<td>//a[@id='_165_selectParentSiteLink']/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -83,6 +110,11 @@
 <tr>
 	<td>MENU_BASIC_INFORMATION_SITE_TEMPLATE</td>
 	<td>//ul[contains(@class,'nav-list')]/li/a[contains(.,'Site Template')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MENU_BASIC_INFORMATION_RECYCLE_BIN</td>
+	<td>//ul[contains(@class,'nav-list')]/li/a[contains(.,'Recycle Bin')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -145,6 +177,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MENU_MISCELLANEOUS_DISPLAY_SETTINGS_LOCALIZED</td>
+	<td>//ul[contains(@class,'nav-list')]/li/a[contains(.,'${key_displaySettings}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -152,12 +189,53 @@
 <!--MEMBERSHIP_OPTIONS-->
 <tr>
 	<td>MEMBERSHIP_OPTIONS_MEMBERSHIP_TYPE_LABEL</td>
-	<td>//div[@class='control-group']/label[@for='_165_type']</td>
+	<td>//div[@class='form-group']/label[@for='_165_type']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>MEMBERSHIP_OPTIONS_MEMBERSHIP_TYPE</td>
-	<td>//div[@class='control-group']/select[@id='_165_type']</td>
+	<td>//div[@class='form-group']/select[@id='_165_type']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--PAGES-->
+<tr>
+	<td>PAGES_LABEL</td>
+	<td>//h3[contains(.,'Pages')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_PUBLIC_PAGES_LABEL</td>
+	<td>//div[contains(@class,'panel-toggle')]/span[contains(.,'Public Pages')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_PUBLIC_PAGES_SITE_TEMPLATE_LABEL</td>
+	<td>//div[(contains(@class,'control-group') or contains(@class,'form-group'))]/label[@for='_165_publicLayoutSetPrototypeId']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_PUBLIC_PAGES_SITE_TEMPLATE_SELECT</td>
+	<td>//div[(contains(@class,'control-group') or contains(@class,'form-group'))]/select[@id='_165_publicLayoutSetPrototypeId']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_PRIVATE_PAGES_LABEL</td>
+	<td>//div[contains(@class,'panel-toggle')]/span[contains(.,'Private Pages')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_PRIVATE_PAGES_SITE_TEMPLATE_LABEL</td>
+	<td>//div[(contains(@class,'control-group') or contains(@class,'form-group'))]/label[@for='_165_privateLayoutSetPrototypeId']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGES_PRIVATE_PAGES_SITE_TEMPLATE_SELECT</td>
+	<td>//div[(contains(@class,'control-group') or contains(@class,'form-group'))]/select[@id='_165_privateLayoutSetPrototypeId']</td>
 	<td></td>
 </tr>
 </tbody>

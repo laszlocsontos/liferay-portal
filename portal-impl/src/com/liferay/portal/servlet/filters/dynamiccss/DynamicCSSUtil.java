@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -94,13 +94,9 @@ public class DynamicCSSUtil {
 			return content;
 		}
 
-		StopWatch stopWatch = null;
+		StopWatch stopWatch = new StopWatch();
 
-		if (_log.isDebugEnabled()) {
-			stopWatch = new StopWatch();
-
-			stopWatch.start();
-		}
+		stopWatch.start();
 
 		// Request will only be null when called by StripFilterTest
 
@@ -154,9 +150,10 @@ public class DynamicCSSUtil {
 			cacheResourceURLConnection = cacheResourceURL.openConnection();
 		}
 
-		if (themeCssFastLoad && (cacheResourceURLConnection != null) &&
+		if ((themeCssFastLoad || !content.contains(_CSS_IMPORT_BEGIN)) &&
+			(cacheResourceURLConnection != null) &&
 			(resourceURLConnection != null) &&
-			(cacheResourceURLConnection.getLastModified() ==
+			(cacheResourceURLConnection.getLastModified() >=
 				resourceURLConnection.getLastModified())) {
 
 			parsedContent = StringUtil.read(
@@ -177,9 +174,14 @@ public class DynamicCSSUtil {
 				content = propagateQueryString(content, queryString);
 			}
 
-			parsedContent = _parseSass(
-				servletContext, request, themeDisplay, theme, resourcePath,
-				content);
+			if (!themeCssFastLoad && _isImportsOnly(content)) {
+				parsedContent = content;
+			}
+			else {
+				parsedContent = _parseSass(
+					servletContext, request, themeDisplay, theme, resourcePath,
+					content);
+			}
 
 			if (PortalUtil.isRightToLeft(request) &&
 				!RTLCSSUtil.isExcludedPath(resourcePath)) {
@@ -402,6 +404,39 @@ public class DynamicCSSUtil {
 		return themeImagesPath;
 	}
 
+	private static boolean _isImportsOnly(String content) {
+		int pos = 0;
+
+		while (true) {
+			int importX = content.indexOf(_CSS_IMPORT_BEGIN, pos);
+			int importY = content.indexOf(
+				_CSS_IMPORT_END, importX + _CSS_IMPORT_BEGIN.length());
+
+			if ((importX == -1) || (importY == -1)) {
+				String substring = content.substring(pos);
+
+				substring = substring.trim();
+
+				if (substring.isEmpty()) {
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+
+			String substring = content.substring(pos, importX);
+
+			substring = substring.trim();
+
+			if (!substring.isEmpty()) {
+				return false;
+			}
+
+			pos = importY + _CSS_IMPORT_END.length();
+		}
+	}
+
 	private static boolean _isThemeCssFastLoad(
 		HttpServletRequest request, ThemeDisplay themeDisplay) {
 
@@ -481,7 +516,7 @@ public class DynamicCSSUtil {
 
 	/**
 	 * @see com.liferay.portal.servlet.filters.aggregate.AggregateFilter#aggregateCss(
-	 *      com.liferay.portal.servlet.filters.aggregate.AggregateContext, String)
+	 *      com.liferay.portal.servlet.filters.aggregate.ServletPaths, String)
 	 */
 	private static String propagateQueryString(
 		String content, String queryString) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,6 @@ import com.liferay.mail.model.CyrusVirtual;
 import com.liferay.portal.kernel.dao.orm.ObjectNotFoundException;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Dummy;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
@@ -37,7 +36,7 @@ public class CyrusVirtualPersistenceImpl
 
 	@Override
 	public CyrusVirtual findByPrimaryKey(String emailAddress)
-		throws NoSuchCyrusVirtualException, SystemException {
+		throws NoSuchCyrusVirtualException {
 
 		Session session = null;
 
@@ -47,7 +46,8 @@ public class CyrusVirtualPersistenceImpl
 			return (CyrusVirtual)session.load(CyrusVirtual.class, emailAddress);
 		}
 		catch (ObjectNotFoundException onfe) {
-			throw new NoSuchCyrusVirtualException();
+			throw new NoSuchCyrusVirtualException(
+				"{emailAddress=" + emailAddress + "}");
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -58,7 +58,7 @@ public class CyrusVirtualPersistenceImpl
 	}
 
 	@Override
-	public List<CyrusVirtual> findByUserId(long userId) throws SystemException {
+	public List<CyrusVirtual> findByUserId(long userId) {
 		Session session = null;
 
 		try {
@@ -79,9 +79,7 @@ public class CyrusVirtualPersistenceImpl
 	}
 
 	@Override
-	public void remove(String emailAddress)
-		throws NoSuchCyrusVirtualException, SystemException {
-
+	public void remove(String emailAddress) throws NoSuchCyrusVirtualException {
 		Session session = null;
 
 		try {
@@ -95,7 +93,8 @@ public class CyrusVirtualPersistenceImpl
 			session.flush();
 		}
 		catch (ObjectNotFoundException onfe) {
-			throw new NoSuchCyrusVirtualException();
+			throw new NoSuchCyrusVirtualException(
+				"{emailAddress=" + emailAddress + "}");
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -106,7 +105,7 @@ public class CyrusVirtualPersistenceImpl
 	}
 
 	@Override
-	public void removeByUserId(long userId) throws SystemException {
+	public void removeByUserId(long userId) {
 		Session session = null;
 
 		try {
@@ -135,7 +134,7 @@ public class CyrusVirtualPersistenceImpl
 	}
 
 	@Override
-	public void update(CyrusVirtual virtual) throws SystemException {
+	public void update(CyrusVirtual virtual) {
 		Session session = null;
 
 		try {

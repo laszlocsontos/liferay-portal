@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portal.security.permission;
 
 import com.liferay.portal.NoSuchResourceActionException;
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -28,7 +27,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UniqueList;
-import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentType;
@@ -69,7 +67,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.jsp.PageContext;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
@@ -137,6 +135,23 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
+	public String getAction(HttpServletRequest request, String action) {
+		String key = getActionNamePrefix() + action;
+
+		String value = LanguageUtil.get(request, key, null);
+
+		if ((value == null) || value.equals(key)) {
+			value = PortletResourceBundles.getString(request, key);
+		}
+
+		if (value == null) {
+			value = key;
+		}
+
+		return value;
+	}
+
+	@Override
 	public String getAction(Locale locale, String action) {
 		String key = getActionNamePrefix() + action;
 
@@ -154,35 +169,18 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
-	public String getAction(PageContext pageContext, String action) {
-		String key = getActionNamePrefix() + action;
-
-		String value = LanguageUtil.get(pageContext, key, null);
-
-		if ((value == null) || value.equals(key)) {
-			value = PortletResourceBundles.getString(pageContext, key);
-		}
-
-		if (value == null) {
-			value = key;
-		}
-
-		return value;
-	}
-
-	@Override
 	public String getActionNamePrefix() {
 		return _ACTION_NAME_PREFIX;
 	}
 
 	@Override
 	public List<String> getActionsNames(
-		PageContext pageContext, List<String> actions) {
+		HttpServletRequest request, List<String> actions) {
 
 		List<String> actionNames = new UniqueList<String>();
 
 		for (String action : actions) {
-			actionNames.add(getAction(pageContext, action));
+			actionNames.add(getAction(request, action));
 		}
 
 		return actionNames;
@@ -190,7 +188,7 @@ public class ResourceActionsImpl implements ResourceActions {
 
 	@Override
 	public List<String> getActionsNames(
-		PageContext pageContext, String name, long actionIds) {
+		HttpServletRequest request, String name, long actionIds) {
 
 		try {
 			List<ResourceAction> resourceActions =
@@ -206,7 +204,7 @@ public class ResourceActionsImpl implements ResourceActions {
 				}
 			}
 
-			return getActionsNames(pageContext, actions);
+			return getActionsNames(request, actions);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -233,13 +231,13 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
-	public String getModelResource(Locale locale, String name) {
+	public String getModelResource(HttpServletRequest request, String name) {
 		String key = getModelResourceNamePrefix() + name;
 
-		String value = LanguageUtil.get(locale, key, null);
+		String value = LanguageUtil.get(request, key, null);
 
 		if ((value == null) || value.equals(key)) {
-			value = PortletResourceBundles.getString(locale, key);
+			value = PortletResourceBundles.getString(request, key);
 		}
 
 		if (value == null) {
@@ -250,13 +248,13 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
-	public String getModelResource(PageContext pageContext, String name) {
+	public String getModelResource(Locale locale, String name) {
 		String key = getModelResourceNamePrefix() + name;
 
-		String value = LanguageUtil.get(pageContext, key, null);
+		String value = LanguageUtil.get(locale, key, null);
 
 		if ((value == null) || value.equals(key)) {
-			value = PortletResourceBundles.getString(pageContext, key);
+			value = PortletResourceBundles.getString(locale, key);
 		}
 
 		if (value == null) {
@@ -384,7 +382,7 @@ public class ResourceActionsImpl implements ResourceActions {
 				checkPortletGroupDefaultActions(groupDefaultActions);
 
 				_portletResourceGroupDefaultActions.put(
-					name, new UnmodifiableList<String>(groupDefaultActions));
+					name, Collections.unmodifiableList(groupDefaultActions));
 			}
 
 			List<String> guestDefaultActions =
@@ -396,7 +394,7 @@ public class ResourceActionsImpl implements ResourceActions {
 				checkPortletGuestDefaultActions(guestDefaultActions);
 
 				_portletResourceGuestDefaultActions.put(
-					name, new UnmodifiableList<String>(guestDefaultActions));
+					name, Collections.unmodifiableList(guestDefaultActions));
 			}
 
 			List<String> layoutManagerActions =
@@ -408,7 +406,7 @@ public class ResourceActionsImpl implements ResourceActions {
 				checkPortletLayoutManagerActions(layoutManagerActions);
 
 				_portletResourceLayoutManagerActions.put(
-					name, new UnmodifiableList<String>(layoutManagerActions));
+					name, Collections.unmodifiableList(layoutManagerActions));
 			}
 
 			actions = setActions(_portletResourceActions, name, actions);
@@ -554,16 +552,14 @@ public class ResourceActionsImpl implements ResourceActions {
 	@Deprecated
 	@Override
 	public List<Role> getRoles(
-			long companyId, Group group, String modelResource)
-		throws SystemException {
+		long companyId, Group group, String modelResource) {
 
 		return getRoles(companyId, group, modelResource, null);
 	}
 
 	@Override
 	public List<Role> getRoles(
-			long companyId, Group group, String modelResource, int[] roleTypes)
-		throws SystemException {
+		long companyId, Group group, String modelResource, int[] roleTypes) {
 
 		if (roleTypes == null) {
 			roleTypes = getRoleTypes(companyId, group, modelResource);
@@ -1130,7 +1126,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		Map<String, List<String>> actionsMap, String name,
 		List<String> actions) {
 
-		actions = new UnmodifiableList<String>(actions);
+		actions = Collections.unmodifiableList(actions);
 
 		actionsMap.put(name, actions);
 

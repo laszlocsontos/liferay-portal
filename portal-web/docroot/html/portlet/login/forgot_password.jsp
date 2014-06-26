@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,6 +48,7 @@ if (reminderAttempts == null) {
 	<liferay-ui:error exception="<%= SendPasswordException.class %>" message="your-password-can-only-be-sent-to-an-external-email-address" />
 	<liferay-ui:error exception="<%= UserActiveException.class %>" message="your-account-is-not-active" />
 	<liferay-ui:error exception="<%= UserEmailAddressException.class %>" message="please-enter-a-valid-email-address" />
+	<liferay-ui:error exception="<%= UserLockoutException.class %>" message="this-account-has-been-locked" />
 	<liferay-ui:error exception="<%= UserReminderQueryException.class %>" message="your-answer-does-not-match-what-is-in-our-database" />
 
 	<aui:fieldset>
@@ -114,10 +115,10 @@ if (reminderAttempts == null) {
 					%>
 
 					<div class="alert alert-info">
-						<%= LanguageUtil.format(pageContext, "a-new-password-will-be-sent-to-x-if-you-can-correctly-answer-the-following-question", login, false) %>
+						<%= LanguageUtil.format(request, "a-new-password-will-be-sent-to-x-if-you-can-correctly-answer-the-following-question", login, false) %>
 					</div>
 
-					<aui:input autoFocus="<%= true %>" label="<%= HtmlUtil.escape(LanguageUtil.get(pageContext, user2.getReminderQueryQuestion())) %>" name="answer" type="text" />
+					<aui:input autoFocus="<%= true %>" label="<%= HtmlUtil.escape(LanguageUtil.get(request, user2.getReminderQueryQuestion())) %>" name="answer" type="text" />
 				</c:if>
 
 				<c:choose>

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -68,12 +68,14 @@ String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectAsset";
 					%>
 
 					<liferay-ui:search-container-column-text name="title">
-						<img alt="" src="<%= assetRenderer.getIconPath(renderRequest) %>" /><%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
+						<i class="<%= assetRenderer.getIconCssClass() %>"></i>
+
+						<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
 						name="type"
-						value="<%= assetRendererFactory.getTypeName(locale, false) %>"
+						value="<%= assetRendererFactory.getTypeName(locale) %>"
 					/>
 
 					<liferay-ui:search-container-column-date
@@ -83,6 +85,7 @@ String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectAsset";
 
 					<liferay-ui:search-container-column-jsp
 						align="right"
+						cssClass="entry-action"
 						path="/html/portlet/asset_publisher/asset_selection_action.jsp"
 					/>
 				</liferay-ui:search-container-row>
@@ -104,7 +107,12 @@ String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectAsset";
 
 				<div class="select-asset-selector">
 					<div class="lfr-meta-actions edit-controls">
-						<liferay-ui:icon-menu cssClass="select-existing-selector" direction="right" icon='<%= themeDisplay.getPathThemeImages() + "/common/add.png" %>' message='<%= LanguageUtil.format(pageContext, (groupIds.length == 1) ? "select" : "select-in-x", HtmlUtil.escape((GroupLocalServiceUtil.getGroup(groupId)).getDescriptiveName(locale)), false) %>' showWhenSingleIcon="<%= true %>">
+						<liferay-ui:icon-menu
+							cssClass="select-existing-selector"
+							direction="right" icon="../aui/plus"
+							message='<%= LanguageUtil.format(request, (groupIds.length == 1) ? "select" : "select-in-x", HtmlUtil.escape((GroupLocalServiceUtil.getGroup(groupId)).getDescriptiveName(locale)), false) %>'
+							showWhenSingleIcon="<%= true %>"
+						>
 
 							<%
 							PortletURL assetBrowserURL = PortletURLFactoryUtil.create(request, PortletKeys.ASSET_BROWSER, PortalUtil.getControlPanelPlid(company.getCompanyId()), PortletRequest.RENDER_PHASE);
@@ -116,7 +124,9 @@ String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectAsset";
 							assetBrowserURL.setPortletMode(PortletMode.VIEW);
 							assetBrowserURL.setWindowState(LiferayWindowState.POP_UP);
 
-							for (AssetRendererFactory curRendererFactory : AssetRendererFactoryRegistryUtil.getAssetRendererFactories(company.getCompanyId())) {
+							List <AssetRendererFactory> assetRendererFactories = ListUtil.sort(AssetRendererFactoryRegistryUtil.getAssetRendererFactories(company.getCompanyId()), new AssetRendererFactoryTypeNameComparator(locale));
+
+							for (AssetRendererFactory curRendererFactory : assetRendererFactories) {
 								if (!curRendererFactory.isSelectable()) {
 									continue;
 								}
@@ -126,24 +136,55 @@ String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectAsset";
 								Map<String, Object> data = new HashMap<String, Object>();
 
 								data.put("groupid", String.valueOf(groupId));
-								data.put("href", assetBrowserURL.toString());
-								data.put("title", LanguageUtil.format(pageContext, "select-x", curRendererFactory.getTypeName(locale, false), false));
 
-								String type = curRendererFactory.getTypeName(locale, false);
+								if (!curRendererFactory.isSupportsClassTypes()) {
+									data.put("href", assetBrowserURL.toString());
 
-								data.put("type", type);
+									String type = curRendererFactory.getTypeName(locale);
+
+									data.put("title", LanguageUtil.format(request, "select-x", type, false));
+									data.put("type", type);
 							%>
 
-								<liferay-ui:icon
-									cssClass="asset-selector"
-									data="<%= data %>"
-									id="<%= groupId + FriendlyURLNormalizerUtil.normalize(type) %>"
-									message="<%= curRendererFactory.getTypeName(locale, false) %>"
-									src="<%= curRendererFactory.getIconPath(renderRequest) %>"
-									url="javascript:;"
-								/>
+									<liferay-ui:icon
+										cssClass="asset-selector"
+										data="<%= data %>"
+										iconCssClass="<%= curRendererFactory.getIconCssClass() %>"
+										id="<%= groupId + FriendlyURLNormalizerUtil.normalize(type) %>"
+										message="<%= type %>"
+										url="javascript:;"
+									/>
 
 							<%
+								}
+								else {
+									ClassTypeReader classTypeReader = curRendererFactory.getClassTypeReader();
+
+									List<ClassType> assetAvailableClassTypes = classTypeReader.getAvailableClassTypes(PortalUtil.getCurrentAndAncestorSiteGroupIds(groupId), locale);
+
+									for (ClassType assetAvailableClassType : assetAvailableClassTypes) {
+										assetBrowserURL.setParameter("subtypeSelectionId", String.valueOf(assetAvailableClassType.getClassTypeId()));
+
+										data.put("href", assetBrowserURL.toString());
+
+										String type = assetAvailableClassType.getName();
+
+										data.put("title", LanguageUtil.format(request, "select-x", type, false));
+										data.put("type", type);
+							%>
+
+										<liferay-ui:icon
+											cssClass="asset-selector"
+											data="<%= data %>"
+											iconCssClass="<%= curRendererFactory.getIconCssClass() %>"
+											id="<%= groupId + FriendlyURLNormalizerUtil.normalize(type) %>"
+											message="<%= type %>"
+											url="javascript:;"
+										/>
+
+							<%
+									}
+								}
 							}
 							%>
 
@@ -193,6 +234,7 @@ String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectAsset";
 				{
 					dialog: {
 						constrain: true,
+						destroyOnHide: true,
 						modal: true
 					},
 					eventName: '<%= eventName %>',

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,11 +46,9 @@ public class EmailAddressLocalServiceUtil {
 	*
 	* @param emailAddress the email address
 	* @return the email address that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.EmailAddress addEmailAddress(
-		com.liferay.portal.model.EmailAddress emailAddress)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.EmailAddress emailAddress) {
 		return getService().addEmailAddress(emailAddress);
 	}
 
@@ -71,12 +69,10 @@ public class EmailAddressLocalServiceUtil {
 	* @param emailAddressId the primary key of the email address
 	* @return the email address that was removed
 	* @throws PortalException if a email address with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.EmailAddress deleteEmailAddress(
 		long emailAddressId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteEmailAddress(emailAddressId);
 	}
 
@@ -85,11 +81,9 @@ public class EmailAddressLocalServiceUtil {
 	*
 	* @param emailAddress the email address
 	* @return the email address that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.EmailAddress deleteEmailAddress(
-		com.liferay.portal.model.EmailAddress emailAddress)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.EmailAddress emailAddress) {
 		return getService().deleteEmailAddress(emailAddress);
 	}
 
@@ -102,12 +96,10 @@ public class EmailAddressLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQuery(dynamicQuery);
 	}
 
@@ -122,12 +114,11 @@ public class EmailAddressLocalServiceUtil {
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return getService().dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,14 +134,12 @@ public class EmailAddressLocalServiceUtil {
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@SuppressWarnings("rawtypes")
 	public static java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return getService()
 				   .dynamicQuery(dynamicQuery, start, end, orderByComparator);
 	}
@@ -160,11 +149,9 @@ public class EmailAddressLocalServiceUtil {
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
@@ -174,18 +161,15 @@ public class EmailAddressLocalServiceUtil {
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
 	public static com.liferay.portal.model.EmailAddress fetchEmailAddress(
-		long emailAddressId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long emailAddressId) {
 		return getService().fetchEmailAddress(emailAddressId);
 	}
 
@@ -195,11 +179,9 @@ public class EmailAddressLocalServiceUtil {
 	* @param uuid the email address's UUID
 	* @param companyId the primary key of the company
 	* @return the matching email address, or <code>null</code> if a matching email address could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.EmailAddress fetchEmailAddressByUuidAndCompanyId(
-		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String uuid, long companyId) {
 		return getService().fetchEmailAddressByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -209,19 +191,34 @@ public class EmailAddressLocalServiceUtil {
 	* @param emailAddressId the primary key of the email address
 	* @return the email address
 	* @throws PortalException if a email address with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.EmailAddress getEmailAddress(
 		long emailAddressId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getEmailAddress(emailAddressId);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return getService().getActionableDynamicQuery();
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		return getService().getExportActionableDynamicQuery(portletDataContext);
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deletePersistedModel(persistedModel);
 	}
 
 	public static com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
@@ -232,12 +229,10 @@ public class EmailAddressLocalServiceUtil {
 	* @param companyId the primary key of the company
 	* @return the matching email address
 	* @throws PortalException if a matching email address could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.EmailAddress getEmailAddressByUuidAndCompanyId(
 		java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getEmailAddressByUuidAndCompanyId(uuid, companyId);
 	}
 
@@ -251,11 +246,9 @@ public class EmailAddressLocalServiceUtil {
 	* @param start the lower bound of the range of email addresses
 	* @param end the upper bound of the range of email addresses (not inclusive)
 	* @return the range of email addresses
-	* @throws SystemException if a system exception occurred
 	*/
 	public static java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return getService().getEmailAddresses(start, end);
 	}
 
@@ -263,10 +256,8 @@ public class EmailAddressLocalServiceUtil {
 	* Returns the number of email addresses.
 	*
 	* @return the number of email addresses
-	* @throws SystemException if a system exception occurred
 	*/
-	public static int getEmailAddressesCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static int getEmailAddressesCount() {
 		return getService().getEmailAddressesCount();
 	}
 
@@ -275,11 +266,9 @@ public class EmailAddressLocalServiceUtil {
 	*
 	* @param emailAddress the email address
 	* @return the email address that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.EmailAddress updateEmailAddress(
-		com.liferay.portal.model.EmailAddress emailAddress)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.model.EmailAddress emailAddress) {
 		return getService().updateEmailAddress(emailAddress);
 	}
 
@@ -309,8 +298,7 @@ public class EmailAddressLocalServiceUtil {
 	public static com.liferay.portal.model.EmailAddress addEmailAddress(
 		long userId, java.lang.String className, long classPK,
 		java.lang.String address, int typeId, boolean primary)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addEmailAddress(userId, className, classPK, address,
 			typeId, primary);
@@ -320,35 +308,30 @@ public class EmailAddressLocalServiceUtil {
 		long userId, java.lang.String className, long classPK,
 		java.lang.String address, int typeId, boolean primary,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addEmailAddress(userId, className, classPK, address,
 			typeId, primary, serviceContext);
 	}
 
 	public static void deleteEmailAddresses(long companyId,
-		java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		java.lang.String className, long classPK) {
 		getService().deleteEmailAddresses(companyId, className, classPK);
 	}
 
-	public static java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public static java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses() {
 		return getService().getEmailAddresses();
 	}
 
 	public static java.util.List<com.liferay.portal.model.EmailAddress> getEmailAddresses(
-		long companyId, java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, java.lang.String className, long classPK) {
 		return getService().getEmailAddresses(companyId, className, classPK);
 	}
 
 	public static com.liferay.portal.model.EmailAddress updateEmailAddress(
 		long emailAddressId, java.lang.String address, int typeId,
 		boolean primary)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateEmailAddress(emailAddressId, address, typeId, primary);
 	}

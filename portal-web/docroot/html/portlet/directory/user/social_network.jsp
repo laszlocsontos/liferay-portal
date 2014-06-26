@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,7 @@ String twitter = selContact.getTwitterSn();
 %>
 
 <c:if test="<%= Validator.isNotNull(facebook) || Validator.isNotNull(twitter) %>">
-	<h3><liferay-ui:message key="social-network" /></h3>
+	<h3 class="icon-group"><liferay-ui:message key="social-network" /></h3>
 
 	<dl class="property-list">
 		<c:if test="<%= Validator.isNotNull(facebook) %>">

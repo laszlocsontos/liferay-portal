@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -171,7 +171,7 @@ public class JSONWebServiceTest extends BaseJSONWebServiceTestCase {
 
 			Assert.fail();
 		}
-		catch (IllegalArgumentException iae) {
+		catch (Exception e) {
 		}
 
 		mockHttpServletRequest = createHttpRequest(
@@ -215,6 +215,19 @@ public class JSONWebServiceTest extends BaseJSONWebServiceTestCase {
 		}
 		catch (Exception e) {
 		}
+
+		mockHttpServletRequest = createHttpRequest("/foo/use2");
+
+		mockHttpServletRequest.setParameter(
+			"fooData:" + FooDataImpl.class.getName(),
+			"{height: 121, name:'Felix', value:'!!!'}");
+
+		jsonWebServiceAction = lookupJSONWebServiceAction(
+			mockHttpServletRequest);
+
+		Assert.assertEquals(
+			"using #2: h=121/id=-1/n=Felix/v=!!!",
+			jsonWebServiceAction.invoke());
 	}
 
 	@Test

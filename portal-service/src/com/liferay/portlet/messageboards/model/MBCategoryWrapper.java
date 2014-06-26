@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -317,11 +317,9 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	* Returns the user uuid of this message boards category.
 	*
 	* @return the user uuid of this message boards category
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getUserUuid() {
 		return _mbCategory.getUserUuid();
 	}
 
@@ -579,11 +577,9 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	* Returns the status by user uuid of this message boards category.
 	*
 	* @return the status by user uuid of this message boards category
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public java.lang.String getStatusByUserUuid()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public java.lang.String getStatusByUserUuid() {
 		return _mbCategory.getStatusByUserUuid();
 	}
 
@@ -641,12 +637,10 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	* Returns the trash entry created when this message boards category was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this message boards category.
 	*
 	* @return the trash entry created when this message boards category was moved to the Recycle Bin
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.trash.model.TrashEntry getTrashEntry()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mbCategory.getTrashEntry();
 	}
 
@@ -684,7 +678,6 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	* Returns <code>true</code> if the parent of this message boards category is in the Recycle Bin.
 	*
 	* @return <code>true</code> if the parent of this message boards category is in the Recycle Bin; <code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public boolean isInTrashContainer() {
@@ -692,9 +685,13 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	@Override
-	public boolean isInTrashExplicitly()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public boolean isInTrashExplicitly() {
 		return _mbCategory.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return _mbCategory.isInTrashImplicitly();
 	}
 
 	/**
@@ -936,29 +933,25 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	@Override
-	public void persist()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void persist() {
 		_mbCategory.persist();
 	}
 
 	@Override
 	public java.util.List<java.lang.Long> getAncestorCategoryIds()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mbCategory.getAncestorCategoryIds();
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> getAncestors()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mbCategory.getAncestors();
 	}
 
 	@Override
 	public com.liferay.portlet.messageboards.model.MBCategory getParentCategory()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _mbCategory.getParentCategory();
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -137,7 +137,7 @@ public class ModuleFrameworkUtilAdapter {
 	private static ModuleFramework _moduleFramework;
 	private static ModuleFrameworkAdapterHelper _moduleFrameworkAdapterHelper =
 		new ModuleFrameworkAdapterHelper(
-			"com.liferay.osgi.bootstrap.ModuleFrameworkUtil");
+			"com.liferay.portal.bootstrap.ModuleFrameworkUtil");
 
 	static {
 		_moduleFramework =

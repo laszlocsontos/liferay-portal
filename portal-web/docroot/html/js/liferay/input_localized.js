@@ -44,11 +44,15 @@ AUI.add(
 
 					editor: {},
 
-					name: {
+					fieldPrefix: {
 						validator: Lang.isString
 					},
 
-					namespace: {
+					fieldPrefixSeparator: {
+						validator: Lang.isString
+					},
+
+					id: {
 						validator: Lang.isString
 					},
 
@@ -62,6 +66,14 @@ AUI.add(
 
 					itemsError: {
 						validator: Lang.isArray
+					},
+
+					name: {
+						validator: Lang.isString
+					},
+
+					namespace: {
+						validator: Lang.isString
 					},
 
 					selected: {
@@ -108,14 +120,14 @@ AUI.add(
 				prototype: {
 					BOUNDING_TEMPLATE: '<span />',
 
-					INPUT_HIDDEN_TEMPLATE: '<input id="{namespace}{value}" name="{name}{value}" type="hidden" value="" />',
+					INPUT_HIDDEN_TEMPLATE: '<input id="{namespace}{id}_{value}" name="{namespace}{fieldNamePrefix}{name}_{value}{fieldNameSuffix}" type="hidden" value="" />',
 
-					ITEM_TEMPLATE: '<td class="palette-item {selectedClassName}" data-column={column} data-index={index} data-row={row} data-value="{value}">' +
+					ITEM_TEMPLATE: '<li class="palette-item {selectedClassName}" data-column={column} data-index={index} data-row={row} data-value="{value}">' +
 						'<a href="" class="palette-item-inner" onclick="return false;">' +
 							'<img class="lfr-input-localized-flag" data-languageId="{value}" src="' + themeDisplay.getPathThemeImages() + '/language/{value}.png" />' +
 							'<div class="lfr-input-localized-state {stateClass}"></div>' +
 						'</a>' +
-					'</td>',
+					'</li>',
 
 					initializer: function() {
 						var instance = this;
@@ -136,6 +148,21 @@ AUI.add(
 						];
 
 						instance._eventHandles = eventHandles;
+
+						var boundingBox = instance.get('boundingBox');
+
+						boundingBox.plug(
+							A.Plugin.NodeFocusManager,
+							{
+								descendants: '.palette-item a',
+								keys: {
+									next: 'down:39,40',
+									previous: 'down:37,38'
+								}
+							}
+						);
+
+						instance._inputPlaceholderDescription = boundingBox.one('#' + inputPlaceholder.attr('id') + '_desc');
 					},
 
 					destructor: function() {
@@ -185,6 +212,10 @@ AUI.add(
 
 						if (editor) {
 							editor.setHTML(inputPlaceholder.val());
+						}
+
+						if (instance._inputPlaceholderDescription) {
+							instance._inputPlaceholderDescription.text(instance._flags.one('[data-languageId="' + languageId + '"]').attr('alt'));
 						}
 					},
 
@@ -269,16 +300,30 @@ AUI.add(
 						var instance = this;
 
 						var boundingBox = instance.get('boundingBox');
+						var fieldPrefix = instance.get('fieldPrefix');
+						var fieldPrefixSeparator = instance.get('fieldPrefixSeparator');
+						var id = instance.get('id');
 						var name = instance.get('name');
 						var namespace = instance.get('namespace');
 
-						var inputLanguage = boundingBox.one('#' + namespace + languageId);
+						var fieldNamePrefix = STR_BLANK;
+						var fieldNameSuffix = STR_BLANK;
+
+						if (fieldPrefix) {
+							fieldNamePrefix = fieldPrefix + fieldPrefixSeparator;
+							fieldNameSuffix = fieldPrefixSeparator;
+						}
+
+						var inputLanguage = boundingBox.one('#' + namespace + id + '_' + languageId);
 
 						if (!inputLanguage) {
 							inputLanguage = A.Node.create(
 								A.Lang.sub(
 									instance.INPUT_HIDDEN_TEMPLATE,
 									{
+										fieldNamePrefix: fieldNamePrefix,
+										fieldNameSuffix: fieldNameSuffix,
+										id: id,
 										name: name,
 										namespace: namespace,
 										value: languageId
@@ -378,7 +423,7 @@ AUI.add(
 
 						AArray.each(
 							flags,
-							function(item, index, collection) {
+							function(item, index) {
 								var flagNode = instance.getItemByIndex(index);
 
 								flagNode.toggleClass(

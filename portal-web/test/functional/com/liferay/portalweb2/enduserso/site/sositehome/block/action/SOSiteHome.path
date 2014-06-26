@@ -101,7 +101,7 @@
 </tr>
 <!--ANNOUNCEMENTS-->
 <tr>
-	<td>ANOUNCEMENTS_PORTLET_TITLE</td>
+	<td>ANNOUNCEMENTS_PORTLET_TITLE</td>
 	<td>//header[contains(.,'Announcements')]//h1</td>
 	<td></td>
 </tr>
@@ -229,18 +229,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>BOOKMARKS_ENTRY_LINK_INCREMENT</td>
-	<td>//tr[contains(.,'${number}')]/td/a</td>
-	<td></td>
-</tr>
-<tr>
 	<td>BOOKMARKS_ENTRY_ACTIONS</td>
 	<td>//tr[contains(.,'${key_bookmarksEntryName}')]//a[@title='Actions']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>BOOKMARKS_ENTRY_ACTIONS_INCREMENT</td>
-	<td>//tr[contains(.,'${number}')]//a[@title='Actions']</td>
 	<td></td>
 </tr>
 <tr>
@@ -425,42 +415,37 @@
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE</td>
+	<td>//div[@class='today-events']//div[@class='event' and contains(.,'${key_eventTitle}')]/span[@class='event-name']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE_GENERIC</td>
 	<td>//div[@class='today-events']//span[@class='event-name']/a</td>
 	<td></td>
 </tr>
 <tr>
-	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TITLE_INCREMENT</td>
-	<td>//div[@class='today-events']//div[@class='event' and contains(.,'${number}')]/span[@class='event-name']/a</td>
-	<td></td>
-</tr>
-<tr>
 	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TIME</td>
-	<td>//div[@class='today-events']//span[@class='event-time']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>EVENTS_DISPLAY_TODAYS_EVENTS_EVENT_TIME_INCREMENT</td>
-	<td>//div[@class='today-events']//div[@class='event' and contains(.,'${number}')]/span[@class='event-time']</td>
+	<td>//div[@class='today-events']//div[@class='event' and contains(.,'${key_eventTitle}')]/span[@class='event-time']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE</td>
+	<td>//div[@class='upcoming-events']//div[@class='event' and contains(.,'${key_eventTitle}')]/span[@class='event-name']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE_GENERIC</td>
 	<td>//div[@class='upcoming-events']//span[@class='event-name']/a</td>
 	<td></td>
 </tr>
 <tr>
-	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TITLE_INCREMENT</td>
-	<td>//div[@class='upcoming-events']//div[@class='event' and contains(.,'${number}')]/span[@class='event-name']/a</td>
-	<td></td>
-</tr>
-<tr>
 	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TIME</td>
-	<td>//div[@class='upcoming-events']//span[@class='event-time']</td>
+	<td>//div[@class='upcoming-events']//div[@class='event' and contains(.,'${key_eventTitle}')]/span[@class='event-time']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>EVENTS_DISPLAY_UPCOMING_EVENTS_EVENT_TIME_INCREMENT</td>
-	<td>//div[@class='upcoming-events']//div[@class='event' and contains(.,'${number}')]/span[@class='event-time']</td>
+	<td>EVENTS_DISPLAY_NO_EVENTS_MESSAGE</td>
+	<td>//section[@id='portlet_1_WAR_eventsdisplayportlet']//div[@class='portlet-body']</td>
 	<td></td>
 </tr>
 <tr>

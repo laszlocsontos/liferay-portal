@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,7 @@ request.setAttribute("view.jsp-results", assetEntries);
 
 <c:choose>
 	<c:when test="<%= assetPublisherDisplayContext.getPortletDisplayDDMTemplateId() > 0 %>">
-		<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), assetEntries, contextObjects) %>
+		<%= PortletDisplayTemplateUtil.renderDDMTemplate(request, response, assetPublisherDisplayContext.getPortletDisplayDDMTemplateId(), assetEntries, contextObjects) %>
 	</c:when>
 	<c:otherwise>
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -94,6 +94,7 @@ import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.upload.UploadServletRequestImpl;
 import com.liferay.portal.util.MaintenanceUtil;
+import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -866,16 +867,24 @@ public class EditServerAction extends PortletAction {
 			advancedProperties);
 		portletPreferences.setValue(
 			PropsKeys.MAIL_SESSION_MAIL_POP3_HOST, pop3Host);
-		portletPreferences.setValue(
-			PropsKeys.MAIL_SESSION_MAIL_POP3_PASSWORD, pop3Password);
+
+		if (!pop3Password.equals(Portal.TEMP_OBFUSCATION_VALUE)) {
+			portletPreferences.setValue(
+				PropsKeys.MAIL_SESSION_MAIL_POP3_PASSWORD, pop3Password);
+		}
+
 		portletPreferences.setValue(
 			PropsKeys.MAIL_SESSION_MAIL_POP3_PORT, String.valueOf(pop3Port));
 		portletPreferences.setValue(
 			PropsKeys.MAIL_SESSION_MAIL_POP3_USER, pop3User);
 		portletPreferences.setValue(
 			PropsKeys.MAIL_SESSION_MAIL_SMTP_HOST, smtpHost);
-		portletPreferences.setValue(
-			PropsKeys.MAIL_SESSION_MAIL_SMTP_PASSWORD, smtpPassword);
+
+		if (!smtpPassword.equals(Portal.TEMP_OBFUSCATION_VALUE)) {
+			portletPreferences.setValue(
+				PropsKeys.MAIL_SESSION_MAIL_SMTP_PASSWORD, smtpPassword);
+		}
+
 		portletPreferences.setValue(
 			PropsKeys.MAIL_SESSION_MAIL_SMTP_PORT, String.valueOf(smtpPort));
 		portletPreferences.setValue(

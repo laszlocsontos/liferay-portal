@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,48 +26,42 @@ public class ModulePathContainerTest {
 
 	@Test
 	public void testModulePathWithNoContext() {
-		ComboServlet.ModulePathContainer modulePathContainer =
-			new ComboServlet.ModulePathContainer("/js/javascript.js");
+		String modulePath = "/js/javascript.js";
 
 		Assert.assertEquals(
-			StringPool.BLANK, modulePathContainer.getModuleContextPath());
+			StringPool.BLANK, ComboServlet.getModuleContextPath(modulePath));
 		Assert.assertEquals(
-			"/js/javascript.js", modulePathContainer.getResourcePath());
+			"/js/javascript.js", ComboServlet.getResourcePath(modulePath));
 	}
 
 	@Test
 	public void testModulePathWithPluginContext() {
-		ComboServlet.ModulePathContainer modulePathContainer =
-			new ComboServlet.ModulePathContainer(
-				"plugin-context:/js/javascript.js");
+		String modulePath = "plugin-context:/js/javascript.js";
 
 		Assert.assertEquals(
-			"plugin-context", modulePathContainer.getModuleContextPath());
+			"plugin-context", ComboServlet.getModuleContextPath(modulePath));
 		Assert.assertEquals(
-			"/js/javascript.js", modulePathContainer.getResourcePath());
+			"/js/javascript.js", ComboServlet.getResourcePath(modulePath));
 	}
 
 	@Test
 	public void testModulePathWithPluginContextAndNoResource() {
-		ComboServlet.ModulePathContainer modulePathContainer =
-			new ComboServlet.ModulePathContainer("/plugin-context:");
+		String modulePath = "/plugin-context:";
 
 		Assert.assertEquals(
-			"/plugin-context", modulePathContainer.getModuleContextPath());
+			"/plugin-context", ComboServlet.getModuleContextPath(modulePath));
 		Assert.assertEquals(
-			StringPool.BLANK, modulePathContainer.getResourcePath());
+			StringPool.BLANK, ComboServlet.getResourcePath(modulePath));
 	}
 
 	@Test
 	public void testModulePathWithPluginContextWithInitialSlash() {
-		ComboServlet.ModulePathContainer modulePathContainer =
-			new ComboServlet.ModulePathContainer(
-				"/plugin-context:/js/javascript.js");
+		String modulePath = "/plugin-context:/js/javascript.js";
 
 		Assert.assertEquals(
-			"/plugin-context", modulePathContainer.getModuleContextPath());
+			"/plugin-context", ComboServlet.getModuleContextPath(modulePath));
 		Assert.assertEquals(
-			"/js/javascript.js", modulePathContainer.getResourcePath());
+			"/js/javascript.js", ComboServlet.getResourcePath(modulePath));
 	}
 
 }

@@ -1,13 +1,103 @@
 <definition component-name="portal-security">
-	<property name="portlet.plugins.includes" value="opensocial-portlet" />
+	<property name="testray.main.component.name" value="Security" />
 
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 	</set-up>
 
 	<tear-down>
+		<execute macro="PortalSettings#tearDownAuthenticationCP" />
+
 		<execute macro="Page#tearDownPG" />
 	</tear-down>
+
+	<command name="AuthenticationCAS" priority="5">
+		<property name="web.plugins.includes" value="cas-web" />
+
+		<var name="userEmailAddress" value="userea@liferay.com" />
+		<var name="userFirstName" value="userfn" />
+		<var name="userLastName" value="userln" />
+		<var name="userScreenName" value="usersn" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="${userEmailAddress}" />
+			<var name="userFirstName" value="${userFirstName}" />
+			<var name="userLastName" value="${userLastName}" />
+			<var name="userScreenName" value="${userScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="${userEmailAddress}" />
+			<var name="userScreenName" value="${userScreenName}" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Portal Settings" />
+		</execute>
+
+		<execute macro="PortalSettings#editConfigurationAuthenticationGeneral">
+			<var name="authenticationMethod" value="By Screen Name" />
+		</execute>
+
+		<execute macro="PortalSettings#editConfigurationAuthenticationCAS">
+			<var name="casLoginURL" value="http://localhost:8080/cas-web/login" />
+			<var name="casLogoutURL" value="http://localhost:8080/cas-web/logout" />
+			<var name="casServerURL" value="http://localhost:8080/cas-web" />
+		</execute>
+
+		<execute macro="User#logoutPG" />
+
+		<execute action="CAS#assertTextEquals" locator-key1="APP_NAME_HEADER" value1="Central Authentication Service (CAS)" />
+		<execute action="CAS#assertTextEquals" locator-key1="LOGOUT_SUCCESSFUL_HEADER" value1="Logout successful" />
+		<execute action="CAS#assertTextEquals" locator-key1="LOGOUT_SUCCESSFUL_MESSAGE_1" value1="You have successfully logged out of the Central Authentication Service." />
+		<execute action="CAS#assertTextEquals" locator-key1="LOGOUT_SUCCESSFUL_MESSAGE_2" value1="For security reasons, exit your web browser." />
+
+		<execute macro="Page#openURL" />
+
+		<execute action="Dockbar#assertClick" locator-key1="USER_SIGN_IN" value1="Sign In" />
+
+		<execute action="CAS#type" locator-key1="NETID_FIELD" value1="${userScreenName}" />
+		<execute action="CAS#type" locator-key1="PASSWORD_FIELD" value1="${userScreenName}" />
+		<execute action="CAS#assertClick" locator-key1="LOGIN_BUTTON" value1="LOGIN" />
+
+		<var name="key_pageName" value="Welcome" />
+
+		<execute action="Home#assertTextEquals" locator-key1="PAGE" value1="Welcome" />
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginPG">
+			<var name="authenticationMethod" value="By Screen Name" />
+			<var name="userScreenName" value="test" />
+		</execute>
+	</command>
+
+	<command name="ValidateBeanIdentifierUserPermissions" priority="4">
+		<var name="url" value="http://localhost:8080/c/portal/json_service?serviceClassName=com.liferay.portal.service.AccountServiceUtil&amp;serviceMethodName=getBeanIdentifier&amp;p_auth=" />
+
+		<execute macro="Api#gotoPAuthURL" />
+
+		<execute action="Jsonwebservices#pause" locator1="1000" />
+		<execute action="Jsonwebservices#assertElementNotPresent" locator-key1="SECURITY_TEST_PAGE_POPULATED" />
+	</command>
+
+	<command name="ValidateCannotStealAdminAccount" priority="5">
+		<var name="url" value="http://localhost:8080/c/portal/json_service?serviceClassName=com.liferay.portal.service.UserServiceUtil&amp;serviceMethodName=updateStatus&amp;serviceParameters=[userId,status]&amp;userId=10203&amp;status=6&amp;p_auth=" />
+
+		<execute macro="Api#gotoPAuthURL" />
+
+		<execute action="Jsonwebservices#assertTextEquals" locator-key1="SECURITY_TEST_PAGE_BODY" value1="{&quot;message&quot;:&quot;com.liferay.portal.security.auth.PrincipalException&quot;,&quot;exception&quot;:&quot;com.liferay.portal.security.auth.PrincipalException&quot;}" />
+
+		<execute action="Jsonwebservices#assertTextNotPresent" locator-key1="SECURITY_TEST_PAGE_BODY" value1="companyId" />
+	</command>
 
 	<command name="ValidateForwardURLPG" priority="4">
 		<execute action="Home#open" locator1="http://localhost:8080/html/common/forward_jsp.jsp?FORWARD_URL=http://www.msn.com" />
@@ -31,7 +121,59 @@
 		<execute action="Home#assertElementPresent" locator-key1="PAGE" value1="Test" />
 	</command>
 
-	<command name="ViewExternalWebappsPG" priority="5">
+	<command name="ValidateXSSVulnerabilities" priority="5">
+		<var name="maliciousURL1">
+			<![CDATA[
+				http://localhost:8080/group/guest/home?p_p_id=82&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&_82_struts_action=%2Flanguage%2Fview&languageId=&lt;/script&gt;&lt;script&gt;alert(document.domain)&lt;/script>
+			]]>
+		</var>
+
+		<var name="maliciousURL2">
+			<![CDATA[
+				http://localhost:8080/group/guest/home?p_p_id=82&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&_82_struts_action=%2Flanguage%2Fview&languageId=&lt;/script&gt;&lt;script&gt;alert(document.domain)&lt;/script&gt;
+			]]>
+		</var>
+
+		<var name="maliciousURL3">
+			<![CDATA[
+				http://localhost:8080/group/guest/home?p_p_id=82&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&_82_struts_action=%2Flanguage%2Fview&languageId=%3C/script%3E%3Cscript%3Ealert(document.domain)%3C/script%3E
+			]]>
+		</var>
+
+		<var name="maliciousURL4">
+			<![CDATA[
+				http://localhost:8080/group/guest/home?p_p_id=82&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&_82_struts_action=%2Flanguage%2Fview&languageId=</script><script>alert(document.domain)</script>
+			]]>
+		</var>
+
+		<execute action="Home#open" locator1="${maliciousURL1}" />
+
+		<execute action="Home#assertTextEquals" locator-key1="ERROR_MESSAGE_ALERT_ERROR" value1="Not Found" />
+		<execute action="BasePortlet#assertTextEquals" locator-key1="PORTLET_CONTENT" value1="The requested resource was not found." />
+		<execute action="Home#assertElementPresent" locator-key1="URL_ERROR_MESSAGE" />
+
+		<execute action="Home#open" locator1="${maliciousURL2}" />
+
+		<execute action="Home#assertTextEquals" locator-key1="ERROR_MESSAGE_ALERT_ERROR" value1="Not Found" />
+		<execute action="BasePortlet#assertTextEquals" locator-key1="PORTLET_CONTENT" value1="The requested resource was not found." />
+		<execute action="Home#assertElementPresent" locator-key1="URL_ERROR_MESSAGE" />
+
+		<execute action="Home#open" locator1="${maliciousURL3}" />
+
+		<execute action="Home#assertTextEquals" locator-key1="ERROR_MESSAGE_ALERT_ERROR" value1="Not Found" />
+		<execute action="BasePortlet#assertTextEquals" locator-key1="PORTLET_CONTENT" value1="The requested resource was not found." />
+		<execute action="Home#assertElementPresent" locator-key1="URL_ERROR_MESSAGE" />
+
+		<execute action="Home#open" locator1="${maliciousURL4}" />
+
+		<execute action="Home#assertTextEquals" locator-key1="ERROR_MESSAGE_ALERT_ERROR" value1="Not Found" />
+		<execute action="BasePortlet#assertTextEquals" locator-key1="PORTLET_CONTENT" value1="The requested resource was not found." />
+		<execute action="Home#assertElementPresent" locator-key1="URL_ERROR_MESSAGE" />
+	</command>
+
+	<command known-issues="LPS-44790" name="ViewExternalWebappsPG" priority="5">
+		<property name="portlet.plugins.includes" value="opensocial-portlet" />
+
 		<execute macro="Page#addPG">
 			<var name="pageName" value="External Webapps Test Page" />
 		</execute>
@@ -53,5 +195,57 @@
 		</execute>
 
 		<execute action="PGOpensocialgadget#assertTextEquals" locator-key1="PORTLET_TITLE" value1="To-Do List" />
+	</command>
+
+	<command name="ViewURLValidateNoXSS" priority="5">
+		<var name="maliciousURL1">
+			<![CDATA[
+				http://localhost:8080/c/portal/flash?title=abc</title><script%0d%0a>alert(3.1415926)</script%0d%0a><title>aaa
+			]]>
+		</var>
+
+		<var name="maliciousURL2">
+			<![CDATA[
+				http://localhost:8080/group/control_panel/manage?p_p_id=132&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_132_struts_action=%2Fplugins_admin%2Fedit_plugin&_132_pluginId=116&_132_pluginType=portlet&_132_title=Activities&_132_moduleId=%3Cscript%3Ealert(%22xss%22);%3C/script%3E
+			]]>
+		</var>
+
+		<var name="maliciousURL3">
+			<![CDATA[
+				http://localhost:8080/group/control_panel/manage?p_p_id=132&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_132_struts_action=%2Fplugins_admin%2Fedit_plugin&_132_pluginId=116&_132_pluginType=portlet&_132_title=Activities&_132_moduleId=%3Cscript%3Ealert(%22xss%22);%3C/script%3E&_2_backURL=%22%3E%3Cscript%3Ealert%28%27xss%27%29;%3C/script%3E
+			]]>
+		</var>
+
+		<var name="maliciousURL4">
+			<![CDATA[
+				http://localhost:8080/group/control_panel/manage?p_p_id=132&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_132_struts_action=%2Fplugins_admin%2Fedit_plugin&_132_pluginId=116&_132_pluginType=portlet&_132_title=Activities&_132_moduleId=%3Cscript%3Ealert(%22xss%22);%3C/script%3E&_2_backURL=alert%28%27xss%27%29
+			]]>
+		</var>
+
+		<var name="maliciousURL5">
+			<![CDATA[
+				http://localhost:8080/html/portal/progress_poller.jsp?ProgressId=a%3D1%3Balert(document.cookie)%3B%2F%2F
+			]]>
+		</var>
+
+		<execute action="Home#open" locator1="${maliciousURL1}" />
+		<execute action="Home#assertAlertNotPresent" />
+
+		<execute action="Home#open" locator1="${maliciousURL2}" />
+		<execute action="Home#assertAlertNotPresent" />
+
+		<execute action="Dockbar#click" locator-key1="USER_NAME" />
+		<execute action="Dockbar#assertClick" locator-key1="USER_MY_ACCOUNT" value1="My Account" />
+
+		<execute action="Myaccount#selectFrame" locator-key1="MY_ACCOUNT_IFRAME" />
+
+		<execute action="Home#open" locator1="${maliciousURL3}" />
+		<execute action="Home#assertAlertNotPresent" />
+
+		<execute action="Home#open" locator1="${maliciousURL4}" />
+		<execute action="Home#assertAlertNotPresent" />
+
+		<execute action="Home#open" locator1="${maliciousURL5}" />
+		<execute action="Home#assertAlertNotPresent" />
 	</command>
 </definition>

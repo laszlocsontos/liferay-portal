@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,7 +29,7 @@ long categoryId = BeanParamUtil.getLong(category, request, "categoryId", Shoppin
 
 	<c:if test="<%= category != null %>">
 		<div class="breadcrumbs">
-			<%= ShoppingUtil.getBreadcrumbs(category, pageContext, renderRequest, renderResponse) %>
+			<%= ShoppingUtil.getBreadcrumbs(category, renderRequest, renderResponse) %>
 		</div>
 	</c:if>
 
@@ -105,7 +105,7 @@ long categoryId = BeanParamUtil.getLong(category, request, "categoryId", Shoppin
 		sb.append(UnicodeFormatter.toString(curCategory.getName()));
 		sb.append("'); window.close();");
 
-		row.addButton("right", SearchEntry.DEFAULT_VALIGN, LanguageUtil.get(pageContext, "choose"), sb.toString());
+		row.addButton("right", SearchEntry.DEFAULT_VALIGN, LanguageUtil.get(request, "choose"), sb.toString());
 
 		// Add result row
 

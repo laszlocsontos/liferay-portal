@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -79,7 +79,7 @@ searchContainer.setResults(results);
 		// Last post date
 
 		if (node.getLastPostDate() == null) {
-			row.addText(LanguageUtil.get(pageContext, "never"), rowURL);
+			row.addText(LanguageUtil.get(request, "never"), rowURL);
 		}
 		else {
 			row.addText(dateFormatDateTime.format(node.getLastPostDate()), rowURL);
@@ -87,7 +87,7 @@ searchContainer.setResults(results);
 
 		// Action
 
-		row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/wiki/node_action.jsp");
+		row.addJSP("/html/portlet/wiki/node_action.jsp", "entry-action");
 
 		// Add result row
 

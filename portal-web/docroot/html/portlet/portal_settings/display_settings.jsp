@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -146,7 +146,7 @@
 		%>
 
 		<c:if test="<%= !deployed %>">
-			<aui:option label='<%= defaultRegularThemeId + "(" + LanguageUtil.get(pageContext, "undeployed") + ")" %>' selected="<%= true %>" value="<%= defaultRegularThemeId %>" />
+			<aui:option label='<%= defaultRegularThemeId + "(" + LanguageUtil.get(request, "undeployed") + ")" %>' selected="<%= true %>" value="<%= defaultRegularThemeId %>" />
 		</c:if>
 	</aui:select>
 
@@ -173,7 +173,7 @@
 			%>
 
 			<c:if test="<%= !deployed %>">
-				<aui:option label='<%= defaultWapThemeId + "(" + LanguageUtil.get(pageContext, "undeployed") + ")" %>' selected="<%= true %>" value="<%= defaultWapThemeId %>" />
+				<aui:option label='<%= defaultWapThemeId + "(" + LanguageUtil.get(request, "undeployed") + ")" %>' selected="<%= true %>" value="<%= defaultWapThemeId %>" />
 			</c:if>
 		</aui:select>
 	</c:if>
@@ -200,7 +200,7 @@
 		%>
 
 		<c:if test="<%= !deployed %>">
-			<aui:option label='<%= defaultControlPanelThemeId + "(" + LanguageUtil.get(pageContext, "undeployed") + ")" %>' selected="<%= true %>" value="<%= defaultControlPanelThemeId %>" />
+			<aui:option label='<%= defaultControlPanelThemeId + "(" + LanguageUtil.get(request, "undeployed") + ")" %>' selected="<%= true %>" value="<%= defaultControlPanelThemeId %>" />
 		</c:if>
 	</aui:select>
 </aui:fieldset>

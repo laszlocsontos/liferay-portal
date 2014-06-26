@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portal.security.permission;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Permission;
 import com.liferay.portal.model.ResourceAction;
 import com.liferay.portal.model.ResourceConstants;
@@ -41,7 +40,7 @@ public class PermissionConverterImpl implements PermissionConverter {
 
 	@Override
 	public List<Permission> convertPermissions(long roleId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return convertPermissions(roleId, null);
 	}
@@ -49,7 +48,7 @@ public class PermissionConverterImpl implements PermissionConverter {
 	@Override
 	public List<Permission> convertPermissions(
 			long roleId, PermissionConversionFilter permissionConversionFilter)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Role role = RoleLocalServiceUtil.getRole(roleId);
 
@@ -57,16 +56,13 @@ public class PermissionConverterImpl implements PermissionConverter {
 	}
 
 	@Override
-	public List<Permission> convertPermissions(Role role)
-		throws SystemException {
-
+	public List<Permission> convertPermissions(Role role) {
 		return convertPermissions(role, null);
 	}
 
 	@Override
 	public List<Permission> convertPermissions(
-			Role role, PermissionConversionFilter permissionConversionFilter)
-		throws SystemException {
+		Role role, PermissionConversionFilter permissionConversionFilter) {
 
 		int[] scopes = new int[0];
 

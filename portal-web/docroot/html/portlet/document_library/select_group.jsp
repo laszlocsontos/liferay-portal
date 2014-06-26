@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -55,7 +55,7 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 			<%
 			int additionalSites = 0;
 
-			if (!searchTerms.hasSearchTerms() && PortalUtil.isCompanyControlPanelPortlet(PortletKeys.DOCUMENT_LIBRARY, themeDisplay)) {
+			if (!searchTerms.hasSearchTerms() && PortalUtil.isCompanyControlPanelPortlet(PortletKeys.DOCUMENT_LIBRARY_ADMIN, themeDisplay)) {
 				if (searchContainer.getStart() == 0) {
 					results.add(company.getGroup());
 				}
@@ -93,10 +93,10 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 			List<Group> sites = null;
 
 			if (searchTerms.isAdvancedSearch()) {
-				sites = GroupLocalServiceUtil.search(company.getCompanyId(), null, searchTerms.getName(), searchTerms.getDescription(), groupParams, searchTerms.isAndOperator(), start, end, searchContainer.getOrderByComparator());
+				sites = GroupServiceUtil.search(company.getCompanyId(), null, searchTerms.getName(), searchTerms.getDescription(), groupParams, searchTerms.isAndOperator(), start, end, searchContainer.getOrderByComparator());
 			}
 			else {
-				sites = GroupLocalServiceUtil.search(company.getCompanyId(), null, searchTerms.getKeywords(), groupParams, start, end, searchContainer.getOrderByComparator());
+				sites = GroupServiceUtil.search(company.getCompanyId(), null, searchTerms.getKeywords(), groupParams, start, end, searchContainer.getOrderByComparator());
 			}
 
 			results.addAll(sites);
@@ -118,7 +118,7 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 			String groupDescriptiveName = HtmlUtil.escape(group.getDescriptiveName(locale));
 
 			if (group.isUser()) {
-				groupDescriptiveName = LanguageUtil.get(pageContext, "my-site");
+				groupDescriptiveName = LanguageUtil.get(request, "my-site");
 			}
 			%>
 
@@ -129,7 +129,7 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 
 			<liferay-ui:search-container-column-text
 				name="type"
-				value="<%= LanguageUtil.get(pageContext, group.getTypeLabel()) %>"
+				value="<%= LanguageUtil.get(request, group.getTypeLabel()) %>"
 			/>
 
 			<liferay-ui:search-container-column-text>

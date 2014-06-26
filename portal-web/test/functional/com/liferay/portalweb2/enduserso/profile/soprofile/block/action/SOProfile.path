@@ -79,6 +79,21 @@
 	<td></td>
 </tr>
 <tr>
+	<td>WHATS_HAPPENING</td>
+	<td>//div[contains(@class,'microblogs-status-container')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WHATS_HAPPENING_OPTIONS</td>
+	<td>//div[contains(@id,'microblogsportlet')]//span[contains(@class,'portlet-actions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WHATS_HAPPENING_OPTIONS_LINK</td>
+	<td>//div[contains(@id,'microblogsportlet')]//span[contains(@class,'portlet-actions')]//a[@title='Options']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>WHATS_HAPPENING_ENTRY_CONTENT</td>
 	<td>//div[@class='entry-bubble']/div[@class='content']</td>
 	<td></td>
@@ -95,7 +110,7 @@
 </tr>
 <tr>
 	<td>DEFAULT_PROFILE_PICTURE</td>
-	<td>//img[contains(@src,'default')]</td>
+	<td>//img[@id='_so_WAR_sotheme_avatar' and contains(@src,'img_id=0')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -295,6 +310,21 @@
 <tr>
 	<td>PROFILE_INFO_PROJECTS_DESCRIPTION</td>
 	<td>//div[@class='project-description property-list']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PROFILE_INFO_SITES_TITLE</td>
+	<td>//div[@class='user-sites-title']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PROFILE_INFO_SITES</td>
+	<td>//ul[@class='user-sites']//a[contains(.,'${key_siteName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PROFILE_INFO_SITES_EMPTY</td>
+	<td>//ul[@class='user-sites']//div[@class='empty']</td>
 	<td></td>
 </tr>
 <tr>

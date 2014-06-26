@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,16 +18,16 @@ import com.liferay.portal.kernel.resiliency.spi.MockSPI;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
 import com.liferay.portal.kernel.resiliency.spi.SPIConfiguration;
 import com.liferay.portal.kernel.resiliency.spi.SPIRegistryUtil;
+import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletApp;
 import com.liferay.portal.test.AdviseWith;
 import com.liferay.portal.test.AspectJMockingNewClassLoaderJUnitTestRunner;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -69,9 +69,12 @@ public class SPIRegistryImplTest {
 
 		spiRegistryUtil.setSPIRegistry(_spiRegistryImpl);
 
-		_excludedPortletIds = _getExcludedPortletIds(_spiRegistryImpl);
-		_portletIds = _getPortletIds(_spiRegistryImpl);
-		_portletSPIs = _getPortletSPIs(_spiRegistryImpl);
+		_excludedPortletIds = (Set<String>)ReflectionTestUtil.getFieldValue(
+			_spiRegistryImpl, "_excludedPortletIds");
+		_portletIds = (Map<SPI, String[]>)ReflectionTestUtil.getFieldValue(
+			_spiRegistryImpl, "_portletIds");
+		_portletSPIs = (Map<String, SPI>)ReflectionTestUtil.getFieldValue(
+			_spiRegistryImpl, "_portletSPIs");
 	}
 
 	@Test
@@ -113,9 +116,6 @@ public class SPIRegistryImplTest {
 	@AdviseWith(adviceClasses = {PortletLocalServiceUtilAdvice.class})
 	@Test
 	public void testRegistration() throws Exception {
-
-		// With log
-
 		PortletLocalServiceUtilAdvice._portletIds = Arrays.asList(
 			"portlet3", "portlet4");
 
@@ -140,72 +140,88 @@ public class SPIRegistryImplTest {
 
 		mockSPI.spiConfiguration = spiConfiguration;
 
-		List<LogRecord> logRecords = JDKLoggerTestUtil.configureJDKLogger(
-			SPIRegistryImpl.class.getName(), Level.WARNING);
+		CaptureHandler captureHandler = null;
 
-		_spiRegistryImpl.registerSPI(mockSPI);
+		try {
 
-		Assert.assertEquals(3, _portletSPIs.size());
-		Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet1"));
-		Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet3"));
-		Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet4"));
-		Assert.assertSame(
-			mockSPI, _spiRegistryImpl.getServletContextSPI("portletApp1"));
-		Assert.assertSame(
-			mockSPI, _spiRegistryImpl.getServletContextSPI("portletApp2"));
-		Assert.assertNull(_spiRegistryImpl.getServletContextSPI("portletApp3"));
+			// With log
 
-		_spiRegistryImpl.setSPIRegistryValidator(
-			new MockSPIRegistryValidator());
+			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+				SPIRegistryImpl.class.getName(), Level.WARNING);
 
-		Assert.assertSame(
-			_spiRegistryImpl.getErrorSPI(),
-			_spiRegistryImpl.getServletContextSPI("portletApp1"));
-		Assert.assertSame(
-			_spiRegistryImpl.getErrorSPI(),
-			_spiRegistryImpl.getServletContextSPI("portletApp2"));
-		Assert.assertNull(_spiRegistryImpl.getServletContextSPI("portletApp3"));
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
-		_spiRegistryImpl.setSPIRegistryValidator(null);
+			_spiRegistryImpl.registerSPI(mockSPI);
 
-		List<String> portletIds = Arrays.asList(_portletIds.remove(mockSPI));
+			Assert.assertEquals(3, _portletSPIs.size());
+			Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet1"));
+			Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet3"));
+			Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet4"));
+			Assert.assertSame(
+				mockSPI, _spiRegistryImpl.getServletContextSPI("portletApp1"));
+			Assert.assertSame(
+				mockSPI, _spiRegistryImpl.getServletContextSPI("portletApp2"));
+			Assert.assertNull(
+				_spiRegistryImpl.getServletContextSPI("portletApp3"));
 
-		Assert.assertTrue(portletIds.contains("portlet1"));
-		Assert.assertTrue(portletIds.contains("portlet3"));
-		Assert.assertTrue(portletIds.contains("portlet4"));
+			_spiRegistryImpl.setSPIRegistryValidator(
+				new MockSPIRegistryValidator());
 
-		Assert.assertEquals(2, logRecords.size());
+			Assert.assertSame(
+				_spiRegistryImpl.getErrorSPI(),
+				_spiRegistryImpl.getServletContextSPI("portletApp1"));
+			Assert.assertSame(
+				_spiRegistryImpl.getErrorSPI(),
+				_spiRegistryImpl.getServletContextSPI("portletApp2"));
+			Assert.assertNull(
+				_spiRegistryImpl.getServletContextSPI("portletApp3"));
 
-		LogRecord logRecord1 = logRecords.get(0);
+			_spiRegistryImpl.setSPIRegistryValidator(null);
 
-		Assert.assertEquals(
-			"Skip unknown portlet id portlet2", logRecord1.getMessage());
+			List<String> portletIds = Arrays.asList(
+				_portletIds.remove(mockSPI));
 
-		LogRecord logRecord2 = logRecords.get(1);
+			Assert.assertTrue(portletIds.contains("portlet1"));
+			Assert.assertTrue(portletIds.contains("portlet3"));
+			Assert.assertTrue(portletIds.contains("portlet4"));
 
-		Assert.assertEquals(
-			"Skip unknown servlet context name portletApp2",
-			logRecord2.getMessage());
+			Assert.assertEquals(2, logRecords.size());
 
-		// Without log
+			LogRecord logRecord1 = logRecords.get(0);
 
-		logRecords = JDKLoggerTestUtil.configureJDKLogger(
-			SPIRegistryImpl.class.getName(), Level.OFF);
+			Assert.assertEquals(
+				"Skip unknown portlet id portlet2", logRecord1.getMessage());
 
-		_spiRegistryImpl.registerSPI(mockSPI);
+			LogRecord logRecord2 = logRecords.get(1);
 
-		Assert.assertEquals(3, _portletSPIs.size());
-		Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet1"));
-		Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet3"));
-		Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet4"));
+			Assert.assertEquals(
+				"Skip unknown servlet context name portletApp2",
+				logRecord2.getMessage());
 
-		portletIds = Arrays.asList(_portletIds.remove(mockSPI));
+			// Without log
 
-		Assert.assertTrue(portletIds.contains("portlet1"));
-		Assert.assertTrue(portletIds.contains("portlet3"));
-		Assert.assertTrue(portletIds.contains("portlet4"));
+			logRecords = captureHandler.resetLogLevel(Level.OFF);
 
-		Assert.assertTrue(logRecords.isEmpty());
+			_spiRegistryImpl.registerSPI(mockSPI);
+
+			Assert.assertEquals(3, _portletSPIs.size());
+			Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet1"));
+			Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet3"));
+			Assert.assertEquals(mockSPI, _portletSPIs.remove("portlet4"));
+
+			portletIds = Arrays.asList(_portletIds.remove(mockSPI));
+
+			Assert.assertTrue(portletIds.contains("portlet1"));
+			Assert.assertTrue(portletIds.contains("portlet3"));
+			Assert.assertTrue(portletIds.contains("portlet4"));
+
+			Assert.assertTrue(logRecords.isEmpty());
+		}
+		finally {
+			if (captureHandler != null) {
+				captureHandler.close();
+			}
+		}
 
 		// Hash failure
 
@@ -333,36 +349,6 @@ public class SPIRegistryImplTest {
 				}
 
 			});
-	}
-
-	private static Set<String> _getExcludedPortletIds(
-			SPIRegistryImpl spiRegistryImpl)
-		throws Exception {
-
-		Field excludedPortletIdsField = ReflectionUtil.getDeclaredField(
-			SPIRegistryImpl.class, "_excludedPortletIds");
-
-		return (Set<String>)excludedPortletIdsField.get(spiRegistryImpl);
-	}
-
-	private static Map<SPI, String[]> _getPortletIds(
-			SPIRegistryImpl spiRegistryImpl)
-		throws Exception {
-
-		Field portletIdsField = ReflectionUtil.getDeclaredField(
-			SPIRegistryImpl.class, "_portletIds");
-
-		return (Map<SPI, String[]>)portletIdsField.get(spiRegistryImpl);
-	}
-
-	private static Map<String, SPI> _getPortletSPIs(
-			SPIRegistryImpl spiRegistryImpl)
-		throws Exception {
-
-		Field portletSPIsField = ReflectionUtil.getDeclaredField(
-			SPIRegistryImpl.class, "_portletSPIs");
-
-		return (Map<String, SPI>)portletSPIsField.get(spiRegistryImpl);
 	}
 
 	private Set<String> _excludedPortletIds;

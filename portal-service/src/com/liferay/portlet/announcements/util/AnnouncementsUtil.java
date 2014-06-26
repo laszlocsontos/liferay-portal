@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.announcements.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -46,7 +45,7 @@ import java.util.List;
 public class AnnouncementsUtil {
 
 	public static LinkedHashMap<Long, long[]> getAnnouncementScopes(long userId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		LinkedHashMap<Long, long[]> scopes = new LinkedHashMap<Long, long[]>();
 
@@ -152,7 +151,7 @@ public class AnnouncementsUtil {
 			roles.add(guestRole);
 		}
 
-		if (roles.size() > 0) {
+		if (!roles.isEmpty()) {
 			scopes.put(_ROLE_CLASS_NAME_ID, _getRoleIds(roles));
 		}
 

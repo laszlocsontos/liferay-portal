@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.dynamicdatalists.workflow;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -37,7 +36,7 @@ import java.util.Map;
 /**
  * @author Marcellus Tavares
  */
-public class DDLRecordWorkflowHandler extends BaseWorkflowHandler {
+public class DDLRecordWorkflowHandler extends BaseWorkflowHandler<DDLRecord> {
 
 	@Override
 	public String getClassName() {
@@ -52,7 +51,7 @@ public class DDLRecordWorkflowHandler extends BaseWorkflowHandler {
 	@Override
 	public WorkflowDefinitionLink getWorkflowDefinitionLink(
 			long companyId, long groupId, long classPK)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		DDLRecordVersion recordVersion =
 			DDLRecordLocalServiceUtil.getRecordVersion(classPK);
@@ -73,7 +72,7 @@ public class DDLRecordWorkflowHandler extends BaseWorkflowHandler {
 	@Override
 	public DDLRecord updateStatus(
 			int status, Map<String, Serializable> workflowContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long userId = GetterUtil.getLong(
 			(String)workflowContext.get(WorkflowConstants.CONTEXT_USER_ID));

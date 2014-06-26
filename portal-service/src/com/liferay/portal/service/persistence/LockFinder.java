@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,5 @@ import aQute.bnd.annotation.ProviderType;
 public interface LockFinder {
 	public com.liferay.portal.model.Lock fetchByC_K(
 		java.lang.String className, java.lang.String key,
-		com.liferay.portal.kernel.dao.orm.LockMode lockMode)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		com.liferay.portal.kernel.dao.orm.LockMode lockMode);
 }

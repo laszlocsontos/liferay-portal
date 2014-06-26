@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.events;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.events.ActionException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -60,10 +61,9 @@ public class AddDefaultLayoutPrototypesAction
 		throws Exception {
 
 		Layout layout = addLayoutPrototype(
-			companyId, defaultUserId, "Blog",
-			"Create, edit, and view blogs from this page. Explore topics " +
-				"using tags, and connect with other members that blog.",
-			"2_columns_iii", layoutPrototypes);
+			companyId, defaultUserId, "layout-prototype-blog-title",
+			"layout-prototype-blog-description", "2_columns_iii",
+			layoutPrototypes);
 
 		if (layout == null) {
 			return;
@@ -87,13 +87,19 @@ public class AddDefaultLayoutPrototypesAction
 	}
 
 	protected Layout addLayoutPrototype(
-			long companyId, long defaultUserId, String name, String description,
-			String layouteTemplateId, List<LayoutPrototype> layoutPrototypes)
+			long companyId, long defaultUserId, String nameKey,
+			String descriptionKey, String layouteTemplateId,
+			List<LayoutPrototype> layoutPrototypes)
 		throws Exception {
+
+		String name = LanguageUtil.get(LocaleUtil.getDefault(), nameKey);
+		String description = LanguageUtil.get(
+			LocaleUtil.getDefault(), descriptionKey);
 
 		for (LayoutPrototype layoutPrototype : layoutPrototypes) {
 			String curName = layoutPrototype.getName(LocaleUtil.getDefault());
-			String curDescription = layoutPrototype.getDescription();
+			String curDescription = layoutPrototype.getDescription(
+				LocaleUtil.getDefault());
 
 			if (name.equals(curName) && description.equals(curDescription)) {
 				return null;
@@ -101,12 +107,19 @@ public class AddDefaultLayoutPrototypesAction
 		}
 
 		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
 
-		nameMap.put(LocaleUtil.getDefault(), name);
+		Locale[] locales = LanguageUtil.getAvailableLocales();
+
+		for (Locale locale : locales) {
+			nameMap.put(locale, LanguageUtil.get(locale, nameKey));
+			descriptionMap.put(
+				locale, LanguageUtil.get(locale, descriptionKey));
+		}
 
 		LayoutPrototype layoutPrototype =
 			LayoutPrototypeLocalServiceUtil.addLayoutPrototype(
-				defaultUserId, companyId, nameMap, description, true,
+				defaultUserId, companyId, nameMap, descriptionMap, true,
 				new ServiceContext());
 
 		Layout layout = layoutPrototype.getLayout();
@@ -125,11 +138,9 @@ public class AddDefaultLayoutPrototypesAction
 		throws Exception {
 
 		Layout layout = addLayoutPrototype(
-			companyId, defaultUserId, "Content Display Page",
-			"Create, edit, and explore web content with this page. Search " +
-				"available content, explore related content with tags, and " +
-					"browse content categories.",
-			"2_columns_ii", layoutPrototypes);
+			companyId, defaultUserId, "layout-prototype-web-content-title",
+			"layout-prototype-web-content-description", "2_columns_ii",
+			layoutPrototypes);
 
 		if (layout == null) {
 			return;
@@ -160,11 +171,9 @@ public class AddDefaultLayoutPrototypesAction
 		throws Exception {
 
 		Layout layout = addLayoutPrototype(
-			companyId, defaultUserId, "Wiki",
-			"Collaborate with members through the wiki on this page. " +
-				"Discover related content through tags, and navigate quickly " +
-					"and easily with categories.",
-			"2_columns_iii", layoutPrototypes);
+			companyId, defaultUserId, "layout-prototype-wiki-title",
+			"layout-prototype-wiki-description", "2_columns_iii",
+			layoutPrototypes);
 
 		if (layout == null) {
 			return;

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,12 +50,12 @@
 			%>
 
 				<c:if test='<%= (invalidEmailAddresses != null) && invalidEmailAddresses.contains("emailAddress" + i) %>'>
-					<div class="alert alert-error">
+					<div class="alert alert-danger">
 						<liferay-ui:message key="please-enter-a-valid-email-address" />
 					</div>
 				</c:if>
 
-				<aui:input cssClass="lfr-input-text-container" label="" name='<%= "emailAddress" + i %>' size="65" title='<%= LanguageUtil.get(pageContext, "email-address") + StringPool.SPACE + (i + 1) %>' type="text" value="<%= emailAddress %>" />
+				<aui:input cssClass="lfr-input-text-container" label="" name='<%= "emailAddress" + i %>' size="65" title='<%= LanguageUtil.get(request, "email-address") + StringPool.SPACE + (i + 1) %>' type="text" value="<%= emailAddress %>" />
 
 			<%
 			}

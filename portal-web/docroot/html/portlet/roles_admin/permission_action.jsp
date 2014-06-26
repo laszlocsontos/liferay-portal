@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,7 +25,7 @@ Permission permission = (Permission)objArray[0];
 Role role = (Role)objArray[1];
 %>
 
-<liferay-ui:icon-menu>
+<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
 	<portlet:actionURL var="deletePermissionURL">
 		<portlet:param name="struts_action" value="/roles_admin/edit_role_permissions" />
 		<portlet:param name="<%= Constants.CMD %>" value="delete_permission" />

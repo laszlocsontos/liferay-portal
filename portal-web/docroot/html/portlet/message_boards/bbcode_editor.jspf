@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,7 @@
 <%
 Map<String,String> configParams = new HashMap();
 
-configParams.put("emoticonsPath", themeDisplay.getPathThemeImages() + "/emoticons");
+configParams.put("emoticonsPath", themeDisplay.getPathThemeImages() + MBUtil.EMOTICONS);
 
 if (quote && Validator.isNull(body) && (curParentMessage != null)) {
 	StringBundler sb = new StringBundler(5);
@@ -39,7 +39,7 @@ else if (splitThread && Validator.isNull(body)) {
 	sb.append(MBThreadConstants.NEW_THREAD_URL);
 	sb.append("[/url]");
 
-	body = LanguageUtil.format(pageContext, "the-new-thread-can-be-found-at-x", sb.toString(), false);
+	body = LanguageUtil.format(request, "the-new-thread-can-be-found-at-x", sb.toString(), false);
 }
 %>
 
@@ -51,6 +51,6 @@ else if (splitThread && Validator.isNull(body)) {
 	}
 
 	function <portlet:namespace />initEditor() {
-		return "<%= UnicodeFormatter.toString(body) %>";
+		return '<%= UnicodeFormatter.toString(body) %>';
 	}
 </aui:script>

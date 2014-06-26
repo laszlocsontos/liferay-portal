@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -82,7 +82,7 @@ String privateVirtualHost = ParamUtil.getString(request, "privateVirtualHost", B
 	</c:if>
 
 	<c:if test="<%= gfurle.getType() == GroupFriendlyURLException.KEYWORD_CONFLICT %>">
-		<%= LanguageUtil.format(pageContext, "please-enter-a-friendly-url-that-does-not-conflict-with-the-keyword-x", gfurle.getKeywordConflict(), false) %>
+		<%= LanguageUtil.format(request, "please-enter-a-friendly-url-that-does-not-conflict-with-the-keyword-x", gfurle.getKeywordConflict(), false) %>
 	</c:if>
 
 	<c:if test="<%= gfurle.getType() == GroupFriendlyURLException.POSSIBLE_DUPLICATE %>">
@@ -113,7 +113,7 @@ String privateVirtualHost = ParamUtil.getString(request, "privateVirtualHost", B
 	String taglibLabel = "site-friendly-url";
 
 	if (!liveGroup.hasStagingGroup()) {
-		taglibLabel = "<span class=\"hide-accessible\">" + LanguageUtil.get(pageContext, taglibLabel) + "</span>";
+		taglibLabel = "<span class=\"hide-accessible\">" + LanguageUtil.get(request, taglibLabel) + "</span>";
 	}
 	%>
 
@@ -181,7 +181,7 @@ String privateVirtualHost = ParamUtil.getString(request, "privateVirtualHost", B
 		boolean directoryIndexingEnabled = PropertiesParamUtil.getBoolean(typeSettingsProperties, request, "directoryIndexingEnabled");
 		%>
 
-		<aui:input helpMessage='<%= LanguageUtil.format(pageContext, "directory-indexing-help", new Object[] {HtmlUtil.escape(group.getDescriptiveName(themeDisplay.getLocale())), themeDisplay.getPortalURL() + "/documents" + group.getFriendlyURL()}, false) %>' label="directory-indexing-enabled" name="TypeSettingsProperties--directoryIndexingEnabled--" type="checkbox" value="<%= directoryIndexingEnabled %>" />
+		<aui:input helpMessage='<%= LanguageUtil.format(request, "directory-indexing-help", new Object[] {HtmlUtil.escape(group.getDescriptiveName(themeDisplay.getLocale())), themeDisplay.getPortalURL() + "/documents" + group.getFriendlyURL()}, false) %>' label="directory-indexing-enabled" name="TypeSettingsProperties--directoryIndexingEnabled--" type="checkbox" value="<%= directoryIndexingEnabled %>" />
 	</c:if>
 </aui:fieldset>
 

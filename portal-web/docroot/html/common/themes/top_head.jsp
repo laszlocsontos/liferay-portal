@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,7 +44,7 @@ if (!themeDisplay.isSignedIn() && layout.isPublicLayout()) {
 	%>
 
 			<c:if test="<%= availableLocale.equals(LocaleUtil.getDefault()) %>">
-				<link href="<%= canonicalURL %>" hreflang="x-default" rel="alternate" />
+				<link href="<%= HtmlUtil.escapeAttribute(canonicalURL) %>" hreflang="x-default" rel="alternate" />
 			</c:if>
 
 			<link href="<%= HtmlUtil.escapeAttribute(PortalUtil.getAlternateURL(canonicalURL, themeDisplay, availableLocale, layout)) %>" hreflang="<%= LocaleUtil.toW3cLanguageId(availableLocale) %>" rel="alternate" />
@@ -90,7 +90,7 @@ if (layout != null) {
 			}
 		}
 	}
-	else if (layout.isTypePortlet()) {
+	else if (layout.isTypeEmbedded() || layout.isTypePortlet()) {
 		portlets = layoutTypePortlet.getAllPortlets();
 
 		if (themeDisplay.isStateMaximized() || themeDisplay.isStatePopUp()) {

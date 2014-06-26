@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,7 @@
 page import="com.liferay.portal.kernel.trash.TrashHandler" %><%@
 page import="com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.trash.TrashRenderer" %><%@
-page import="com.liferay.portlet.trash.DuplicateEntryException" %><%@
+page import="com.liferay.portlet.trash.RestoreEntryException" %><%@
 page import="com.liferay.portlet.trash.model.TrashEntryList" %><%@
 page import="com.liferay.portlet.trash.model.impl.TrashEntryImpl" %><%@
 page import="com.liferay.portlet.trash.search.EntrySearch" %><%@

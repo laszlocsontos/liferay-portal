@@ -21,7 +21,7 @@
 </tr>
 <tr>
 	<td>NAME_FIELD_REQUIRED</td>
-	<td>//div[@class='control-group error']</td>
+	<td>//div[contains(@class,'error')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -51,7 +51,7 @@
 </tr>
 <tr>
 	<td>CANCEL_BUTTON</td>
-	<td>//button[contains(.,'Cancel')]</td>
+	<td>//a[contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.flags.messaging;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -116,7 +115,7 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 			reportedUserName = reportedUser.getFullName();
 			reportedEmailAddress = reportedUser.getEmailAddress();
 			reportedURL = reportedUser.getDisplayURL(
-				serviceContext.getPortalURL(), serviceContext.getPathMain());
+				serviceContext.getThemeDisplay());
 		}
 
 		// Content
@@ -166,7 +165,7 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 	}
 
 	protected List<User> getRecipients(long companyId, long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<User> recipients = new UniqueList<User>();
 

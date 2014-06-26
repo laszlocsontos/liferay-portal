@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,8 @@
 String action = (String)request.getAttribute("render_controls.jsp-action");
 PortletDataHandlerControl[] controls = (PortletDataHandlerControl[])request.getAttribute("render_controls.jsp-controls");
 ManifestSummary manifestSummary = (ManifestSummary)request.getAttribute("render_controls.jsp-manifestSummary");
-String portletId =(String)request.getAttribute("render_controls.jsp-portletId");
+Map<String, String[]> parameterMap = (Map<String, String[]>)GetterUtil.getObject(request.getAttribute("render_controls.jsp-parameterMap"), Collections.emptyMap());
+String portletId = (String)request.getAttribute("render_controls.jsp-portletId");
 
 control:
 for (int i = 0; i < controls.length; i++) {
@@ -35,7 +36,7 @@ for (int i = 0; i < controls.length; i++) {
 
 				PortletDataHandlerBoolean control = (PortletDataHandlerBoolean)controls[i];
 
-				String controlLabel = LanguageUtil.get(pageContext, control.getControlLabel());
+				String controlLabel = LanguageUtil.get(request, control.getControlLabel());
 
 				String className = controls[i].getClassName();
 
@@ -54,13 +55,13 @@ for (int i = 0; i < controls.length; i++) {
 
 				PortletDataHandlerControl[] children = control.getChildren();
 
-				String controlName = Validator.isNotNull(control.getNamespace()) ? control.getNamespacedControlName() : control.getControlName() + StringPool.UNDERLINE + portletId;
+				String controlName = Validator.isNotNull(control.getNamespace()) ? control.getNamespacedControlName() : (control.getControlName() + StringPool.UNDERLINE + portletId);
 				%>
 
-				<aui:input data="<%= data %>" disabled="<%= controls[i].isDisabled() %>" helpMessage="<%= control.getHelpMessage(locale, action) %>" label="<%= controlLabel %>" name="<%= controlName %>" type="checkbox" value="<%= control.getDefaultState() %>" />
+				<aui:input data="<%= data %>" disabled="<%= controls[i].isDisabled() %>" helpMessage="<%= control.getHelpMessage(locale, action) %>" label="<%= controlLabel %>" name="<%= controlName %>" type="checkbox" value="<%= MapUtil.getBoolean(parameterMap, controlName, control.getDefaultState()) %>" />
 
 				<c:if test="<%= children != null %>">
-					<ul class="unstyled" id="<portlet:namespace /><%= controlName %>Controls">
+					<ul class="list-unstyled" id="<portlet:namespace /><%= controlName %>Controls">
 
 						<%
 						request.setAttribute("render_controls.jsp-controls", children);
@@ -70,12 +71,12 @@ for (int i = 0; i < controls.length; i++) {
 					</ul>
 
 					<aui:script>
-						Liferay.Util.toggleBoxes('<portlet:namespace /><%= controlName %>Checkbox', '<portlet:namespace /><%= controlName %>Controls', false, true);
+						Liferay.Util.toggleBoxes('<portlet:namespace /><%= controlName %>', '<portlet:namespace /><%= controlName %>Controls', false, true);
 					</aui:script>
 				</c:if>
 			</c:when>
 			<c:when test="<%= controls[i] instanceof PortletDataHandlerChoice %>">
-				<aui:field-wrapper label='<%= "&#9632" + LanguageUtil.get(pageContext, controls[i].getControlLabel()) %>'>
+				<aui:field-wrapper label='<%= "&#9632" + LanguageUtil.get(request, controls[i].getControlLabel()) %>'>
 
 					<%
 					PortletDataHandlerChoice control = (PortletDataHandlerChoice)controls[i];
@@ -87,12 +88,12 @@ for (int i = 0; i < controls.length; i++) {
 
 						Map<String, Object> data = new HashMap<String, Object>();
 
-						String controlName = LanguageUtil.get(pageContext, choice);
+						String controlName = LanguageUtil.get(request, choice);
 
 						data.put("name", controlName);
 					%>
 
-						<aui:input checked="<%= control.getDefaultChoiceIndex() == j %>" data="<%= data %>" helpMessage="<%= control.getHelpMessage(locale, action) %>" label="<%= choice %>" name="<%= control.getNamespacedControlName() %>" type="radio" value="<%= choices[j] %>" />
+						<aui:input checked="<%= MapUtil.getBoolean(parameterMap, control.getNamespacedControlName(), control.getDefaultChoiceIndex() == j) %>" data="<%= data %>" helpMessage="<%= control.getHelpMessage(locale, action) %>" label="<%= choice %>" name="<%= control.getNamespacedControlName() %>" type="radio" value="<%= choices[j] %>" />
 
 					<%
 					}

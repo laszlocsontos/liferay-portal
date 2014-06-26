@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,8 @@ String closeRedirect = ParamUtil.getString(request, "closeRedirect");
 
 long groupId = ParamUtil.getLong(request, "groupId");
 long liveGroupId = ParamUtil.getLong(request, "liveGroupId");
+long layoutSetBranchId = ParamUtil.getLong(request, "layoutSetBranchId");
+String layoutSetBranchName = ParamUtil.getString(request, "layoutSetBranchName");
 boolean localPublishing = ParamUtil.getBoolean(request, "localPublishing");
 
 PortletURL renderURL = liferayPortletResponse.createRenderURL();
@@ -29,6 +31,8 @@ renderURL.setParameter("struts_action", "/layouts_admin/publish_layouts");
 renderURL.setParameter("tabs2", "current-and-previous");
 renderURL.setParameter("closeRedirect", closeRedirect);
 renderURL.setParameter("groupId", String.valueOf(groupId));
+renderURL.setParameter("layoutSetBranchId", String.valueOf(layoutSetBranchId));
+renderURL.setParameter("layoutSetBranchName", layoutSetBranchName);
 renderURL.setParameter("localPublishing", String.valueOf(localPublishing));
 
 String orderByCol = ParamUtil.getString(request, "orderByCol");
@@ -81,9 +85,16 @@ String taskExecutorClassName = localPublishing ? LayoutStagingBackgroundTaskExec
 		modelVar="backgroundTask"
 	>
 		<liferay-ui:search-container-column-text
-			name="user-name"
-			value="<%= HtmlUtil.escape(backgroundTask.getUserName()) %>"
-		/>
+			cssClass="background-task-user-column"
+			name="user"
+		>
+			<liferay-ui:user-display
+				displayStyle="3"
+				showUserDetails="<%= false %>"
+				showUserName="<%= false %>"
+				userId="<%= backgroundTask.getUserId() %>"
+			/>
+		</liferay-ui:search-container-column-text>
 
 		<liferay-ui:search-container-column-jsp
 			cssClass="background-task-status-column"
@@ -126,21 +137,34 @@ String taskExecutorClassName = localPublishing ? LayoutStagingBackgroundTaskExec
 
 		<liferay-ui:search-container-column-text>
 			<c:if test="<%= !backgroundTask.isInProgress() %>">
-				<portlet:actionURL var="deleteBackgroundTaskURL">
-					<portlet:param name="struts_action" value="/group_pages/delete_background_task" />
-					<portlet:param name="redirect" value="<%= renderURL.toString() %>" />
-					<portlet:param name="backgroundTaskId" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
-				</portlet:actionURL>
+				<liferay-ui:icon-menu icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>">
+					<c:if test="<%= backgroundTask.getGroupId() != liveGroupId %>">
+						<portlet:actionURL var="relaunchURL">
+							<portlet:param name="struts_action" value="/layouts_admin/edit_publish_configuration" />
+							<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RELAUNCH %>" />
+							<portlet:param name="redirect" value="<%= renderURL.toString() %>" />
+							<portlet:param name="backgroundTaskId" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
+						</portlet:actionURL>
 
-				<%
-				Date completionDate = backgroundTask.getCompletionDate();
-				%>
+						<liferay-ui:icon iconCssClass="icon-repeat" message="relaunch" url="<%= relaunchURL %>" />
+					</c:if>
 
-				<liferay-ui:icon-delete
-					label="true"
-					message='<%= ((completionDate != null) && completionDate.before(new Date())) ? "clear" : "cancel" %>'
-					url="<%= deleteBackgroundTaskURL %>"
-				/>
+					<portlet:actionURL var="deleteBackgroundTaskURL">
+						<portlet:param name="struts_action" value="/group_pages/delete_background_task" />
+						<portlet:param name="redirect" value="<%= renderURL.toString() %>" />
+						<portlet:param name="backgroundTaskId" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
+					</portlet:actionURL>
+
+					<%
+					Date completionDate = backgroundTask.getCompletionDate();
+					%>
+
+					<liferay-ui:icon-delete
+						label="true"
+						message='<%= ((completionDate != null) && completionDate.before(new Date())) ? "clear" : "cancel" %>'
+						url="<%= deleteBackgroundTaskURL %>"
+					/>
+				</liferay-ui:icon-menu>
 			</c:if>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>

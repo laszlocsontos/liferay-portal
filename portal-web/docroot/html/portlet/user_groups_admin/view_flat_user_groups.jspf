@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -26,12 +26,12 @@ UserGroupSearch userGroupSearch = new UserGroupSearch(renderRequest, portletURL)
 	<aui:input name="deleteUserGroupIds" type="hidden" />
 
 	<aui:nav-bar>
-		<aui:nav>
-			<portlet:renderURL var="viewUserGroupsURL">
-				<portlet:param name="struts_action" value="/user_groups_admin/view" />
-			</portlet:renderURL>
-
+		<aui:nav cssClass="navbar-nav" searchContainer="<%= userGroupSearch %>">
 			<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, ActionKeys.ADD_USER_GROUP) %>">
+				<portlet:renderURL var="viewUserGroupsURL">
+					<portlet:param name="struts_action" value="/user_groups_admin/view" />
+				</portlet:renderURL>
+
 				<portlet:renderURL var="addUsergroupURL">
 					<portlet:param name="struts_action" value="/user_groups_admin/edit_user_group" />
 					<portlet:param name="redirect" value="<%= viewUserGroupsURL %>" />
@@ -41,7 +41,7 @@ UserGroupSearch userGroupSearch = new UserGroupSearch(renderRequest, portletURL)
 			</c:if>
 		</aui:nav>
 
-		<aui:nav-bar-search cssClass="pull-right" file="/html/portlet/user_groups_admin/user_group_search.jsp" searchContainer="<%= userGroupSearch %>" />
+		<aui:nav-bar-search cssClass="navbar-search-advanced" file="/html/portlet/user_groups_admin/user_group_search.jsp" searchContainer="<%= userGroupSearch %>" />
 	</aui:nav-bar>
 
 	<%
@@ -99,6 +99,7 @@ UserGroupSearch userGroupSearch = new UserGroupSearch(renderRequest, portletURL)
 
 		<liferay-ui:search-container-column-jsp
 			align="right"
+			cssClass="entry-action"
 			path="/html/portlet/user_groups_admin/user_group_action.jsp"
 		/>
 	</liferay-ui:search-container-row>

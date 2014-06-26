@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -82,9 +81,7 @@ public class RawMetadataProcessorImpl
 	}
 
 	@Override
-	public void generateMetadata(FileVersion fileVersion)
-		throws SystemException {
-
+	public void generateMetadata(FileVersion fileVersion) {
 		long fileEntryMetadataCount =
 			DLFileEntryMetadataLocalServiceUtil.
 				getFileVersionFileEntryMetadatasCount(
@@ -115,9 +112,7 @@ public class RawMetadataProcessorImpl
 	}
 
 	@Override
-	public void saveMetadata(FileVersion fileVersion)
-		throws PortalException, SystemException {
-
+	public void saveMetadata(FileVersion fileVersion) throws PortalException {
 		Map<String, Fields> rawMetadataMap = null;
 
 		if (fileVersion instanceof LiferayFileVersion) {

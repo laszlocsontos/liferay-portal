@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,6 @@
 package com.liferay.portlet.social.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.security.permission.PermissionChecker;
 
@@ -27,7 +26,7 @@ public class SocialRequestPermissionUtil {
 	public static void check(
 			PermissionChecker permissionChecker, long requestId,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		getSocialRequestPermission().check(
 			permissionChecker, requestId, actionId);
@@ -36,7 +35,7 @@ public class SocialRequestPermissionUtil {
 	public static boolean contains(
 			PermissionChecker permissionChecker, long requestId,
 			String actionId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getSocialRequestPermission().contains(
 			permissionChecker, requestId, actionId);

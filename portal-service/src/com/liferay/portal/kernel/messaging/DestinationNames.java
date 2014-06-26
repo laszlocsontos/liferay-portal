@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -118,6 +118,8 @@ public interface DestinationNames {
 		"liferay/poller_comet_response";
 
 	public static final String POLLER_RESPONSE = "liferay/poller_response";
+
+	public static final String PUSH_NOTIFICATION = "liferay/push_notification";
 
 	public static final String REPORT_COMPILER = "liferay/report_compiler";
 

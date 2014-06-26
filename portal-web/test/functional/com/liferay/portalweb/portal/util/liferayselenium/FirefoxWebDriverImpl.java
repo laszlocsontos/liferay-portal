@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,8 +28,8 @@ import org.openqa.selenium.firefox.FirefoxProfile;
  */
 public class FirefoxWebDriverImpl extends BaseWebDriverImpl {
 
-	public FirefoxWebDriverImpl(String projectDir, String browserURL) {
-		super(projectDir, browserURL, new FirefoxDriver(_firefoxProfile));
+	public FirefoxWebDriverImpl(String projectDirName, String browserURL) {
+		super(projectDirName, browserURL, new FirefoxDriver(_firefoxProfile));
 	}
 
 	private static FirefoxProfile _firefoxProfile = new FirefoxProfile();
@@ -51,14 +51,14 @@ public class FirefoxWebDriverImpl extends BaseWebDriverImpl {
 
 			_firefoxProfile.addExtension(
 				new File(
-					TestPropsValues.SELENIUM_EXECUTABLE_DIR +
+					TestPropsValues.SELENIUM_EXECUTABLE_DIR_NAME +
 						"addons/jserrorcollector.xpi"));
 		}
 		catch (Exception e) {
 		}
 
 		_firefoxProfile.setPreference(
-			"browser.download.dir", TestPropsValues.OUTPUT_DIR);
+			"browser.download.dir", TestPropsValues.OUTPUT_DIR_NAME);
 		_firefoxProfile.setPreference("browser.download.folderList", 2);
 		_firefoxProfile.setPreference(
 			"browser.download.manager.showWhenStarting", false);
@@ -71,6 +71,12 @@ public class FirefoxWebDriverImpl extends BaseWebDriverImpl {
 				"application/zip,audio/mpeg3,image/jpeg,image/png,text/plain");
 		_firefoxProfile.setPreference("dom.max_chrome_script_run_time", 300);
 		_firefoxProfile.setPreference("dom.max_script_run_time", 300);
+
+		if (TestPropsValues.MOBILE_DEVICE_ENABLED) {
+			_firefoxProfile.setPreference(
+				"general.useragent.override",
+				TestPropsValues.MOBILE_DEVICE_USER_AGENT);
+		}
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,6 @@ package com.liferay.portal.security.pwd;
 
 import com.liferay.portal.UserPasswordException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.RandomUtil;
 import com.liferay.portal.kernel.security.SecureRandom;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -84,7 +83,7 @@ public class PasswordPolicyToolkit extends BasicToolkit {
 	public void validate(
 			long userId, String password1, String password2,
 			PasswordPolicy passwordPolicy)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (passwordPolicy.isCheckSyntax()) {
 			if (!passwordPolicy.isAllowDictionaryWords() &&

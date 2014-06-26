@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,9 @@ PortletURL portletURL = renderResponse.createRenderURL();
 portletURL.setParameter("struts_action", "/document_library/view_file_entry_type");
 %>
 
-<liferay-util:include page="/html/portlet/document_library/file_entry_type_toolbar.jsp" />
+<liferay-util:include page="/html/portlet/document_library/file_entry_type_toolbar.jsp">
+	<liferay-util:param name="includeBasicFileEntryType" value="<%= Boolean.FALSE.toString() %>" />
+</liferay-util:include>
 
 <liferay-ui:error exception="<%= RequiredStructureException.class %>" message="cannot-delete-a-document-type-that-is-presently-used-by-one-or-more-documents" />
 
@@ -52,7 +54,7 @@ portletURL.setParameter("struts_action", "/document_library/view_file_entry_type
 
 		<liferay-ui:search-container-column-text
 			name="scope"
-			value="<%= LanguageUtil.get(pageContext, group.getScopeLabel(themeDisplay)) %>"
+			value="<%= LanguageUtil.get(request, group.getScopeLabel(themeDisplay)) %>"
 		/>
 
 		<liferay-ui:search-container-column-date
@@ -62,6 +64,7 @@ portletURL.setParameter("struts_action", "/document_library/view_file_entry_type
 
 		<liferay-ui:search-container-column-jsp
 			align="right"
+			cssClass="entry-action"
 			path="/html/portlet/document_library/file_entry_type_action.jsp"
 		/>
 	</liferay-ui:search-container-row>

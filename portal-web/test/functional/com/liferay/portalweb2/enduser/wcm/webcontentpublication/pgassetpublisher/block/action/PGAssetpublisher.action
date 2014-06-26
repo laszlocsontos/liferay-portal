@@ -1,11 +1,25 @@
 <definition>
 	<command name="assertClick">
-		<case locator-key1="ADD_NEW_MENULIST_WEB_CONTENT">
+		<case locator-key1="ADD_NEW_MENULIST_BASIC_WEB_CONTENT">
 			<execute function="AssertClick#assertTextClickAtAndWait" />
 		</case>
 
 		<case locator-key1="ASSET_ABSTRACT_READ_MORE">
 			<execute function="AssertClick#assertPartialTextClickAtAndWait" />
+		</case>
+
+		<case locator-key1="ASSET_ABSTRACT_VIEW">
+			<execute function="AssertClick#assertPartialTextClickAtAndWait" />
+		</case>
+
+		<case locator-key1="DISPLAY_ICON_EDIT">
+			<execute function="AssertClick#assertPartialTextClickAtAndWait" />
+		</case>
+	</command>
+
+	<command name="assertElementPresent">
+		<case locator-key1="ASSET_ABSTRACT_BOOKMARK_LIFERAY_LOGO">
+			<execute function="AssertElementPresent#assertElementPresent" />
 		</case>
 	</command>
 
@@ -14,7 +28,15 @@
 			<execute function="AssertTextEquals#assertPartialText" />
 		</case>
 
+		<case locator-key1="ASSET_ABSTRACT_DETAIL_CONTENT">
+			<execute function="AssertTextEquals#assertPartialText" />
+		</case>
+
 		<case locator-key1="METADATA_CATEGORY">
+			<execute function="AssertTextEquals#assertPartialText" />
+		</case>
+
+		<case locator-key1="METADATA_AUTHOR">
 			<execute function="AssertTextEquals#assertPartialText" />
 		</case>
 
@@ -24,10 +46,6 @@
 	</command>
 
 	<command name="assertTextNotEquals">
-		<case locator-key1="ASSET_ABSTRACT_SUMMARY">
-			<execute function="AssertTextNotEquals#assertNotPartialText" />
-		</case>
-
 		<case locator-key1="ASSET_ABSTRACT_TITLE">
 			<execute function="AssertTextNotEquals#assertNotPartialText" />
 		</case>

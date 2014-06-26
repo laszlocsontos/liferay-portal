@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -47,7 +47,7 @@ double trashEntriesMaxAge = PropertiesParamUtil.getInteger(groupTypeSettings, re
 </aui:fieldset>
 
 <aui:script use="aui-base">
-	var trashEnabledCheckbox = A.one('#<portlet:namespace />trashEnabledCheckbox');
+	var trashEnabledCheckbox = A.one('#<portlet:namespace />trashEnabled');
 
 	var trashEnabledDefault = trashEnabledCheckbox.attr('checked');
 
@@ -59,7 +59,7 @@ double trashEntriesMaxAge = PropertiesParamUtil.getInteger(groupTypeSettings, re
 			var trashEnabled = currentTarget.attr('checked');
 
 			if (!trashEnabled && trashEnabledDefault) {
-				if (!confirm('<%= HtmlUtil.escapeJS(LanguageUtil.get(pageContext, "disabling-the-recycle-bin-will-prevent-the-restoring-of-content-that-has-been-moved-to-the-recycle-bin")) %>')) {
+				if (!confirm('<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "disabling-the-recycle-bin-will-prevent-the-restoring-of-content-that-has-been-moved-to-the-recycle-bin")) %>')) {
 					currentTarget.attr('checked', true);
 
 					trashEnabled = true;
@@ -70,8 +70,6 @@ double trashEntriesMaxAge = PropertiesParamUtil.getInteger(groupTypeSettings, re
 
 			if (trashEntriesMaxAge) {
 				trashEntriesMaxAge.attr('disabled', !trashEnabled);
-
-				trashEntriesMaxAge.ancestor('.field').toggleClass('field-disabled', !trashEnabled);
 			}
 		}
 	);

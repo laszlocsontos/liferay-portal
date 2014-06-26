@@ -36,12 +36,12 @@
 </tr>
 <tr>
 	<td>ADD</td>
-	<td>//div[@class='navbar-inner']//span[@class='nav-item-label' and contains(.,'Add')]</td>
+	<td>//div[@class='navbar-inner' or contains(@class,'navbar-default')]//span[@class='nav-item-label' and contains(.,'Add')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ADVANCED_SEARCH_ICON</td>
-	<td>//span[contains(@class,'toggle-advanced')]</td>
+	<td>//div[@class='taglib-search-toggle']/div/a[contains(@id,'ddm_structure')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -60,9 +60,24 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ERROR_MESSAGE_1</td>
+	<td>xpath=(//div[contains(@class,'alert') and (contains(@class,'alert-error') or contains(@class,'alert-danger'))])[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_MESSAGE_2</td>
+	<td>xpath=(//div[contains(@class,'alert') and (contains(@class,'alert-error') or contains(@class,'alert-danger'))])[2]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>INFO_MESSAGE</td>
 	<td>//div[contains(@class,'alert') and contains(@class,'alert-info')]</td>
 	<td>Info Message</td>
+</tr>
+<tr>
+	<td>CONFIRMATION</td>
+	<td></td>
+	<td></td>
 </tr>
 <!---->
 <!--ADVANCED_SEARCH-->
@@ -120,12 +135,12 @@
 </tr>
 <tr>
 	<td>STRUCTURE_TABLE_ACTIONS</td>
-	<td>//tr[contains(.,'${key_structureName}')]//a[@id='_166_ddmStructuresSearchContainer_1_menu']</td>
+	<td>//tr[contains(.,'${key_structureName}')]/td[6]/div/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>STRUCTURE_TABLE_ACTIONS_GENERIC</td>
-	<td>//a[@id='_166_ddmStructuresSearchContainer_1_menu']</td>
+	<td>//tr/td[6]/div/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -151,7 +166,7 @@
 </tr>
 <tr>
 	<td>STRUCTURE_MENULIST_PERMISSIONS</td>
-	<td>//a[@id='_166_ddmStructuresSearchContainer_1_menu_permissions']</td>
+	<td>//a[contains(@id,'_166_ddmStructuresSearchContainer') and contains(@id,'menu_permissions')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -161,7 +176,7 @@
 </tr>
 <tr>
 	<td>STRUCTURE_MENULIST_DELETE</td>
-	<td>//a[@id='_166_ddmStructuresSearchContainer_1_menu_delete']</td>
+	<td>//a[contains(@id,'_166_ddmStructuresSearchContainer') and contains(.,'Delete')]/span</td>
 	<td></td>
 </tr>
 </tbody>

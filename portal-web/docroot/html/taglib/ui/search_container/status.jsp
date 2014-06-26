@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,7 @@ User statusByUser = UserLocalServiceUtil.fetchUser(statusByUserId);
 					<aui:a href="<%= statusByUser.getDisplayURL(themeDisplay) %>"><%= StringUtil.shorten(statusByUser.getFullName(), 20) %></aui:a>
 				</div>
 				<div class="user-status-date">
-					<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(pageContext, System.currentTimeMillis() - statusDate.getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
+					<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - statusDate.getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
 				</div>
 			</span>
 		</div>

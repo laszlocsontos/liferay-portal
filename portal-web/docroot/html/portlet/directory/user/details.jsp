@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,7 +35,7 @@ for (int i = 1; i<organizations.size(); i++) {
 <h2><%= selUser.getFullName() %></h2>
 
 <div class="details">
-	<img alt="<liferay-ui:message key="avatar" />" class="avatar" id="<portlet:namespace />avatar" src="<%= selUser.getPortraitURL(themeDisplay) %>" />
+	<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="avatar" />" class="avatar" id="<portlet:namespace />avatar" src="<%= selUser.getPortraitURL(themeDisplay) %>" />
 
 	<dl class="property-list">
 		<c:if test="<%= Validator.isNotNull(selUser.getDisplayEmailAddress()) %>">
@@ -70,7 +70,7 @@ for (int i = 1; i<organizations.size(); i++) {
 				<liferay-ui:message key="gender" />
 			</dt>
 			<dd>
-				<%= LanguageUtil.get(pageContext, selUser.isMale() ? "male" : "female") %>
+				<%= LanguageUtil.get(request, selUser.isMale() ? "male" : "female") %>
 			</dd>
 		</c:if>
 

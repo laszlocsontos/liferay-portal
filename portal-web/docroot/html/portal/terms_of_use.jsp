@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -207,7 +207,7 @@ if (referer.equals(themeDisplay.getPathMain() + "/portal/update_terms_of_use")) 
 			<aui:button type="submit" value="i-agree" />
 
 			<%
-			String taglibOnClick = "alert('" + UnicodeLanguageUtil.get(pageContext, "you-must-agree-with-the-terms-of-use-to-continue") + "');";
+			String taglibOnClick = "alert('" + UnicodeLanguageUtil.get(request, "you-must-agree-with-the-terms-of-use-to-continue") + "');";
 			%>
 
 			<aui:button onClick="<%= taglibOnClick %>" type="cancel" value="i-disagree" />

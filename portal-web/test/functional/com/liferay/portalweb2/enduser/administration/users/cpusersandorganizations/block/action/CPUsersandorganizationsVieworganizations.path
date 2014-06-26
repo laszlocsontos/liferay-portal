@@ -51,7 +51,7 @@
 </tr>
 <tr>
 	<td>BASIC_SEARCH_ADVANCED</td>
-	<td>//button[@id='toggle_id_users_admin_organization_searchtoggleAdvanced'] | //span[@id='toggle_id_users_admin_organization_searchtoggleAdvanced']</td>
+	<td>//a[@id='toggle_id_users_admin_organization_searchtoggleAdvanced']</td>
 	<td></td>
 </tr>
 <tr>
@@ -148,7 +148,7 @@
 </tr>
 <tr>
 	<td>ORGANIZATION_TABLE_ACTIONS</td>
-	<td>//tr[contains(.,'${key_orgName}')]/td[8]/div/a[@title='Actions']</td>
+	<td>//tr[contains(.,'${key_orgName}')]/td[8]/div/a</td>
 	<td></td>
 </tr>
 </tbody>

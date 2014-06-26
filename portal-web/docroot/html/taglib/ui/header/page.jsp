@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,14 +18,14 @@
 
 <%
 if (Validator.isNull(backLabel)) {
-	backLabel = LanguageUtil.get(pageContext, "back");
+	backLabel = LanguageUtil.get(request, "back");
 }
 
 if (Validator.isNotNull(backURL) && !backURL.equals("javascript:history.go(-1);")) {
 	backURL = HtmlUtil.escapeHREF(PortalUtil.escapeRedirect(backURL));
 }
 
-String headerTitle = (localizeTitle) ? LanguageUtil.get(pageContext, title) : title;
+String headerTitle = (localizeTitle) ? LanguageUtil.get(request, title) : title;
 %>
 
 <div class="taglib-header <%= cssClass %>">

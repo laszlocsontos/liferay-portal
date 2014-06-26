@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ DDLRecordVersion latestRecordVersion = record.getLatestRecordVersion();
 
 <liferay-ui:header
 	backURL="<%= redirect %>"
-	title='<%= LanguageUtil.format(pageContext, "view-x", ddmStructure.getName(locale), false) %>'
+	title='<%= LanguageUtil.format(request, "view-x", ddmStructure.getName(locale), false) %>'
 />
 
 <c:if test="<%= recordVersion != null %>">
@@ -99,5 +99,5 @@ portletURL.setParameter("struts_action", "/dynamic_data_lists/view_record_set");
 portletURL.setParameter("recordSetId", String.valueOf(recordSetId));
 
 PortalUtil.addPortletBreadcrumbEntry(request, recordSet.getName(locale), portletURL.toString());
-PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.format(pageContext, "view-x", ddmStructure.getName(locale), false), currentURL);
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.format(request, "view-x", ddmStructure.getName(locale), false), currentURL);
 %>

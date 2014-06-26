@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,6 @@ String message = (String)request.getAttribute("liferay-ui:error:message");
 
 <c:if test="<%= (key != null) && Validator.isNull(message) %>">
 	<c:if test="<%= SessionErrors.contains(portletRequest, key) %>">
-		<div class="alert alert-error">
+		<div class="alert alert-danger">
 	</c:if>
 </c:if>

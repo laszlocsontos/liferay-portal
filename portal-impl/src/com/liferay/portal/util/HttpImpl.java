@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -234,7 +234,13 @@ public class HttpImpl implements Http {
 		sb.append(encodeURL(value));
 		sb.append(anchor);
 
-		return sb.toString();
+		String result = sb.toString();
+
+		if (result.length() > URL_MAXIMUM_LENGTH) {
+			result = shortenURL(result, 2);
+		}
+
+		return result;
 	}
 
 	@Override
@@ -255,13 +261,17 @@ public class HttpImpl implements Http {
 		return decodeURL(url, false);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #decodeURL(String)}
+	 */
+	@Deprecated
 	@Override
 	public String decodeURL(String url, boolean unescapeSpaces) {
 		if (Validator.isNull(url)) {
 			return url;
 		}
 
-		return URLCodec.decodeURL(url, StringPool.UTF8, unescapeSpaces);
+		return URLCodec.decodeURL(url, StringPool.UTF8);
 	}
 
 	public void destroy() {
@@ -736,7 +746,19 @@ public class HttpImpl implements Http {
 				String value = StringPool.BLANK;
 
 				if (kvp.length > 1) {
-					value = decodeURL(kvp[1]);
+					try {
+						value = decodeURL(kvp[1]);
+					}
+					catch (IllegalArgumentException iae) {
+						if (_log.isInfoEnabled()) {
+							_log.info(
+								"Skipping parameter with key " + key +
+									" because of invalid value " + kvp[1],
+								iae);
+						}
+
+						continue;
+					}
 				}
 
 				List<String> values = tempParameterMap.get(key);
@@ -1053,6 +1075,67 @@ public class HttpImpl implements Http {
 		url = removeParameter(url, name);
 
 		return addParameter(url, name, value);
+	}
+
+	@Override
+	public String shortenURL(String url, int count) {
+		if (count == 0) {
+			return null;
+		}
+
+		StringBundler sb = new StringBundler();
+
+		String[] params = url.split(StringPool.AMPERSAND);
+
+		for (int i = 0; i < params.length; i++) {
+			String param = params[i];
+
+			if (param.contains("_backURL=") || param.contains("_redirect=") ||
+				param.contains("_returnToFullPageURL=") ||
+				param.startsWith("redirect")) {
+
+				int pos = param.indexOf(StringPool.EQUAL);
+
+				String qName = param.substring(0, pos);
+
+				String redirect = param.substring(pos + 1);
+
+				try {
+					redirect = decodeURL(redirect);
+				}
+				catch (IllegalArgumentException iae) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							"Skipping undecodable parameter " + param, iae);
+					}
+
+					continue;
+				}
+
+				String newURL = shortenURL(redirect, count - 1);
+
+				if (newURL != null) {
+					newURL = encodeURL(newURL);
+
+					sb.append(qName);
+					sb.append(StringPool.EQUAL);
+					sb.append(newURL);
+
+					if (i < (params.length - 1)) {
+						sb.append(StringPool.AMPERSAND);
+					}
+				}
+			}
+			else {
+				sb.append(param);
+
+				if (i < (params.length - 1)) {
+					sb.append(StringPool.AMPERSAND);
+				}
+			}
+		}
+
+		return sb.toString();
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -60,73 +60,63 @@ catch (NoSuchArticleException nsae) {
 	<c:if test="<%= article != null %>">
 
 		<%
-		if (Validator.isNotNull(article.getStructureId())) {
-			DDMStructure ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(article.getGroupId(), PortalUtil.getClassNameId(JournalArticle.class), article.getStructureId(), true);
+		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(article.getGroupId(), PortalUtil.getClassNameId(JournalArticle.class), article.getStructureId(), true);
 
-			List<DDMTemplate> ddmTemplates = new ArrayList<DDMTemplate>();
+		List<DDMTemplate> ddmTemplates = DDMTemplateLocalServiceUtil.getTemplates(article.getGroupId(), PortalUtil.getClassNameId(DDMStructure.class), ddmStructure.getStructureId(), true);
 
-			if (ddmStructure != null) {
-				ddmTemplates.addAll(DDMTemplateLocalServiceUtil.getTemplates(ddmStructure.getGroupId(), PortalUtil.getClassNameId(DDMStructure.class), ddmStructure.getStructureId()));
-
-				if (article.getGroupId() != ddmStructure.getGroupId()) {
-					ddmTemplates.addAll(DDMTemplateLocalServiceUtil.getTemplates(article.getGroupId(), PortalUtil.getClassNameId(DDMStructure.class), ddmStructure.getStructureId()));
-				}
+		if (!ddmTemplates.isEmpty()) {
+			if (Validator.isNull(ddmTemplateKey)) {
+				ddmTemplateKey = article.getTemplateId();
 			}
-
-			if (!ddmTemplates.isEmpty()) {
-				if (Validator.isNull(ddmTemplateKey)) {
-					ddmTemplateKey = article.getTemplateId();
-				}
 		%>
 
-				<aui:fieldset>
-					<liferay-ui:message key="override-default-template" />
+			<aui:fieldset>
+				<liferay-ui:message key="override-default-template" />
 
-					<liferay-ui:table-iterator
-						list="<%= ddmTemplates %>"
-						listType="com.liferay.portlet.dynamicdatamapping.model.DDMTemplate"
-						rowLength="3"
-						rowPadding="30"
-					>
+				<liferay-ui:table-iterator
+					list="<%= ddmTemplates %>"
+					listType="com.liferay.portlet.dynamicdatamapping.model.DDMTemplate"
+					rowLength="3"
+					rowPadding="30"
+				>
 
-						<%
-						boolean templateChecked = false;
+					<%
+					boolean templateChecked = false;
 
-						if (ddmTemplateKey.equals(tableIteratorObj.getTemplateKey())) {
-							templateChecked = true;
-						}
+					if (ddmTemplateKey.equals(tableIteratorObj.getTemplateKey())) {
+						templateChecked = true;
+					}
 
-						if ((tableIteratorPos.intValue() == 0) && Validator.isNull(ddmTemplateKey)) {
-							templateChecked = true;
-						}
-						%>
+					if ((tableIteratorPos.intValue() == 0) && Validator.isNull(ddmTemplateKey)) {
+						templateChecked = true;
+					}
+					%>
 
-						<liferay-portlet:renderURL portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>" var="editTemplateURL">
-							<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
-							<portlet:param name="redirect" value="<%= currentURL %>" />
-							<portlet:param name="refererPortletName" value="<%= PortletKeys.JOURNAL_CONTENT %>" />
-							<portlet:param name="groupId" value="<%= String.valueOf(tableIteratorObj.getGroupId()) %>" />
-							<portlet:param name="templateId" value="<%= String.valueOf(tableIteratorObj.getTemplateId()) %>" />
-						</liferay-portlet:renderURL>
+					<liferay-portlet:renderURL portletName="<%= PortletKeys.DYNAMIC_DATA_MAPPING %>" var="editTemplateURL">
+						<portlet:param name="struts_action" value="/dynamic_data_mapping/edit_template" />
+						<portlet:param name="redirect" value="<%= currentURL %>" />
+						<portlet:param name="refererPortletName" value="<%= PortletKeys.JOURNAL_CONTENT %>" />
+						<portlet:param name="groupId" value="<%= String.valueOf(tableIteratorObj.getGroupId()) %>" />
+						<portlet:param name="templateId" value="<%= String.valueOf(tableIteratorObj.getTemplateId()) %>" />
+					</liferay-portlet:renderURL>
 
-						<liferay-util:buffer var="linkContent">
-							<aui:a href="<%= editTemplateURL %>" id="tableIteratorObjName"><%= HtmlUtil.escape(tableIteratorObj.getName(locale)) %></aui:a>
-						</liferay-util:buffer>
+					<liferay-util:buffer var="linkContent">
+						<aui:a href="<%= editTemplateURL %>" id="tableIteratorObjName"><%= HtmlUtil.escape(tableIteratorObj.getName(locale)) %></aui:a>
+					</liferay-util:buffer>
 
-						<aui:input checked="<%= templateChecked %>" label="<%= linkContent %>" name="overideTemplateId" onChange='<%= "if (this.checked) {document." + renderResponse.getNamespace() + "fm." + renderResponse.getNamespace() + "ddmTemplateKey.value = this.value;}" %>' type="radio" value="<%= tableIteratorObj.getTemplateKey() %>" />
+					<aui:input checked="<%= templateChecked %>" label="<%= linkContent %>" name="overideTemplateId" onChange='<%= "if (this.checked) {document." + renderResponse.getNamespace() + "fm." + renderResponse.getNamespace() + "ddmTemplateKey.value = this.value;}" %>' type="radio" value="<%= tableIteratorObj.getTemplateKey() %>" />
 
-						<c:if test="<%= tableIteratorObj.isSmallImage() %>">
-							<br />
+					<c:if test="<%= tableIteratorObj.isSmallImage() %>">
+						<br />
 
-							<img border="0" hspace="0" src="<%= Validator.isNotNull(tableIteratorObj.getSmallImageURL()) ? HtmlUtil.escapeHREF(tableIteratorObj.getSmallImageURL()) : themeDisplay.getPathImage() + "/journal/template?img_id=" + tableIteratorObj.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(tableIteratorObj.getSmallImageId()) %>" vspace="0" />
-						</c:if>
-					</liferay-ui:table-iterator>
+						<img alt="" hspace="0" src="<%= Validator.isNotNull(tableIteratorObj.getSmallImageURL()) ? HtmlUtil.escapeHREF(tableIteratorObj.getSmallImageURL()) : themeDisplay.getPathImage() + "/journal/template?img_id=" + tableIteratorObj.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(tableIteratorObj.getSmallImageId()) %>" vspace="0" />
+					</c:if>
+				</liferay-ui:table-iterator>
 
-					<br />
-				</aui:fieldset>
+				<br />
+			</aui:fieldset>
 
 		<%
-			}
 		}
 		%>
 
@@ -236,9 +226,7 @@ catch (NoSuchArticleException nsae) {
 	<aui:input name="preferences--ddmTemplateKey--" type="hidden" value="<%= ddmTemplateKey %>" />
 
 	<aui:fieldset>
-		<aui:field-wrapper label="portlet-id">
-			<liferay-ui:input-resource url="<%= portletResource %>" />
-		</aui:field-wrapper>
+		<aui:input name="portletId" type="resource" value="<%= portletResource %>" />
 	</aui:fieldset>
 
 	<aui:fieldset>
@@ -252,11 +240,7 @@ catch (NoSuchArticleException nsae) {
 			for (String conversion : conversions) {
 			%>
 
-				<label class="checkbox inline">
-					<input <%= ArrayUtil.contains(extensions, conversion) ? "checked": "" %> <%= openOfficeServerEnabled ? "" : "disabled" %> name="<portlet:namespace />extensions" type="checkbox" value="<%= conversion %>" />
-
-					<%= StringUtil.toUpperCase(conversion) %>
-				</label>
+				<aui:input checked="<%= ArrayUtil.contains(extensions, conversion) %>" disabled="<%= !openOfficeServerEnabled %>" id='<%= "extensions" + conversion %>' inlineField="<%= true %>" label="<%= StringUtil.toUpperCase(conversion) %>" name="extensions" type="checkbox" value="<%= conversion %>" />
 
 			<%
 			}
@@ -295,14 +279,15 @@ catch (NoSuchArticleException nsae) {
 
 			document.<portlet:namespace />fm.<portlet:namespace />groupId.value = articleGroupId;
 			document.<portlet:namespace />fm.<portlet:namespace />articleId.value = articleId;
-			document.<portlet:namespace />fm.<portlet:namespace />ddmTemplateKey.value = "";
+			document.<portlet:namespace />fm.<portlet:namespace />ddmTemplateKey.value = '';
 
 			A.one('.displaying-article-id-holder').show();
 			A.one('.displaying-help-message-holder').hide();
 
 			var displayArticleId = A.one('.displaying-article-id');
 
-			displayArticleId.set('innerHTML', Liferay.Util.escapeHTML(articleTitle) + ' (<%= UnicodeLanguageUtil.get(pageContext, "modified") %>)');
+			displayArticleId.html(Liferay.Util.escapeHTML(articleTitle) + ' (<%= UnicodeLanguageUtil.get(request, "modified") %>)');
+
 			displayArticleId.addClass('modified');
 		},
 		['aui-base']

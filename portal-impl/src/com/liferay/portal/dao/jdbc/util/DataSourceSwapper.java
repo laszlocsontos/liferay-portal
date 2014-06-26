@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,13 +27,15 @@ import javax.sql.DataSource;
 
 import org.hibernate.engine.SessionFactoryImplementor;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
 /**
  * @author Shuyang Zhou
  */
-public class DataSourceSwapper {
+public class DataSourceSwapper implements BeanFactoryAware {
 
 	public static void swapCounterDataSource(Properties properties)
 		throws Exception {
@@ -99,6 +101,11 @@ public class DataSourceSwapper {
 		_reinitializeHibernate("liferaySessionFactory", newDataSource);
 	}
 
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) {
+		_beanFactory = beanFactory;
+	}
+
 	public void setCounterDataSourceWrapper(
 		DataSourceWrapper counterDataSourceWrapper) {
 
@@ -118,6 +125,7 @@ public class DataSourceSwapper {
 		PortalHibernateConfiguration portalHibernateConfiguration =
 			new PortalHibernateConfiguration();
 
+		portalHibernateConfiguration.setBeanFactory(_beanFactory);
 		portalHibernateConfiguration.setDataSource(dataSource);
 
 		portalHibernateConfiguration.afterPropertiesSet();
@@ -154,6 +162,7 @@ public class DataSourceSwapper {
 
 	private static Log _log = LogFactoryUtil.getLog(DataSourceSwapper.class);
 
+	private static BeanFactory _beanFactory;
 	private static DataSourceWrapper _counterDataSourceWrapper;
 	private static DataSourceWrapper _liferayDataSourceWrapper;
 

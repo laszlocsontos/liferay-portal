@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,12 +39,10 @@ public class BlogsStatsUserLocalServiceWrapper
 	*
 	* @param blogsStatsUser the blogs stats user
 	* @return the blogs stats user that was added
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.blogs.model.BlogsStatsUser addBlogsStatsUser(
-		com.liferay.portlet.blogs.model.BlogsStatsUser blogsStatsUser)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.blogs.model.BlogsStatsUser blogsStatsUser) {
 		return _blogsStatsUserLocalService.addBlogsStatsUser(blogsStatsUser);
 	}
 
@@ -66,13 +64,11 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @param statsUserId the primary key of the blogs stats user
 	* @return the blogs stats user that was removed
 	* @throws PortalException if a blogs stats user with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.blogs.model.BlogsStatsUser deleteBlogsStatsUser(
 		long statsUserId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _blogsStatsUserLocalService.deleteBlogsStatsUser(statsUserId);
 	}
 
@@ -81,12 +77,10 @@ public class BlogsStatsUserLocalServiceWrapper
 	*
 	* @param blogsStatsUser the blogs stats user
 	* @return the blogs stats user that was removed
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.blogs.model.BlogsStatsUser deleteBlogsStatsUser(
-		com.liferay.portlet.blogs.model.BlogsStatsUser blogsStatsUser)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.blogs.model.BlogsStatsUser blogsStatsUser) {
 		return _blogsStatsUserLocalService.deleteBlogsStatsUser(blogsStatsUser);
 	}
 
@@ -100,13 +94,11 @@ public class BlogsStatsUserLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _blogsStatsUserLocalService.dynamicQuery(dynamicQuery);
 	}
 
@@ -121,13 +113,12 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @param start the lower bound of the range of model instances
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		int end) {
 		return _blogsStatsUserLocalService.dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -143,15 +134,13 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	public java.util.List dynamicQuery(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
 		int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator) {
 		return _blogsStatsUserLocalService.dynamicQuery(dynamicQuery, start,
 			end, orderByComparator);
 	}
@@ -161,12 +150,10 @@ public class BlogsStatsUserLocalServiceWrapper
 	*
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery) {
 		return _blogsStatsUserLocalService.dynamicQueryCount(dynamicQuery);
 	}
 
@@ -176,21 +163,18 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @param dynamicQuery the dynamic query
 	* @param projection the projection to apply to the query
 	* @return the number of rows that match the dynamic query
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public long dynamicQueryCount(
 		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.dao.orm.Projection projection) {
 		return _blogsStatsUserLocalService.dynamicQueryCount(dynamicQuery,
 			projection);
 	}
 
 	@Override
 	public com.liferay.portlet.blogs.model.BlogsStatsUser fetchBlogsStatsUser(
-		long statsUserId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long statsUserId) {
 		return _blogsStatsUserLocalService.fetchBlogsStatsUser(statsUserId);
 	}
 
@@ -200,21 +184,33 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @param statsUserId the primary key of the blogs stats user
 	* @return the blogs stats user
 	* @throws PortalException if a blogs stats user with the primary key could not be found
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.blogs.model.BlogsStatsUser getBlogsStatsUser(
 		long statsUserId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _blogsStatsUserLocalService.getBlogsStatsUser(statsUserId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery() {
+		return _blogsStatsUserLocalService.getActionableDynamicQuery();
+	}
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.portal.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.model.PersistedModel persistedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _blogsStatsUserLocalService.deletePersistedModel(persistedModel);
 	}
 
 	@Override
 	public com.liferay.portal.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _blogsStatsUserLocalService.getPersistedModel(primaryKeyObj);
 	}
 
@@ -228,12 +224,10 @@ public class BlogsStatsUserLocalServiceWrapper
 	* @param start the lower bound of the range of blogs stats users
 	* @param end the upper bound of the range of blogs stats users (not inclusive)
 	* @return the range of blogs stats users
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getBlogsStatsUsers(
-		int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		int start, int end) {
 		return _blogsStatsUserLocalService.getBlogsStatsUsers(start, end);
 	}
 
@@ -241,11 +235,9 @@ public class BlogsStatsUserLocalServiceWrapper
 	* Returns the number of blogs stats users.
 	*
 	* @return the number of blogs stats users
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
-	public int getBlogsStatsUsersCount()
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getBlogsStatsUsersCount() {
 		return _blogsStatsUserLocalService.getBlogsStatsUsersCount();
 	}
 
@@ -254,12 +246,10 @@ public class BlogsStatsUserLocalServiceWrapper
 	*
 	* @param blogsStatsUser the blogs stats user
 	* @return the blogs stats user that was updated
-	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.portlet.blogs.model.BlogsStatsUser updateBlogsStatsUser(
-		com.liferay.portlet.blogs.model.BlogsStatsUser blogsStatsUser)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.blogs.model.BlogsStatsUser blogsStatsUser) {
 		return _blogsStatsUserLocalService.updateBlogsStatsUser(blogsStatsUser);
 	}
 
@@ -285,34 +275,29 @@ public class BlogsStatsUserLocalServiceWrapper
 
 	@Override
 	public void deleteStatsUser(
-		com.liferay.portlet.blogs.model.BlogsStatsUser statsUsers)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portlet.blogs.model.BlogsStatsUser statsUsers) {
 		_blogsStatsUserLocalService.deleteStatsUser(statsUsers);
 	}
 
 	@Override
 	public void deleteStatsUser(long statsUserId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_blogsStatsUserLocalService.deleteStatsUser(statsUserId);
 	}
 
 	@Override
-	public void deleteStatsUserByGroupId(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void deleteStatsUserByGroupId(long groupId) {
 		_blogsStatsUserLocalService.deleteStatsUserByGroupId(groupId);
 	}
 
 	@Override
-	public void deleteStatsUserByUserId(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public void deleteStatsUserByUserId(long userId) {
 		_blogsStatsUserLocalService.deleteStatsUserByUserId(userId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getCompanyStatsUsers(
-		long companyId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, int start, int end) {
 		return _blogsStatsUserLocalService.getCompanyStatsUsers(companyId,
 			start, end);
 	}
@@ -320,30 +305,26 @@ public class BlogsStatsUserLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getCompanyStatsUsers(
 		long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _blogsStatsUserLocalService.getCompanyStatsUsers(companyId,
 			start, end, obc);
 	}
 
 	@Override
-	public int getCompanyStatsUsersCount(long companyId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getCompanyStatsUsersCount(long companyId) {
 		return _blogsStatsUserLocalService.getCompanyStatsUsersCount(companyId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getGroupsStatsUsers(
-		long companyId, long groupId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long companyId, long groupId, int start, int end) {
 		return _blogsStatsUserLocalService.getGroupsStatsUsers(companyId,
 			groupId, start, end);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getGroupStatsUsers(
-		long groupId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long groupId, int start, int end) {
 		return _blogsStatsUserLocalService.getGroupStatsUsers(groupId, start,
 			end);
 	}
@@ -351,22 +332,19 @@ public class BlogsStatsUserLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getGroupStatsUsers(
 		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _blogsStatsUserLocalService.getGroupStatsUsers(groupId, start,
 			end, obc);
 	}
 
 	@Override
-	public int getGroupStatsUsersCount(long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getGroupStatsUsersCount(long groupId) {
 		return _blogsStatsUserLocalService.getGroupStatsUsersCount(groupId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getOrganizationStatsUsers(
-		long organizationId, int start, int end)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		long organizationId, int start, int end) {
 		return _blogsStatsUserLocalService.getOrganizationStatsUsers(organizationId,
 			start, end);
 	}
@@ -374,38 +352,33 @@ public class BlogsStatsUserLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portlet.blogs.model.BlogsStatsUser> getOrganizationStatsUsers(
 		long organizationId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.util.OrderByComparator obc) {
 		return _blogsStatsUserLocalService.getOrganizationStatsUsers(organizationId,
 			start, end, obc);
 	}
 
 	@Override
-	public int getOrganizationStatsUsersCount(long organizationId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+	public int getOrganizationStatsUsersCount(long organizationId) {
 		return _blogsStatsUserLocalService.getOrganizationStatsUsersCount(organizationId);
 	}
 
 	@Override
 	public com.liferay.portlet.blogs.model.BlogsStatsUser getStatsUser(
 		long groupId, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _blogsStatsUserLocalService.getStatsUser(groupId, userId);
 	}
 
 	@Override
 	public void updateStatsUser(long groupId, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_blogsStatsUserLocalService.updateStatsUser(groupId, userId);
 	}
 
 	@Override
 	public void updateStatsUser(long groupId, long userId,
 		java.util.Date displayDate)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		_blogsStatsUserLocalService.updateStatsUser(groupId, userId, displayDate);
 	}
 

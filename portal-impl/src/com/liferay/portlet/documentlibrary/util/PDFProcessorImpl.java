@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -411,13 +411,9 @@ public class PDFProcessorImpl
 		throws Exception {
 
 		if (_isGeneratePreview(fileVersion)) {
-			StopWatch stopWatch = null;
+			StopWatch stopWatch = new StopWatch();
 
-			if (_log.isInfoEnabled()) {
-				stopWatch = new StopWatch();
-
-				stopWatch.start();
-			}
+			stopWatch.start();
 
 			_generateImagesGS(fileVersion, file, false);
 
@@ -427,25 +423,22 @@ public class PDFProcessorImpl
 				_log.info(
 					"Ghostscript generated " + previewFileCount +
 						" preview pages for " + fileVersion.getTitle() +
-							" in " + stopWatch);
+							" in " + stopWatch.getTime() + " ms");
 			}
 		}
 
 		if (_isGenerateThumbnail(fileVersion)) {
-			StopWatch stopWatch = null;
+			StopWatch stopWatch = new StopWatch();
 
-			if (_log.isInfoEnabled()) {
-				stopWatch = new StopWatch();
-
-				stopWatch.start();
-			}
+			stopWatch.start();
 
 			_generateImagesGS(fileVersion, file, true);
 
 			if (_log.isInfoEnabled()) {
 				_log.info(
 					"Ghostscript generated a thumbnail for " +
-						fileVersion.getTitle() + " in " + stopWatch);
+						fileVersion.getTitle() + " in " + stopWatch.getTime() +
+							" ms");
 			}
 		}
 	}
@@ -594,6 +587,7 @@ public class PDFProcessorImpl
 					generatePreview, generateThumbnail);
 
 			Future<String> future = ProcessExecutor.execute(
+				ClassPathUtil.getGlobalClassPath(),
 				ClassPathUtil.getPortalClassPath(), processCallable);
 
 			String processIdentity = String.valueOf(
@@ -750,7 +744,7 @@ public class PDFProcessorImpl
 	private static Log _log = LogFactoryUtil.getLog(PDFProcessorImpl.class);
 
 	private List<Long> _fileVersionIds = new Vector<Long>();
-	private boolean _ghostscriptInitialized = false;
+	private boolean _ghostscriptInitialized;
 
 	private static class LiferayPDFBoxProcessCallable
 		implements ProcessCallable<String> {

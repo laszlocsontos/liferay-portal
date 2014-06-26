@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,7 @@
 if (!ArrayUtil.contains(PropsValues.ASSET_PUBLISHER_DISPLAY_STYLES, assetPublisherDisplayContext.getDisplayStyle())) {
 %>
 
-	<%= HtmlUtil.escape(LanguageUtil.format(pageContext, "x-is-not-a-display-type", assetPublisherDisplayContext.getDisplayStyle())) %>
+	<%= HtmlUtil.escape(LanguageUtil.format(request, "x-is-not-a-display-type", assetPublisherDisplayContext.getDisplayStyle())) %>
 
 <%
 }

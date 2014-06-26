@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,10 +22,10 @@
 String portletTitle = HtmlUtil.escape(PortalUtil.getPortletTitle(renderResponse));
 
 if (portletTitle == null) {
-	portletTitle = LanguageUtil.get(pageContext, "portlet");
+	portletTitle = LanguageUtil.get(request, "portlet");
 }
 %>
 
 <div class="alert alert-info">
-	<%= LanguageUtil.format(pageContext, "x-will-only-be-shown-after-you-refresh-the-page", portletTitle, false) %>
+	<%= LanguageUtil.format(request, "x-will-only-be-shown-after-you-refresh-the-page", portletTitle, false) %>
 </div>

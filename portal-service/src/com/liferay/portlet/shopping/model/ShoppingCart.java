@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,11 +37,9 @@ public interface ShoppingCart extends ShoppingCartModel, PersistedModel {
 	public void addItemId(long itemId, java.lang.String fields);
 
 	public com.liferay.portlet.shopping.model.ShoppingCoupon getCoupon()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public java.util.Map<com.liferay.portlet.shopping.model.ShoppingCartItem, java.lang.Integer> getItems()
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public java.util.Map<com.liferay.portlet.shopping.model.ShoppingCartItem, java.lang.Integer> getItems();
 
 	public int getItemsSize();
 }

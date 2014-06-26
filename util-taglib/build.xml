@@ -9,6 +9,7 @@
 
 	<target name="build-taglibs">
 		<delete file="${project.dir}/util-taglib/src/META-INF/aui.tld" failonerror="false" />
+		<delete file="${project.dir}/util-taglib/src/META-INF/ddm.tld" failonerror="false" />
 
 		<java
 			classname="com.liferay.alloy.tools.tagbuilder.TagBuilder"
@@ -18,6 +19,7 @@
 			newenvironment="true"
 		>
 			<jvmarg value="-Dtagbuilder.components.xml=${project.dir}/util-taglib/src/com/liferay/taglib/aui.xml,${project.dir}/util-taglib/src/com/liferay/taglib/liferay-aui.xml,${project.dir}/util-taglib/src/com/liferay/taglib/liferay-ddm.xml" />
+			<jvmarg value="-Dtagbuilder.copyright.year=present" />
 			<jvmarg value="-Dtagbuilder.docroot.dir=${project.dir}/portal-web/docroot/" />
 			<jvmarg value="-Dtagbuilder.java.dir=${project.dir}/util-taglib/src/com/liferay/taglib/" />
 			<jvmarg value="-Dtagbuilder.java.package=com.liferay.taglib" />
@@ -41,6 +43,18 @@
 				<replace file="src/META-INF/liferay-aui.tld">
 					<replacetoken><![CDATA[<uri>http://alloy.liferay.com/tld/aui</uri>]]></replacetoken>
 					<replacevalue><![CDATA[<uri>http://liferay.com/tld/aui</uri>]]></replacevalue>
+				</replace>
+
+				<copy file="src/META-INF/ddm.tld" overwrite="true" tofile="src/META-INF/liferay-ddm.tld" preservelastmodified="true" />
+
+				<replace file="src/META-INF/liferay-ddm.tld">
+					<replacetoken><![CDATA[<short-name>ddm</short-name>]]></replacetoken>
+					<replacevalue><![CDATA[<short-name>liferay-ddm</short-name>]]></replacevalue>
+				</replace>
+
+				<replace file="src/META-INF/liferay-ddm.tld">
+					<replacetoken><![CDATA[<uri>http://alloy.liferay.com/tld/ddm</uri>]]></replacetoken>
+					<replacevalue><![CDATA[<uri>http://liferay.com/tld/ddm</uri>]]></replacevalue>
 				</replace>
 
 				<copy file="src/META-INF/liferay-portlet.tld" tofile="src/META-INF/liferay-portlet_2_0.tld" preservelastmodified="true" />
@@ -104,9 +118,11 @@
 		>
 			<arg line="-d ${doc.taglibs.dir}" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/aui.tld" />
+			<arg value="${project.dir}/util-taglib/src/META-INF/ddm.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-portlet-ext.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-portlet.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-security.tld" />
+			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-staging.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-theme.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-ui.tld" />
 			<arg value="${project.dir}/util-taglib/src/META-INF/liferay-util.tld" />

@@ -90,12 +90,22 @@
 </tr>
 <tr>
 	<td>SUCCESS_MESSAGE_RECYCLE_BIN</td>
-	<td>//form[@id='_33_undoForm']</td>
+	<td>//form[@id='_182_undoForm']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>TAG</td>
 	<td>//span/a[contains(.,'${key_tagName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CATEGORIZATION_FILTER_TITLE</td>
+	<td>//h2[contains(@class,'taglib-categorization-filter') and contains (.,'${key_vocabularyName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TAG_FILTER_TITLE</td>
+	<td>//h2[contains(@class,'taglib-categorization-filter') and contains (.,'${key_tagName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -131,6 +141,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ENTRY_TITLE_GENERIC</td>
+	<td>//div[@class='entry-title']/h2/a</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ENTRY_TITLE_1</td>
 	<td>xpath=(//div[@class='entry-title']/h2/a)[1]</td>
 	<td></td>
@@ -156,12 +171,27 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ENTRY_CONTENT_GENERIC</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved')]//div[@class='entry-body']/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_CONTENT_SPECIFIC</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved')]//div[@class='entry-body']/div[contains(.,'${key_entryContent}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ENTRY_CONTENT_ABSTRACT</td>
 	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//div[@class='entry-body']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_CONTENT_CKE_EDIT_INLINE</td>
+	<td>//div[@class='entry-body']/div[contains(@class,'cke_editable') and contains(.,'${key_entryContent}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_CONTENT_CKE_EDIT_INLINE_SENDKEYS</td><!--This path is here so that sendKeys can be used on this locator-->
 	<td>//div[@class='entry-body']/div[contains(@class,'cke_editable') and contains(.,'${key_entryContent}')]</td>
 	<td></td>
 </tr>
@@ -187,22 +217,22 @@
 </tr>
 <tr>
 	<td>ENTRY_COMMENT_1</td>
-	<td>xpath=(//div[@class='stats']/span[@class='comments'])[1]</td>
+	<td>xpath=(//div[@class='stats']/span[@class='comments']/a)[1]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_COMMENT_2</td>
-	<td>xpath=(//div[@class='stats']/span[@class='comments'])[2]</td>
+	<td>xpath=(//div[@class='stats']/span[@class='comments']/a)[2]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_COMMENT_3</td>
-	<td>xpath=(//div[@class='stats']/span[@class='comments'])[3]</td>
+	<td>xpath=(//div[@class='stats']/span[@class='comments']/a)[3]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_EDIT</td>
-	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//div[contains(@class,'edit-actions')]//span/a/span[.='Edit']</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]/ul[contains(@class,'edit-actions')]//span/a/span[.='Edit']</td>
 	<td></td>
 </tr>
 <tr>
@@ -242,7 +272,7 @@
 </tr>
 <tr>
 	<td>ENTRY_RECYCLE_BIN</td>
-	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//div[contains(@class,'edit-actions')]//span/a/span[.='Move to the Recycle Bin']</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]/ul[contains(@class,'edit-actions')]//span/a/span[.='Move to the Recycle Bin']</td>
 	<td></td>
 </tr>
 <tr>
@@ -258,6 +288,46 @@
 <tr>
 	<td>ENTRY_RECYCLE_BIN_3</td>
 	<td>xpath=(//div[contains(@class,'edit-actions')]//span/a/span[.='Move to the Recycle Bin'])[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_COMMENTS</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//span/a[contains(.,'Comments')]</td>
+	<td>Vocabulary 1</td>
+</tr>
+<tr>
+	<td>ENTRY_FLAG</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//span/a[contains(.,'Flag')]</td>
+	<td>Vocabulary 1</td>
+</tr>
+<tr>
+	<td>ENTRY_TAG</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//span/a[contains(.,'${key_tagName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_VOCABULARY_CATEGORIZATION</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//span[contains(.,'${key_vocabularyName}:') and contains(.,'${key_categoryName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_VOCABULARY_CATEGORIZATION_LINK</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//span[contains(.,'${key_vocabularyName}:') and contains(.,'${key_categoryName}')]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_RELATED_ASSETS_HEADER</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//div/div[contains(@class,'asset-links')]/h2[contains(.,'Related Assets:')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_RELATED_ASSETS_LINK_IMAGE</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//div/div[contains(@class,'asset-links')]/ul//a/i</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_RELATED_ASSETS_TITLE</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'approved') and contains(.,'${key_entryTitle}')]//div/div[contains(@class,'asset-links')]/ul//a[contains(.,'${key_assetTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -293,7 +363,7 @@
 </tr>
 <tr>
 	<td>DRAFT_ENTRY_EDIT</td>
-	<td>//div[contains(@class,'entry') and contains(@class,'draft') and contains(.,'${key_entryTitle}')]//div[contains(@class,'edit-actions')]//span/a/span[.='Edit']</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'draft') and contains(.,'${key_entryTitle}')]//ul[contains(@class,'edit-actions')]//span/a/span[.='Edit']</td>
 	<td></td>
 </tr>
 <tr>
@@ -319,7 +389,48 @@
 </tr>
 <tr>
 	<td>SCHEDULED_ENTRY_EDIT</td>
-	<td>//div[contains(@class,'entry') and contains(@class,'scheduled') and contains(.,'${key_entryTitle}')]//div[contains(@class,'edit-actions')]//span/a/span[.='Edit']</td>
+	<td>//div[contains(@class,'entry') and contains(@class,'scheduled') and contains(.,'${key_entryTitle}')]//ul[contains(@class,'edit-actions')]//span/a/span[.='Edit']</td>
+	<td></td>
+</tr>
+<!--REPORT_INAPPROPRIATE_CONTENT-->
+<tr>
+	<td>REPORT_INAPPROPRIATE_CONTENT_HEADER</td>
+	<td>//h3[contains(.,'Report')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORT_INAPPROPRIATE_CONTENT_WARNING</td>
+	<td>//p[contains(.,'You are about to report a violation')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORT_INAPPROPRIATE_CONTENT_WARNING_TERMS_OF_USE_LINK</td>
+	<td>//a[@href='/c/portal/terms_of_use']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORT_INAPPROPRIATE_CONTENT_REASON_SELECT</td>
+	<td>//div[contains(.,'Reason for the Report')]/select[@id='_142_reason']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORT_INAPPROPRIATE_CONTENT_SAVE_BUTTON</td>
+	<td>//button[@id='_142_flagsSubmit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORT_INAPPROPRIATE_CONTENT_SUCCESS_MESSAGE</td>
+	<td>//div[contains(.,'Thank you for your report')]/p[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REPORT_INAPPROPRIATE_CONTENT_CLOSE_BUTTON</td>
+	<td>//button[contains(@class,'btn close')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 </tbody>

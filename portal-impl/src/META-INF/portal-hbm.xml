@@ -124,8 +124,6 @@
 	<import class="com.liferay.portlet.journal.model.JournalContentSearch" />
 	<import class="com.liferay.portlet.journal.model.JournalFeed" />
 	<import class="com.liferay.portlet.journal.model.JournalFolder" />
-	<import class="com.liferay.portlet.journal.model.JournalStructure" />
-	<import class="com.liferay.portlet.journal.model.JournalTemplate" />
 	<import class="com.liferay.portlet.messageboards.model.MBBan" />
 	<import class="com.liferay.portlet.messageboards.model.MBCategory" />
 	<import class="com.liferay.portlet.messageboards.model.MBDiscussion" />
@@ -375,6 +373,10 @@
 		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="type" type="com.liferay.portal.dao.orm.hibernate.IntegerType" column="type_" />
 		<property name="settings" type="com.liferay.portal.dao.orm.hibernate.StringType" column="settings_" />
+		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+		<property name="statusByUserId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="statusByUserName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="statusDate" type="org.hibernate.type.TimestampType" />
 	</class>
 	<class name="com.liferay.portal.model.impl.GroupImpl" table="Group_" dynamic-update="true">
 		<cache usage="read-write" />
@@ -1182,9 +1184,11 @@
 		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="type" type="com.liferay.portal.dao.orm.hibernate.StringType" column="type_" />
 		<property name="timestamp" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="deliveryType" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="deliverBy" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="delivered" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="payload" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="actionRequired" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="archived" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 	</class>
 	<class name="com.liferay.portal.model.impl.UserTrackerImpl" table="UserTracker" dynamic-update="true">
@@ -1476,6 +1480,7 @@
 		<property name="createDate" type="org.hibernate.type.TimestampType" />
 		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
 		<property name="title" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="deckTitle" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="urlTitle" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="content" type="com.liferay.portal.dao.orm.hibernate.StringType" />
@@ -1865,7 +1870,7 @@
 		<property name="structureKey" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
-		<property name="xsd" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="definition" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="storageType" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="type" type="com.liferay.portal.dao.orm.hibernate.IntegerType" column="type_" />
 	</class>
@@ -2065,6 +2070,7 @@
 		<property name="treePath" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="description" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="restrictionType" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="statusByUserId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="statusByUserName" type="com.liferay.portal.dao.orm.hibernate.StringType" />

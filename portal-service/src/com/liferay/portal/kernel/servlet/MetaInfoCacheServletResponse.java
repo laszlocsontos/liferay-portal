@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -358,7 +358,18 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 
 	@Override
 	public void sendError(int status) throws IOException {
-		sendError(status, null);
+		if (isCommitted()) {
+			throw new IllegalStateException("Send error after commit");
+		}
+
+		_metaData._error = true;
+		_metaData._status = status;
+
+		resetBuffer();
+
+		_committed = true;
+
+		super.sendError(status);
 	}
 
 	@Override
@@ -533,7 +544,13 @@ public class MetaInfoCacheServletResponse extends HttpServletResponseWrapper {
 
 	@Override
 	public void setStatus(int status) {
-		setStatus(status, null);
+		if (isCommitted()) {
+			return;
+		}
+
+		_metaData._status = status;
+
+		super.setStatus(status);
 	}
 
 	@Override

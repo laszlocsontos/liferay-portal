@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,7 +67,7 @@ int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 		Liferay.Search.tokenList.add(
 			{
 				clearFields: '<%= renderResponse.getNamespace() + HtmlUtil.escapeJS(facet.getFieldId()) %>',
-				html: '<%= UnicodeLanguageUtil.format(pageContext, "from-x-to-x", new Object[] {"<strong>" + HtmlUtil.escape(fieldParamFrom) + "</strong>", "<strong>" + HtmlUtil.escape(fieldParamTo) + "</strong>"}, false) %>'
+				html: '<%= UnicodeLanguageUtil.format(request, "from-x-to-x", new Object[] {"<strong>" + HtmlUtil.escape(fieldParamFrom) + "</strong>", "<strong>" + HtmlUtil.escape(fieldParamTo) + "</strong>"}, false) %>'
 			}
 		);
 	</aui:script>
