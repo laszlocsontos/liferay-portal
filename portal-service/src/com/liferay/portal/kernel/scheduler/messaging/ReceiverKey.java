@@ -23,6 +23,14 @@ import java.io.Serializable;
  */
 public class ReceiverKey implements Serializable {
 
+	/**
+	 * The empty constructor is required by
+	 * {@link com.liferay.portal.json.jabsorb.serializer.LiferaySerializer}.
+	 * Do not use this for any other purpose.
+	 */
+	public ReceiverKey() {
+	}
+
 	public ReceiverKey(String jobName, String groupName) {
 		_jobName = jobName;
 		_groupName = groupName;
