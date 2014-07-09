@@ -275,10 +275,10 @@ public class JournalUtil {
 		portletURL.setParameter(
 			"groupId", String.valueOf(article.getGroupId()));
 		portletURL.setParameter(
-			"articleId", String.valueOf(article.getArticleId()));
+				"articleId", String.valueOf(article.getArticleId()));
 
 		PortalUtil.addPortletBreadcrumbEntry(
-			request, unescapedArticle.getTitle(), portletURL.toString());
+				request, unescapedArticle.getTitle(), portletURL.toString());
 	}
 
 	public static void addPortletBreadcrumbEntries(
@@ -336,7 +336,7 @@ public class JournalUtil {
 		}
 
 		portletURL.setParameter(
-			"folderId", String.valueOf(folder.getFolderId()));
+				"folderId", String.valueOf(folder.getFolderId()));
 
 		if (folder.getFolderId() !=
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
@@ -499,6 +499,33 @@ public class JournalUtil {
 		sb.append(folder.getName());
 
 		return sb.toString();
+	}
+
+	public static Layout getArticleLayout(JournalArticle journalArticle) throws SystemException {
+		if (Validator.isNull(journalArticle)) {
+			return null;
+		}
+
+		return getArticleLayout(
+			journalArticle.getLayoutUuid(), journalArticle.getGroupId());
+	}
+
+	public static Layout getArticleLayout(String layoutUuid, long groupId) throws SystemException {
+		if (Validator.isNull(layoutUuid)) {
+			return null;
+		}
+
+		// The target page and the article must belong to the same group
+
+		Layout layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+			layoutUuid, groupId, false);
+
+		if (layout == null) {
+			layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+				layoutUuid, groupId, false);
+		}
+
+		return layout;
 	}
 
 	public static OrderByComparator getArticleOrderByComparator(
@@ -892,15 +919,13 @@ public class JournalUtil {
 			JournalArticle article, ThemeDisplay themeDisplay)
 		throws Exception {
 
-		if ((article != null) && Validator.isNotNull(article.getLayoutUuid())) {
-			Layout layout =
-				LayoutLocalServiceUtil.getLayoutByUuidAndCompanyId(
-					article.getLayoutUuid(), themeDisplay.getCompanyId());
+		Layout layout = getArticleLayout(article);
 
+		if (layout != null) {
 			return layout.getPlid();
 		}
 
-		Layout layout = LayoutLocalServiceUtil.fetchFirstLayout(
+		layout = LayoutLocalServiceUtil.fetchFirstLayout(
 			themeDisplay.getScopeGroupId(), false,
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
