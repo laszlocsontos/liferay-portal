@@ -43,6 +43,7 @@ import com.liferay.portlet.journal.model.JournalArticleDisplay;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.portlet.journal.service.permission.JournalArticlePermission;
+import com.liferay.portlet.journal.util.JournalUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -233,8 +234,7 @@ public class JournalArticleAssetRenderer
 		Layout layout = themeDisplay.getLayout();
 
 		if (Validator.isNotNull(_article.getLayoutUuid())) {
-			layout = LayoutLocalServiceUtil.getLayoutByUuidAndCompanyId(
-				_article.getLayoutUuid(), _article.getCompanyId());
+			layout = JournalUtil.getArticleLayout(_article);
 		}
 
 		String portletId = (String)liferayPortletRequest.getAttribute(
