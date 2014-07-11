@@ -522,7 +522,7 @@ public class JournalUtil {
 
 		if (layout == null) {
 			layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
-				layoutUuid, groupId, false);
+				layoutUuid, groupId, true);
 		}
 
 		return layout;
