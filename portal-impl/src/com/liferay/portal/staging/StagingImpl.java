@@ -1773,27 +1773,7 @@ public class StagingImpl implements Staging {
 		String portletId, PortletPreferences portletPreferences,
 		Date lastPublishDate) {
 
-		if (lastPublishDate == null) {
-			lastPublishDate = new Date();
-		}
-
-		try {
-			portletPreferences.setValue(
-				"last-publish-date", String.valueOf(lastPublishDate.getTime()));
-
-			portletPreferences.store();
-		}
-		catch (UnsupportedOperationException uoe) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Not updating the portlet setup for " + portletId +
-						" because no setup was returned for the current " +
-							"page");
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
+		doUpdateLastPublishDate(portletId, portletPreferences, lastPublishDate);
 	}
 
 	@Override
@@ -1957,6 +1937,33 @@ public class StagingImpl implements Staging {
 			StringPool.BLANK, null,
 			LayoutRemoteStagingBackgroundTaskExecutor.class, taskContextMap,
 			new ServiceContext());
+	}
+
+	protected void doUpdateLastPublishDate(
+		String portletId, PortletPreferences portletPreferences,
+		Date lastPublishDate) {
+
+		if (lastPublishDate == null) {
+			lastPublishDate = new Date();
+		}
+
+		try {
+			portletPreferences.setValue(
+				"last-publish-date", String.valueOf(lastPublishDate.getTime()));
+
+			portletPreferences.store();
+		}
+		catch (UnsupportedOperationException uoe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Not updating the portlet setup for " + portletId +
+						" because no setup was returned for the current " +
+							"page");
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
 	}
 
 	protected boolean getBoolean(
