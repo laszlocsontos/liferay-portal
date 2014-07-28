@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.staging.LayoutStagingUtil;
 import com.liferay.portal.kernel.staging.Staging;
 import com.liferay.portal.kernel.staging.StagingConstants;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -139,6 +140,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -1747,6 +1749,24 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void updateLastPublishDate(
+		final String portletId, final PortletPreferences portletPreferences,
+		final Date lastPublishDate) {
+
+		TransactionCommitCallbackRegistryUtil.registerCallback(
+			new Callable<Void>() {
+
+			@Override
+			public Void call() throws Exception {
+				doUpdateLastPublishDate(
+					portletId, portletPreferences, lastPublishDate);
+
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public void updateLastPublishDate(
 			long groupId, boolean privateLayout, Date lastPublishDate)
 		throws PortalException {
 
@@ -1754,26 +1774,32 @@ public class StagingImpl implements Staging {
 			lastPublishDate = new Date();
 		}
 
-		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+		final LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
 			groupId, privateLayout);
 
-		UnicodeProperties settingsProperties =
+		final UnicodeProperties settingsProperties =
 			layoutSet.getSettingsProperties();
 
 		settingsProperties.setProperty(
 			"last-publish-date", String.valueOf(lastPublishDate.getTime()));
 
-		LayoutSetLocalServiceUtil.updateSettings(
-			layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
-			settingsProperties.toString());
-	}
+		TransactionCommitCallbackRegistryUtil.registerCallback(
+			new Callable<Void>() {
 
-	@Override
-	public void updateLastPublishDate(
-		String portletId, PortletPreferences portletPreferences,
-		Date lastPublishDate) {
+			@Override
+			public Void call() throws Exception {
+				try {
+					LayoutSetLocalServiceUtil.updateSettings(
+						layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
+						settingsProperties.toString());
+				}
+				catch (Exception e) {
+					_log.error(e);
+				}
 
-		doUpdateLastPublishDate(portletId, portletPreferences, lastPublishDate);
+				return null;
+			}
+		});
 	}
 
 	@Override
