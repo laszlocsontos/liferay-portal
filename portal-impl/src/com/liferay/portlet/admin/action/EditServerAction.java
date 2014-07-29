@@ -216,7 +216,7 @@ public class EditServerAction extends PortletAction {
 		else if (cmd.equals("shutdown")) {
 			shutdown(actionRequest);
 		}
-		else if (cmd.equals("threadDump")) {
+		else if (cmd.equals("threadDumpLocal")) {
 			threadDump(actionRequest, actionResponse);
 
 			setForward(actionRequest, ActionConstants.COMMON_NULL);
@@ -639,7 +639,7 @@ public class EditServerAction extends PortletAction {
 		HttpServletResponse response = PortalUtil.getHttpServletResponse(
 			actionResponse);
 
-		ThreadDumpResult threadDumpResult = ThreadUtil.threadDump();
+		ThreadDumpResult threadDumpResult = ThreadUtil.takeThreadDump();
 
 		ServletResponseUtil.sendFile(
 			request, response, threadDumpResult.getContentFileName(),
