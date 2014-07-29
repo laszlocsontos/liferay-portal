@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.scripting.ScriptingUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.servlet.DirectServletRegistryUtil;
+import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.CharPool;
@@ -69,6 +70,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.ThreadDumpResult;
 import com.liferay.portal.kernel.util.ThreadUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnsyncPrintWriterPool;
@@ -98,6 +100,7 @@ import com.liferay.portal.upload.UploadServletRequestImpl;
 import com.liferay.portal.util.MaintenanceUtil;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.ShutdownUtil;
@@ -125,6 +128,9 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletSession;
 import javax.portlet.PortletURL;
 import javax.portlet.WindowState;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Level;
 import org.apache.struts.action.ActionForm;
@@ -211,7 +217,11 @@ public class EditServerAction extends PortletAction {
 			shutdown(actionRequest);
 		}
 		else if (cmd.equals("threadDump")) {
-			threadDump();
+			threadDump(actionRequest, actionResponse);
+
+			setForward(actionRequest, ActionConstants.COMMON_NULL);
+
+			return;
 		}
 		else if (cmd.equals("updateCaptcha")) {
 			updateCaptcha(actionRequest, portletPreferences);
@@ -620,17 +630,21 @@ public class EditServerAction extends PortletAction {
 		threadPoolExecutor.execute(masterClusterLoadingSyncJob);
 	}
 
-	protected void threadDump() throws Exception {
-		if (_log.isInfoEnabled()) {
-			Log log = SanitizerLogWrapper.allowCRLF(_log);
+	protected void threadDump(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
 
-			log.info(ThreadUtil.threadDump());
-		}
-		else {
-			_log.error(
-				"Thread dumps require the log level to be at least INFO for " +
-					getClass().getName());
-		}
+		HttpServletRequest request = PortalUtil.getHttpServletRequest(
+			actionRequest);
+		HttpServletResponse response = PortalUtil.getHttpServletResponse(
+			actionResponse);
+
+		ThreadDumpResult threadDumpResult = ThreadUtil.threadDump();
+
+		ServletResponseUtil.sendFile(
+			request, response, threadDumpResult.getContentFileName(),
+			threadDumpResult.getContentInputStream(),
+			threadDumpResult.getContentType());
 	}
 
 	protected void updateCaptcha(
