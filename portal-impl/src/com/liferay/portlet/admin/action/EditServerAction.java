@@ -211,9 +211,10 @@ public class EditServerAction extends PortletAction {
 			shutdown(actionRequest);
 		}
 		else if (cmd.equals("threadDumpClusterWide")) {
+			ThreadUtil.writeThreadDump(true);
 		}
 		else if (cmd.equals("threadDumpLocal")) {
-			threadDump();
+			ThreadUtil.writeThreadDump(false);
 		}
 		else if (cmd.equals("updateCaptcha")) {
 			updateCaptcha(actionRequest, portletPreferences);
@@ -620,10 +621,6 @@ public class EditServerAction extends PortletAction {
 				EditServerAction.class.getName());
 
 		threadPoolExecutor.execute(masterClusterLoadingSyncJob);
-	}
-
-	protected void threadDump() throws Exception {
-		ThreadUtil.writeThreadDump();
 	}
 
 	protected void updateCaptcha(
