@@ -14,13 +14,23 @@
 
 package com.liferay.portal.kernel.util;
 
+import java.io.Serializable;
+
 import java.util.Date;
-public class ThreadDump {
+
+/**
+ * @author László Csontos
+ */
+public class ThreadDump implements Serializable {
 
 	public ThreadDump(String content, Date createDate, String hostName) {
 		_content = content;
 		_createDate = createDate;
 		_hostName = hostName;
+	}
+
+	public ThreadDump(Throwable t, Date createDate, String hostName) {
+		this(StackTraceUtil.getStackTrace(t), createDate, hostName);
 	}
 
 	public String getContent() {

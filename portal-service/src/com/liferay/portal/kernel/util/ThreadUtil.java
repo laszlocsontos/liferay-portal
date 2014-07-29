@@ -14,6 +14,12 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.portal.kernel.cluster.Address;
+import com.liferay.portal.kernel.cluster.BaseClusterResponseCallback;
+import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
+import com.liferay.portal.kernel.cluster.ClusterNodeResponse;
+import com.liferay.portal.kernel.cluster.ClusterRequest;
+import com.liferay.portal.kernel.cluster.ClusterResponseCallback;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -26,7 +32,12 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Tina Tian
@@ -62,13 +73,16 @@ public class ThreadUtil {
 	}
 
 	public static ThreadDumpResult takeThreadDump() {
-		String threadDump = _getThreadDumpFromJstack();
+		return takeThreadDump(false);
+	}
 
-		if (Validator.isNull(threadDump)) {
-			threadDump = _getThreadDumpFromStackTrace();
+	public static ThreadDumpResult takeThreadDump(boolean clusterWide) {
+		if (clusterWide && ClusterExecutorUtil.isEnabled()) {
+			return _doClusterWideThreadDump();
 		}
-
-		return new ThreadDumpResult(threadDump);
+		else {
+			return _doLocalThreadDump();
+		}
 	}
 
 	/**
@@ -81,15 +95,15 @@ public class ThreadUtil {
 
 		unsyncByteArrayOutputStream.write(_THREAD_DUMP_LEGACY_HEADER);
 
-		ThreadDumpResult threadDump = takeThreadDump();
+		ThreadDumpResult threadDumpResult = takeThreadDump();
 
-		unsyncByteArrayOutputStream.write(threadDump.getContentBytes());
+		unsyncByteArrayOutputStream.write(threadDumpResult.getContentBytes());
 
 		return unsyncByteArrayOutputStream.toString();
 	}
 
-	public static void writeThreadDump() {
-		ThreadDumpResult threadDumpResult = takeThreadDump();
+	public static void writeThreadDump(boolean clusterWide) {
+		ThreadDumpResult threadDumpResult = takeThreadDump(clusterWide);
 
 		File threadDumpFile = new File(
 			_getThreadDumpDestDir(), threadDumpResult.getContentFileName());
@@ -107,7 +121,43 @@ public class ThreadUtil {
 		}
 	}
 
-	private static String _getThreadDumpDestDir() {
+	private static ThreadDumpResult _doClusterWideThreadDump() {
+		ClusterRequest clusterRequest = ClusterRequest.createMulticastRequest(
+			new MethodHandler(_TAKE_THREAD_DUMP_METHOD_KEY), false);
+
+		List<Address> clusterNodeAddresses =
+			ClusterExecutorUtil.getClusterNodeAddresses();
+
+		ThreadDumpResult threadDumpResult = new ThreadDumpResult(
+			clusterNodeAddresses.size());
+
+		ClusterResponseCallback threadDumpClusterResponseCallback =
+			new ThreadDumpClusterResponseCallback(
+				clusterNodeAddresses, threadDumpResult);
+
+		ClusterExecutorUtil.execute(
+			clusterRequest, threadDumpClusterResponseCallback);
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Cluster wide thread dump request has been submitted.");
+		}
+
+		threadDumpResult.await();
+
+		return threadDumpResult;
+	}
+
+	private static ThreadDumpResult _doLocalThreadDump() {
+		String threadDump = _getThreadDumpFromJstack();
+
+		if (Validator.isNull(threadDump)) {
+			threadDump = _getThreadDumpFromStackTrace();
+		}
+
+		return new ThreadDumpResult(threadDump);
+	}
+
+	private static File _getThreadDumpDestDir() {
 		String destDir = PropsUtil.get(PropsKeys.THREAD_DUMP_DEST_DIR);
 
 		if (Validator.isBlank(destDir)) {
@@ -118,7 +168,7 @@ public class ThreadUtil {
 			FileUtil.mkdirs(destDir);
 		}
 
-		return destDir;
+		return new File(destDir);
 	}
 
 	private static String _getThreadDumpFromJstack() {
@@ -221,8 +271,122 @@ public class ThreadUtil {
 		return sb.toString();
 	}
 
+	private static final MethodKey _TAKE_THREAD_DUMP_METHOD_KEY = new MethodKey(
+		ThreadUtil.class, "takeThreadDump");
+
+	private static final int _THREAD_DUMP_CLUSTER_WIDE_TIMEOUT =
+		GetterUtil.getInteger(
+			PropsUtil.get(PropsKeys.THREAD_DUMP_CLUSTER_WIDE_TIMEOUT));
+
 	private static final byte[] _THREAD_DUMP_LEGACY_HEADER = "\n\n".getBytes();
 
 	private static Log _log = LogFactoryUtil.getLog(ThreadUtil.class);
+
+	private static class ThreadDumpClusterResponseCallback
+		extends BaseClusterResponseCallback {
+
+		@Override
+		public void callback(BlockingQueue<ClusterNodeResponse> blockingQueue) {
+			do {
+				_clusterNodeAddressCount--;
+
+				ClusterNodeResponse clusterNodeResponse = null;
+
+				try {
+					clusterNodeResponse = blockingQueue.poll(
+						_THREAD_DUMP_CLUSTER_WIDE_TIMEOUT, TimeUnit.SECONDS);
+				}
+				catch (InterruptedException ie) {
+					_log.error(
+						"Unable to get cluster node response in " +
+							_THREAD_DUMP_CLUSTER_WIDE_TIMEOUT +
+								TimeUnit.SECONDS);
+				}
+
+				if (clusterNodeResponse == null) {
+					continue;
+				}
+
+				Address clusterNodeAddress = clusterNodeResponse.getAddress();
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Processing response of node " + clusterNodeAddress);
+				}
+
+				try {
+					ThreadDumpResult threadDumpResult =
+						(ThreadDumpResult)clusterNodeResponse.getResult();
+
+					_silentClusterNodeAddresses.remove(clusterNodeAddress);
+
+					if (threadDumpResult == null) {
+						continue;
+					}
+
+					ThreadDump threadDump = threadDumpResult.getThreadDump();
+
+					_threadDumpResult.addThreadDump(threadDump);
+				}
+				catch (Exception e) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							"Exception occured on node " + clusterNodeAddress,
+							e);
+					}
+
+					_threadDumpResult.addError(
+						clusterNodeAddress.getDescription(), e);
+				}
+			}
+			while (_clusterNodeAddressCount > 0);
+
+			// Silent nodes
+
+			if (_log.isWarnEnabled() &&
+				!_silentClusterNodeAddresses.isEmpty()) {
+
+				_log.warn(
+					"The following nodes gave no response: " +
+						StringUtil.merge(_silentClusterNodeAddresses));
+			}
+		}
+
+		@Override
+		public void processInterruptedException(
+			InterruptedException interruptedException) {
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Cluster wide thread dump generation has been " +
+						"interrupted; sealing bundle.");
+			}
+		}
+
+		@Override
+		public void processTimeoutException(TimeoutException timeoutException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Waiting for cluster nodes has timed out; sealing bundle.");
+			}
+		}
+
+		private ThreadDumpClusterResponseCallback(
+			List<Address> clusterNodeAddresses,
+			ThreadDumpResult threadDumpResult) {
+
+			_clusterNodeAddressCount = clusterNodeAddresses.size();
+
+			_silentClusterNodeAddresses = SetUtil.fromList(
+				clusterNodeAddresses);
+
+			_threadDumpResult = threadDumpResult;
+		}
+
+		private int _clusterNodeAddressCount;
+		private Set<Address> _silentClusterNodeAddresses;
+		private ThreadDumpResult _threadDumpResult;
+
+	}
 
 }
