@@ -217,9 +217,14 @@ public class EditServerAction extends PortletAction {
 			shutdown(actionRequest);
 		}
 		else if (cmd.equals("threadDumpClusterWide")) {
+			threadDump(actionRequest, actionResponse, true);
+
+			setForward(actionRequest, ActionConstants.COMMON_NULL);
+
+			return;
 		}
 		else if (cmd.equals("threadDumpLocal")) {
-			threadDump(actionRequest, actionResponse);
+			threadDump(actionRequest, actionResponse, false);
 
 			setForward(actionRequest, ActionConstants.COMMON_NULL);
 
@@ -633,7 +638,8 @@ public class EditServerAction extends PortletAction {
 	}
 
 	protected void threadDump(
-			ActionRequest actionRequest, ActionResponse actionResponse)
+			ActionRequest actionRequest, ActionResponse actionResponse,
+			boolean clusterWide)
 		throws Exception {
 
 		HttpServletRequest request = PortalUtil.getHttpServletRequest(
@@ -641,7 +647,8 @@ public class EditServerAction extends PortletAction {
 		HttpServletResponse response = PortalUtil.getHttpServletResponse(
 			actionResponse);
 
-		ThreadDumpResult threadDumpResult = ThreadUtil.takeThreadDump();
+		ThreadDumpResult threadDumpResult = ThreadUtil.takeThreadDump(
+			clusterWide);
 
 		ServletResponseUtil.sendFile(
 			request, response, threadDumpResult.getFileName(),

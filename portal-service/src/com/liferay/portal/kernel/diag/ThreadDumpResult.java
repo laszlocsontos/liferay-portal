@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.diag;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -25,7 +26,7 @@ public interface ThreadDumpResult {
 
 	public String getFileName();
 
-	public InputStream getInputStream();
+	public InputStream getInputStream() throws IOException;
 
 	public ThreadDump getThreadDump();
 
