@@ -15,11 +15,17 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+
+import java.text.Format;
 
 import java.util.Date;
 import java.util.Map;
@@ -27,6 +33,7 @@ import java.util.Map;
 /**
  * @author Tina Tian
  * @author Shuyang Zhou
+ * @author László Csontos
  */
 public class ThreadUtil {
 
@@ -56,14 +63,49 @@ public class ThreadUtil {
 		return threads;
 	}
 
-	public static String threadDump() {
+	public static ThreadDumpResult threadDump() {
 		String threadDump = _getThreadDumpFromJstack();
 
 		if (Validator.isNull(threadDump)) {
 			threadDump = _getThreadDumpFromStackTrace();
 		}
 
-		return "\n\n".concat(threadDump);
+		return new ThreadDumpResult(threadDump);
+	}
+
+	public static void writeThreadDump() {
+		ThreadDumpResult threadDumpResult = threadDump();
+
+		Date takenAt = threadDumpResult.getCreateDate();
+
+		File threadDumpFile = new File(
+			_getThreadDumpDestDir(),
+			"threadDump-" + _ISO_DATE_FORMAT.format(takenAt) + ".txt");
+
+		try {
+			FileUtil.write(threadDumpFile, threadDumpResult.getThreadDump());
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Thread dump has been written to " + threadDumpFile);
+			}
+		}
+		catch (IOException ioe) {
+			_log.error(ioe);
+		}
+	}
+
+	private static String _getThreadDumpDestDir() {
+		String destDir = PropsUtil.get(PropsKeys.THREAD_DUMP_DEST_DIR);
+
+		if (Validator.isBlank(destDir)) {
+			destDir = SystemProperties.get(SystemProperties.TMP_DIR);
+		}
+
+		if (!FileUtil.exists(destDir)) {
+			FileUtil.mkdirs(destDir);
+		}
+
+		return destDir;
 	}
 
 	private static String _getThreadDumpFromJstack() {
@@ -165,5 +207,10 @@ public class ThreadUtil {
 
 		return sb.toString();
 	}
+
+	private static final Format _ISO_DATE_FORMAT =
+		FastDateFormatFactoryUtil.getSimpleDateFormat("yyyyMMdd'T'HHmmssz");
+
+	private static Log _log = LogFactoryUtil.getLog(ThreadUtil.class);
 
 }
