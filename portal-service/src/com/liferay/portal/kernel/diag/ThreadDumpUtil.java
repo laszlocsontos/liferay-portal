@@ -15,13 +15,21 @@
 package com.liferay.portal.kernel.diag;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.lang.management.ManagementFactory;
@@ -33,17 +41,50 @@ import java.util.Map;
 /**
  * @author Tina Tian
  * @author Shuyang Zhou
+ * @author László Csontos
  */
 public class ThreadDumpUtil {
 
-	public static String threadDump() {
+	public static ThreadDumpResult threadDump() {
 		String threadDump = _getThreadDumpFromJstack();
 
 		if (Validator.isNull(threadDump)) {
 			threadDump = _getThreadDumpFromStackTrace();
 		}
 
-		return "\n\n".concat(threadDump);
+		return new ThreadDumpResultImpl(threadDump);
+	}
+
+	public static void writeThreadDump() {
+		ThreadDumpResult threadDumpResult = threadDump();
+
+		File threadDumpFile = new File(
+			_getThreadDumpDestDir(), threadDumpResult.getFileName());
+
+		try {
+			FileUtil.write(threadDumpFile, threadDumpResult.getInputStream());
+
+			if (_log.isInfoEnabled()) {
+				_log.info("Thread dump has been written to " + threadDumpFile);
+			}
+		}
+		catch (IOException ioe) {
+			_log.error(ioe);
+		}
+	}
+
+	private static String _getThreadDumpDestDir() {
+		String destDir = PropsUtil.get(PropsKeys.THREAD_DUMP_DEST_DIR);
+
+		if (Validator.isBlank(destDir)) {
+			destDir = SystemProperties.get(SystemProperties.TMP_DIR);
+		}
+
+		if (!FileUtil.exists(destDir)) {
+			FileUtil.mkdirs(destDir);
+		}
+
+		return destDir;
 	}
 
 	private static String _getThreadDumpFromJstack() {
@@ -145,5 +186,7 @@ public class ThreadDumpUtil {
 
 		return sb.toString();
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(ThreadDumpUtil.class);
 
 }

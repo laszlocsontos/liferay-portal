@@ -12,27 +12,31 @@
  * details.
  */
 
-package com.liferay.portal.servlet.filters.threaddump;
+package com.liferay.portal.kernel.diag;
 
-import com.liferay.portal.kernel.diag.ThreadDumpUtil;
+import java.util.Date;
+public class ThreadDump {
 
-/**
- * @author Shuyang Zhou
- * @author Brian Wing Shun Chan
- */
-public class ThreadDumper implements Runnable {
-
-	public boolean isExecuted() {
-		return _executed;
+	public ThreadDump(String content, Date createDate, String hostName) {
+		_content = content;
+		_createDate = createDate;
+		_hostName = hostName;
 	}
 
-	@Override
-	public void run() {
-		ThreadDumpUtil.writeThreadDump();
-
-		_executed = true;
+	public String getContent() {
+		return _content;
 	}
 
-	private boolean _executed;
+	public Date getCreateDate() {
+		return _createDate;
+	}
+
+	public String getHostName() {
+		return _hostName;
+	}
+
+	private String _content;
+	private Date _createDate;
+	private String _hostName;
 
 }
