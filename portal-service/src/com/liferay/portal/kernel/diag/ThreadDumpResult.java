@@ -12,31 +12,21 @@
  * details.
  */
 
-package com.liferay.portal.servlet.filters.threaddump;
+package com.liferay.portal.kernel.diag;
 
-import com.liferay.portal.kernel.diag.ThreadUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import java.io.InputStream;
 
 /**
- * @author Shuyang Zhou
- * @author Brian Wing Shun Chan
+ * @author László Csontos
  */
-public class ThreadDumper implements Runnable {
+public interface ThreadDumpResult {
 
-	public boolean isExecuted() {
-		return _executed;
-	}
+	public String getContentType();
 
-	@Override
-	public void run() {
-		ThreadUtil.writeThreadDump();
+	public String getFileName();
 
-		_executed = true;
-	}
+	public InputStream getInputStream();
 
-	private static Log _log = LogFactoryUtil.getLog(ThreadDumper.class);
-
-	private boolean _executed;
+	public ThreadDump getThreadDump();
 
 }
