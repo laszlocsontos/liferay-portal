@@ -14,10 +14,27 @@
 
 package com.liferay.portal.kernel.transaction;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+
 /**
  * @author Shuyang Zhou
  */
 public class TransactionAttribute {
+
+	public static final TransactionAttribute
+		REQUIRES_NEW_TRANSACTION_ATTRIBUTE;
+
+	static {
+		TransactionAttribute.Builder builder =
+			new TransactionAttribute.Builder();
+
+		builder.setPropagation(Propagation.REQUIRES_NEW);
+		builder.setRollbackForClasses(
+			PortalException.class, SystemException.class);
+
+		REQUIRES_NEW_TRANSACTION_ATTRIBUTE = builder.build();
+	}
 
 	public Isolation getIsolation() {
 		return _isolation;

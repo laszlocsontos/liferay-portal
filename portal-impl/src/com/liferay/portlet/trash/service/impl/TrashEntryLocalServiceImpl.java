@@ -15,7 +15,6 @@
 package com.liferay.portlet.trash.service.impl;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-import com.liferay.portal.kernel.dao.orm.BaseActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
@@ -27,6 +26,7 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -161,7 +161,7 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 
 			});
 		actionableDynamicQuery.setTransactionAttribute(
-			BaseActionableDynamicQuery.REQUIRES_NEW_TRANSACTION_ATTRIBUTE);
+			TransactionAttribute.REQUIRES_NEW_TRANSACTION_ATTRIBUTE);
 
 		actionableDynamicQuery.performActions();
 	}

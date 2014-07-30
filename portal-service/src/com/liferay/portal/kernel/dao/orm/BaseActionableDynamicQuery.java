@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
-import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -40,20 +39,6 @@ import java.util.concurrent.Callable;
  */
 public abstract class BaseActionableDynamicQuery
 	implements ActionableDynamicQuery {
-
-	public static final TransactionAttribute
-		REQUIRES_NEW_TRANSACTION_ATTRIBUTE;
-
-	static {
-		TransactionAttribute.Builder builder =
-			new TransactionAttribute.Builder();
-
-		builder.setPropagation(Propagation.REQUIRES_NEW);
-		builder.setRollbackForClasses(
-			PortalException.class, SystemException.class);
-
-		REQUIRES_NEW_TRANSACTION_ATTRIBUTE = builder.build();
-	}
 
 	@Override
 	public void addDocument(Document document) throws PortalException {
