@@ -18,9 +18,12 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.staging.MergeLayoutPrototypesThreadLocal;
+import com.liferay.portal.kernel.transaction.TransactionAttribute;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -44,6 +47,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -92,17 +96,21 @@ public class LayoutLocalServiceVirtualLayoutsAdvice
 				return layout;
 			}
 
-			LayoutSet layoutSet = layout.getLayoutSet();
-
 			try {
 				WorkflowThreadLocal.setEnabled(false);
 
-				SitesUtil.mergeLayoutPrototypeLayout(group, layout);
+				Callable<Void> mergeLayoutOrLayoutSetCallable =
+					new MergeLayoutOrLayoutSetCallable(layout);
 
-				if (Validator.isNotNull(
-						layout.getSourcePrototypeLayoutUuid())) {
+				// LPS-48981
 
-					SitesUtil.mergeLayoutSetPrototypeLayouts(group, layoutSet);
+				if (ExportImportThreadLocal.isLayoutExportInProcess()) {
+					TransactionInvokerUtil.invoke(
+						TransactionAttribute.REQUIRES_NEW_TRANSACTION_ATTRIBUTE,
+						mergeLayoutOrLayoutSetCallable);
+				}
+				else {
+					mergeLayoutOrLayoutSetCallable.call();
 				}
 			}
 			finally {
@@ -321,5 +329,31 @@ public class LayoutLocalServiceVirtualLayoutsAdvice
 			LayoutLocalServiceVirtualLayoutsAdvice.class +
 				"._virtualLayoutTargetGroupId",
 			GroupConstants.DEFAULT_LIVE_GROUP_ID);
+
+	private static class MergeLayoutOrLayoutSetCallable
+		implements Callable<Void> {
+
+		@Override
+		public Void call() throws Exception {
+			Group group = _layout.getGroup();
+
+			SitesUtil.mergeLayoutPrototypeLayout(group, _layout);
+
+			if (Validator.isNotNull(_layout.getSourcePrototypeLayoutUuid())) {
+				LayoutSet layoutSet = _layout.getLayoutSet();
+
+				SitesUtil.mergeLayoutSetPrototypeLayouts(group, layoutSet);
+			}
+
+			return null;
+		}
+
+		private MergeLayoutOrLayoutSetCallable(Layout layout) {
+			_layout = layout;
+		}
+
+		private Layout _layout;
+
+	}
 
 }
