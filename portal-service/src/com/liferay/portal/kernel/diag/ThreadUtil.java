@@ -71,7 +71,7 @@ public class ThreadUtil {
 		return threads;
 	}
 
-	public static ThreadDumpResult threadDump() {
+	public static ThreadDumpResult takeThreadDump() {
 		String threadDump = _getThreadDumpFromJstack();
 
 		if (Validator.isNull(threadDump)) {
@@ -81,8 +81,20 @@ public class ThreadUtil {
 		return new ThreadDumpResultImpl(threadDump);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
+	public static String threadDump() {
+		ThreadDumpResult threadDumpResult = takeThreadDump();
+
+		ThreadDump threadDump = threadDumpResult.getThreadDump();
+
+		return threadDump.getContent();
+	}
+
 	public static void writeThreadDump() {
-		ThreadDumpResult threadDumpResult = threadDump();
+		ThreadDumpResult threadDumpResult = takeThreadDump();
 
 		File threadDumpFile = new File(
 			_getThreadDumpDestDir(), threadDumpResult.getFileName());
@@ -212,6 +224,8 @@ public class ThreadUtil {
 
 		return sb.toString();
 	}
+
+	private static final byte[] _THREAD_DUMP_LEGACY_HEADER = "\n\n".getBytes();
 
 	private static Log _log = LogFactoryUtil.getLog(ThreadUtil.class);
 
