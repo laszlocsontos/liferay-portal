@@ -45,7 +45,7 @@ import java.util.Map;
  */
 public class ThreadDumpUtil {
 
-	public static ThreadDumpResult threadDump() {
+	public static ThreadDumpResult takeThreadDump() {
 		String threadDump = _getThreadDumpFromJstack();
 
 		if (Validator.isNull(threadDump)) {
@@ -55,8 +55,20 @@ public class ThreadDumpUtil {
 		return new ThreadDumpResultImpl(threadDump);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
+	public static String threadDump() {
+		ThreadDumpResult threadDumpResult = takeThreadDump();
+
+		ThreadDump threadDump = threadDumpResult.getThreadDump();
+
+		return "\n\n".concat(threadDump.getContent());
+	}
+
 	public static void writeThreadDump() {
-		ThreadDumpResult threadDumpResult = threadDump();
+		ThreadDumpResult threadDumpResult = takeThreadDump();
 
 		File threadDumpFile = new File(
 			_getThreadDumpDestDir(), threadDumpResult.getFileName());
