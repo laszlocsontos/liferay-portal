@@ -61,7 +61,7 @@ public class ThreadUtil {
 		return threads;
 	}
 
-	public static ThreadDumpResult threadDump() {
+	public static ThreadDumpResult takeThreadDump() {
 		String threadDump = _getThreadDumpFromJstack();
 
 		if (Validator.isNull(threadDump)) {
@@ -71,8 +71,25 @@ public class ThreadUtil {
 		return new ThreadDumpResult(threadDump);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0
+	 */
+	@Deprecated
+	public static String threadDump() {
+		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
+
+		unsyncByteArrayOutputStream.write(_THREAD_DUMP_LEGACY_HEADER);
+
+		ThreadDumpResult threadDump = takeThreadDump();
+
+		unsyncByteArrayOutputStream.write(threadDump.getContentBytes());
+
+		return unsyncByteArrayOutputStream.toString();
+	}
+
 	public static void writeThreadDump() {
-		ThreadDumpResult threadDumpResult = threadDump();
+		ThreadDumpResult threadDumpResult = takeThreadDump();
 
 		File threadDumpFile = new File(
 			_getThreadDumpDestDir(), threadDumpResult.getContentFileName());
@@ -203,6 +220,8 @@ public class ThreadUtil {
 
 		return sb.toString();
 	}
+
+	private static final byte[] _THREAD_DUMP_LEGACY_HEADER = "\n\n".getBytes();
 
 	private static Log _log = LogFactoryUtil.getLog(ThreadUtil.class);
 

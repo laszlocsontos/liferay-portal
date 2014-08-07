@@ -43,6 +43,12 @@ public class ThreadDumpResult {
 		_threadDump = new ThreadDump(threadDump, new Date(), hostName);
 	}
 
+	public byte[] getContentBytes() {
+		String content = _threadDump.getContent();
+
+		return content.getBytes();
+	}
+
 	public String getContentFileName() {
 		return (
 			"threadDump-" + _ISO_DATE_FORMAT.format(
@@ -50,9 +56,9 @@ public class ThreadDumpResult {
 	}
 
 	public InputStream getContentInputStream() {
-		String content = _threadDump.getContent();
+		byte[] bytes = getContentBytes();
 
-		return new ByteArrayInputStream(content.getBytes());
+		return new ByteArrayInputStream(bytes);
 	}
 
 	public String getContentType() {
