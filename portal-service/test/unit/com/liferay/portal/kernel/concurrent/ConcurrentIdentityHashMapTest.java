@@ -37,28 +37,6 @@ public class ConcurrentIdentityHashMapTest {
 		new CodeCoverageAssertor();
 
 	@Test
-	public void testConstructor() {
-		ConcurrentMap<IdentityKey<String>, Object> innerConcurrentMap =
-			new ConcurrentHashMap<IdentityKey<String>, Object>();
-
-		ConcurrentIdentityHashMap<String, Object> concurrentIdentityHashMap =
-			new ConcurrentIdentityHashMap<String, Object>(innerConcurrentMap);
-
-		Assert.assertSame(
-			innerConcurrentMap, concurrentIdentityHashMap.innerConcurrentMap);
-
-		Map<String, Object> dataMap = createDataMap();
-
-		concurrentIdentityHashMap =
-			new ConcurrentIdentityHashMap<String, Object>(dataMap);
-
-		Assert.assertEquals(dataMap, concurrentIdentityHashMap);
-
-		new ConcurrentIdentityHashMap<String, Object>(10);
-		new ConcurrentIdentityHashMap<String, Object>(10, 0.75F, 4);
-	}
-
-	@Test
 	public void testConcurrentIdentityHashMap() {
 		ConcurrentIdentityHashMap<String, Object> concurrentIdentityHashMap =
 			new ConcurrentIdentityHashMap<String, Object>();
@@ -96,6 +74,28 @@ public class ConcurrentIdentityHashMapTest {
 
 		Assert.assertSame(_testKey1, iterator.next());
 		Assert.assertFalse(iterator.hasNext());
+	}
+
+	@Test
+	public void testConstructor() {
+		ConcurrentMap<IdentityKey<String>, Object> innerConcurrentMap =
+			new ConcurrentHashMap<IdentityKey<String>, Object>();
+
+		ConcurrentIdentityHashMap<String, Object> concurrentIdentityHashMap =
+			new ConcurrentIdentityHashMap<String, Object>(innerConcurrentMap);
+
+		Assert.assertSame(
+			innerConcurrentMap, concurrentIdentityHashMap.innerConcurrentMap);
+
+		Map<String, Object> dataMap = createDataMap();
+
+		concurrentIdentityHashMap =
+			new ConcurrentIdentityHashMap<String, Object>(dataMap);
+
+		Assert.assertEquals(dataMap, concurrentIdentityHashMap);
+
+		new ConcurrentIdentityHashMap<String, Object>(10);
+		new ConcurrentIdentityHashMap<String, Object>(10, 0.75F, 4);
 	}
 
 	protected Map<String, Object> createDataMap() {

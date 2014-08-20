@@ -76,21 +76,21 @@ public class ThreadUtil {
 		return threads;
 	}
 
-	public static ThreadDump takeThreadDump() {
+	public static ThreadDumpResult takeThreadDump() {
 		String threadDump = _getThreadDumpFromJstack();
 
 		if (Validator.isNull(threadDump)) {
 			threadDump = _getThreadDumpFromStackTrace();
 		}
 
-		return new ThreadDump(threadDump);
+		return new ThreadDumpResult(threadDump);
 	}
 
 	/**
 	 * @deprecated As of 7.0.0
 	 */
 	@Deprecated
-	public static ThreadDump threadDump() {
+	public static ThreadDumpResult threadDump() {
 		return takeThreadDump();
 	}
 
@@ -121,14 +121,14 @@ public class ThreadUtil {
 			return;
 		}
 
-		ThreadDump threadDump = takeThreadDump();
+		ThreadDumpResult threadDumpResult = takeThreadDump();
 
 		File threadDumpFile = _getThreadDumpFile(
-			threadDumpType, threadDump.getTakenAt(),
-			threadDump.getTargetHost());
+			threadDumpType, threadDumpResult.getTakenAt(),
+			threadDumpResult.getTargetHost());
 
 		try {
-			FileUtil.write(threadDumpFile, threadDump.getThreadDump());
+			FileUtil.write(threadDumpFile, threadDumpResult.getThreadDump());
 
 			if (_log.isInfoEnabled()) {
 				_log.info("Thread dump has been written to " + threadDumpFile);
@@ -340,12 +340,13 @@ public class ThreadUtil {
 						"Processing response of node " + clusterNodeAddress);
 				}
 
-				ThreadDump threadDump = null;
+				ThreadDumpResult threadDumpResult = null;
 
 				boolean addDumpSuccess = false;
 
 				try {
-					threadDump = (ThreadDump)clusterNodeResponse.getResult();
+					threadDumpResult =
+						(ThreadDumpResult)clusterNodeResponse.getResult();
 
 					_silentClusterNodeAddresses.remove(clusterNodeAddress);
 				}
@@ -359,11 +360,11 @@ public class ThreadUtil {
 					addDumpSuccess = _addDump(clusterNodeAddress, e);
 				}
 
-				if (threadDump == null) {
+				if (threadDumpResult == null) {
 					continue;
 				}
 
-				addDumpSuccess = _addDump(threadDump);
+				addDumpSuccess = _addDump(threadDumpResult);
 
 				if (!addDumpSuccess) {
 					_log.error(
@@ -429,12 +430,13 @@ public class ThreadUtil {
 			return _addZipEntry(threadDumpFile, stackTrace);
 		}
 
-		private boolean _addDump(ThreadDump threadDump) {
+		private boolean _addDump(ThreadDumpResult threadDumpResult) {
 			File threadDumpFile = _getThreadDumpFile(
-				ThreadDumpType.LOCAL, threadDump.getTakenAt(),
-				threadDump.getTargetHost());
+				ThreadDumpType.LOCAL, threadDumpResult.getTakenAt(),
+				threadDumpResult.getTargetHost());
 
-			return _addZipEntry(threadDumpFile, threadDump.getThreadDump());
+			return _addZipEntry(
+				threadDumpFile, threadDumpResult.getThreadDump());
 		}
 
 		private boolean _addZipEntry(File file, String content) {
