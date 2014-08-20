@@ -124,8 +124,8 @@ public class ThreadUtil {
 		ThreadDumpResult threadDumpResult = takeThreadDump();
 
 		File threadDumpFile = _getThreadDumpFile(
-			threadDumpType, threadDumpResult.getTakenAt(),
-			threadDumpResult.getTargetHost());
+			threadDumpType, threadDumpResult.getCreateDate(),
+			threadDumpResult.getHostName());
 
 		try {
 			FileUtil.write(threadDumpFile, threadDumpResult.getThreadDump());
@@ -154,11 +154,11 @@ public class ThreadUtil {
 	}
 
 	private static File _getThreadDumpFile(
-		ThreadDumpType threadDumpType, Date takenAt, String targetHost) {
+		ThreadDumpType threadDumpType, Date createdate, String hostName) {
 
 		int size = 6;
 
-		if (Validator.isNotNull(targetHost)) {
+		if (Validator.isNotNull(hostName)) {
 			size = 8;
 		}
 
@@ -167,16 +167,16 @@ public class ThreadUtil {
 		sb.append(threadDumpType.getDescription());
 		sb.append("ThreadDump");
 
-		if (takenAt == null) {
-			takenAt = new Date();
+		if (createdate == null) {
+			createdate = new Date();
 		}
 
 		sb.append(StringPool.DASH);
-		sb.append(_ISO_DATE_FORMAT.format(takenAt));
+		sb.append(_ISO_DATE_FORMAT.format(createdate));
 
-		if (Validator.isNotNull(targetHost)) {
+		if (Validator.isNotNull(hostName)) {
 			sb.append(StringPool.DASH);
-			sb.append(targetHost);
+			sb.append(hostName);
 		}
 
 		sb.append(StringPool.PERIOD);
@@ -432,8 +432,8 @@ public class ThreadUtil {
 
 		private boolean _addDump(ThreadDumpResult threadDumpResult) {
 			File threadDumpFile = _getThreadDumpFile(
-				ThreadDumpType.LOCAL, threadDumpResult.getTakenAt(),
-				threadDumpResult.getTargetHost());
+				ThreadDumpType.LOCAL, threadDumpResult.getCreateDate(),
+				threadDumpResult.getHostName());
 
 			return _addZipEntry(
 				threadDumpFile, threadDumpResult.getThreadDump());
