@@ -15,6 +15,8 @@
 package com.liferay.portal.convert;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
@@ -24,6 +26,7 @@ import com.liferay.portal.kernel.util.InstancePool;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Image;
@@ -44,6 +47,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLContentLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.store.AdvancedFileSystemStore;
 import com.liferay.portlet.documentlibrary.store.DBStore;
 import com.liferay.portlet.documentlibrary.store.FileSystemStore;
 import com.liferay.portlet.documentlibrary.store.Store;
@@ -58,7 +62,10 @@ import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.util.test.WikiTestUtil;
 
+import java.io.File;
 import java.io.InputStream;
+
+import java.lang.reflect.Field;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,6 +210,71 @@ public class ConvertDocumentLibraryTest {
 			DBStore.class.getName(), store.getClass().getName());
 	}
 
+	@Test
+	public void testValidateConversionToAFSStore() throws Exception {
+		_convertProcess.setParameterValues(
+			new String[] {AdvancedFileSystemStore.class.getName()});
+
+		setPropsValue("DL_STORE_ADVANCED_FILE_SYSTEM_ROOT_DIR", null);
+
+		try {
+			_convertProcess.validateConversion();
+
+			Assert.fail(
+				"Conversion validation should have thrown an exception for " +
+					"blank property.");
+		}
+		catch (Exception e) {
+			Assert.assertEquals(
+				InvalidFileSystemStoreRootDirException.class, e.getClass());
+		}
+
+		setPropsValue(
+			"DL_STORE_ADVANCED_FILE_SYSTEM_ROOT_DIR",
+			PropsValues.DL_STORE_FILE_SYSTEM_ROOT_DIR);
+
+		try {
+			_convertProcess.validateConversion();
+
+			Assert.fail(
+				"Conversion validation should have thrown an exception for " +
+					"the same property value.");
+		}
+		catch (Exception e) {
+			Assert.assertEquals(
+				InvalidFileSystemStoreRootDirException.class, e.getClass());
+		}
+
+		File advancedFileSystemStoreRootDir = FileUtil.createTempFolder();
+
+		setPropsValue(
+			"DL_STORE_ADVANCED_FILE_SYSTEM_ROOT_DIR",
+			advancedFileSystemStoreRootDir.getName());
+
+		try {
+			_convertProcess.validateConversion();
+		}
+		catch (Exception e) {
+			Assert.fail(
+				"Conversion validation with correct setup shouldn't fail.");
+		}
+		finally {
+			FileUtil.deltree(advancedFileSystemStoreRootDir);
+		}
+	}
+
+	@Test
+	public void testValidateConversionToDBStore() throws Exception {
+		try {
+			_convertProcess.validateConversion();
+		}
+		catch (Exception e) {
+			Assert.fail(
+				"Conversion validation from FileSystemStore to a " +
+					"non-FileSystemStore should never fail");
+		}
+	}
+
 	protected Image addImage() throws Exception {
 		return ImageLocalServiceUtil.updateImage(
 			CounterLocalServiceUtil.increment(),
@@ -260,6 +332,18 @@ public class ConvertDocumentLibraryTest {
 			fileEntry.getFileEntryId());
 	}
 
+	protected void setPropsValue(String key, Object value) {
+		try {
+			Field field = ReflectionUtil.getDeclaredField(
+				PropsValues.class, key);
+
+			field.set(null, value);
+		}
+		catch (Exception e) {
+			_log.error(e);
+		}
+	}
+
 	protected void testMigrateDL(long folderId) throws Exception {
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
 			_group.getGroupId(), folderId,
@@ -280,6 +364,9 @@ public class ConvertDocumentLibraryTest {
 			Assert.fail();
 		}
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		ConvertDocumentLibraryTest.class);
 
 	private ConvertProcess _convertProcess;
 
