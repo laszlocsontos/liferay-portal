@@ -63,6 +63,7 @@ import javax.naming.ldap.PagedResultsResponseControl;
  * @author Wesley Gong
  * @author Marcellus Tavares
  * @author Hugo Huijser
+ * @author Vilmos Papp
  */
 public class PortalLDAPUtil {
 
@@ -145,8 +146,12 @@ public class PortalLDAPUtil {
 			String groupFilter = PrefsPropsUtil.getString(
 				companyId, PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix);
 
-			StringBundler sb = new StringBundler(
-				Validator.isNotNull(groupFilter) ? 11 : 5);
+			int limit = _getStringBundlerCapacityForFilter(groupFilter);
+
+			StringBundler sb = new StringBundler(limit);
+
+			boolean encloseFilter =
+				(limit != _ENCLOSED_FILTER_STRING_BUNDLER_CAPACITY);
 
 			if (Validator.isNotNull(groupFilter)) {
 				sb.append(StringPool.OPEN_PARENTHESIS);
@@ -165,14 +170,25 @@ public class PortalLDAPUtil {
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			if (Validator.isNotNull(groupFilter)) {
-				sb.append(StringPool.OPEN_PARENTHESIS);
+				if (encloseFilter) {
+					sb.append(StringPool.OPEN_PARENTHESIS);
+				}
+
 				sb.append(groupFilter);
-				sb.append(StringPool.CLOSE_PARENTHESIS);
+
+				if (encloseFilter) {
+					sb.append(StringPool.CLOSE_PARENTHESIS);
+				}
+
 				sb.append(StringPool.CLOSE_PARENTHESIS);
 			}
 
 			SearchControls searchControls = new SearchControls(
 				SearchControls.SUBTREE_SCOPE, 1, 0, null, false, false);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("LDAP query: " + sb.toString());
+			}
 
 			enu = ldapContext.search(baseDN, sb.toString(), searchControls);
 
@@ -460,8 +476,12 @@ public class PortalLDAPUtil {
 			String userFilter = PrefsPropsUtil.getString(
 				companyId, PropsKeys.LDAP_IMPORT_USER_SEARCH_FILTER + postfix);
 
-			StringBundler sb = new StringBundler(
-				Validator.isNotNull(userFilter) ? 11 : 5);
+			int limit = _getStringBundlerCapacityForFilter(userFilter);
+
+			StringBundler sb = new StringBundler(limit);
+
+			boolean encloseFilter =
+				(limit != _ENCLOSED_FILTER_STRING_BUNDLER_CAPACITY);
 
 			if (Validator.isNotNull(userFilter)) {
 				sb.append(StringPool.OPEN_PARENTHESIS);
@@ -500,14 +520,25 @@ public class PortalLDAPUtil {
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			if (Validator.isNotNull(userFilter)) {
-				sb.append(StringPool.OPEN_PARENTHESIS);
+				if (encloseFilter) {
+					sb.append(StringPool.OPEN_PARENTHESIS);
+				}
+
 				sb.append(userFilter);
-				sb.append(StringPool.CLOSE_PARENTHESIS);
+
+				if (encloseFilter) {
+					sb.append(StringPool.CLOSE_PARENTHESIS);
+				}
+
 				sb.append(StringPool.CLOSE_PARENTHESIS);
 			}
 
 			SearchControls searchControls = new SearchControls(
 				SearchControls.SUBTREE_SCOPE, 1, 0, null, false, false);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("LDAP query: " + sb.toString());
+			}
 
 			enu = ldapContext.search(baseDN, sb.toString(), searchControls);
 
@@ -931,6 +962,25 @@ public class PortalLDAPUtil {
 
 		return sb.toString();
 	}
+
+	private static int _getStringBundlerCapacityForFilter(String filter) {
+		int limit = 5;
+
+		if (Validator.isNotNull(filter)) {
+			limit = 11;
+
+			if (StringUtil.isEnclosed(
+					filter, CharPool.OPEN_PARENTHESIS,
+					CharPool.CLOSE_PARENTHESIS)) {
+
+				limit = _ENCLOSED_FILTER_STRING_BUNDLER_CAPACITY;
+			}
+		}
+
+		return limit;
+	}
+
+	private static final int _ENCLOSED_FILTER_STRING_BUNDLER_CAPACITY = 9;
 
 	private static Log _log = LogFactoryUtil.getLog(PortalLDAPUtil.class);
 
