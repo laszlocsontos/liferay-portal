@@ -15,6 +15,7 @@
 package com.liferay.portal.service.persistence.impl;
 
 import com.liferay.portal.NoSuchModelException;
+import com.liferay.portal.cache.MockPortalCacheManager;
 import com.liferay.portal.cache.memory.MemoryPortalCache;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
@@ -788,12 +789,12 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testDestroy() throws Exception {
+	public void testDestroy() {
 		testDestroy(_tableMapperImpl);
 	}
 
 	@Test
-	public void testDestroyReverse() throws Exception {
+	public void testDestroyReverse() {
 		testDestroy(new ReverseTableMapper<Right, Left>(_tableMapperImpl));
 	}
 
@@ -1310,7 +1311,7 @@ public class TableMapperTest {
 		Assert.assertTrue(tableMappers.isEmpty());
 	}
 
-	protected void testDestroy(TableMapper<?, ?> tableMapper) throws Exception {
+	protected void testDestroy(TableMapper<?, ?> tableMapper) {
 		MockMultiVMPool mockMultiVMPool =
 			(MockMultiVMPool)MultiVMPoolUtil.getMultiVMPool();
 
@@ -1777,7 +1778,8 @@ public class TableMapperTest {
 			PortalCache<?, ?> portalCache = _portalCaches.get(name);
 
 			if (portalCache == null) {
-				portalCache = new MemoryPortalCache<Long, long[]>(name, 16);
+				portalCache = new MemoryPortalCache<Long, long[]>(
+					new MockPortalCacheManager<Long, long[]>(name), name, 16);
 
 				_portalCaches.put(name, portalCache);
 			}

@@ -53,7 +53,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "vocabul
 			</aui:nav-item>
 		</aui:nav>
 
-		<aui:nav-bar-search cssClass="pull-right">
+		<aui:nav-bar-search>
 			<div class="form-search">
 				<liferay-ui:input-search />
 			</div>
@@ -73,11 +73,20 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "vocabul
 	>
 
 		<%
-		AssetVocabularyDisplay assetVocabularyDisplay = AssetVocabularyServiceUtil.searchVocabulariesDisplay(scopeGroupId, keywords, searchContainer.getStart(), searchContainer.getEnd(), true);
+		List<AssetVocabulary> vocabularies = null;
+
+		if (Validator.isNotNull(keywords)) {
+			AssetVocabularyDisplay assetVocabularyDisplay = AssetVocabularyServiceUtil.searchVocabulariesDisplay(scopeGroupId, keywords, searchContainer.getStart(), searchContainer.getEnd(), true);
+
+			vocabularies = assetVocabularyDisplay.getVocabularies();
+		}
+		else {
+			vocabularies = AssetVocabularyServiceUtil.getGroupVocabularies(scopeGroupId, true, searchContainer.getStart(), searchContainer.getEnd(), null);
+		}
 		%>
 
 		<liferay-ui:search-container-results
-			results="<%= assetVocabularyDisplay.getVocabularies() %>"
+			results="<%= vocabularies %>"
 		/>
 
 		<liferay-ui:search-container-row

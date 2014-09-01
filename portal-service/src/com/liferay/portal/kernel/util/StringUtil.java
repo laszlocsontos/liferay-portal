@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 /**
@@ -44,6 +45,7 @@ import java.util.regex.Pattern;
  * @author Ganesh Ram
  * @author Shuyang Zhou
  * @author Hugo Huijser
+ * @author Vilmos Papp
  */
 public class StringUtil {
 
@@ -386,6 +388,15 @@ public class StringUtil {
 		}
 	}
 
+	/**
+	 * Returns <code>true</code> if the strings are equal, ignoring new line
+	 * characters.
+	 *
+	 * @param  s1 the first string to compare
+	 * @param  s2 the second string to compare
+	 * @return <code>true</code> if the strings are equal, ignoring new line
+	 *         characters; <code>false</code> otherwise
+	 */
 	public static boolean equalsIgnoreBreakLine(String s1, String s2) {
 		if (s1 == s2) {
 			return true;
@@ -1052,6 +1063,60 @@ public class StringUtil {
 		String postfix = s.substring(offset);
 
 		return prefix.concat(insert).concat(postfix);
+	}
+
+	/**
+	 * Returns <code>true</code> if the string <code>s</code>
+	 * is enclosed with character <code>openChar</code> and
+	 * <code>closeChar</code> we assume that "()" is not an enclosed string as
+	 * there are no characters between the brackets
+	 *
+	 * @param s the string in which to search
+	 * @param openChar the character to start the enclosed string
+	 * @param closeChar the character to end the enclosed string
+	 * @return <code>true</code> if <code>openChar</code> and
+	 *         <code>closeChar</code> pairs are balanced in <code>s</code>
+	 *         and <code>openChar</code> is the first character of
+	 *         <code>s</code> and <code>closeChar</code> is the last character
+	 *         of <code>s</code>;
+	 *         <code>false</code> otherwise
+	 */
+	public static boolean isEnclosed(String s, char openChar, char closeChar) {
+		if (Validator.isNull(s)) {
+			return false;
+		}
+
+		if (s.length() < 3) {
+			return false;
+		}
+
+		if ((s.charAt(0) != openChar) ||
+			(s.charAt(s.length() - 1) != closeChar)) {
+
+			return false;
+		}
+
+		Stack<Character> stack = new Stack<Character>();
+
+		for (int i = 1; i < s.length() - 1; i++) {
+			char c = s.charAt(i);
+
+			if (c == openChar) {
+				stack.push(openChar);
+
+				continue;
+			}
+
+			if (c == closeChar) {
+				if (stack.isEmpty()) {
+					return false;
+				}
+
+				stack.pop();
+			}
+		}
+
+		return stack.isEmpty();
 	}
 
 	/**
@@ -2417,8 +2482,8 @@ public class StringUtil {
 	}
 
 	/**
-	 * Replaces all occurrences of the of the keywords found in the substring,
-	 * defined by the beginning and ending strings, with the new values.
+	 * Replaces all occurrences of the keywords found in the substring, defined
+	 * by the beginning and ending strings, with the new values.
 	 *
 	 * <p>
 	 * For example, with the following initialized variables:
@@ -2789,9 +2854,9 @@ public class StringUtil {
 	}
 
 	/**
-	 * Replaces all occurrences of the of the keywords found in the substring,
-	 * defined by the beginning and ending strings, with the new values. The
-	 * result is returned as a {@link StringBundler}.
+	 * Replaces all occurrences of the keywords found in the substring, defined
+	 * by the beginning and ending strings, with the new values. The result is
+	 * returned as a {@link StringBundler}.
 	 *
 	 * <p>
 	 * For example, with the following initialized variables:
@@ -2822,10 +2887,10 @@ public class StringUtil {
 	 *         string is excluded from the result.
 	 * @param  values the key-value map values
 	 * @return a string bundler representing the original string with all
-	 *         occurrences of the of the keywords found in the substring,
-	 *         replaced with the new values. <code>null</code> is returned if
-	 *         the original string, the beginning string, the ending string, or
-	 *         the key-map values are <code>null</code>.
+	 *         occurrences of the keywords found in the substring, replaced with
+	 *         the new values. <code>null</code> is returned if the original
+	 *         string, the beginning string, the ending string, or the key-map
+	 *         values are <code>null</code>.
 	 * @see    #replace(String, String, String, Map)
 	 */
 	public static StringBundler replaceToStringBundler(
@@ -2871,22 +2936,22 @@ public class StringUtil {
 	}
 
 	/**
-	 * Replaces all occurrences of the of the keywords found in the substring,
-	 * defined by the beginning and ending strings, with the new values. The
-	 * result is returned as a {@link StringBundler}.
+	 * Replaces all occurrences of the keywords found in the substring, defined
+	 * by the beginning and ending strings, with the new values. The result is
+	 * returned as a {@link StringBundler}.
 	 *
 	 * @param  s the original string
 	 * @param  begin the string preceding the substring to be modified. This
 	 *         string is removed from the result.
 	 * @param  end the string following the substring to be modified. This
 	 *         string is removed from the result.
-	 * @param  values the key-value map values, which has a string keys and
-	 *         {@link StringBundler} values
+	 * @param  values the key-value map values, which has string keys and {@link
+	 *         StringBundler} values
 	 * @return a string bundler representing the original string with all
-	 *         occurrences of the of the keywords found in the substring,
-	 *         replaced with the new values. <code>null</code> is returned if
-	 *         the original string, the beginning string, the ending string, or
-	 *         the key-map values are <code>null</code>.
+	 *         occurrences of the keywords found in the substring, replaced with
+	 *         the new values. <code>null</code> is returned if the original
+	 *         string, the beginning string, the ending string, or the key-map
+	 *         values are <code>null</code>.
 	 */
 	public static StringBundler replaceWithStringBundler(
 		String s, String begin, String end, Map<String, StringBundler> values) {
@@ -4512,6 +4577,45 @@ public class StringUtil {
 		return String.valueOf(obj);
 	}
 
+	/**
+	 * Returns <code>true</code> if the string matches the wildcard pattern.
+	 *
+	 * <p>
+	 * For example, with the following initialized variables:
+	 * </p>
+	 *
+	 * <p>
+	 * <pre>
+	 * <code>
+	 * String s = "*master";
+	 * String wildcard = "/*m?st*";
+	 * char singleWildcardCharacter = '?';
+	 * char multipleWildcardCharacter = '*';
+	 * char escapeWildcardCharacter = '/';
+	 * boolean caseSensitive = false;
+	 * </code>
+	 * </pre>
+	 * </p>
+	 *
+	 * <p>
+	 * <code>wildcardMatches(s, wildcard, singleWildcardCharacter,
+	 * multipleWildcardCharacter, escapeWildcardCharacter, caseSensitive)</code>
+	 * returns <code>true</code>
+	 * </p>
+	 *
+	 * @param  s the string to be checked
+	 * @param  wildcard the wildcard pattern to match
+	 * @param  singleWildcardCharacter the char used to match exactly one
+	 *         character
+	 * @param  multipleWildcardCharacter the char used to match <code>0</code>
+	 *         or more characters
+	 * @param  escapeWildcardCharacter the char placed in front of a wildcard
+	 *         character to indicate that it should be interpreted as a regular
+	 *         character
+	 * @param  caseSensitive whether to use case sensitivity
+	 * @return <code>true</code> if the string matches the wildcard pattern;
+	 *         <code>false</code> otherwise
+	 */
 	public static boolean wildcardMatches(
 		String s, String wildcard, char singleWildcardCharacter,
 		char multipleWildcardCharacter, char escapeWildcardCharacter,

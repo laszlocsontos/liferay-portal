@@ -198,10 +198,6 @@
 			<forward name="portlet.announcements.view" path="portlet.announcements.view" />
 		</action>
 
-		<!-- Amazon Rankings -->
-
-		<action path="/amazon_rankings/view" forward="portlet.amazon_rankings.view" />
-
 		<!-- Announcements -->
 
 		<action path="/announcements/edit_entry" type="com.liferay.portlet.announcements.action.EditEntryAction">
@@ -421,14 +417,6 @@
 		<!-- Control Panel Menu -->
 
 		<action path="/control_panel_menu/view" forward="portlet.control_panel_menu.view" />
-
-		<!-- Currency Converter -->
-
-		<action path="/currency_converter/edit" type="com.liferay.portlet.currencyconverter.action.EditPreferencesAction">
-			<forward name="portlet.currency_converter.edit" path="portlet.currency_converter.edit" />
-		</action>
-
-		<action path="/currency_converter/view" forward="portlet.currency_converter.view" />
 
 		<!-- Directory -->
 
@@ -1748,11 +1736,6 @@
 		<action path="/search/view" forward="portlet.search.view" />
 
 		<!-- Shopping -->
-
-		<action path="/shopping/add_book_items" type="com.liferay.portlet.shopping.action.AddBookItemsAction">
-			<forward name="portlet.shopping.add_book_items" path="portlet.shopping.add_book_items" />
-			<forward name="portlet.shopping.error" path="portlet.shopping.error" />
-		</action>
 
 		<action path="/shopping/cart" type="com.liferay.portlet.shopping.action.CartAction">
 			<forward name="portlet.shopping.cart" path="portlet.shopping.cart" />

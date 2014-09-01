@@ -16,9 +16,7 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.amazonrankings.util.AmazonRankingsUtil" %><%@
-page import="com.liferay.portlet.shopping.AmazonException" %><%@
-page import="com.liferay.portlet.shopping.BillingCityException" %><%@
+<%@ page import="com.liferay.portlet.shopping.BillingCityException" %><%@
 page import="com.liferay.portlet.shopping.BillingCountryException" %><%@
 page import="com.liferay.portlet.shopping.BillingEmailAddressException" %><%@
 page import="com.liferay.portlet.shopping.BillingFirstNameException" %><%@
@@ -45,6 +43,7 @@ page import="com.liferay.portlet.shopping.CouponMinimumOrderException" %><%@
 page import="com.liferay.portlet.shopping.CouponNameException" %><%@
 page import="com.liferay.portlet.shopping.CouponStartDateException" %><%@
 page import="com.liferay.portlet.shopping.DuplicateCouponCodeException" %><%@
+page import="com.liferay.portlet.shopping.DuplicateItemFieldNameException" %><%@
 page import="com.liferay.portlet.shopping.DuplicateItemSKUException" %><%@
 page import="com.liferay.portlet.shopping.ItemLargeImageNameException" %><%@
 page import="com.liferay.portlet.shopping.ItemLargeImageSizeException" %><%@
