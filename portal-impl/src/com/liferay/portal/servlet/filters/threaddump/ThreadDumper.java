@@ -14,9 +14,9 @@
 
 package com.liferay.portal.servlet.filters.threaddump;
 
+import com.liferay.portal.kernel.diag.ThreadUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ThreadUtil;
 
 /**
  * @author Shuyang Zhou

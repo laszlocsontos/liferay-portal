@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.nio.intraband.mailbox;
 
+import com.liferay.portal.kernel.diag.ThreadUtil;
 import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.nio.intraband.Datagram;
 import com.liferay.portal.kernel.nio.intraband.test.MockIntraband;
@@ -22,7 +23,6 @@ import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtilAdvice;
-import com.liferay.portal.kernel.util.ThreadUtil;
 import com.liferay.portal.test.AdviseWith;
 import com.liferay.portal.test.runners.AspectJMockingNewJVMJUnitTestRunner;
 

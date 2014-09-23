@@ -14,13 +14,13 @@
 
 package com.liferay.portal.kernel.memory;
 
+import com.liferay.portal.kernel.diag.ThreadUtil;
 import com.liferay.portal.kernel.memory.FinalizeManager.ReferenceFactory;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.GCUtil;
 import com.liferay.portal.kernel.test.NewClassLoaderJUnitTestRunner;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.ThreadUtil;
 
 import java.lang.ref.Reference;
 
