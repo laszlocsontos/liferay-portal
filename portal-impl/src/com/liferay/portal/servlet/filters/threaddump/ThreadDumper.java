@@ -14,9 +14,9 @@
 
 package com.liferay.portal.servlet.filters.threaddump;
 
+import com.liferay.portal.kernel.diag.ThreadDumpUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ThreadUtil;
 
 /**
  * @author Shuyang Zhou
@@ -31,7 +31,7 @@ public class ThreadDumper implements Runnable {
 	@Override
 	public void run() {
 		if (_log.isInfoEnabled()) {
-			_log.info(ThreadUtil.threadDump());
+			_log.info(ThreadDumpUtil.threadDump());
 		}
 
 		_executed = true;

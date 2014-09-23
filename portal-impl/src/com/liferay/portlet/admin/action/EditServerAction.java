@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.cluster.ClusterLink;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.dao.shard.ShardUtil;
+import com.liferay.portal.kernel.diag.ThreadDumpUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
 import com.liferay.portal.kernel.image.GhostscriptUtil;
@@ -69,7 +70,6 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.ThreadUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnsyncPrintWriterPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -624,7 +624,7 @@ public class EditServerAction extends PortletAction {
 		if (_log.isInfoEnabled()) {
 			Log log = SanitizerLogWrapper.allowCRLF(_log);
 
-			log.info(ThreadUtil.threadDump());
+			log.info(ThreadDumpUtil.threadDump());
 		}
 		else {
 			_log.error(
