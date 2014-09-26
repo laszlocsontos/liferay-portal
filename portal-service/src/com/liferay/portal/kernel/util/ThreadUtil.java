@@ -48,6 +48,9 @@ public class ThreadUtil {
 		return threads;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link ThreadDumpUtil#threadDump}
+	 */
 	@Deprecated
 	public static String threadDump() {
 		return ThreadDumpUtil.threadDump();
