@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.portal.kernel.diag.ThreadDumpUtil;
+
 /**
  * @author Tina Tian
  * @author Shuyang Zhou
@@ -44,6 +46,11 @@ public class ThreadUtil {
 		}
 
 		return threads;
+	}
+
+	@Deprecated
+	public static String threadDump() {
+		return ThreadDumpUtil.threadDump();
 	}
 
 }
