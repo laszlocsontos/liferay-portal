@@ -142,6 +142,10 @@ public class RestrictPortletServletRequest
 		}
 	}
 
+	public Object setAttributeIfAbsent(String name, Object value) {
+		return value;
+	}
+
 	protected void doMergeSharedAttributes(ServletRequest servletRequest) {
 		for (Map.Entry<String, Object> entry : _attributes.entrySet()) {
 			String name = entry.getKey();
