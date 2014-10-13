@@ -46,6 +46,53 @@ public class RestrictPortletServletRequest
 
 	@Override
 	public Object getAttribute(String name) {
+		return doGetAttribute(name);
+	}
+
+	@Override
+	public Enumeration<String> getAttributeNames() {
+		return doGetAttributeNames();
+	}
+
+	public Map<String, Object> getAttributes() {
+		return doGetAttributes();
+	}
+
+	public void mergeSharedAttributes() {
+		ServletRequest servletRequest = getRequest();
+
+		Lock lock = (Lock)servletRequest.getAttribute(
+			WebKeys.PARALLEL_RENDERING_MERGE_LOCK);
+
+		if (lock != null) {
+			lock.lock();
+		}
+
+		try {
+			doMergeSharedAttributes(servletRequest);
+		}
+		finally {
+			if (lock != null) {
+				lock.unlock();
+			}
+		}
+	}
+
+	@Override
+	public void removeAttribute(String name) {
+		doRemoveAttribute(name);
+	}
+
+	@Override
+	public void setAttribute(String name, Object value) {
+		doSetAttribute(name, value);
+	}
+
+	public Object setAttributeIfAbsent(String name, Object value) {
+		return value;
+	}
+
+	protected Object doGetAttribute(String name) {
 		if (RequestDispatcherAttributeNames.contains(name)) {
 			return super.getAttribute(name);
 		}
@@ -63,8 +110,7 @@ public class RestrictPortletServletRequest
 		return super.getAttribute(name);
 	}
 
-	@Override
-	public Enumeration<String> getAttributeNames() {
+	protected Enumeration<String> doGetAttributeNames() {
 		Enumeration<String> superEnumeration = super.getAttributeNames();
 
 		if (_attributes.isEmpty()) {
@@ -94,56 +140,8 @@ public class RestrictPortletServletRequest
 		return Collections.enumeration(names);
 	}
 
-	public Map<String, Object> getAttributes() {
+	protected Map<String, Object> doGetAttributes() {
 		return _attributes;
-	}
-
-	public void mergeSharedAttributes() {
-		ServletRequest servletRequest = getRequest();
-
-		Lock lock = (Lock)servletRequest.getAttribute(
-			WebKeys.PARALLEL_RENDERING_MERGE_LOCK);
-
-		if (lock != null) {
-			lock.lock();
-		}
-
-		try {
-			doMergeSharedAttributes(servletRequest);
-		}
-		finally {
-			if (lock != null) {
-				lock.unlock();
-			}
-		}
-	}
-
-	@Override
-	public void removeAttribute(String name) {
-		if (RequestDispatcherAttributeNames.contains(name)) {
-			super.removeAttribute(name);
-		}
-		else {
-			_attributes.put(name, _nullValue);
-		}
-	}
-
-	@Override
-	public void setAttribute(String name, Object value) {
-		if (RequestDispatcherAttributeNames.contains(name)) {
-			super.setAttribute(name, value);
-		}
-		else {
-			if (value == null) {
-				value = _nullValue;
-			}
-
-			_attributes.put(name, value);
-		}
-	}
-
-	public Object setAttributeIfAbsent(String name, Object value) {
-		return value;
 	}
 
 	protected void doMergeSharedAttributes(ServletRequest servletRequest) {
@@ -193,6 +191,28 @@ public class RestrictPortletServletRequest
 			if ((value != _nullValue) && _log.isDebugEnabled()) {
 				_log.debug("Ignore setting restricted attribute " + name);
 			}
+		}
+	}
+
+	protected void doRemoveAttribute(String name) {
+		if (RequestDispatcherAttributeNames.contains(name)) {
+			super.removeAttribute(name);
+		}
+		else {
+			_attributes.put(name, _nullValue);
+		}
+	}
+
+	protected void doSetAttribute(String name, Object value) {
+		if (RequestDispatcherAttributeNames.contains(name)) {
+			super.setAttribute(name, value);
+		}
+		else {
+			if (value == null) {
+				value = _nullValue;
+			}
+
+			_attributes.put(name, value);
 		}
 	}
 
