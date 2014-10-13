@@ -218,7 +218,7 @@ public class RestrictPortletServletRequest
 	}
 
 	protected Map<String, Object> doGetAttributes() {
-		return _attributes;
+		return Collections.unmodifiableMap(_attributes);
 	}
 
 	protected void doMergeSharedAttributes(ServletRequest servletRequest) {
