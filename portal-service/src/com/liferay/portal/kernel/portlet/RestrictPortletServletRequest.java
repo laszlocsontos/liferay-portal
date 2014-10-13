@@ -30,32 +30,61 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Shuyang Zhou
+ * @author László Csontos
  */
 public class RestrictPortletServletRequest
 	extends PersistentHttpServletRequestWrapper {
 
 	public RestrictPortletServletRequest(HttpServletRequest request) {
 		super(request);
+
+		ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+		_readLock = readWriteLock.readLock();
+		_writeLock = readWriteLock.writeLock();
 	}
 
 	@Override
 	public Object getAttribute(String name) {
-		return doGetAttribute(name);
+		_readLock.lock();
+
+		try {
+			return doGetAttribute(name);
+		}
+		finally {
+			_readLock.unlock();
+		}
 	}
 
 	@Override
 	public Enumeration<String> getAttributeNames() {
-		return doGetAttributeNames();
+		_readLock.lock();
+
+		try {
+			return doGetAttributeNames();
+		}
+		finally {
+			_readLock.unlock();
+		}
 	}
 
 	public Map<String, Object> getAttributes() {
-		return doGetAttributes();
+		_readLock.lock();
+
+		try {
+			return doGetAttributes();
+		}
+		finally {
+			_readLock.unlock();
+		}
 	}
 
 	public void mergeSharedAttributes() {
@@ -68,10 +97,14 @@ public class RestrictPortletServletRequest
 			lock.lock();
 		}
 
+		_writeLock.lock();
+
 		try {
 			doMergeSharedAttributes(servletRequest);
 		}
 		finally {
+			_writeLock.unlock();
+
 			if (lock != null) {
 				lock.unlock();
 			}
@@ -80,16 +113,60 @@ public class RestrictPortletServletRequest
 
 	@Override
 	public void removeAttribute(String name) {
-		doRemoveAttribute(name);
+		_writeLock.lock();
+
+		try {
+			doRemoveAttribute(name);
+		}
+		finally {
+			_writeLock.unlock();
+		}
 	}
 
 	@Override
 	public void setAttribute(String name, Object value) {
-		doSetAttribute(name, value);
+		_writeLock.lock();
+
+		try {
+			doSetAttribute(name, value);
+		}
+		finally {
+			_writeLock.unlock();
+		}
 	}
 
 	public Object setAttributeIfAbsent(String name, Object value) {
-		return value;
+		_readLock.lock();
+
+		Object originalValue = null;
+
+		try {
+			originalValue = doGetAttribute(name);
+
+			if (originalValue != null) {
+				return originalValue;
+			}
+		}
+		finally {
+			_readLock.unlock();
+		}
+
+		_writeLock.lock();
+
+		try {
+			originalValue = doGetAttribute(name);
+
+			if (originalValue != null) {
+				return originalValue;
+			}
+
+			doSetAttribute(name, value);
+
+			return value;
+		}
+		finally {
+			_writeLock.unlock();
+		}
 	}
 
 	protected Object doGetAttribute(String name) {
@@ -236,5 +313,7 @@ public class RestrictPortletServletRequest
 
 	private final Map<String, Object> _attributes =
 		new HashMap<String, Object>();
+	private final Lock _readLock;
+	private final Lock _writeLock;
 
 }
