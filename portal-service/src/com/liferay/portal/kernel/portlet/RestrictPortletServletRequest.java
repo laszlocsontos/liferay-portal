@@ -21,8 +21,11 @@ import com.liferay.portal.kernel.servlet.RequestDispatcherAttributeNames;
 import com.liferay.portal.kernel.util.Mergeable;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -204,6 +207,37 @@ public class RestrictPortletServletRequest
 	}
 
 	protected void doSetAttribute(String name, Object value) {
+		if (_log.isDebugEnabled()) {
+			StringBundler sb = new StringBundler();
+
+			sb.append("doSetAttribute: ");
+			sb.append(name);
+			sb.append(StringPool.EQUAL);
+			sb.append(value);
+			sb.append(StringPool.COMMA);
+
+			Class<?> valueClass = null;
+
+			if (value != null) {
+				valueClass = value.getClass();
+			}
+
+			sb.append(valueClass);
+			sb.append(StringPool.COMMA);
+
+			boolean isCollection = false;
+
+			if ((value instanceof Collection<?>) ||
+				(value instanceof Map<?, ?>)) {
+
+				isCollection = true;
+			}
+
+			sb.append(isCollection);
+
+			_log.debug(sb.toString());
+		}
+
 		if (RequestDispatcherAttributeNames.contains(name)) {
 			super.setAttribute(name, value);
 		}
