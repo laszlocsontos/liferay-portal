@@ -374,8 +374,6 @@ public class RuntimePageImpl implements RuntimePage {
 		boolean portletParallelRender = GetterUtil.getBoolean(
 			request.getAttribute(WebKeys.PORTLET_PARALLEL_RENDER));
 
-		Lock lock = null;
-
 		Map<String, StringBundler> contentsMap =
 			new HashMap<String, StringBundler>();
 
@@ -401,12 +399,10 @@ public class RuntimePageImpl implements RuntimePage {
 					_log.debug("Start parallel rendering");
 				}
 
-				if (lock == null) {
-					lock = new ReentrantLock();
-				}
+				Lock mergeLock = new ReentrantLock();
 
 				request.setAttribute(
-					WebKeys.PARALLEL_RENDERING_MERGE_LOCK, lock);
+					WebKeys.PARALLEL_RENDERING_MERGE_LOCK, mergeLock);
 
 				ObjectValuePair<HttpServletRequest, Closeable> objectValuePair =
 					ThreadLocalFacadeServletRequestWrapperUtil.inject(request);
