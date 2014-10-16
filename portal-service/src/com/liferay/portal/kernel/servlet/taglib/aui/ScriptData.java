@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.servlet.taglib.aui;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.util.Mergeable;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -54,6 +56,10 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 	}
 
 	public void mark() {
+		if (_log.isDebugEnabled()) {
+			_log.debug("mark()");
+		}
+
 		for (PortletData portletData : _portletDataMap.values()) {
 			_addToSBIndexList(portletData._callbackSB);
 			_addToSBIndexList(portletData._rawSB);
@@ -70,6 +76,10 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 	}
 
 	public void reset() {
+		if (_log.isDebugEnabled()) {
+			_log.debug("reset()");
+		}
+
 		for (ObjectValuePair<StringBundler, Integer> ovp : _sbIndexList) {
 			StringBundler sb = ovp.getKey();
 
@@ -137,6 +147,17 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 		int index = _sbIndexList.indexOf(ovp);
 
 		if (index == -1) {
+			if (_log.isDebugEnabled()) {
+				StringBundler msg = new StringBundler(4);
+
+				msg.append("_addToSBIndexList(): sb=\"");
+				msg.append(sb);
+				msg.append("\",sb.index()=");
+				msg.append(sb.index());
+
+				_log.debug(msg.toString());
+			}
+
 			_sbIndexList.add(ovp);
 		}
 		else {
@@ -166,6 +187,8 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 
 		return portletData;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(ScriptData.class);
 
 	private static final long serialVersionUID = 1L;
 
