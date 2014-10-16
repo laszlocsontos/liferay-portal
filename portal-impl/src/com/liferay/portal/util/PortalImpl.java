@@ -5466,6 +5466,8 @@ public class PortalImpl implements Portal {
 		int i = 1;
 
 		while (uniqueElementIds.contains(namespace.concat(uniqueElementId))) {
+			String previousUniqueElementId = uniqueElementId;
+
 			if (Validator.isNull(elementId) ||
 				elementId.endsWith(StringPool.UNDERLINE)) {
 
@@ -5476,10 +5478,26 @@ public class PortalImpl implements Portal {
 					String.valueOf(i));
 			}
 
+			if (_log.isDebugEnabled()) {
+				StringBundler sb = new StringBundler(5);
+
+				sb.append("Collision found with elementId \"");
+				sb.append(previousUniqueElementId);
+				sb.append("\"; retrying with new elementId \"");
+				sb.append(uniqueElementId);
+				sb.append("\".");
+
+				_log.debug(sb.toString());
+			}
+
 			i++;
 		}
 
 		uniqueElementIds.add(namespace.concat(uniqueElementId));
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("New elementId set is: " + uniqueElementIds);
+		}
 
 		return uniqueElementId;
 	}
