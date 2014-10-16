@@ -5462,25 +5462,21 @@ public class PortalImpl implements Portal {
 					request, WebKeys.UNIQUE_ELEMENT_IDS,
 					new ConcurrentHashSet<>());
 		}
-		else {
-			int i = 1;
 
-			while (uniqueElementIds.contains(
-						namespace.concat(uniqueElementId))) {
+		int i = 1;
 
-				if (Validator.isNull(elementId) ||
-					elementId.endsWith(StringPool.UNDERLINE)) {
+		while (uniqueElementIds.contains(namespace.concat(uniqueElementId))) {
+			if (Validator.isNull(elementId) ||
+				elementId.endsWith(StringPool.UNDERLINE)) {
 
-					uniqueElementId = elementId.concat(String.valueOf(i));
-				}
-				else {
-					uniqueElementId =
-						elementId.concat(StringPool.UNDERLINE).concat(
-							String.valueOf(i));
-				}
-
-				i++;
+				uniqueElementId = elementId.concat(String.valueOf(i));
 			}
+			else {
+				uniqueElementId = elementId.concat(StringPool.UNDERLINE).concat(
+					String.valueOf(i));
+			}
+
+			i++;
 		}
 
 		uniqueElementIds.add(namespace.concat(uniqueElementId));
