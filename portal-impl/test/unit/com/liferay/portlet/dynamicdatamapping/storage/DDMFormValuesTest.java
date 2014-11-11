@@ -16,15 +16,13 @@ package com.liferay.portlet.dynamicdatamapping.storage;
 
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portlet.dynamicdatamapping.BaseDDMTestCase;
-import com.liferay.portlet.dynamicdatamapping.model.Value;
 
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.testng.Assert;
 
 /**
  * @author Marcellus Tavares
@@ -45,15 +43,16 @@ public class DDMFormValuesTest extends BaseDDMTestCase {
 
 	@Test
 	public void testDDMFormFieldValuesMap() {
-		Map<String, List<Value>> ddmFormFieldValuesMap =
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
 			_ddmFormValues.getDDMFormFieldValuesMap();
 
-		List<Value> values = ddmFormFieldValuesMap.get(_FIELD_NAME);
+		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValuesMap.get(
+			_FIELD_NAME);
 
-		Assert.assertEquals(3, values.size());
+		Assert.assertEquals(3, ddmFormFieldValues.size());
 	}
 
-	private final String _FIELD_NAME = StringUtil.randomString();
+	private static final String _FIELD_NAME = StringUtil.randomString();
 
 	private DDMFormValues _ddmFormValues;
 

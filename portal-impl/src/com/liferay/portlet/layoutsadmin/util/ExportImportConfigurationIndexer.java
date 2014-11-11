@@ -16,6 +16,7 @@ package com.liferay.portlet.layoutsadmin.util;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
@@ -35,7 +36,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 
 import javax.portlet.PortletRequest;
@@ -176,16 +176,25 @@ public class ExportImportConfigurationIndexer extends BaseIndexer {
 	protected void populateLayoutIds(
 		Document document, Map<String, Serializable> settingsMap) {
 
-		if (!settingsMap.containsKey("layoutIdMap")) {
+		if (!settingsMap.containsKey("layoutIdMap") &&
+			!settingsMap.containsKey("layoutIds")) {
+
 			return;
 		}
 
-		Map<Long, Boolean> layoutIdMap = (Map<Long, Boolean>)settingsMap.get(
-			"layoutIdMap");
+		long[] layoutIds = GetterUtil.getLongValues(
+			settingsMap.get("layoutIds"));
 
-		Set<Long> layoutIdSet = layoutIdMap.keySet();
+		if (ArrayUtil.isEmpty(layoutIds)) {
+			Map<Long, Boolean> layoutIdMap =
+				(Map<Long, Boolean>)settingsMap.get("layoutIdMap");
 
-		Long[] layoutIds = layoutIdSet.toArray(new Long[layoutIdSet.size()]);
+			try {
+				layoutIds = ExportImportHelperUtil.getLayoutIds(layoutIdMap);
+			}
+			catch (PortalException pe) {
+			}
+		}
 
 		document.addKeyword("layoutIds", layoutIds);
 	}

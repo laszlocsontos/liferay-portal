@@ -25,9 +25,9 @@ public class SearchEngineProxyWrapper implements SearchEngine {
 		SearchEngine searchEngine, IndexSearcher indexSearcher,
 		IndexWriter indexWriter) {
 
+		_searchEngine = searchEngine;
 		_indexSearcher = indexSearcher;
 		_indexWriter = indexWriter;
-		_searchEngine = searchEngine;
 	}
 
 	@Override
@@ -115,8 +115,8 @@ public class SearchEngineProxyWrapper implements SearchEngine {
 		_searchEngine.restore(companyId, backupName);
 	}
 
-	private IndexSearcher _indexSearcher;
-	private IndexWriter _indexWriter;
-	private SearchEngine _searchEngine;
+	private final IndexSearcher _indexSearcher;
+	private final IndexWriter _indexWriter;
+	private final SearchEngine _searchEngine;
 
 }

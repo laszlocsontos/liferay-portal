@@ -49,10 +49,6 @@ public class PortletKeys {
 
 	public static final String BLOGS_AGGREGATOR = "115";
 
-	public static final String BOOKMARKS = "28";
-
-	public static final String BOOKMARKS_ADMIN = "198";
-
 	public static final String BREADCRUMB = "73";
 
 	public static final String CALENDAR = "8";
@@ -103,8 +99,6 @@ public class PortletKeys {
 
 	public static final String JOURNAL_CONTENT = "56";
 
-	public static final String JOURNAL_CONTENT_LIST = "62";
-
 	public static final String JOURNAL_CONTENT_SEARCH = "77";
 
 	public static final String LANGUAGE = "82";
@@ -152,7 +146,8 @@ public class PortletKeys {
 
 	public static final String NAVIGATION = "71";
 
-	public static final String NESTED_PORTLETS = "118";
+	public static final String NESTED_PORTLETS =
+		"com_liferay_nested_portlets_web_portlet_NestedPortletsPortlet";
 
 	public static final String PAGE_COMMENTS = "107";
 

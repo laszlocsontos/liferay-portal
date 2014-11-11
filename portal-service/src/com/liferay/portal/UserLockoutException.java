@@ -27,13 +27,14 @@ public class UserLockoutException extends PortalException {
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public UserLockoutException() {
-		super();
 	}
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public UserLockoutException(String msg) {
 		super(msg);
 	}
@@ -41,6 +42,7 @@ public class UserLockoutException extends PortalException {
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public UserLockoutException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
@@ -48,6 +50,7 @@ public class UserLockoutException extends PortalException {
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public UserLockoutException(Throwable cause) {
 		super(cause);
 	}
@@ -72,8 +75,8 @@ public class UserLockoutException extends PortalException {
 			return _ldapMessage;
 		}
 
-		private String _fullUserDN;
-		private String _ldapMessage;
+		private final String _fullUserDN;
+		private final String _ldapMessage;
 
 	}
 
@@ -102,8 +105,8 @@ public class UserLockoutException extends PortalException {
 			return _user;
 		}
 
-		private PasswordPolicy _passwordPolicy;
-		private User _user;
+		private final PasswordPolicy _passwordPolicy;
+		private final User _user;
 
 	}
 

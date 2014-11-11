@@ -583,11 +583,20 @@ public class ServiceBuilder {
 		_tplSpringXml = _getTplProperty("spring_xml", _tplSpringXml);
 
 		try {
-			_badTableNames = _readLines(_tplBadTableNames);
-			_badAliasNames = _readLines(_tplBadAliasNames);
-			_badColumnNames = _readLines(_tplBadColumnNames);
+			_apiDir = apiDir;
+			_autoImportDefaultReferences = autoImportDefaultReferences;
+			_autoNamespaceTables = autoNamespaceTables;
+			_beanLocatorUtil = beanLocatorUtil;
+			_buildNumber = buildNumber;
+			_buildNumberIncrement = buildNumberIncrement;
 			_hbmFileName = hbmFileName;
+			_implDir = implDir;
 			_modelHintsFileName = modelHintsFileName;
+			_osgiModule = osgiModule;
+			_pluginName = GetterUtil.getString(pluginName);
+			_propsUtil = propsUtil;
+			_remotingFileName = remotingFileName;
+			_resourcesDir = resourcesDir;
 			_springFileName = springFileName;
 
 			_springNamespaces = springNamespaces;
@@ -599,27 +608,20 @@ public class ServiceBuilder {
 					_springNamespaces, _SPRING_NAMESPACE_BEANS);
 			}
 
-			_apiDir = apiDir;
-			_implDir = implDir;
-			_resourcesDir = resourcesDir;
-			_remotingFileName = remotingFileName;
 			_sqlDir = sqlDir;
 			_sqlFileName = sqlFileName;
 			_sqlIndexesFileName = sqlIndexesFileName;
 			_sqlSequencesFileName = sqlSequencesFileName;
-			_autoImportDefaultReferences = autoImportDefaultReferences;
-			_autoNamespaceTables = autoNamespaceTables;
-			_beanLocatorUtil = beanLocatorUtil;
-			_beanLocatorUtilShortName = _beanLocatorUtil.substring(
-				_beanLocatorUtil.lastIndexOf(".") + 1);
-			_propsUtil = propsUtil;
-			_pluginName = GetterUtil.getString(pluginName);
 			_targetEntityName = targetEntityName;
 			_testDir = testDir;
 			_build = build;
-			_buildNumber = buildNumber;
-			_buildNumberIncrement = buildNumberIncrement;
-			_osgiModule = osgiModule;
+
+			_badTableNames = _readLines(_tplBadTableNames);
+			_badAliasNames = _readLines(_tplBadAliasNames);
+			_badColumnNames = _readLines(_tplBadColumnNames);
+
+			_beanLocatorUtilShortName = _beanLocatorUtil.substring(
+				_beanLocatorUtil.lastIndexOf(".") + 1);
 
 			String content = getContent(inputFileName);
 
@@ -2161,7 +2163,7 @@ public class ServiceBuilder {
 	}
 
 	private void _createFinderUtil(Entity entity) throws Exception {
-		if (!entity.hasFinderClass()) {
+		if (!entity.hasFinderClass() || _osgiModule) {
 			_removeFinderUtil(entity);
 
 			return;
@@ -2426,8 +2428,7 @@ public class ServiceBuilder {
 			int x = newContent.indexOf("</model-hints>");
 
 			newContent =
-				newContent.substring(0, x) + content +
-					newContent.substring(x);
+				newContent.substring(0, x) + content + newContent.substring(x);
 		}
 		else {
 			firstModel = newContent.lastIndexOf("<model", firstModel) - 1;

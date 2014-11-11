@@ -34,7 +34,6 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletURLImpl;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -43,8 +42,8 @@ import com.liferay.portlet.journal.model.JournalFeed;
 import com.liferay.portlet.journal.model.JournalFeedConstants;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalFeedLocalServiceUtil;
+import com.liferay.portlet.journal.util.JournalContentUtil;
 import com.liferay.portlet.journal.util.JournalRSSUtil;
-import com.liferay.portlet.journalcontent.util.JournalContentUtil;
 import com.liferay.util.RSSUtil;
 
 import com.sun.syndication.feed.synd.SyndContent;
@@ -190,19 +189,18 @@ public class RSSAction extends com.liferay.portal.struts.RSSAction {
 			return PortalUtil.getLayoutFriendlyURL(hitLayout, themeDisplay);
 		}
 
+		String portletId = feed.getTargetPortletId();
+
+		if (Validator.isNull(portletId)) {
+			return StringPool.BLANK;
+		}
+
 		long plid = PortalUtil.getPlidFromFriendlyURL(
 			feed.getCompanyId(), feed.getTargetLayoutFriendlyUrl());
-
-		String portletId = PortletKeys.JOURNAL_CONTENT;
-
-		if (Validator.isNotNull(feed.getTargetPortletId())) {
-			portletId = feed.getTargetPortletId();
-		}
 
 		PortletURL entryURL = new PortletURLImpl(
 			resourceRequest, portletId, plid, PortletRequest.RENDER_PHASE);
 
-		entryURL.setParameter("struts_action", "/journal_content/view");
 		entryURL.setParameter("groupId", String.valueOf(article.getGroupId()));
 		entryURL.setParameter("articleId", article.getArticleId());
 
@@ -264,16 +262,16 @@ public class RSSAction extends com.liferay.portal.struts.RSSAction {
 		String contentField = feed.getContentField();
 
 		if (contentField.equals(JournalFeedConstants.RENDERED_WEB_CONTENT)) {
-			String rendererTemplateId = article.getTemplateId();
+			String ddmRendererTemplateKey = article.getDDMTemplateKey();
 
-			if (Validator.isNotNull(feed.getRendererTemplateId())) {
-				rendererTemplateId = feed.getRendererTemplateId();
+			if (Validator.isNotNull(feed.getDDMRendererTemplateKey())) {
+				ddmRendererTemplateKey = feed.getDDMRendererTemplateKey();
 			}
 
 			JournalArticleDisplay articleDisplay =
 				JournalContentUtil.getDisplay(
 					feed.getGroupId(), article.getArticleId(),
-					rendererTemplateId, null, languageId, 1,
+					ddmRendererTemplateKey, null, languageId, 1,
 					new PortletRequestModel() {
 
 						@Override
@@ -374,6 +372,6 @@ public class RSSAction extends com.liferay.portal.struts.RSSAction {
 		"<request><parameters><parameter><name>rss</name><value>true</value>" +
 			"</parameter></parameters></request>";
 
-	private static Log _log = LogFactoryUtil.getLog(RSSAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(RSSAction.class);
 
 }

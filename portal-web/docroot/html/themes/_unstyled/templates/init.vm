@@ -6,7 +6,7 @@
 #set ($theme_timestamp = $themeDisplay.getTheme().getTimestamp())
 #set ($theme_settings = $themeDisplay.getThemeSettings())
 
-#set ($root_css_class = "aui " + $languageUtil.get($locale, "lang.dir"))
+#set ($root_css_class = $languageUtil.get($locale, "lang.dir"))
 #set ($css_class = $htmlUtil.escape($theme_display.getColorScheme().getCssClass()) + " yui3-skin-sam")
 
 #set ($liferay_toggle_controls = $sessionClicks.get($request, "liferay_toggle_controls", "visible"))
@@ -295,14 +295,14 @@
 #end
 
 #if ($page_group.isLayoutPrototype())
-	#set ($the_title = $page_group.getDescriptiveName())
+	#set ($the_title = $page_group.getDescriptiveName($locale))
 #end
 
 #if ($tilesTitle == "")
 	#set ($the_title = $htmlUtil.escape($the_title))
 #end
 
-#if ($the_title != "" && $company_name != $site_name)
+#if ($the_title != "" && $company_name != $site_name && !$page_group.isLayoutPrototype())
 	#set ($the_title = $the_title + " - " + $site_name)
 #end
 

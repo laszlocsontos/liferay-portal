@@ -764,6 +764,14 @@ public class LiferaySeleniumHelper {
 
 				return true;
 			}
+
+			if (line.contains("[org.apache.xmlbeans.impl.store.CharUtil$1]")) {
+				return true;
+			}
+
+			if (line.contains("[org.apache.xmlbeans.impl.store.Locale$1]")) {
+				return true;
+			}
 		}
 
 		// LPS-49505
@@ -823,6 +831,15 @@ public class LiferaySeleniumHelper {
 
 				return true;
 			}
+		}
+
+		// LPS-50936
+
+		if (line.matches(
+				"Liferay does not have the Xuggler native libraries " +
+					"installed.")) {
+
+			return true;
 		}
 
 		if (Validator.equals(
@@ -1152,6 +1169,12 @@ public class LiferaySeleniumHelper {
 			LiferaySelenium liferaySelenium, String image, String value)
 		throws Exception {
 
+		_screen.click(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+
+		_screen.type("a", Key.CTRL);
+
 		sikuliType(
 			liferaySelenium, image,
 			liferaySelenium.getProjectDirName() +
@@ -1179,6 +1202,12 @@ public class LiferaySeleniumHelper {
 	public static void sikuliUploadTempFile(
 			LiferaySelenium liferaySelenium, String image, String value)
 		throws Exception {
+
+		_screen.click(
+			liferaySelenium.getProjectDirName() +
+			liferaySelenium.getSikuliImagesDirName() + image);
+
+		_screen.type("a", Key.CTRL);
 
 		String slash = "/";
 

@@ -16,9 +16,8 @@ package com.liferay.portal.expression;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import org.testng.Assert;
 
 /**
  * @author Marcellus Tavares
@@ -61,7 +60,7 @@ public class VariableNamesExtractorTest {
 		Assert.assertEquals("variable", variableNames.get(0));
 	}
 
-	private VariableNamesExtractor _variableNamesExtractor =
+	private final VariableNamesExtractor _variableNamesExtractor =
 		new VariableNamesExtractor();
 
 }

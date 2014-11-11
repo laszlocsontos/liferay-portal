@@ -73,6 +73,30 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		return newContent;
 	}
 
+	protected void checkPoshiCharactersAfterDefinition(
+		String fileName, String content) {
+
+		Matcher matcher = _poshiCharactersAfterDefinitionTag.matcher(content);
+
+		if (matcher.find()) {
+			processErrorMessage(
+				fileName,
+				"Characters found after definition element: " + fileName);
+		}
+	}
+
+	protected void checkPoshiCharactersBeforeDefinition(
+		String fileName, String content) {
+
+		Matcher matcher = _poshiCharactersBeforeDefinitionTag.matcher(content);
+
+		if (matcher.find()) {
+			processErrorMessage(
+				fileName,
+				"Characters found before definition element: " + fileName);
+		}
+	}
+
 	protected void checkServiceXMLExceptions(
 		String fileName, Element rootElement) {
 
@@ -449,8 +473,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		String[] excludes = new String[] {
 			"**\\.bnd\\**", "**\\.idea\\**", "**\\.ivy\\**",
 			"portal-impl\\**\\*.action", "portal-impl\\**\\*.function",
-			"portal-impl\\**\\*.macro", "portal-impl\\**\\*.testcase",
-			"tools\\sdk\\**"
+			"portal-impl\\**\\*.macro", "portal-impl\\**\\*.testcase"
 		};
 
 		String[] includes = new String[] {
@@ -459,10 +482,10 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		};
 
 		_friendlyUrlRoutesSortExclusions = getPropertyList(
-			"friendly.url.routes.sort.excludes");
+			"friendly.url.routes.sort.excludes.files");
 		_numericalPortletNameElementExclusions = getPropertyList(
-			"numerical.portlet.name.element.excludes");
-		_xmlExclusions = getPropertyList("xml.excludes");
+			"numerical.portlet.name.element.excludes.files");
+		_xmlExclusions = getPropertyList("xml.excludes.files");
 
 		List<String> fileNames = getFileNames(excludes, includes);
 
@@ -725,6 +748,9 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 	protected String formatPoshiXML(String fileName, String content)
 		throws Exception {
+
+		checkPoshiCharactersAfterDefinition(fileName, content);
+		checkPoshiCharactersBeforeDefinition(fileName, content);
 
 		content = sortPoshiAttributes(fileName, content);
 
@@ -1154,6 +1180,10 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 	private List<String> _columnNames;
 	private List<String> _friendlyUrlRoutesSortExclusions;
 	private List<String> _numericalPortletNameElementExclusions;
+	private Pattern _poshiCharactersAfterDefinitionTag = Pattern.compile(
+		"</definition>([\\w\\s\\t\\n\\<\\>]+)");
+	private Pattern _poshiCharactersBeforeDefinitionTag = Pattern.compile(
+		"([\\w\\s\\t\\n\\<\\>]+)<definition");
 	private Pattern _poshiClosingTagPattern = Pattern.compile("</[^>/]*>");
 	private Pattern _poshiCommandsPattern = Pattern.compile(
 		"\\<command.*name=\\\"([^\\\"]*)\\\".*\\>[\\s\\S]*?\\</command\\>" +

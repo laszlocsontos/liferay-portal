@@ -173,14 +173,13 @@ public class HttpClientSPIAgentTest {
 
 			socket.close();
 
-			CaptureHandler captureHandler = null;
+			CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					HttpClientSPIAgent.class.getName(), Level.OFF);
 
 			try {
 
 				// Clean up when input is shutdown, failed without log
-
-				captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-					HttpClientSPIAgent.class.getName(), Level.OFF);
 
 				List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -239,9 +238,7 @@ public class HttpClientSPIAgentTest {
 				Assert.assertSame(IOException.class, throwable.getClass());
 			}
 			finally {
-				if (captureHandler != null) {
-					captureHandler.close();
-				}
+				captureHandler.close();
 			}
 
 			// Clean up when output is shutdown()
@@ -382,14 +379,12 @@ public class HttpClientSPIAgentTest {
 
 	@Test
 	public void testDestroy() throws Exception {
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			HttpClientSPIAgent.class.getName(), Level.OFF);
 
 		try {
 
 			// Error without log
-
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				HttpClientSPIAgent.class.getName(), Level.OFF);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -480,9 +475,7 @@ public class HttpClientSPIAgentTest {
 			}
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler.close();
 		}
 	}
 
@@ -657,14 +650,13 @@ public class HttpClientSPIAgentTest {
 
 			closePeers(socket, serverSocket);
 
-			CaptureHandler captureHandler = null;
+			CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					HttpClientSPIAgent.class.getName(), Level.OFF);
 
 			try {
 
 				// Force close, failed without log
-
-				captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-					HttpClientSPIAgent.class.getName(), Level.OFF);
 
 				List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -711,9 +703,7 @@ public class HttpClientSPIAgentTest {
 				Assert.assertSame(IOException.class, throwable.getClass());
 			}
 			finally {
-				if (captureHandler != null) {
-					captureHandler.close();
-				}
+				captureHandler.close();
 			}
 
 			// socket.isConnected()
@@ -842,14 +832,12 @@ public class HttpClientSPIAgentTest {
 
 		closePeers(socket, serverSocket);
 
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			HttpClientSPIAgent.class.getName(), Level.OFF);
 
 		try {
 
 			// Unable to send, unable to close, without log
-
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				HttpClientSPIAgent.class.getName(), Level.OFF);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -924,9 +912,7 @@ public class HttpClientSPIAgentTest {
 			swapSocketImpl(socket, socketImpl);
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler.close();
 		}
 
 		closePeers(socket, serverSocket);
@@ -1194,10 +1180,10 @@ public class HttpClientSPIAgentTest {
 
 	private static final String _SERVLET_CONTEXT_NAME = "SERVLET_CONTEXT_NAME";
 
-	private MockHttpServletRequest _mockHttpServletRequest =
+	private final MockHttpServletRequest _mockHttpServletRequest =
 		new MockHttpServletRequest();
 	private Portlet _portlet;
-	private SPIConfiguration _spiConfiguration = new SPIConfiguration(
+	private final SPIConfiguration _spiConfiguration = new SPIConfiguration(
 		null, null, 1234, "baseDir", null, null, null);
 
 	private static class RecordSPIAgentResponse extends SPIAgentResponse {

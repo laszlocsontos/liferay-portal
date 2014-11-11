@@ -378,6 +378,10 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				"portal-dependency-jars",
 				properties.getProperty("portal.dependency.jars")));
 
+		if (!ArrayUtil.contains(portalJars, "liferay-icu4j.jar")) {
+			portalJars = ArrayUtil.append(portalJars, "liferay-icu4j.jar");
+		}
+
 		for (String portalJar : portalJars) {
 			portalJar = portalJar.trim();
 
@@ -485,8 +489,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		}
 
 		File portletPropertiesFile = new File(
-			srcFile.getAbsolutePath() +
-				"/WEB-INF/classes/portlet.properties");
+			srcFile.getAbsolutePath() + "/WEB-INF/classes/portlet.properties");
 
 		if (portletPropertiesFile.exists()) {
 			return;

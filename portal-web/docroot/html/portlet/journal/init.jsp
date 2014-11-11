@@ -22,7 +22,6 @@ page import="com.liferay.portal.kernel.xml.Element" %><%@
 page import="com.liferay.portal.kernel.xml.Node" %><%@
 page import="com.liferay.portal.kernel.xml.SAXReaderUtil" %><%@
 page import="com.liferay.portal.kernel.xml.XPath" %><%@
-page import="com.liferay.portlet.documentlibrary.util.JournalSearcher" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.NoSuchTemplateException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.StorageFieldRequiredException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil" %><%@
@@ -36,7 +35,6 @@ page import="com.liferay.portlet.journal.ArticleIdException" %><%@
 page import="com.liferay.portlet.journal.ArticleSmallImageNameException" %><%@
 page import="com.liferay.portlet.journal.ArticleSmallImageSizeException" %><%@
 page import="com.liferay.portlet.journal.ArticleTitleException" %><%@
-page import="com.liferay.portlet.journal.ArticleTypeException" %><%@
 page import="com.liferay.portlet.journal.ArticleVersionException" %><%@
 page import="com.liferay.portlet.journal.DuplicateArticleIdException" %><%@
 page import="com.liferay.portlet.journal.DuplicateFeedIdException" %><%@
@@ -50,12 +48,12 @@ page import="com.liferay.portlet.journal.FolderNameException" %><%@
 page import="com.liferay.portlet.journal.InvalidDDMStructureException" %><%@
 page import="com.liferay.portlet.journal.NoSuchFolderException" %><%@
 page import="com.liferay.portlet.journal.asset.JournalArticleAssetRenderer" %><%@
+page import="com.liferay.portlet.journal.context.JournalDisplayContext" %><%@
 page import="com.liferay.portlet.journal.model.JournalArticleResource" %><%@
 page import="com.liferay.portlet.journal.model.JournalFeed" %><%@
 page import="com.liferay.portlet.journal.model.JournalFeedConstants" %><%@
 page import="com.liferay.portlet.journal.model.JournalFolder" %><%@
 page import="com.liferay.portlet.journal.model.JournalFolderConstants" %><%@
-page import="com.liferay.portlet.journal.model.impl.JournalArticleImpl" %><%@
 page import="com.liferay.portlet.journal.search.ArticleDisplayTerms" %><%@
 page import="com.liferay.portlet.journal.search.EntriesChecker" %><%@
 page import="com.liferay.portlet.journal.search.FeedDisplayTerms" %><%@
@@ -70,6 +68,7 @@ page import="com.liferay.portlet.journal.service.permission.JournalFeedPermissio
 page import="com.liferay.portlet.journal.service.permission.JournalFolderPermission" %><%@
 page import="com.liferay.portlet.journal.service.permission.JournalPermission" %><%@
 page import="com.liferay.portlet.journal.util.JournalConverterUtil" %><%@
+page import="com.liferay.portlet.journal.util.JournalSearcher" %><%@
 page import="com.liferay.portlet.journal.util.JournalUtil" %><%@
 page import="com.liferay.portlet.journal.util.comparator.ArticleVersionComparator" %><%@
 page import="com.liferay.util.RSSUtil" %>
@@ -77,7 +76,7 @@ page import="com.liferay.util.RSSUtil" %>
 <%
 PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(liferayPortletRequest);
 
-String[] displayViews = StringUtil.split(PrefsParamUtil.getString(portletPreferences, liferayPortletRequest, "displayViews", StringUtil.merge(PropsValues.JOURNAL_DISPLAY_VIEWS)));
+JournalDisplayContext journalDisplayContext = new JournalDisplayContext(liferayPortletRequest, portletPreferences);
 
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>

@@ -23,6 +23,7 @@ import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
+import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
 import com.liferay.sync.engine.util.StreamUtil;
 
@@ -104,6 +105,14 @@ public class DownloadFileHandler extends BaseHandler {
 
 		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
 
+		syncFile = SyncFileService.fetchSyncFile(syncFile.getSyncFileId());
+
+		if ((syncFile == null) ||
+			(syncFile.getState() == SyncFile.STATE_UNSYNCED)) {
+
+			return;
+		}
+
 		Path filePath = Paths.get(syncFile.getFilePathName());
 
 		Watcher watcher = WatcherRegistry.getWatcher(getSyncAccountId());
@@ -116,8 +125,12 @@ public class DownloadFileHandler extends BaseHandler {
 
 			inputStream = httpEntity.getContent();
 
-			Path tempFilePath = Files.createTempFile(
-				String.valueOf(syncFile.getSyncFileId()), ".tmp");
+			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+				getSyncAccountId());
+
+			Path tempFilePath = FileUtil.getFilePath(
+				syncAccount.getFilePathName(), ".data",
+				String.valueOf(syncFile.getSyncFileId()));
 
 			if (Files.exists(filePath)) {
 				Files.copy(
@@ -152,6 +165,8 @@ public class DownloadFileHandler extends BaseHandler {
 			SyncFileService.update(syncFile);
 
 			SyncFileService.updateFileKeySyncFile(syncFile);
+
+			IODeltaUtil.checksums(syncFile);
 		}
 		catch (FileSystemException fse) {
 			downloadedFilePathNames.remove(filePath.toString());
@@ -170,7 +185,7 @@ public class DownloadFileHandler extends BaseHandler {
 		}
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(
+	private static final Logger _logger = LoggerFactory.getLogger(
 		DownloadFileHandler.class);
 
 }

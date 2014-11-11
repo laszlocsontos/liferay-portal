@@ -95,9 +95,6 @@ import java.util.Set;
  */
 public class GroupImpl extends GroupBaseImpl {
 
-	public GroupImpl() {
-	}
-
 	@Override
 	public void clearStagingGroup() {
 		_stagingGroup = null;
@@ -181,12 +178,47 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public String getDescriptiveName() throws PortalException {
-		return getDescriptiveName(LocaleUtil.getDefault());
+		return getDescriptiveName(LocaleUtil.getMostRelevantLocale());
 	}
 
 	@Override
 	public String getDescriptiveName(Locale locale) throws PortalException {
 		return GroupLocalServiceUtil.getGroupDescriptiveName(this, locale);
+	}
+
+	@Override
+	public String getDisplayURL(ThemeDisplay themeDisplay) {
+		return getDisplayURL(themeDisplay, false);
+	}
+
+	@Override
+	public String getDisplayURL(
+		ThemeDisplay themeDisplay, boolean privateLayout) {
+
+		String portalURL = themeDisplay.getPortalURL();
+
+		if ((privateLayout && (getPrivateLayoutsPageCount() > 0)) ||
+			(!privateLayout && (getPublicLayoutsPageCount() > 0))) {
+
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(portalURL);
+			sb.append(themeDisplay.getPathMain());
+			sb.append("/my_sites/view?groupId=");
+			sb.append(getGroupId());
+
+			if (privateLayout) {
+				sb.append("&privateLayout=1");
+			}
+			else {
+				sb.append("&privateLayout=0");
+			}
+
+			return PortalUtil.addPreservedParameters(
+				themeDisplay, sb.toString());
+		}
+
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -997,7 +1029,7 @@ public class GroupImpl extends GroupBaseImpl {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(GroupImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(GroupImpl.class);
 
 	private Group _liveGroup;
 	private Group _stagingGroup;

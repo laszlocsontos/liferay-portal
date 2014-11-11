@@ -76,6 +76,14 @@ public class FieldsToDDMFormValuesConverterImpl
 		Field ddmFieldsDisplayField = ddmFields.get(
 			DDMImpl.FIELDS_DISPLAY_NAME);
 
+		if (ddmFieldsDisplayField == null) {
+			if (ddmFields.contains(fieldName)) {
+				return 1;
+			}
+
+			return 0;
+		}
+
 		String[] ddmFieldsDisplayValues = getDDMFieldsDisplayValues(
 			ddmFieldsDisplayField);
 
@@ -115,9 +123,8 @@ public class FieldsToDDMFormValuesConverterImpl
 	protected DDMFormValues createDDMFormValues(
 		DDMForm ddmForm, Set<Locale> availableLocales, Locale defaultLocale) {
 
-		DDMFormValues ddmFormValues = new DDMFormValues();
+		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
-		ddmFormValues.setDDMForm(ddmForm);
 		ddmFormValues.setAvailableLocales(availableLocales);
 		ddmFormValues.setDefaultLocale(defaultLocale);
 
@@ -129,6 +136,10 @@ public class FieldsToDDMFormValuesConverterImpl
 
 		Field ddmFieldsDisplayField = ddmFields.get(
 			DDMImpl.FIELDS_DISPLAY_NAME);
+
+		if (ddmFieldsDisplayField == null) {
+			return StringUtil.randomString();
+		}
 
 		String prefix = fieldName.concat(DDMImpl.INSTANCE_SEPARATOR);
 

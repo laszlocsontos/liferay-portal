@@ -15,6 +15,7 @@
 package com.liferay.sync.engine.model;
 
 import com.liferay.sync.engine.SyncEngine;
+import com.liferay.sync.engine.documentlibrary.util.ServerEventUtil;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.session.SessionManager;
 
@@ -58,8 +59,8 @@ public class SyncAccountModelListener implements ModelListener<SyncAccount> {
 
 			SessionManager.removeSession(syncAccount.getSyncAccountId());
 
-			SyncAccountService.synchronizeSyncAccount(
-				syncAccount.getSyncAccountId(), 0);
+			ServerEventUtil.synchronizeSyncAccount(
+				syncAccount.getSyncAccountId());
 		}
 	}
 
@@ -86,6 +87,7 @@ public class SyncAccountModelListener implements ModelListener<SyncAccount> {
 		}
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(SyncEngine.class);
+	private static final Logger _logger = LoggerFactory.getLogger(
+		SyncEngine.class);
 
 }

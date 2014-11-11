@@ -210,8 +210,8 @@ public class StagingImplTest {
 
 		// Layouts
 
-		LayoutTestUtil.addLayout(_group.getGroupId(), "Layout 1");
-		LayoutTestUtil.addLayout(_group.getGroupId(), "Layout 2");
+		LayoutTestUtil.addLayout(_group);
+		LayoutTestUtil.addLayout(_group);
 
 		// Create content
 
@@ -338,7 +338,7 @@ public class StagingImplTest {
 			ServiceContextTestUtil.getServiceContext());
 	}
 
-	private static Locale[] _locales = {
+	private static final Locale[] _locales = {
 		LocaleUtil.GERMANY, LocaleUtil.SPAIN, LocaleUtil.US
 	};
 

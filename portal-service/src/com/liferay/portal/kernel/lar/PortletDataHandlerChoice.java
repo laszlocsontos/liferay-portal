@@ -35,8 +35,8 @@ public class PortletDataHandlerChoice extends PortletDataHandlerControl {
 
 		super(namespace, controlName);
 
-		_choices = choices;
 		_defaultChoice = defaultChoice;
+		_choices = choices;
 	}
 
 	public String[] getChoices() {
@@ -66,6 +66,6 @@ public class PortletDataHandlerChoice extends PortletDataHandlerControl {
 	};
 
 	private String[] _choices;
-	private int _defaultChoice;
+	private final int _defaultChoice;
 
 }

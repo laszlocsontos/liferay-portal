@@ -360,6 +360,35 @@ public interface BlogsEntryModel extends BaseModel<BlogsEntry>,
 	public void setTrackbacks(String trackbacks);
 
 	/**
+	 * Returns the cover image file entry ID of this blogs entry.
+	 *
+	 * @return the cover image file entry ID of this blogs entry
+	 */
+	public long getCoverImageFileEntryId();
+
+	/**
+	 * Sets the cover image file entry ID of this blogs entry.
+	 *
+	 * @param coverImageFileEntryId the cover image file entry ID of this blogs entry
+	 */
+	public void setCoverImageFileEntryId(long coverImageFileEntryId);
+
+	/**
+	 * Returns the cover image u r l of this blogs entry.
+	 *
+	 * @return the cover image u r l of this blogs entry
+	 */
+	@AutoEscape
+	public String getCoverImageURL();
+
+	/**
+	 * Sets the cover image u r l of this blogs entry.
+	 *
+	 * @param coverImageURL the cover image u r l of this blogs entry
+	 */
+	public void setCoverImageURL(String coverImageURL);
+
+	/**
 	 * Returns the small image of this blogs entry.
 	 *
 	 * @return the small image of this blogs entry
@@ -658,19 +687,19 @@ public interface BlogsEntryModel extends BaseModel<BlogsEntry>,
 	public Object clone();
 
 	@Override
-	public int compareTo(BlogsEntry blogsEntry);
+	public int compareTo(com.liferay.portlet.blogs.model.BlogsEntry blogsEntry);
 
 	@Override
 	public int hashCode();
 
 	@Override
-	public CacheModel<BlogsEntry> toCacheModel();
+	public CacheModel<com.liferay.portlet.blogs.model.BlogsEntry> toCacheModel();
 
 	@Override
-	public BlogsEntry toEscapedModel();
+	public com.liferay.portlet.blogs.model.BlogsEntry toEscapedModel();
 
 	@Override
-	public BlogsEntry toUnescapedModel();
+	public com.liferay.portlet.blogs.model.BlogsEntry toUnescapedModel();
 
 	@Override
 	public String toString();

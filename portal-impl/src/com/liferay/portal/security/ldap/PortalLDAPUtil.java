@@ -14,6 +14,7 @@
 
 package com.liferay.portal.security.ldap;
 
+import com.liferay.portal.kernel.ldap.LDAPUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.log.LogUtil;
@@ -145,8 +146,12 @@ public class PortalLDAPUtil {
 			String groupFilter = PrefsPropsUtil.getString(
 				companyId, PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix);
 
+			LDAPUtil.validateFilter(
+				groupFilter,
+				PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix);
+
 			StringBundler sb = new StringBundler(
-				Validator.isNotNull(groupFilter) ? 11 : 5);
+				Validator.isNotNull(groupFilter) ? 9 : 5);
 
 			if (Validator.isNotNull(groupFilter)) {
 				sb.append(StringPool.OPEN_PARENTHESIS);
@@ -165,9 +170,7 @@ public class PortalLDAPUtil {
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			if (Validator.isNotNull(groupFilter)) {
-				sb.append(StringPool.OPEN_PARENTHESIS);
 				sb.append(groupFilter);
-				sb.append(StringPool.CLOSE_PARENTHESIS);
 				sb.append(StringPool.CLOSE_PARENTHESIS);
 			}
 
@@ -219,10 +222,24 @@ public class PortalLDAPUtil {
 			mappedGroupAttributeIds.add(groupMappings.getProperty("user"));
 		}
 
-		return _getAttributes(
+		Attributes attributes = _getAttributes(
 			ldapContext, fullDistinguishedName,
 			mappedGroupAttributeIds.toArray(
 				new String[mappedGroupAttributeIds.size()]));
+
+		if (_log.isDebugEnabled()) {
+			for (String attributeId : mappedGroupAttributeIds) {
+				Attribute attribute = attributes.get(attributeId);
+
+				if (attribute == null) {
+					continue;
+				}
+
+				_log.debug("LDAP group attribute " + attribute.toString());
+			}
+		}
+
+		return attributes;
 	}
 
 	public static byte[] getGroups(
@@ -460,8 +477,11 @@ public class PortalLDAPUtil {
 			String userFilter = PrefsPropsUtil.getString(
 				companyId, PropsKeys.LDAP_IMPORT_USER_SEARCH_FILTER + postfix);
 
+			LDAPUtil.validateFilter(
+				userFilter, PropsKeys.LDAP_IMPORT_USER_SEARCH_FILTER + postfix);
+
 			StringBundler sb = new StringBundler(
-				Validator.isNotNull(userFilter) ? 11 : 5);
+				Validator.isNotNull(userFilter) ? 9 : 5);
 
 			if (Validator.isNotNull(userFilter)) {
 				sb.append(StringPool.OPEN_PARENTHESIS);
@@ -500,9 +520,7 @@ public class PortalLDAPUtil {
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			if (Validator.isNotNull(userFilter)) {
-				sb.append(StringPool.OPEN_PARENTHESIS);
 				sb.append(userFilter);
-				sb.append(StringPool.CLOSE_PARENTHESIS);
 				sb.append(StringPool.CLOSE_PARENTHESIS);
 			}
 
@@ -565,8 +583,22 @@ public class PortalLDAPUtil {
 		String[] mappedUserAttributeIds = ArrayUtil.toStringArray(
 			userMappings.values().toArray(new Object[userMappings.size()]));
 
-		return _getAttributes(
+		Attributes attributes = _getAttributes(
 			ldapContext, fullDistinguishedName, mappedUserAttributeIds);
+
+		if (_log.isDebugEnabled()) {
+			for (String attributeId : mappedUserAttributeIds) {
+				Attribute attribute = attributes.get(attributeId);
+
+				if (attribute == null) {
+					continue;
+				}
+
+				_log.debug("LDAP user attribute " + attribute.toString());
+			}
+		}
+
+		return attributes;
 	}
 
 	public static byte[] getUsers(

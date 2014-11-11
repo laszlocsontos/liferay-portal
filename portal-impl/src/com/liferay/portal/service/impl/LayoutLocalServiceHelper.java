@@ -345,9 +345,8 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 		LayoutImpl.validateFriendlyURLKeyword(friendlyURL);
 
 		if (friendlyURL.contains(Portal.FRIENDLY_URL_SEPARATOR)) {
-			LayoutFriendlyURLException lfurle =
-				new LayoutFriendlyURLException(
-					LayoutFriendlyURLException.KEYWORD_CONFLICT);
+			LayoutFriendlyURLException lfurle = new LayoutFriendlyURLException(
+				LayoutFriendlyURLException.KEYWORD_CONFLICT);
 
 			lfurle.setKeywordConflict(Portal.FRIENDLY_URL_SEPARATOR);
 
@@ -436,7 +435,10 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 
 				if (layoutFriendlyURLsException == null) {
 					layoutFriendlyURLsException =
-						new LayoutFriendlyURLsException();
+						new LayoutFriendlyURLsException(lfurle);
+				}
+				else {
+					layoutFriendlyURLsException.addSuppressed(lfurle);
 				}
 
 				layoutFriendlyURLsException.addLocalizedException(

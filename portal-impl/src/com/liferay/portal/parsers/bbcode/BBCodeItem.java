@@ -20,8 +20,8 @@ package com.liferay.portal.parsers.bbcode;
 public class BBCodeItem {
 
 	public BBCodeItem(int type, String attribute, String value) {
-		_attribute = attribute;
 		_type = type;
+		_attribute = attribute;
 		_value = value;
 	}
 
@@ -37,8 +37,8 @@ public class BBCodeItem {
 		return _value;
 	}
 
-	private String _attribute;
-	private int _type;
-	private String _value;
+	private final String _attribute;
+	private final int _type;
+	private final String _value;
 
 }

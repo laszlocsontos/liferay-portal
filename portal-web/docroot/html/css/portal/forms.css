@@ -3,7 +3,7 @@
 
 .form-group-inline {
 	display: inline-block;
-	vertical-align: middle;
+	vertical-align: bottom;
 }
 
 .button-holder {
@@ -118,6 +118,11 @@
 			}
 		}
 
+		.file-entry-upload-progress {
+			height: 6px;
+			margin-top: -7px;
+		}
+
 		.lfr-ddm-repeatable-add-button, .lfr-ddm-repeatable-delete-button {
 			display: block;
 			height: 16px;
@@ -164,14 +169,12 @@
 }
 
 @include respond-to(phone, tablet) {
-	.aui {
-		#{$form_text_fields},
-		select,
-		.input-group .input-group-addon,
-		.navbar-search .search-query {
-			font-size: 18px;
-			height: auto;
-			line-height: normal;
-		}
+	#{$form_text_fields},
+	select,
+	.input-group .input-group-addon,
+	.navbar-search .search-query {
+		font-size: 18px;
+		height: auto;
+		line-height: normal;
 	}
 }

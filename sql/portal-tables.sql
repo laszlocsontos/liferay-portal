@@ -220,7 +220,7 @@ create table BackgroundTask (
 	name VARCHAR(75) null,
 	servletContextNames VARCHAR(255) null,
 	taskExecutorClassName VARCHAR(200) null,
-	taskContext TEXT null,
+	taskContextMap TEXT null,
 	completed BOOLEAN,
 	completionDate DATE null,
 	status INTEGER,
@@ -245,6 +245,8 @@ create table BlogsEntry (
 	allowPingbacks BOOLEAN,
 	allowTrackbacks BOOLEAN,
 	trackbacks TEXT null,
+	coverImageFileEntryId LONG,
+	coverImageURL VARCHAR(75) null,
 	smallImage BOOLEAN,
 	smallImageFileEntryId LONG,
 	smallImageId LONG,
@@ -265,49 +267,6 @@ create table BlogsStatsUser (
 	ratingsTotalEntries INTEGER,
 	ratingsTotalScore DOUBLE,
 	ratingsAverageScore DOUBLE
-);
-
-create table BookmarksEntry (
-	uuid_ VARCHAR(75) null,
-	entryId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	modifiedDate DATE null,
-	resourceBlockId LONG,
-	folderId LONG,
-	treePath STRING null,
-	name VARCHAR(255) null,
-	url STRING null,
-	description STRING null,
-	visits INTEGER,
-	priority INTEGER,
-	status INTEGER,
-	statusByUserId LONG,
-	statusByUserName VARCHAR(75) null,
-	statusDate DATE null
-);
-
-create table BookmarksFolder (
-	uuid_ VARCHAR(75) null,
-	folderId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	modifiedDate DATE null,
-	resourceBlockId LONG,
-	parentFolderId LONG,
-	treePath STRING null,
-	name VARCHAR(75) null,
-	description STRING null,
-	status INTEGER,
-	statusByUserId LONG,
-	statusByUserName VARCHAR(75) null,
-	statusDate DATE null
 );
 
 create table BrowserTracker (
@@ -521,6 +480,7 @@ create table DDMStructure (
 	parentStructureId LONG,
 	classNameId LONG,
 	structureKey VARCHAR(75) null,
+	version VARCHAR(75) null,
 	name STRING null,
 	description STRING null,
 	definition TEXT null,
@@ -533,6 +493,22 @@ create table DDMStructureLink (
 	classNameId LONG,
 	classPK LONG,
 	structureId LONG
+);
+
+create table DDMStructureVersion (
+	structureVersionId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	structureId LONG,
+	version VARCHAR(75) null,
+	name STRING null,
+	description STRING null,
+	definition TEXT null,
+	storageType VARCHAR(75) null,
+	type_ INTEGER
 );
 
 create table DDMTemplate (
@@ -873,9 +849,8 @@ create table JournalArticle (
 	urlTitle VARCHAR(150) null,
 	description TEXT null,
 	content TEXT null,
-	type_ VARCHAR(75) null,
-	structureId VARCHAR(75) null,
-	templateId VARCHAR(75) null,
+	DDMStructureKey VARCHAR(75) null,
+	DDMTemplateKey VARCHAR(75) null,
 	layoutUuid VARCHAR(75) null,
 	displayDate DATE null,
 	expirationDate DATE null,
@@ -930,10 +905,9 @@ create table JournalFeed (
 	feedId VARCHAR(75) null,
 	name VARCHAR(75) null,
 	description STRING null,
-	type_ VARCHAR(75) null,
-	structureId VARCHAR(75) null,
-	templateId VARCHAR(75) null,
-	rendererTemplateId VARCHAR(75) null,
+	DDMStructureKey VARCHAR(75) null,
+	DDMTemplateKey VARCHAR(75) null,
+	DDMRendererTemplateKey VARCHAR(75) null,
 	delta INTEGER,
 	orderByCol VARCHAR(75) null,
 	orderByType VARCHAR(75) null,

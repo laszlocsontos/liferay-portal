@@ -46,6 +46,7 @@ import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.blogs.EntryContentException;
+import com.liferay.portlet.blogs.EntryDescriptionException;
 import com.liferay.portlet.blogs.EntryDisplayDateException;
 import com.liferay.portlet.blogs.EntrySmallImageNameException;
 import com.liferay.portlet.blogs.EntrySmallImageSizeException;
@@ -234,12 +235,13 @@ public class EditEntryAction extends PortletAction {
 				setForward(actionRequest, "portlet.blogs.error");
 			}
 			else if (e instanceof EntryContentException ||
+					 e instanceof EntryDescriptionException ||
 					 e instanceof EntryDisplayDateException ||
 					 e instanceof EntrySmallImageNameException ||
 					 e instanceof EntrySmallImageSizeException ||
 					 e instanceof EntryTitleException ||
-					 e instanceof LiferayFileItemException ||
 					 e instanceof FileSizeException ||
+					 e instanceof LiferayFileItemException ||
 					 e instanceof SanitizerException) {
 
 				SessionErrors.add(actionRequest, e.getClass());
@@ -432,7 +434,7 @@ public class EditEntryAction extends PortletAction {
 				entry.getDescription(), content, displayDateMonth,
 				displayDateDay, displayDateYear, displayDateHour,
 				displayDateMinute, entry.getAllowPingbacks(),
-				entry.getAllowTrackbacks(), null, null, serviceContext);
+				entry.getAllowTrackbacks(), null, null, null, serviceContext);
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -458,7 +460,20 @@ public class EditEntryAction extends PortletAction {
 
 		String title = ParamUtil.getString(actionRequest, "title");
 		String subtitle = ParamUtil.getString(actionRequest, "subtitle");
-		String description = ParamUtil.getString(actionRequest, "description");
+
+		String description = StringPool.BLANK;
+
+		boolean customAbstract = ParamUtil.getBoolean(
+			actionRequest, "customAbstract");
+
+		if (customAbstract) {
+			description = ParamUtil.getString(actionRequest, "description");
+
+			if (Validator.isNull(description)) {
+				throw new EntryDescriptionException();
+			}
+		}
+
 		String content = ParamUtil.getString(actionRequest, "content");
 
 		int displayDateMonth = ParamUtil.getInteger(
@@ -485,13 +500,24 @@ public class EditEntryAction extends PortletAction {
 		String[] trackbacks = StringUtil.split(
 			ParamUtil.getString(actionRequest, "trackbacks"));
 
+		long coverImageFileEntryId = ParamUtil.getLong(
+			actionRequest, "coverImageFileEntryId");
+		String coverImageURL = ParamUtil.getString(
+			actionRequest, "coverImageURL");
+		String coverImageFileEntryCropRegion = ParamUtil.getString(
+			actionRequest, "coverImageFileEntryCropRegion");
+
+		ImageSelector coverImageImageSelector = new ImageSelector(
+			coverImageFileEntryId, coverImageURL,
+			coverImageFileEntryCropRegion);
+
 		long smallImageFileEntryId = ParamUtil.getLong(
 			actionRequest, "smallImageFileEntryId");
 		String smallImageURL = ParamUtil.getString(
 			actionRequest, "smallImageURL");
 
-		ImageSelector imageSelector = new ImageSelector(
-			smallImageFileEntryId, smallImageURL);
+		ImageSelector smallImageImageSelector = new ImageSelector(
+			smallImageFileEntryId, smallImageURL, null);
 
 		BlogsEntry entry = null;
 		String oldUrlTitle = StringPool.BLANK;
@@ -507,7 +533,8 @@ public class EditEntryAction extends PortletAction {
 				title, subtitle, description, content, displayDateMonth,
 				displayDateDay, displayDateYear, displayDateHour,
 				displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
-				imageSelector, serviceContext);
+				coverImageImageSelector, smallImageImageSelector,
+				serviceContext);
 
 			AssetPublisherUtil.addAndStoreSelection(
 				actionRequest, BlogsEntry.class.getName(), entry.getEntryId(),
@@ -517,6 +544,18 @@ public class EditEntryAction extends PortletAction {
 
 			// Update entry
 
+			boolean sendEmailEntryUpdated = ParamUtil.getBoolean(
+				actionRequest, "sendEmailEntryUpdated");
+
+			serviceContext.setAttribute(
+				"sendEmailEntryUpdated", sendEmailEntryUpdated);
+
+			String emailEntryUpdatedComment = ParamUtil.getString(
+				actionRequest, "emailEntryUpdatedComment");
+
+			serviceContext.setAttribute(
+				"emailEntryUpdatedComment", emailEntryUpdatedComment);
+
 			entry = BlogsEntryLocalServiceUtil.getEntry(entryId);
 
 			String tempOldUrlTitle = entry.getUrlTitle();
@@ -525,7 +564,8 @@ public class EditEntryAction extends PortletAction {
 				entryId, title, subtitle, description, content,
 				displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, allowPingbacks,
-				allowTrackbacks, trackbacks, imageSelector, serviceContext);
+				allowTrackbacks, trackbacks, coverImageImageSelector,
+				smallImageImageSelector, serviceContext);
 
 			if (!tempOldUrlTitle.equals(entry.getUrlTitle())) {
 				oldUrlTitle = tempOldUrlTitle;

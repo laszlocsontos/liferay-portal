@@ -1,8 +1,10 @@
 package ${seleniumBuilderContext.getActionPackageName(actionName)};
 
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portalweb.portal.util.liferayselenium.LiferaySelenium;
-import com.liferay.portalweb.portal.util.block.action.BaseAction;
-import com.liferay.portalweb2.util.block.action.BaseLiferayAction;
+import com.liferay.portalweb.util.block.action.BaseAction;
+
+import ${seleniumBuilderContext.getActionClassName("BaseLiferay")};
 
 <#if seleniumBuilderContext.getActionRootElement(actionName)??>
 	<#assign rootElement = seleniumBuilderContext.getActionRootElement(actionName)>
@@ -187,6 +189,7 @@ public class ${actionSimpleClassName} extends
 
 					<#list 1..seleniumBuilderContext.getFunctionLocatorCount(functionName) as i>
 						locator${i} = getLocator(locator${i}, locatorKey${i}, environmentScopeVariables);
+						value${i} = HtmlUtil.escape(value${i});
 					</#list>
 
 					<#if commandElement.element("default")??>

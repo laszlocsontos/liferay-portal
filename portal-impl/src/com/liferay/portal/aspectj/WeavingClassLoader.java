@@ -20,13 +20,12 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URL;
 import java.net.URLClassLoader;
-
-import java.nio.file.Files;
 
 import java.security.ProtectionDomain;
 
@@ -99,7 +98,11 @@ public class WeavingClassLoader extends URLClassLoader {
 
 				dumpDir.mkdirs();
 
-				Files.write(dumpFile.toPath(), data);
+				try (FileOutputStream fileOutputStream = new FileOutputStream(
+						dumpFile)) {
+
+					fileOutputStream.write(data);
+				}
 
 				if (_log.isInfoEnabled()) {
 					_log.info(
@@ -144,9 +147,10 @@ public class WeavingClassLoader extends URLClassLoader {
 		return clazz;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(WeavingClassLoader.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		WeavingClassLoader.class);
 
-	private File _dumpDir;
-	private URLWeavingAdapter _urlWeavingAdapter;
+	private final File _dumpDir;
+	private final URLWeavingAdapter _urlWeavingAdapter;
 
 }

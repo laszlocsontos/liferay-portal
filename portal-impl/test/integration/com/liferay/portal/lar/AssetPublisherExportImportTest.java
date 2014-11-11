@@ -81,8 +81,7 @@ public class AssetPublisherExportImportTest
 	@Override
 	public String getPortletId() throws Exception {
 		return PortletKeys.ASSET_PUBLISHER +
-			PortletConstants.INSTANCE_SEPARATOR +
-				RandomTestUtil.randomString();
+			PortletConstants.INSTANCE_SEPARATOR + RandomTestUtil.randomString();
 	}
 
 	@Test
@@ -565,8 +564,7 @@ public class AssetPublisherExportImportTest
 		Company company = CompanyLocalServiceUtil.getCompany(
 			layout.getCompanyId());
 
-		Layout secondLayout = LayoutTestUtil.addLayout(
-			group.getGroupId(), RandomTestUtil.randomString());
+		Layout secondLayout = LayoutTestUtil.addLayout(group);
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), secondLayout);
 
@@ -614,8 +612,7 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testSeveralLegacyLayoutScopeIds() throws Exception {
-		Layout secondLayout = LayoutTestUtil.addLayout(
-			group.getGroupId(), RandomTestUtil.randomString());
+		Layout secondLayout = LayoutTestUtil.addLayout(group);
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), secondLayout);
 

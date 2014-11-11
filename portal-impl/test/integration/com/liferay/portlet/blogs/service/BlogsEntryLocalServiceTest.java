@@ -32,6 +32,8 @@ import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.OrganizationTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
@@ -139,9 +141,8 @@ public class BlogsEntryLocalServiceTest {
 
 		BlogsEntry nextEntry = addEntry(false);
 
-		BlogsEntry[] entries =
-			BlogsEntryLocalServiceUtil.getEntriesPrevAndNext(
-				currentEntry.getEntryId());
+		BlogsEntry[] entries = BlogsEntryLocalServiceUtil.getEntriesPrevAndNext(
+			currentEntry.getEntryId());
 
 		Assert.assertNotNull(
 			"The previous entry relative to entry " +
@@ -359,6 +360,24 @@ public class BlogsEntryLocalServiceTest {
 	@Test
 	public void testGetGroupUserEntriesNotInTrash() throws Exception {
 		testGetGroupUserEntries(false);
+	}
+
+	@Test
+	public void testGetNoAssetEntries() throws Exception {
+		BlogsEntry entry = BlogsTestUtil.addEntry(_group, true);
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			BlogsEntry.class.getName(), entry.getEntryId());
+
+		Assert.assertNotNull(assetEntry);
+
+		AssetEntryLocalServiceUtil.deleteAssetEntry(assetEntry);
+
+		List<BlogsEntry> entries =
+			BlogsEntryLocalServiceUtil.getNoAssetEntries();
+
+		Assert.assertEquals(1, entries.size());
+		Assert.assertEquals(entry, entries.get(0));
 	}
 
 	@Test

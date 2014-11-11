@@ -14,12 +14,7 @@
 
 package com.liferay.portlet.messageboards.subscriptions;
 
-import com.liferay.portal.kernel.settings.ModifiableSettings;
-import com.liferay.portal.kernel.settings.Settings;
-import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousMailExecutionTestListener;
 import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
@@ -29,6 +24,7 @@ import com.liferay.portal.util.subscriptions.BaseSubscriptionLocalizedContentTes
 import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
+import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 import com.liferay.portlet.messageboards.util.MBConstants;
 import com.liferay.portlet.messageboards.util.test.MBTestUtil;
 
@@ -69,37 +65,25 @@ public class MBSubscriptionLocalizedContentTest
 	}
 
 	@Override
-	protected String getSubscriptionBodyPreferenceName() throws Exception {
+	protected String getServiceName() {
+		return MBConstants.SERVICE_NAME;
+	}
+
+	@Override
+	protected String getSubscriptionAddedBodyPreferenceName() {
 		return "emailMessageAddedBody";
 	}
 
 	@Override
-	protected void setAddBaseModelSubscriptionBodyPreferences()
-		throws Exception {
+	protected String getSubscriptionUpdatedBodyPreferenceName() {
+		return "emailMessageUpdatedBody";
+	}
 
-		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
-			group.getGroupId(), MBConstants.SERVICE_NAME);
+	@Override
+	protected void updateBaseModel(long baseModelId) throws Exception {
+		MBMessage message = MBMessageLocalServiceUtil.getMessage(baseModelId);
 
-		ModifiableSettings modifiableSettings =
-			settings.getModifiableSettings();
-
-		String germanSubscriptionBodyPreferencesKey =
-			LocalizationUtil.getPreferencesKey(
-				getSubscriptionBodyPreferenceName(),
-				LocaleUtil.toLanguageId(LocaleUtil.GERMANY));
-
-		modifiableSettings.setValue(
-			germanSubscriptionBodyPreferencesKey, GERMAN_BODY);
-
-		String spanishSubscriptionBodyPreferencesKey =
-			LocalizationUtil.getPreferencesKey(
-				getSubscriptionBodyPreferenceName(),
-				LocaleUtil.toLanguageId(LocaleUtil.SPAIN));
-
-		modifiableSettings.setValue(
-			spanishSubscriptionBodyPreferencesKey, SPANISH_BODY);
-
-		modifiableSettings.store();
+		MBTestUtil.updateMessage(message, true);
 	}
 
 }

@@ -125,7 +125,7 @@
 		<column name="name" type="String" />
 		<column name="servletContextNames" type="String" />
 		<column name="taskExecutorClassName" type="String" />
-		<column name="taskContext" type="String" />
+		<column name="taskContextMap" type="Map" />
 		<column name="completed" type="boolean" />
 		<column name="completionDate" type="Date" />
 		<column name="status" type="int" />
@@ -1203,6 +1203,7 @@
 		<!-- References -->
 
 		<reference package-path="com.liferay.portal" entity="Image" />
+		<reference package-path="com.liferay.portal" entity="Layout" />
 		<reference package-path="com.liferay.portal" entity="LayoutBranch" />
 		<reference package-path="com.liferay.portal" entity="LayoutRevision" />
 		<reference package-path="com.liferay.portal" entity="LayoutSet" />

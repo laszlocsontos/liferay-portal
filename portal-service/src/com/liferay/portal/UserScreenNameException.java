@@ -31,7 +31,6 @@ public class UserScreenNameException extends PortalException {
 	 */
 	@Deprecated
 	public UserScreenNameException() {
-		super();
 	}
 
 	/**
@@ -88,7 +87,7 @@ public class UserScreenNameException extends PortalException {
 
 		private String _screenName;
 		private long _userId;
-		private char[] _validSpecialChars;
+		private final char[] _validSpecialChars;
 
 	}
 
@@ -195,7 +194,7 @@ public class UserScreenNameException extends PortalException {
 			return _userId;
 		}
 
-		private String[] _reservedScreenNames;
+		private final String[] _reservedScreenNames;
 		private String _screenName;
 		private long _userId;
 
@@ -228,7 +227,7 @@ public class UserScreenNameException extends PortalException {
 			return _userId;
 		}
 
-		private Group _group;
+		private final Group _group;
 		private String _screenName;
 		private long _userId;
 
@@ -264,7 +263,7 @@ public class UserScreenNameException extends PortalException {
 			return _userId;
 		}
 
-		private int _exceptionType;
+		private final int _exceptionType;
 		private String _screenName;
 		private long _userId;
 
@@ -300,7 +299,7 @@ public class UserScreenNameException extends PortalException {
 		}
 
 		private String _screenName;
-		private ScreenNameValidator _screenNameValidator;
+		private final ScreenNameValidator _screenNameValidator;
 		private long _userId;
 
 	}

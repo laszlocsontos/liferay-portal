@@ -7484,7 +7484,7 @@ public class BackgroundTaskPersistenceImpl extends BasePersistenceImpl<Backgroun
 		backgroundTaskImpl.setName(backgroundTask.getName());
 		backgroundTaskImpl.setServletContextNames(backgroundTask.getServletContextNames());
 		backgroundTaskImpl.setTaskExecutorClassName(backgroundTask.getTaskExecutorClassName());
-		backgroundTaskImpl.setTaskContext(backgroundTask.getTaskContext());
+		backgroundTaskImpl.setTaskContextMap(backgroundTask.getTaskContextMap());
 		backgroundTaskImpl.setCompleted(backgroundTask.isCompleted());
 		backgroundTaskImpl.setCompletionDate(backgroundTask.getCompletionDate());
 		backgroundTaskImpl.setStatus(backgroundTask.getStatus());
@@ -7889,7 +7889,7 @@ public class BackgroundTaskPersistenceImpl extends BasePersistenceImpl<Backgroun
 		MVCCModel {
 		@Override
 		public long getMvccVersion() {
-			return 0;
+			return -1;
 		}
 
 		@Override

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.deploy.hot;
 
+import com.liferay.portal.kernel.bean.BeanLocatorException;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -51,10 +52,11 @@ public class ServiceWrapperRegistry {
 		_serviceTracker.close();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		ServiceWrapperRegistry.class);
 
-	private ServiceTracker<ServiceWrapper<?>, ServiceBag<?>> _serviceTracker;
+	private final ServiceTracker<ServiceWrapper<?>, ServiceBag<?>>
+		_serviceTracker;
 
 	private class ServiceWrapperServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<ServiceWrapper<?>, ServiceBag<?>> {
@@ -106,6 +108,22 @@ public class ServiceWrapperRegistry {
 			}
 		}
 
+		protected Object getServiceProxy(Class<?> serviceTypeClass) {
+			Object service = null;
+
+			try {
+				service = PortalBeanLocatorUtil.locate(
+					serviceTypeClass.getName());
+			}
+			catch (BeanLocatorException ble) {
+				Registry registry = RegistryUtil.getRegistry();
+
+				service = registry.getService(serviceTypeClass);
+			}
+
+			return service;
+		}
+
 		private <T> ServiceBag<?> _getServiceBag(
 				ServiceWrapper<T> serviceWrapper)
 			throws Throwable {
@@ -119,8 +137,7 @@ public class ServiceWrapperRegistry {
 
 			Class<?> serviceTypeClass = method.getReturnType();
 
-			Object serviceProxy = PortalBeanLocatorUtil.locate(
-				serviceTypeClass.getName());
+			Object serviceProxy = getServiceProxy(serviceTypeClass);
 
 			if (!ProxyUtil.isProxyClass(serviceProxy.getClass())) {
 				_log.error(

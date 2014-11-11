@@ -95,9 +95,6 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		}
 	}
 
-	public JournalArticleImpl() {
-	}
-
 	@Override
 	public String buildTreePath() throws PortalException {
 		if (getFolderId() == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
@@ -185,7 +182,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		return DDMStructureLocalServiceUtil.fetchStructure(
 			PortalUtil.getSiteGroupId(getGroupId()),
 			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
-			getStructureId(), true);
+			getDDMStructureKey(), true);
 	}
 
 	@Override
@@ -193,7 +190,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		return DDMTemplateLocalServiceUtil.fetchTemplate(
 			PortalUtil.getSiteGroupId(getGroupId()),
 			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
-			getStructureId(), true);
+			getDDMStructureKey(), true);
 	}
 
 	@Override
@@ -270,6 +267,22 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	@Override
 	public StagedModelType getStagedModelType() {
 		return new StagedModelType(JournalArticle.class);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getDDMStructureKey()}
+	 */
+	@Override
+	public String getStructureId() {
+		return getDDMStructureKey();
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #getDDMTemplateKey()}
+	 */
+	@Override
+	public String getTemplateId() {
+		return getDDMTemplateKey();
 	}
 
 	@Override
@@ -362,6 +375,22 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		_smallImageType = smallImageType;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #setDDMStructureKey(String)}
+	 */
+	@Override
+	public void setStructureId(String ddmStructureKey) {
+		setDDMStructureKey(ddmStructureKey);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #setDDMTemplateKey(String)}
+	 */
+	@Override
+	public void setTemplateId(String ddmTemplateKey) {
+		setDDMTemplateKey(ddmTemplateKey);
+	}
+
 	@Override
 	public void setTitle(String title) {
 		super.setTitle(title);
@@ -369,7 +398,8 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		_defaultLanguageId = null;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(JournalArticleImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		JournalArticleImpl.class);
 
 	@CacheField
 	private String _defaultLanguageId;

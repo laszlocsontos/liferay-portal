@@ -33,9 +33,6 @@ import java.util.List;
  */
 public class AssetEntryImpl extends AssetEntryBaseImpl {
 
-	public AssetEntryImpl() {
-	}
-
 	@Override
 	public AssetRenderer getAssetRenderer() {
 		AssetRendererFactory assetRendererFactory =
@@ -82,6 +79,6 @@ public class AssetEntryImpl extends AssetEntryBaseImpl {
 		return AssetTagLocalServiceUtil.getEntryTags(getEntryId());
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(AssetEntryImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(AssetEntryImpl.class);
 
 }

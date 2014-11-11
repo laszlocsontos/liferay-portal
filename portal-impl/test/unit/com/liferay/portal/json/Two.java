@@ -34,12 +34,12 @@ public class Two {
 		return _not;
 	}
 
-	private String _fone = "string";
+	private final String _fone = "string";
 
 	@JSON
-	private int _ftwo = 173;
+	private final int _ftwo = 173;
 
 	@JSON(include = false)
-	private long _not = -1;
+	private final long _not = -1;
 
 }

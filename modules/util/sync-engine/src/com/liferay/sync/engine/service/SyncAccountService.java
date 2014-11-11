@@ -14,7 +14,6 @@
 
 package com.liferay.sync.engine.service;
 
-import com.liferay.sync.engine.documentlibrary.event.GetSyncContextEvent;
 import com.liferay.sync.engine.model.ModelListener;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncAccountModelListener;
@@ -24,21 +23,19 @@ import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.persistence.SyncAccountPersistence;
 import com.liferay.sync.engine.util.Encryptor;
 import com.liferay.sync.engine.util.FileUtil;
+import com.liferay.sync.engine.util.OSDetector;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import java.sql.SQLException;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +71,7 @@ public class SyncAccountService {
 	public static SyncAccount addSyncAccount(
 			String filePathName, String login, int maxConnections,
 			String password, int pollInterval, SyncSite[] syncSites,
-			boolean trustSelfSigned, String url)
+			SyncUser syncUser, boolean trustSelfSigned, String url)
 		throws Exception {
 
 		// Sync account
@@ -93,10 +90,17 @@ public class SyncAccountService {
 
 		// Sync file
 
-		Files.createDirectories(Paths.get(filePathName));
+		Path filePath = Paths.get(filePathName);
+
+		Path dataFilePath = Files.createDirectories(filePath.resolve(".data"));
+
+		if (OSDetector.isWindows()) {
+			Files.setAttribute(dataFilePath, "dos:hidden", true);
+		}
 
 		SyncFileService.addSyncFile(
-			null, null, null, filePathName, null, filePathName, 0, 0,
+			null, null, null, filePathName, null,
+			String.valueOf(filePath.getFileName()), 0, 0, SyncFile.STATE_SYNCED,
 			syncAccount.getSyncAccountId(), SyncFile.TYPE_SYSTEM);
 
 		// Sync sites
@@ -118,6 +122,12 @@ public class SyncAccountService {
 				SyncSiteService.update(syncSite);
 			}
 		}
+
+		// Sync user
+
+		syncUser.setSyncAccountId(syncAccount.getSyncAccountId());
+
+		SyncUserService.update(syncUser);
 
 		return syncAccount;
 	}
@@ -237,7 +247,7 @@ public class SyncAccountService {
 		_activeSyncAccountIds = null;
 	}
 
-	public static void setFilePathName(
+	public static SyncAccount setFilePathName(
 		long syncAccountId, String targetFilePathName) {
 
 		// Sync account
@@ -279,22 +289,8 @@ public class SyncAccountService {
 
 			SyncSiteService.update(syncSite);
 		}
-	}
 
-	public static SyncAccount synchronizeSyncAccount(
-		long syncAccountId, long delay) {
-
-		Map<String, Object> parameters = new HashMap<String, Object>();
-
-		parameters.put("uuid", null);
-
-		GetSyncContextEvent getSyncContextEvent = new GetSyncContextEvent(
-			syncAccountId, parameters);
-
-		_scheduledExecutorService.schedule(
-			getSyncContextEvent, delay, TimeUnit.MILLISECONDS);
-
-		return SyncAccountService.fetchSyncAccount(syncAccountId);
+		return syncAccount;
 	}
 
 	public static void unregisterModelListener(
@@ -318,12 +314,51 @@ public class SyncAccountService {
 		}
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(
+	public static void updateSyncAccountSyncFile(
+			Path filePath, long syncAccountId, boolean moveFile)
+		throws Exception {
+
+		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
+			syncAccountId);
+
+		if (!moveFile) {
+			SyncFile syncFile = SyncFileService.fetchSyncFile(
+				syncAccount.getFilePathName());
+
+			String sourceFileKey = syncFile.getFileKey();
+
+			String targetFileKey = FileUtil.getFileKey(filePath);
+
+			if (!sourceFileKey.equals(targetFileKey)) {
+				throw new Exception(
+					"Target folder is not the moved sync data folder");
+			}
+		}
+
+		syncAccount.setActive(false);
+
+		SyncAccountService.update(syncAccount);
+
+		if (moveFile) {
+			Files.createDirectories(filePath);
+
+			Files.move(
+				Paths.get(syncAccount.getFilePathName()), filePath,
+				StandardCopyOption.REPLACE_EXISTING);
+		}
+
+		syncAccount = setFilePathName(syncAccountId, filePath.toString());
+
+		syncAccount.setActive(true);
+		syncAccount.setUiEvent(SyncAccount.UI_EVENT_DEFAULT);
+
+		SyncAccountService.update(syncAccount);
+	}
+
+	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncAccountService.class);
 
 	private static Set<Long> _activeSyncAccountIds;
-	private static ScheduledExecutorService _scheduledExecutorService =
-		Executors.newScheduledThreadPool(5);
 	private static SyncAccountPersistence _syncAccountPersistence =
 		getSyncAccountPersistence();
 

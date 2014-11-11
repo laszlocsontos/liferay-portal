@@ -28,13 +28,14 @@ public class UserEmailAddressException extends PortalException {
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public UserEmailAddressException() {
-		super();
 	}
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public UserEmailAddressException(String msg) {
 		super(msg);
 	}
@@ -42,6 +43,7 @@ public class UserEmailAddressException extends PortalException {
 	/**
 	 * @deprecated As of 7.0.0, replaced by the inner classes
 	 */
+	@Deprecated
 	public UserEmailAddressException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
@@ -78,9 +80,9 @@ public class UserEmailAddressException extends PortalException {
 			return _user;
 		}
 
-		private String _emailAddress1;
-		private String _emailAddress2;
-		private User _user;
+		private final String _emailAddress1;
+		private final String _emailAddress2;
+		private final User _user;
 
 	}
 
@@ -106,7 +108,7 @@ public class UserEmailAddressException extends PortalException {
 		}
 
 		private String _emailAddress;
-		private long _userId;
+		private final long _userId;
 
 	}
 
@@ -148,7 +150,7 @@ public class UserEmailAddressException extends PortalException {
 		}
 
 		private String _emailAddress;
-		private EmailAddressValidator _emailAddressValidator;
+		private final EmailAddressValidator _emailAddressValidator;
 
 	}
 

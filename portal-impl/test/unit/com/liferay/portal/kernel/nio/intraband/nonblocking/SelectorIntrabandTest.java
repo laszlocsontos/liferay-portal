@@ -97,14 +97,12 @@ public class SelectorIntrabandTest {
 
 	@Test
 	public void testCreateAndDestroy() throws Exception {
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			SelectorIntraband.class.getName(), Level.INFO);
 
 		try {
 
 			// Close selector, with log
-
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				SelectorIntraband.class.getName(), Level.INFO);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -169,9 +167,7 @@ public class SelectorIntrabandTest {
 			Assert.assertTrue(logRecords.isEmpty());
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler.close();
 		}
 	}
 
@@ -191,14 +187,12 @@ public class SelectorIntrabandTest {
 
 		long sequenceId = 100;
 
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+			BaseIntraband.class.getName(), Level.WARNING);
 
 		try {
 
 			// Receive ACK response, no ACK request, with log
-
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				BaseIntraband.class.getName(), Level.WARNING);
 
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
@@ -498,15 +492,13 @@ public class SelectorIntrabandTest {
 			IntrabandTestUtil.assertMessageStartWith(
 				logRecords.get(0), "Unable to dispatch");
 
-			unregisterChannels(registrationReference);
+			_unregisterChannels(registrationReference);
 
 			gatheringByteChannel.close();
 			scatteringByteChannel.close();
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler.close();
 		}
 	}
 
@@ -896,7 +888,7 @@ public class SelectorIntrabandTest {
 
 			while (writeSelectionKey.interestOps() != 0);
 
-			unregisterChannels(selectionKeyRegistrationReference);
+			_unregisterChannels(selectionKeyRegistrationReference);
 
 			// Register after close
 
@@ -950,16 +942,14 @@ public class SelectorIntrabandTest {
 
 		Assert.assertArrayEquals(_data, dataByteBuffer.array());
 
-		CaptureHandler captureHandler = null;
+		CaptureHandler captureHandler1 = JDKLoggerTestUtil.configureJDKLogger(
+			BaseIntraband.class.getName(), Level.WARNING);
 
 		try {
 
 			// Callback timeout, with log
 
-			captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-				BaseIntraband.class.getName(), Level.WARNING);
-
-			List<LogRecord> logRecords = captureHandler.getLogRecords();
+			List<LogRecord> logRecords = captureHandler1.getLogRecords();
 
 			recordCompletionHandler = new RecordCompletionHandler<Object>();
 
@@ -982,7 +972,7 @@ public class SelectorIntrabandTest {
 
 			// Callback timeout, without log
 
-			logRecords = captureHandler.resetLogLevel(Level.OFF);
+			logRecords = captureHandler1.resetLogLevel(Level.OFF);
 
 			recordCompletionHandler = new RecordCompletionHandler<Object>();
 
@@ -999,18 +989,16 @@ public class SelectorIntrabandTest {
 			Assert.assertTrue(logRecords.isEmpty());
 		}
 		finally {
-			if (captureHandler != null) {
-				captureHandler.close();
-			}
+			captureHandler1.close();
 		}
 
 		// Callback timeout, completion handler causes NPE
 
-		captureHandler = JDKLoggerTestUtil.configureJDKLogger(
+		captureHandler1 = JDKLoggerTestUtil.configureJDKLogger(
 			SelectorIntraband.class.getName(), Level.SEVERE);
 
 		try {
-			List<LogRecord> logRecords = captureHandler.getLogRecords();
+			List<LogRecord> logRecords1 = captureHandler1.getLogRecords();
 
 			recordCompletionHandler = new RecordCompletionHandler<Object>() {
 
@@ -1027,24 +1015,45 @@ public class SelectorIntrabandTest {
 
 			Selector selector = _selectorIntraband.selector;
 
+			Datagram datagram = Datagram.createRequestDatagram(_type, _data);
+
 			try {
 				_selectorIntraband.sendDatagram(
-					registrationReference,
-					Datagram.createRequestDatagram(_type, _data), attachment,
+					registrationReference, datagram, attachment,
 					EnumSet.of(CompletionType.DELIVERED),
 					recordCompletionHandler, 10, TimeUnit.MILLISECONDS);
 			}
 			finally {
-				recordCompletionHandler.waitUntilTimeouted(selector);
+				CaptureHandler captureHandler2 =
+					JDKLoggerTestUtil.configureJDKLogger(
+						BaseIntraband.class.getName(), Level.WARNING);
+
+				try {
+					recordCompletionHandler.waitUntilTimeouted(selector);
+
+					List<LogRecord> logRecords2 =
+						captureHandler2.getLogRecords();
+
+					Assert.assertEquals(1, logRecords2.size());
+
+					LogRecord logRecord = logRecords2.get(0);
+
+					Assert.assertEquals(
+						"Removed timeout response waiting datagram " + datagram,
+						logRecord.getMessage());
+				}
+				finally {
+					captureHandler2.close();
+				}
 
 				Jdk14LogImplAdvice.waitUntilErrorCalled();
 			}
 
 			Assert.assertFalse(selector.isOpen());
-			Assert.assertEquals(1, logRecords.size());
+			Assert.assertEquals(1, logRecords1.size());
 
 			IntrabandTestUtil.assertMessageStartWith(
-				logRecords.get(0),
+				logRecords1.get(0),
 				SelectorIntraband.class +
 					".threadFactory-1 exiting exceptionally");
 
@@ -1052,7 +1061,7 @@ public class SelectorIntrabandTest {
 			scatteringByteChannel.close();
 		}
 		finally {
-			captureHandler.close();
+			captureHandler1.close();
 		}
 	}
 
@@ -1263,12 +1272,19 @@ public class SelectorIntrabandTest {
 			Assert.assertArrayEquals(
 				hugeBuffer.array(), dataByteBuffer.array());
 
-			unregisterChannels(registrationReference);
+			_unregisterChannels(registrationReference);
 		}
 	}
 
 	@Aspect
 	public static class Jdk14LogImplAdvice {
+
+		public static volatile CountDownLatch _errorCalledCountDownLatch =
+			new CountDownLatch(1);
+		public static volatile CountDownLatch
+			_isWarnEnabledCalledCountDownLatch = new CountDownLatch(1);
+		public static volatile CountDownLatch
+			_warnCalledCountDownLatch = new CountDownLatch(1);
 
 		public static void reset() {
 			_errorCalledCountDownLatch = new CountDownLatch(1);
@@ -1318,16 +1334,9 @@ public class SelectorIntrabandTest {
 			_warnCalledCountDownLatch.countDown();
 		}
 
-		public static volatile CountDownLatch _errorCalledCountDownLatch =
-			new CountDownLatch(1);
-		public static volatile CountDownLatch
-			_isWarnEnabledCalledCountDownLatch = new CountDownLatch(1);
-		public static volatile CountDownLatch
-			_warnCalledCountDownLatch = new CountDownLatch(1);
-
 	}
 
-	void unregisterChannels(
+	private void _unregisterChannels(
 			SelectionKeyRegistrationReference registrationReference)
 		throws Exception {
 
@@ -1377,7 +1386,54 @@ public class SelectorIntrabandTest {
 		}
 
 		@Override
+		public Object blockingLock() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public SelectableChannel configureBlocking(boolean block) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isBlocking() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isRegistered() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public SelectionKey keyFor(Selector selector) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public SelectorProvider provider() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int read(ByteBuffer byteBuffer) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public long read(ByteBuffer[] byteBuffers) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public long read(ByteBuffer[] byteBuffers, int offset, int length) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public SelectionKey register(
+			Selector selector, int ops, Object attachment) {
+
 			throw new UnsupportedOperationException();
 		}
 
@@ -1397,59 +1453,7 @@ public class SelectorIntrabandTest {
 		}
 
 		@Override
-		public boolean isRegistered() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public SelectionKey keyFor(Selector selector) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public SelectionKey register(
-			Selector selector, int ops, Object attachment) {
-
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public SelectableChannel configureBlocking(boolean block) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean isBlocking() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Object blockingLock() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		protected void implCloseChannel() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public long read(ByteBuffer[] byteBuffers, int offset, int length) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public long read(ByteBuffer[] byteBuffers) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public int read(ByteBuffer byteBuffer) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public long write(ByteBuffer[] byteBuffers, int offset, int length) {
+		public int write(ByteBuffer byteBuffer) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -1459,7 +1463,12 @@ public class SelectorIntrabandTest {
 		}
 
 		@Override
-		public int write(ByteBuffer byteBuffer) {
+		public long write(ByteBuffer[] byteBuffers, int offset, int length) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		protected void implCloseChannel() {
 			throw new UnsupportedOperationException();
 		}
 

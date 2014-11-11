@@ -132,16 +132,16 @@ public class BlogsTestUtil {
 			boolean allowTrackbacks = true;
 			String[] trackbacks = new String[0];
 
-			ImageSelector imageSelector = null;
+			ImageSelector coverImageSelector = null;
+			ImageSelector smallImageSelector = null;
 
 			if (smallImage) {
 				Class<?> clazz = BlogsTestUtil.class;
 
 				ClassLoader classLoader = clazz.getClassLoader();
 
-				InputStream inputStream =
-					classLoader.getResourceAsStream(
-						"com/liferay/portal/util/dependencies/test.jpg");
+				InputStream inputStream = classLoader.getResourceAsStream(
+					"com/liferay/portal/util/dependencies/test.jpg");
 
 				FileEntry fileEntry = null;
 
@@ -157,8 +157,8 @@ public class BlogsTestUtil {
 						MimeTypesUtil.getContentType("image.jpg"));
 				}
 
-				imageSelector = new ImageSelector(
-					fileEntry.getFileEntryId(), StringPool.BLANK);
+				smallImageSelector = new ImageSelector(
+					fileEntry.getFileEntryId(), StringPool.BLANK, null);
 			}
 
 			serviceContext = (ServiceContext)serviceContext.clone();
@@ -170,7 +170,7 @@ public class BlogsTestUtil {
 				userId, title, subtitle, description, content, displayDateMonth,
 				displayDateDay, displayDateYear, displayDateHour,
 				displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
-				imageSelector, serviceContext);
+				coverImageSelector, smallImageSelector, serviceContext);
 
 			if (approved) {
 				return updateStatus(entry, serviceContext);
@@ -220,13 +220,23 @@ public class BlogsTestUtil {
 			BlogsEntry entry, String title, boolean approved)
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(entry.getGroupId());
+
+		return updateEntry(entry, title, approved, serviceContext);
+	}
+
+	public static BlogsEntry updateEntry(
+			BlogsEntry entry, String title, boolean approved,
+			ServiceContext serviceContext)
+		throws Exception {
+
 		boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
 
 		try {
 			WorkflowThreadLocal.setEnabled(true);
 
-			ServiceContext serviceContext =
-				ServiceContextTestUtil.getServiceContext(entry.getGroupId());
+			serviceContext = (ServiceContext)serviceContext.clone();
 
 			serviceContext.setCommand(Constants.UPDATE);
 			serviceContext.setLayoutFullURL("http://localhost");
@@ -236,7 +246,7 @@ public class BlogsTestUtil {
 			entry = BlogsEntryLocalServiceUtil.updateEntry(
 				entry.getUserId(), entry.getEntryId(), title,
 				entry.getSubtitle(), entry.getDescription(), entry.getContent(),
-				1, 1, 2012, 12, 00, true, true, new String[0], null,
+				1, 1, 2012, 12, 00, true, true, new String[0], null, null,
 				serviceContext);
 
 			if (approved) {

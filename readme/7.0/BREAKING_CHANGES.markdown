@@ -20,7 +20,7 @@ feature or API will be dropped in an upcoming version.
 replaces an old API, in spite of the old API being kept in Liferay Portal for
 backwards compatibility.
 
-*This document has been reviewed through commit `10c9096`.*
+*This document has been reviewed through commit `a00a5c3`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -28,7 +28,7 @@ Each change must have a brief descriptive title and contain the following
 information:
 
 * **[Title]** Provide a brief descriptive title. Use past tense and follow
-the capitalization rules from 
+the capitalization rules from
 <http://en.wikibooks.org/wiki/Basic_Book_Design/Capitalizing_Words_in_Titles>.
 * **Date:** Specify the date you submitted the change. Format the date as
 *YYYY-MMM* (e.g., 2014-Mar) or *YYYY-MMM-DD* (e.g., 2014-Feb-25).
@@ -311,7 +311,7 @@ clicking on the checkboxes.
 In your front-end JavaScript code, follow these steps:
 
 - Remove the `Checkbox` suffix when querying for the node in any of its forms,
-like `A.one(...)`, `$(...)`, etc. 
+like `A.one(...)`, `$(...)`, etc.
 - Remove any action that tries to set the value of the checkbox on the
 previously generated hidden field.
 
@@ -329,7 +329,7 @@ properly even when JavaScript is disabled.
 #### What changed?
 Several APIs in `portal-service.jar` contained references to the
 `javax.servlet.jsp` package. This forced `util-taglib`, which depended on many
-of the package's features, to be bound to the same JSP implementation. 
+of the package's features, to be bound to the same JSP implementation.
 
 Due to this, the following APIs had breaking changes:
 
@@ -464,5 +464,149 @@ demonstrates using a `SyncCapability` instance to move a `FileEntry`:
 #### Why was this change made?
 
 There are repositories that don't support Liferay Sync operations.
+
+---------------------------------------
+
+### Removed the `.aui` Namespace from Bootstrap
+- **Date:** 2014-Sep-26
+- **JIRA Ticket:** LPS-50348
+
+#### What changed?
+
+The `.aui` namespace was removed from prefixing all of Bootstrap's CSS.
+
+#### Who is affected?
+
+Theme and plugin developers that targeted their CSS to rely on the namespace are
+affected.
+
+#### How should I update my code?
+
+Theme developers can still manually add an `aui.css` file in their `_diffs`
+directory, and add it back in. The `aui` CSS class can also be added to the
+`$root_css_class` variable.
+
+#### Why was this change made?
+
+Due to changes in the Sass parser, the nesting of third-party libraries was
+causing some syntax errors which broke other functionality (e.g., RTL
+conversion). There was also a lot of additional complexity for a relatively
+minor benefit.
+
+---------------------------------------
+
+### Moved `MVCPortlet`, `ActionCommand` and `ActionCommandCache` from `util-bridges.jar` to `portal-service.jar`
+- **Date:** 2014-Sep-26
+- **JIRA Ticket:** LPS-50156
+
+#### What changed?
+
+The classes from package `com.liferay.util.bridges.mvc` in `util-bridges.jar`
+were moved to a new package `com.liferay.portal.kernel.portlet.bridges.mvc`
+in `portal-service.jar`.
+
+The classes affected are:
+
+```
+com.liferay.util.bridges.mvc.ActionCommand
+com.liferay.util.bridges.mvc.BaseActionCommand
+```
+
+They are now:
+
+```
+com.liferay.portal.kernel.portlet.bridges.mvc.ActionCommand
+com.liferay.portal.kernel.portlet.bridges.mvc.BaseActionCommand
+```
+
+In addition, `com.liferay.util.bridges.mvc.MVCPortlet` is deprecated, but was
+made to extend `com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet`.
+
+#### Who is affected?
+
+This will affect any implementations of `ActionCommand`.
+
+#### How should I update my code?
+
+Replace imports of `com.liferay.util.bridges.mvc.ActionCommand` with
+`com.liferay.portal.kernel.portlet.bridges.mvc.ActionCommand` and imports of
+`com.liferay.util.bridges.mvc.BaseActionCommand` with
+`com.liferay.portal.kernel.portlet.bridges.mvc.BaseActionCommand`.
+
+#### Why was this change made?
+
+This change was made to avoid duplication of an implementable interface in the
+system. Duplication can cause `ClassCastException`s.
+
+---------------------------------------
+
+### Convert Process Classes Are No Longer Specified via the `convert.processes` Portal Property, but Are Contributed as OSGi Modules
+- **Date:** 2014-Oct-09
+- **JIRA Ticket:** LPS-50604
+
+#### What changed?
+
+The implementation class `com.liferay.portal.convert.ConvertProcess` was renamed 
+`com.liferay.portal.convert.BaseConvertProcess`. An interface named
+`com.liferay.portal.convert.ConvertProcess` was created for it.
+
+The `convert.processes` key was removed from `portal.properties`.
+Consequentially, `ConvertProcess` implementations must register as OSGi
+components.
+
+#### Who is affected?
+
+This affects any implementations of the former `ConvertProcess` class, including
+`ConvertProcess` class implementations in EXT plugins. Until version 6.2, this
+type of service could only be implemented with an EXT plugin, given that the
+`ConvertProcess` class resided in `portal-impl`.
+
+#### How should I update my code?
+
+You should replace `extends com.liferay.portal.convert.ConvertProcess` with
+`extends com.liferay.portal.convert.BaseConvertProcess` and annotate the class
+with `@Component(service=ConvertProcess.class)`.
+
+Then turn your EXT plugin into an OSGi bundle and deploy it to the portal. You
+should see your convert process in the configuration UI.
+
+#### Why was this change made?
+
+This change was made as a part of the ongoing strategy to modularize Liferay
+Portal by means of an OSGi container. 
+
+---------------------------------------
+
+### Migration of the Field *Type* from the Journal Article API into a Vocabulary
+- **Date:** 2014-Oct-13
+- **JIRA Ticket:** LPS-50764
+
+#### What changed?
+
+The field *type* from the Journal Article entity has been removed. The Journal
+API no longer supports this parameter. A new vocabulary called *Web Content
+Types* is created when migrating from previous versions of Liferay, and the
+types from the existing articles are kept as categories of this vocabulary.
+
+#### Who is affected?
+
+This affects any caller of the removed methods `JournalArticle.getType()` and
+`JournalFeed.getType()`, and callers of `ArticleTypeException`'s methods, that
+attempt to use the former `type` parameter of the `JournalArticle` or
+`JournalFeed` service.
+
+#### How should I update my code?
+
+If your logic was not affected by the type, you can simply remove the `type`
+parameter from the Journal API call. If your logic was affected by the type, you
+should now use the `AssetCategoryService` to obtain the category of the journal
+articles.
+
+#### Why was this change made?
+
+Web Content Types had to be updated in a properties file and could not be
+translated easily. Categories provide a much more flexible behavior and a better
+UI. In addition, all the features, such as filters, developed for categories can
+be used now in asset publishers and faceted search.
 
 ---------------------------------------

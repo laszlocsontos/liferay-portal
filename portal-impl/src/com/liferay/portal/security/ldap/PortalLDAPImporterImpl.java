@@ -599,10 +599,16 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 		StringBundler sb = new StringBundler(7);
 
 		sb.append("(&");
-		sb.append(
-			PrefsPropsUtil.getString(
-				companyId,
-				PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix));
+
+		String importGroupSearchFilter = PrefsPropsUtil.getString(
+			companyId, PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix);
+
+		LDAPUtil.validateFilter(
+			importGroupSearchFilter,
+			PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix);
+
+		sb.append(importGroupSearchFilter);
+
 		sb.append(StringPool.OPEN_PARENTHESIS);
 		sb.append(groupMappings.getProperty("groupName"));
 		sb.append("=");
@@ -807,6 +813,24 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 			String baseDN = PrefsPropsUtil.getString(
 				companyId, PropsKeys.LDAP_BASE_DN + postfix);
 
+			StringBundler sb = new StringBundler(9);
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(StringPool.AMPERSAND);
+
+			String importGroupSearchFilter = PrefsPropsUtil.getString(
+				companyId, PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix);
+
+			LDAPUtil.validateFilter(
+				importGroupSearchFilter,
+				PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix);
+
+			sb.append(importGroupSearchFilter);
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(groupMappingsUser);
+			sb.append(StringPool.EQUAL);
+
 			Binding binding = PortalLDAPUtil.getUser(
 				ldapServerId, companyId, user.getScreenName(),
 				user.getEmailAddress());
@@ -814,18 +838,8 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 			String fullUserDN = PortalLDAPUtil.getNameInNamespace(
 				ldapServerId, companyId, binding);
 
-			StringBundler sb = new StringBundler(9);
-
-			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append(StringPool.AMPERSAND);
-			sb.append(
-				PrefsPropsUtil.getString(
-					companyId,
-					PropsKeys.LDAP_IMPORT_GROUP_SEARCH_FILTER + postfix));
-			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append(groupMappingsUser);
-			sb.append(StringPool.EQUAL);
 			sb.append(escapeValue(fullUserDN));
+
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 

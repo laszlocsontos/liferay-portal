@@ -20,9 +20,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.portal.model.PasswordPolicy;
 import com.liferay.portal.util.PropsUtil;
-import com.liferay.util.PwdGenerator;
 
 /**
  * @author Brian Wing Shun Chan
@@ -59,10 +59,10 @@ public class RegExpToolkit extends BasicToolkit {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(RegExpToolkit.class);
+	private static final Log _log = LogFactoryUtil.getLog(RegExpToolkit.class);
 
-	private String _charset;
-	private int _length;
-	private String _pattern;
+	private final String _charset;
+	private final int _length;
+	private final String _pattern;
 
 }

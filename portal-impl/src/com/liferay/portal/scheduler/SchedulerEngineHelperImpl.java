@@ -21,20 +21,16 @@ import com.liferay.portal.kernel.cal.Duration;
 import com.liferay.portal.kernel.cal.Recurrence;
 import com.liferay.portal.kernel.cal.RecurrenceSerializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.scheduler.JobState;
 import com.liferay.portal.kernel.scheduler.SchedulerEngine;
-import com.liferay.portal.kernel.scheduler.SchedulerEngineClusterManager;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
 import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.SchedulerLifecycle;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
-import com.liferay.portal.kernel.scheduler.TriggerFactoryUtil;
 import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
@@ -155,7 +151,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	public void delete(String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.delete(namespaceGroupName(groupName, storageType));
+		_schedulerEngine.delete(groupName, storageType);
 	}
 
 	@Override
@@ -163,8 +159,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.delete(
-			jobName, namespaceGroupName(groupName, storageType));
+		_schedulerEngine.delete(jobName, groupName, storageType);
 	}
 
 	@Override
@@ -498,7 +493,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 		throws SchedulerException {
 
 		return _schedulerEngine.getScheduledJob(
-			jobName, namespaceGroupName(groupName, storageType));
+			jobName, groupName, storageType);
 	}
 
 	@Override
@@ -512,18 +507,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	public List<SchedulerResponse> getScheduledJobs(StorageType storageType)
 		throws SchedulerException {
 
-		List<SchedulerResponse> schedulerResponses =
-			new ArrayList<SchedulerResponse>();
-
-		for (SchedulerResponse schedulerResponse :
-				_schedulerEngine.getScheduledJobs()) {
-
-			if (storageType.equals(schedulerResponse.getStorageType())) {
-				schedulerResponses.add(schedulerResponse);
-			}
-		}
-
-		return schedulerResponses;
+		return _schedulerEngine.getScheduledJobs(storageType);
 	}
 
 	@Override
@@ -531,8 +515,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		return _schedulerEngine.getScheduledJobs(
-			namespaceGroupName(groupName, storageType));
+		return _schedulerEngine.getScheduledJobs(groupName, storageType);
 	}
 
 	@Override
@@ -569,44 +552,31 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	}
 
 	@Override
-	public void initialize() throws SchedulerException {
-		if (_schedulerEngineClusterManager != null) {
-			_schedulerEngineClusterManager.initialize();
-		}
-
+	public void initialize() {
 		SchedulerLifecycle schedulerLifecycle = new SchedulerLifecycle();
 
 		schedulerLifecycle.registerPortalLifecycle(PortalLifecycle.METHOD_INIT);
 	}
 
 	@Override
-	public String namespaceGroupName(
-		String groupName, StorageType storageType) {
-
-		return storageType.toString().concat(StringPool.POUND).concat(
-			groupName);
-	}
-
-	@Override
 	public void pause(String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.pause(namespaceGroupName(groupName, storageType));
+		_schedulerEngine.pause(groupName, storageType);
 	}
 
 	@Override
 	public void pause(String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.pause(
-			jobName, namespaceGroupName(groupName, storageType));
+		_schedulerEngine.pause(jobName, groupName, storageType);
 	}
 
 	@Override
 	public void resume(String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.resume(namespaceGroupName(groupName, storageType));
+		_schedulerEngine.resume(groupName, storageType);
 	}
 
 	@Override
@@ -614,8 +584,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.resume(
-			jobName, namespaceGroupName(groupName, storageType));
+		_schedulerEngine.resume(jobName, groupName, storageType);
 	}
 
 	@Override
@@ -649,14 +618,8 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 
 		message.put(SchedulerEngine.EXCEPTIONS_MAX_SIZE, exceptionsMaxSize);
 
-		trigger = TriggerFactoryUtil.buildTrigger(
-			trigger.getTriggerType(), trigger.getJobName(),
-			namespaceGroupName(trigger.getGroupName(), storageType),
-			trigger.getStartDate(), trigger.getEndDate(),
-			trigger.getTriggerContent());
-
 		_schedulerEngine.schedule(
-			trigger, description, destinationName, message);
+			trigger, description, destinationName, message, storageType);
 	}
 
 	@Override
@@ -676,11 +639,6 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 
 	public void setSchedulerEngine(SchedulerEngine schedulerEngine) {
 		_schedulerEngine = schedulerEngine;
-
-		if (schedulerEngine instanceof SchedulerEngineClusterManager) {
-			_schedulerEngineClusterManager =
-				(SchedulerEngineClusterManager)schedulerEngine;
-		}
 	}
 
 	@Override
@@ -698,8 +656,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.suppressError(
-			jobName, namespaceGroupName(groupName, storageType));
+		_schedulerEngine.suppressError(jobName, groupName, storageType);
 	}
 
 	@Override
@@ -716,7 +673,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	public void unschedule(String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.unschedule(namespaceGroupName(groupName, storageType));
+		_schedulerEngine.unschedule(groupName, storageType);
 	}
 
 	@Override
@@ -724,8 +681,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngine.unschedule(
-			jobName, namespaceGroupName(groupName, storageType));
+		_schedulerEngine.unschedule(jobName, groupName, storageType);
 	}
 
 	@Override
@@ -763,26 +719,7 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	public void update(Trigger trigger, StorageType storageType)
 		throws SchedulerException {
 
-		trigger = TriggerFactoryUtil.buildTrigger(
-			trigger.getTriggerType(), trigger.getJobName(),
-			namespaceGroupName(trigger.getGroupName(), storageType),
-			trigger.getStartDate(), trigger.getEndDate(),
-			trigger.getTriggerContent());
-
-		_schedulerEngine.update(trigger);
-	}
-
-	@Override
-	public void updateMemorySchedulerClusterMaster() throws SchedulerException {
-		if (_schedulerEngineClusterManager == null) {
-			_log.error(
-				"Unable to update memory scheduler cluster master because " +
-					"the portal is not using a clustered scheduler engine");
-
-			return;
-		}
-
-		_schedulerEngineClusterManager.updateMemorySchedulerClusterMaster();
+		_schedulerEngine.update(trigger, storageType);
 	}
 
 	protected void addWeeklyDayPos(
@@ -793,10 +730,6 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		SchedulerEngineHelperImpl.class);
-
 	private SchedulerEngine _schedulerEngine;
-	private SchedulerEngineClusterManager _schedulerEngineClusterManager;
 
 }

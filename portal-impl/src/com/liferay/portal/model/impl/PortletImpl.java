@@ -209,8 +209,8 @@ public class PortletImpl extends PortletBaseImpl {
 		_icon = icon;
 		_virtualPath = virtualPath;
 		_strutsPath = strutsPath;
-		_portletName = portletName;
 		_parentStrutsPath = parentStrutsPath;
+		_portletName = portletName;
 		_displayName = displayName;
 		_portletClass = portletClass;
 		_configurationActionClass = configurationActionClass;
@@ -231,8 +231,8 @@ public class PortletImpl extends PortletBaseImpl {
 		_socialActivityInterpreterClasses = socialActivityInterpreterClasses;
 		_socialRequestInterpreterClass = socialRequestInterpreterClass;
 		_socialInteractionsConfiguration = socialInteractionsConfiguration;
-		_userNotificationHandlerClasses = userNotificationHandlerClasses;
 		_userNotificationDefinitions = userNotificationDefinitions;
+		_userNotificationHandlerClasses = userNotificationHandlerClasses;
 		_webDAVStorageToken = webDAVStorageToken;
 		_webDAVStorageClass = webDAVStorageClass;
 		_xmlRpcMethodClass = xmlRpcMethodClass;
@@ -3947,7 +3947,7 @@ public class PortletImpl extends PortletBaseImpl {
 	/**
 	 * Log instance for this class.
 	 */
-	private static Log _log = LogFactoryUtil.getLog(PortletImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(PortletImpl.class);
 
 	/**
 	 * Map of the ready states of all portlets keyed by their root portlet ID.

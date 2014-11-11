@@ -985,8 +985,6 @@
 		Util,
 		'focusFormField',
 		function(el, caretPosition) {
-			Util.addInputFocus();
-
 			var interacting = false;
 
 			var clickHandle = A.getDoc().on(
@@ -1704,6 +1702,10 @@
 		'submitForm',
 		function(form, action, singleSubmit, validate) {
 			if (!Util._submitLocked) {
+				if (form.jquery) {
+					form = form[0];
+				}
+
 				Liferay.fire(
 					'submitForm',
 					{

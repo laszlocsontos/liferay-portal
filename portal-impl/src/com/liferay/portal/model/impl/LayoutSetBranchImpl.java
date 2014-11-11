@@ -40,9 +40,6 @@ import java.io.IOException;
  */
 public class LayoutSetBranchImpl extends LayoutSetBranchBaseImpl {
 
-	public LayoutSetBranchImpl() {
-	}
-
 	@Override
 	public ColorScheme getColorScheme() {
 		return ThemeLocalServiceUtil.getColorScheme(
@@ -228,7 +225,8 @@ public class LayoutSetBranchImpl extends LayoutSetBranchBaseImpl {
 		super.setSettings(_settingsProperties.toString());
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutSetBranchImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutSetBranchImpl.class);
 
 	private LayoutSet _layoutSet;
 	private UnicodeProperties _settingsProperties;

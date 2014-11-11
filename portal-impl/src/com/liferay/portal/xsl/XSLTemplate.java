@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.template.TemplateContextHelper;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.Writer;
 
@@ -37,7 +38,9 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -64,7 +67,16 @@ public class XSLTemplate implements Template {
 		_xslTemplateResource = xslTemplateResource;
 		_errorTemplateResource = errorTemplateResource;
 		_templateContextHelper = templateContextHelper;
+
 		_transformerFactory = TransformerFactory.newInstance();
+
+		try {
+			_transformerFactory.setFeature(
+				XMLConstants.FEATURE_SECURE_PROCESSING,
+				PropsValues.XSL_TEMPLATE_SECURE_PROCESSING_ENABLED);
+		}
+		catch (TransformerConfigurationException tce) {
+		}
 
 		_context = new HashMap<String, Object>();
 	}
@@ -230,12 +242,12 @@ public class XSLTemplate implements Template {
 		}
 	}
 
-	private Map<String, Object> _context;
+	private final Map<String, Object> _context;
 	private TemplateResource _errorTemplateResource;
-	private TemplateContextHelper _templateContextHelper;
+	private final TemplateContextHelper _templateContextHelper;
 	private TransformerFactory _transformerFactory;
 	private StreamSource _xmlStreamSource;
-	private XSLTemplateResource _xslTemplateResource;
+	private final XSLTemplateResource _xslTemplateResource;
 
 	private class TransformerPrivilegedExceptionAction
 		implements PrivilegedExceptionAction<Transformer> {
@@ -252,7 +264,7 @@ public class XSLTemplate implements Template {
 			return _transformerFactory.newTransformer(_scriptSource);
 		}
 
-		private StreamSource _scriptSource;
+		private final StreamSource _scriptSource;
 		private TransformerFactory _transformerFactory;
 
 	}

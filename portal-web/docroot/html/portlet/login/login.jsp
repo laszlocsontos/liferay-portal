@@ -106,7 +106,7 @@
 			<liferay-ui:error exception="<%= NoSuchUserException.class %>" message="authentication-failed" />
 			<liferay-ui:error exception="<%= PasswordExpiredException.class %>" message="your-password-has-expired" />
 			<liferay-ui:error exception="<%= UserEmailAddressException.class %>" message="authentication-failed" />
-			<liferay-ui:error exception="<%= UserLockoutException.class %>" message="this-account-has-been-locked" />
+			<liferay-ui:error exception="<%= UserLockoutException.PasswordPolicyLockout.class %>" message="this-account-has-been-locked" />
 			<liferay-ui:error exception="<%= UserPasswordException.class %>" message="authentication-failed" />
 			<liferay-ui:error exception="<%= UserScreenNameException.class %>" message="authentication-failed" />
 
@@ -148,17 +148,13 @@
 
 		<liferay-util:include page="/html/portlet/login/navigation.jsp" />
 
-		<aui:script use="aui-base">
-			var password = A.one('#<portlet:namespace />password');
-
-			if (password) {
-				password.on(
-					'keypress',
-					function(event) {
-						Liferay.Util.showCapsLock(event, '<portlet:namespace />passwordCapsLockSpan');
-					}
-				);
-			}
+		<aui:script>
+			AUI.$('#<portlet:namespace />password').on(
+				'keypress',
+				function(event) {
+					Liferay.Util.showCapsLock(event, '<portlet:namespace />passwordCapsLockSpan');
+				}
+			);
 		</aui:script>
 	</c:otherwise>
 </c:choose>

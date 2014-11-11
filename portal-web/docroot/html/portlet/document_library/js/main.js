@@ -11,8 +11,6 @@ AUI.add(
 
 		var STR_ROW_IDS_FILE_ENTRY_CHECKBOX = 'rowIdsFileEntry';
 
-		var STR_SELECTED_FOLDER = 'selectedFolder';
-
 		var WIN = A.config.win;
 
 		var HTML5_UPLOAD = (WIN && WIN.File && WIN.FormData && WIN.XMLHttpRequest);

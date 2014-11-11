@@ -158,7 +158,7 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 			<#if column.isPrimitiveType()>
 				${serviceBuilder.getPrimitiveObj(column.type)}
 			<#else>
-				${column.type}
+				${column.genericizedType}
 			</#if>
 
 			${column.name} =
@@ -166,7 +166,7 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 			<#if column.isPrimitiveType()>
 				(${serviceBuilder.getPrimitiveObj(column.type)})
 			<#else>
-				(${column.type})
+				(${column.genericizedType})
 			</#if>
 
 			attributes.get("${column.name}");
@@ -204,7 +204,7 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 		</#if>
 
 		@Override
-		public ${column.type} get${column.methodName}() {
+		public ${column.genericizedType} get${column.methodName}() {
 			return _${column.name};
 		}
 
@@ -259,7 +259,7 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 		</#if>
 
 		@Override
-		public void set${column.methodName}(${column.type} ${column.name}) {
+		public void set${column.methodName}(${column.genericizedType} ${column.name}) {
 			_${column.name} = ${column.name};
 
 			if (_${entity.varName}RemoteModel != null) {
@@ -613,6 +613,35 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 			}
 
 			return true;
+		}
+	</#if>
+
+	<#if entity.isTreeModel()>
+		<#assign pkColumn = entity.getPKList()?first>
+
+		<#if entity.hasColumn("parent" + pkColumn.methodName)>
+			@Override
+			@SuppressWarnings("unused")
+			public String buildTreePath() throws PortalException {
+				try {
+					return (String)invokeOnRemoteModel("buildTreePath", new Class<?>[0], new Object[0]);
+				}
+				catch (Exception e) {
+					throw new UnsupportedOperationException(e);
+				}
+			}
+		</#if>
+
+		@Override
+		public void updateTreePath(String treePath) {
+			try {
+				_treePath = treePath;
+
+				invokeOnRemoteModel("updateTreePath", new Class<?>[] {String.class}, new Object[] {treePath});
+			}
+			catch (Exception e) {
+				throw new UnsupportedOperationException(e);
+			}
 		}
 	</#if>
 
@@ -1024,7 +1053,7 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 	}
 
 	<#list entity.regularColList as column>
-		private ${column.type} _${column.name};
+		private ${column.genericizedType} _${column.name};
 
 		<#if column.localized>
 			private String _${column.name}CurrentLanguageId;

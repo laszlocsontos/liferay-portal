@@ -14,19 +14,31 @@
 
 package com.liferay.xsl.content.web.portlet;
 
-import com.liferay.util.bridges.mvc.MVCPortlet;
-import com.liferay.xsl.content.web.upgrade.XSLContentUpgrade;
+import aQute.bnd.annotation.metatype.Configurable;
+
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.xsl.content.web.configuration.XSLContentConfiguration;
+import com.liferay.xsl.content.web.upgrade.XSLContentWebUpgrade;
+
+import java.io.IOException;
+
+import java.util.Map;
 
 import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Raymond Augé
  */
 @Component(
-	immediate = true,
+	configurationPid = "com.liferay.xsl.content.web", immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-xsl-content",
 		"com.liferay.portlet.display-category=category.cms",
@@ -44,14 +56,44 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.supported-public-render-parameter=tags"
+		"javax.portlet.supported-public-render-parameter=tags",
+		"xml.doctype.declaration.allowed=false",
+		"xml.external.general.entities.allowed=false",
+		"xml.external.parameter.entities.allowed=false",
+		"xsl.secure.processing.enabled=true"
 	},
 	service = Portlet.class
 )
 public class XSLContentPortlet extends MVCPortlet {
 
-	@Reference(unbind = "-")
-	protected void setXSLContentUpgrade(XSLContentUpgrade xslContentUpgrade) {
+	@Override
+	public void doView(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+		renderRequest.setAttribute(
+			XSLContentConfiguration.class.getName(), _xslContentConfiguration);
+
+		super.doView(renderRequest, renderResponse);
 	}
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_xslContentConfiguration = Configurable.createConfigurable(
+			XSLContentConfiguration.class, properties);
+	}
+
+	@Modified
+	protected void modified(Map<String, Object> properties) {
+		_xslContentConfiguration = Configurable.createConfigurable(
+			XSLContentConfiguration.class, properties);
+	}
+
+	@Reference(unbind = "-")
+	protected void setXSLContentWebUpgrade(
+		XSLContentWebUpgrade xslContentWebUpgrade) {
+	}
+
+	private volatile XSLContentConfiguration _xslContentConfiguration;
 
 }

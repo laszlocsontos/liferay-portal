@@ -14,7 +14,14 @@
 
 package com.liferay.portal.kernel.concurrent;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.memory.FinalizeAction;
 import com.liferay.portal.kernel.memory.FinalizeManager;
+import com.liferay.portal.kernel.util.ReflectionUtil;
+
+import java.lang.ref.Reference;
+import java.lang.reflect.Field;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,7 +39,7 @@ public class AsyncBroker<K, V> {
 	}
 
 	public NoticeableFuture<V> post(final K key) {
-		DefaultNoticeableFuture<V> defaultNoticeableFuture =
+		final DefaultNoticeableFuture<V> defaultNoticeableFuture =
 			new DefaultNoticeableFuture<V>();
 
 		DefaultNoticeableFuture<V> previousDefaultNoticeableFuture =
@@ -47,12 +54,23 @@ public class AsyncBroker<K, V> {
 
 				@Override
 				public void complete(Future<V> future) {
-					_defaultNoticeableFutures.remove(key);
+					_defaultNoticeableFutures.remove(
+						key, defaultNoticeableFuture);
 				}
 
 			});
 
+		if (_REFERENT_FIELD != null) {
+			FinalizeManager.register(
+				defaultNoticeableFuture, new CancellationFinalizeAction(key),
+				FinalizeManager.PHANTOM_REFERENCE_FACTORY);
+		}
+
 		return defaultNoticeableFuture;
+	}
+
+	public NoticeableFuture<V> take(K key) {
+		return _defaultNoticeableFutures.remove(key);
 	}
 
 	public boolean takeWithException(K key, Throwable throwable) {
@@ -81,9 +99,60 @@ public class AsyncBroker<K, V> {
 		return true;
 	}
 
+	private static final Field _REFERENT_FIELD;
+
+	private static final Log _log = LogFactoryUtil.getLog(AsyncBroker.class);
+
+	static {
+		Field referentField = null;
+
+		try {
+			referentField = ReflectionUtil.getDeclaredField(
+				Reference.class, "referent");
+		}
+		catch (Throwable t) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Cancellation of orphaned noticeable futures is disabled " +
+						"because the JVM does not support phantom reference " +
+							"resurrection",
+					t);
+			}
+		}
+
+		_REFERENT_FIELD = referentField;
+	}
+
 	private final ConcurrentMap<K, DefaultNoticeableFuture<V>>
 		_defaultNoticeableFutures =
 			new ConcurrentReferenceValueHashMap<K, DefaultNoticeableFuture<V>>(
 				FinalizeManager.WEAK_REFERENCE_FACTORY);
+
+	private static class CancellationFinalizeAction implements FinalizeAction {
+
+		public CancellationFinalizeAction(Object key) {
+			_key = key;
+		}
+
+		@Override
+		public void doFinalize(final Reference<?> reference) {
+			try {
+				NoticeableFuture<?> noticeableFuture =
+					(NoticeableFuture<?>)_REFERENT_FIELD.get(reference);
+
+				if (noticeableFuture.cancel(true) && _log.isWarnEnabled()) {
+					_log.warn(
+						"Cancelled orphan noticeable future " +
+							noticeableFuture + " with key " + _key);
+				}
+			}
+			catch (Exception e) {
+				_log.error("Unable to access referent of " + reference, e);
+			}
+		}
+
+		private final Object _key;
+
+	}
 
 }

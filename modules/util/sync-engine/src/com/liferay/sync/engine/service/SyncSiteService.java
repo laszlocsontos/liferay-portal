@@ -14,7 +14,6 @@
 
 package com.liferay.sync.engine.service;
 
-import com.liferay.sync.engine.documentlibrary.event.GetUserSitesGroupsEvent;
 import com.liferay.sync.engine.model.ModelListener;
 import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.model.SyncSiteModelListener;
@@ -167,14 +166,6 @@ public class SyncSiteService {
 		_syncSitePersistence.registerModelListener(modelListener);
 	}
 
-	public static void synchronizeSyncSites(long syncAccountId) {
-		GetUserSitesGroupsEvent getUserSitesGroupsEvent =
-			new GetUserSitesGroupsEvent(
-				syncAccountId, Collections.<String, Object>emptyMap());
-
-		getUserSitesGroupsEvent.run();
-	}
-
 	public static void unregisterModelListener(
 		ModelListener<SyncSite> modelListener) {
 
@@ -196,10 +187,10 @@ public class SyncSiteService {
 		}
 	}
 
-	private static Logger _logger = LoggerFactory.getLogger(
+	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncSiteService.class);
 
-	private static Map<Long, Set<Long>> _activeSyncSiteIds =
+	private static final Map<Long, Set<Long>> _activeSyncSiteIds =
 		new HashMap<Long, Set<Long>>();
 	private static SyncSitePersistence _syncSitePersistence =
 		getSyncSitePersistence();

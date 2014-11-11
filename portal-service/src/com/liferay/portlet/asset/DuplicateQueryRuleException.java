@@ -24,8 +24,6 @@ public class DuplicateQueryRuleException extends PortalException {
 	public DuplicateQueryRuleException(
 		boolean contains, boolean andOperator, String name) {
 
-		super();
-
 		_contains = contains;
 		_andOperator = andOperator;
 		_name = name;
@@ -43,8 +41,8 @@ public class DuplicateQueryRuleException extends PortalException {
 		return _contains;
 	}
 
-	private boolean _andOperator;
-	private boolean _contains;
-	private String _name;
+	private final boolean _andOperator;
+	private final boolean _contains;
+	private final String _name;
 
 }

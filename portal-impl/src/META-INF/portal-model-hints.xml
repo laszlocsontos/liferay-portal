@@ -94,9 +94,7 @@
 		<field name="taskExecutorClassName" type="String">
 			<hint name="max-length">200</hint>
 		</field>
-		<field name="taskContext" type="String">
-			<hint-collection name="CLOB" />
-		</field>
+		<field name="taskContextMap" type="Map" />
 		<field name="completed" type="boolean" />
 		<field name="completionDate" type="Date" />
 		<field name="status" type="int" />
@@ -1223,6 +1221,7 @@
 		<field name="title" type="String" />
 		<field name="content" type="String">
 			<hint-collection name="CLOB" />
+			<sanitize content-type="text/html" modes="ALL" />
 		</field>
 		<field name="url" type="String">
 			<hint-collection name="URL" />
@@ -1410,6 +1409,8 @@
 		<field name="trackbacks" type="String">
 			<hint-collection name="CLOB" />
 		</field>
+		<field name="coverImageFileEntryId" type="long" />
+		<field name="coverImageURL" type="String" />
 		<field name="smallImage" type="boolean" />
 		<field name="smallImageFileEntryId" type="long" />
 		<field name="smallImageId" type="long" />
@@ -1432,65 +1433,6 @@
 		<field name="ratingsTotalEntries" type="int" />
 		<field name="ratingsTotalScore" type="double" />
 		<field name="ratingsAverageScore" type="double" />
-	</model>
-	<model name="com.liferay.portlet.bookmarks.model.BookmarksEntry">
-		<field name="uuid" type="String" />
-		<field name="entryId" type="long" />
-		<field name="groupId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="userId" type="long" />
-		<field name="userName" type="String" />
-		<field name="createDate" type="Date" />
-		<field name="modifiedDate" type="Date" />
-		<field name="resourceBlockId" type="long" />
-		<field name="folderId" type="long" />
-		<field name="treePath" type="String">
-			<hint name="max-length">4000</hint>
-		</field>
-		<field name="name" type="String">
-			<hint name="max-length">255</hint>
-		</field>
-		<field name="url" type="String">
-			<hint-collection name="URL" />
-			<validator name="required" />
-			<validator name="url" />
-		</field>
-		<field name="description" type="String">
-			<hint-collection name="TEXTAREA" />
-		</field>
-		<field name="visits" type="int" />
-		<field name="priority" type="int">
-			<hint name="display-width">20</hint>
-		</field>
-		<field name="status" type="int" />
-		<field name="statusByUserId" type="long" />
-		<field name="statusByUserName" type="String" />
-		<field name="statusDate" type="Date" />
-	</model>
-	<model name="com.liferay.portlet.bookmarks.model.BookmarksFolder">
-		<field name="uuid" type="String" />
-		<field name="folderId" type="long" />
-		<field name="groupId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="userId" type="long" />
-		<field name="userName" type="String" />
-		<field name="createDate" type="Date" />
-		<field name="modifiedDate" type="Date" />
-		<field name="resourceBlockId" type="long" />
-		<field name="parentFolderId" type="long" />
-		<field name="treePath" type="String">
-			<hint name="max-length">4000</hint>
-		</field>
-		<field name="name" type="String">
-			<validator name="required" />
-		</field>
-		<field name="description" type="String">
-			<hint-collection name="TEXTAREA" />
-		</field>
-		<field name="status" type="int" />
-		<field name="statusByUserId" type="long" />
-		<field name="statusByUserName" type="String" />
-		<field name="statusDate" type="Date" />
 	</model>
 	<model name="com.liferay.portlet.calendar.model.CalEvent">
 		<field name="uuid" type="String" />
@@ -1813,6 +1755,7 @@
 			<hint name="upper-case">true</hint>
 			<hint name="auto-escape">false</hint>
 		</field>
+		<field name="version" type="String" />
 		<field name="name" type="String" localized="true">
 			<validator name="required" />
 		</field>
@@ -1830,6 +1773,27 @@
 		<field name="classNameId" type="long" />
 		<field name="classPK" type="long" />
 		<field name="structureId" type="long" />
+	</model>
+	<model name="com.liferay.portlet.dynamicdatamapping.model.DDMStructureVersion">
+		<field name="structureVersionId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="structureId" type="long" />
+		<field name="version" type="String" />
+		<field name="name" type="String" localized="true">
+			<validator name="required" />
+		</field>
+		<field name="description" type="String" localized="true">
+			<hint-collection name="TEXTAREA" />
+		</field>
+		<field name="definition" type="String">
+			<hint-collection name="CLOB" />
+		</field>
+		<field name="storageType" type="String" />
+		<field name="type" type="int" />
 	</model>
 	<model name="com.liferay.portlet.dynamicdatamapping.model.DDMTemplate">
 		<field name="uuid" type="String" />
@@ -1937,13 +1901,8 @@
 		<field name="content" type="String">
 			<hint-collection name="CLOB" />
 		</field>
-		<field name="type" type="String" />
-		<field name="structureId" type="String">
-			<hint name="auto-escape">false</hint>
-		</field>
-		<field name="templateId" type="String">
-			<hint name="auto-escape">false</hint>
-		</field>
+		<field name="DDMStructureKey" type="String" />
+		<field name="DDMTemplateKey" type="String" />
 		<field name="layoutUuid" type="String" />
 		<field name="displayDate" type="Date" />
 		<field name="expirationDate" type="Date">
@@ -2010,14 +1969,9 @@
 		<field name="description" type="String">
 			<hint-collection name="TEXTAREA" />
 		</field>
-		<field name="type" type="String" />
-		<field name="structureId" type="String">
-			<hint name="auto-escape">false</hint>
-		</field>
-		<field name="templateId" type="String">
-			<hint name="auto-escape">false</hint>
-		</field>
-		<field name="rendererTemplateId" type="String" />
+		<field name="DDMStructureKey" type="String" />
+		<field name="DDMTemplateKey" type="String" />
+		<field name="DDMRendererTemplateKey" type="String" />
 		<field name="delta" type="int">
 			<hint name="display-width">50</hint>
 		</field>

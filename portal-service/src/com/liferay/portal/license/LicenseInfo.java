@@ -28,19 +28,19 @@ public class LicenseInfo {
 		long maxUsers, String[] hostNames, String[] ipAddresses,
 		String[] macAddresses) {
 
-		_description = description;
-		_expirationDate = expirationDate;
-		_hostNames = hostNames;
-		_ipAddresses = ipAddresses;
-		_licenseEntryType = licenseEntryType;
-		_licenseVersion = licenseVersion;
-		_macAddresses = macAddresses;
-		_maxUsers = maxUsers;
 		_owner = owner;
+		_description = description;
 		_productEntryName = productEntryName;
 		_productId = productId;
 		_productVersion = productVersion;
+		_licenseEntryType = licenseEntryType;
+		_licenseVersion = licenseVersion;
 		_startDate = startDate;
+		_expirationDate = expirationDate;
+		_maxUsers = maxUsers;
+		_hostNames = hostNames;
+		_ipAddresses = ipAddresses;
+		_macAddresses = macAddresses;
 	}
 
 	public String getDescription() {
@@ -95,18 +95,18 @@ public class LicenseInfo {
 		return _startDate;
 	}
 
-	private String _description;
-	private Date _expirationDate;
-	private String[] _hostNames;
-	private String[] _ipAddresses;
-	private String _licenseEntryType;
-	private String _licenseVersion;
-	private String[] _macAddresses;
-	private long _maxUsers;
-	private String _owner;
-	private String _productEntryName;
-	private String _productId;
-	private String _productVersion;
-	private Date _startDate;
+	private final String _description;
+	private final Date _expirationDate;
+	private final String[] _hostNames;
+	private final String[] _ipAddresses;
+	private final String _licenseEntryType;
+	private final String _licenseVersion;
+	private final String[] _macAddresses;
+	private final long _maxUsers;
+	private final String _owner;
+	private final String _productEntryName;
+	private final String _productId;
+	private final String _productVersion;
+	private final Date _startDate;
 
 }

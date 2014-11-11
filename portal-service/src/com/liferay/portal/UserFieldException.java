@@ -25,7 +25,6 @@ import java.util.List;
 public class UserFieldException extends PortalException {
 
 	public UserFieldException() {
-		super();
 	}
 
 	public UserFieldException(String msg) {
@@ -52,6 +51,6 @@ public class UserFieldException extends PortalException {
 		return !_fields.isEmpty();
 	}
 
-	private List<String> _fields = new ArrayList<String>();
+	private final List<String> _fields = new ArrayList<String>();
 
 }

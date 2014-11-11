@@ -18,4 +18,19 @@ package com.liferay.registry.internal;
  * @author Raymond Augé
  */
 public class TrackedOne {
+
+	public TrackedOne() {
+		_key = null;
+	}
+
+	public TrackedOne(String key) {
+		_key = key;
+	}
+
+	public String getKey() {
+		return _key;
+	}
+
+	private final String _key;
+
 }

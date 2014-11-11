@@ -17,16 +17,18 @@ package com.liferay.portal.kernel.servlet.taglib.ui;
 /**
  * @author Iván Zaera
  */
-public class URLMenuItem extends MenuItem {
+public class URLMenuItem extends MenuItem implements URLUIItem {
 
 	public String getMethod() {
 		return _method;
 	}
 
+	@Override
 	public String getTarget() {
 		return _target;
 	}
 
+	@Override
 	public String getURL() {
 		return _url;
 	}
@@ -39,10 +41,12 @@ public class URLMenuItem extends MenuItem {
 		_method = method;
 	}
 
+	@Override
 	public void setTarget(String target) {
 		_target = target;
 	}
 
+	@Override
 	public void setURL(String url) {
 		_url = url;
 	}

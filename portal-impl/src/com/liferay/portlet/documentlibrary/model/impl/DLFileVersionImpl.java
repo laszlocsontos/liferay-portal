@@ -42,9 +42,6 @@ import java.util.List;
  */
 public class DLFileVersionImpl extends DLFileVersionBaseImpl {
 
-	public DLFileVersionImpl() {
-	}
-
 	@Override
 	public String buildTreePath() throws PortalException {
 		if (getFolderId() == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
@@ -150,7 +147,8 @@ public class DLFileVersionImpl extends DLFileVersionBaseImpl {
 		super.setExtraSettings(_extraSettingsProperties.toString());
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DLFileVersionImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileVersionImpl.class);
 
 	private transient ExpandoBridge _expandoBridge;
 	private UnicodeProperties _extraSettingsProperties;

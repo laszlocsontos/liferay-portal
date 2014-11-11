@@ -14,30 +14,20 @@
 
 package com.liferay.portlet.journalcontent.action;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
-import com.liferay.portal.kernel.portlet.PortletLayoutListener;
-import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.transaction.Isolation;
-import com.liferay.portal.kernel.transaction.Propagation;
-import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.ServiceBeanMethodInvocationFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.service.PortletLocalServiceUtil;
-import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.WebKeys;
-
-import java.lang.reflect.Method;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.journal.asset.JournalArticleAssetRenderer;
+import com.liferay.portlet.journal.asset.JournalArticleAssetRendererFactory;
+import com.liferay.portlet.journal.model.JournalArticle;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
 /**
@@ -47,108 +37,56 @@ import javax.portlet.PortletRequest;
  */
 public class ConfigurationActionImpl extends DefaultConfigurationAction {
 
-	public ConfigurationActionImpl() {
-		Method doProcessActionMethod = null;
-
-		try {
-			Class<?> clazz = getClass();
-
-			doProcessActionMethod = clazz.getDeclaredMethod(
-				"doProcessAction",
-				new Class<?>[] {
-					PortletConfig.class, ActionRequest.class,
-					ActionResponse.class
-				});
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		_doProcessActionMethod = doProcessActionMethod;
-	}
-
 	@Override
 	public void processAction(
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			ActionResponse actionResponse)
 		throws Exception {
 
-		// This logic has to run in a transaction which we will invoke directly
-		// since this is not a Spring bean
-
-		ServiceBeanMethodInvocationFactoryUtil.proceed(
-			this, ConfigurationActionImpl.class, _doProcessActionMethod,
-			new Object[] {portletConfig, actionRequest, actionResponse},
-			new String[] {"transactionAdvice"});
-	}
-
-	/**
-	 * This method is invoked in a transaction because we may result in a
-	 * persistence call before and/or after the call to super.processAction()
-	 * which itself results in a persistence call.
-	 */
-	@Transactional(
-		isolation = Isolation.PORTAL, propagation = Propagation.REQUIRES_NEW,
-		rollbackFor = {Exception.class}
-	)
-	protected void doProcessAction(
-			PortletConfig portletConfig, ActionRequest actionRequest,
-			ActionResponse actionResponse)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		Layout layout = themeDisplay.getLayout();
-
-		String portletResource = ParamUtil.getString(
-			actionRequest, "portletResource");
-
-		PortletPreferences preferences = actionRequest.getPreferences();
-
 		String articleId = getArticleId(actionRequest);
 
-		String originalArticleId = preferences.getValue("articleId", null);
+		setPreference(actionRequest, "articleId", articleId);
 
-		Portlet portlet = PortletLocalServiceUtil.getPortletById(
-			themeDisplay.getCompanyId(), portletResource);
+		long articleGroupId = getArticleGroupId(actionRequest);
 
-		PortletLayoutListener portletLayoutListener =
-			portlet.getPortletLayoutListenerInstance();
-
-		if ((portletLayoutListener != null) &&
-			Validator.isNotNull(originalArticleId) &&
-			!originalArticleId.equals(articleId)) {
-
-			// Results in a persistence call
-
-			portletLayoutListener.onRemoveFromLayout(
-				portletResource, layout.getPlid());
-		}
-
-		// Results in a persistence call
+		setPreference(
+			actionRequest, "articleGroupId", String.valueOf(articleGroupId));
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
-
-		if (SessionErrors.isEmpty(actionRequest) &&
-			(portletLayoutListener != null)) {
-
-			// Results in a persistence call
-
-			portletLayoutListener.onAddToLayout(
-				portletResource, layout.getPlid());
-		}
 	}
 
-	protected String getArticleId(PortletRequest portletRequest) {
-		String articleId = getParameter(portletRequest, "articleId");
+	protected long getArticleGroupId(PortletRequest portletRequest) {
+		long assetEntryId = GetterUtil.getLong(
+			getParameter(portletRequest, "assetEntryId"));
 
-		return StringUtil.toUpperCase(articleId);
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			assetEntryId);
+
+		return assetEntry.getGroupId();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
-		ConfigurationActionImpl.class);
+	protected String getArticleId(PortletRequest portletRequest)
+		throws PortalException {
 
-	private final Method _doProcessActionMethod;
+		long assetEntryId = GetterUtil.getLong(
+			getParameter(portletRequest, "assetEntryId"));
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			assetEntryId);
+
+		JournalArticleAssetRendererFactory articleAssetRendererFactory =
+			(JournalArticleAssetRendererFactory)
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(
+						JournalArticle.class.getName());
+
+		JournalArticleAssetRenderer articleAssetRenderer =
+			(JournalArticleAssetRenderer)articleAssetRendererFactory.
+				getAssetRenderer(assetEntry.getClassPK());
+
+		JournalArticle article = articleAssetRenderer.getArticle();
+
+		return StringUtil.toUpperCase(article.getArticleId());
+	}
 
 }

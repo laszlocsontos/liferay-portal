@@ -237,13 +237,6 @@ public class SchedulerEngineHelperUtil {
 		getSchedulerEngineHelper().initialize();
 	}
 
-	public static String namespaceGroupName(
-		String groupName, StorageType storageType) {
-
-		return getSchedulerEngineHelper().namespaceGroupName(
-			groupName, storageType);
-	}
-
 	public static void pause(String groupName, StorageType storageType)
 		throws SchedulerException {
 
@@ -350,12 +343,6 @@ public class SchedulerEngineHelperUtil {
 		throws SchedulerException {
 
 		getSchedulerEngineHelper().update(trigger, storageType);
-	}
-
-	public static void updateMemorySchedulerClusterMaster()
-		throws SchedulerException {
-
-		getSchedulerEngineHelper().updateMemorySchedulerClusterMaster();
 	}
 
 	public void setSchedulerEngineHelper(

@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
-import com.liferay.portlet.journalcontent.util.JournalContentUtil;
+import com.liferay.portlet.journal.util.JournalContentUtil;
 
 /**
  * @author Brian Wing Shun Chan
@@ -39,7 +39,7 @@ public class WebServerServletTokenImpl implements WebServerServletToken {
 		String token = _portalCache.get(key);
 
 		if (token == null) {
-			token = _createToken(imageId);
+			token = _createToken();
 
 			_portalCache.put(key, token);
 		}
@@ -64,7 +64,7 @@ public class WebServerServletTokenImpl implements WebServerServletToken {
 		_multiVMPool = multiVMPool;
 	}
 
-	private String _createToken(long imageId) {
+	private String _createToken() {
 		return String.valueOf(System.currentTimeMillis());
 	}
 

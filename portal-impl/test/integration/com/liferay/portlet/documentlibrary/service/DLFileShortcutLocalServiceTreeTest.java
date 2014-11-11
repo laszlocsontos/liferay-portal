@@ -32,11 +32,10 @@ import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.testng.Assert;
 
 /**
  * @author Shinn Lok
@@ -124,7 +123,7 @@ public class DLFileShortcutLocalServiceTreeTest {
 		_dlFileShortcuts.add(dlFileShortcutAA);
 	}
 
-	private List<DLFileShortcut> _dlFileShortcuts =
+	private final List<DLFileShortcut> _dlFileShortcuts =
 		new ArrayList<DLFileShortcut>();
 	private FileEntry _fileEntry;
 	private Folder _folder;

@@ -37,9 +37,6 @@ public class ShoppingItemImpl extends ShoppingItemBaseImpl {
 
 	public static final int STOCK_QUANTITY_INFINITE_STOCK = -1;
 
-	public ShoppingItemImpl() {
-	}
-
 	@Override
 	public int compareTo(ShoppingItem item) {
 		return new ItemNameComparator(true).compare(this, item);
@@ -119,7 +116,8 @@ public class ShoppingItemImpl extends ShoppingItemBaseImpl {
 		super.setFieldsQuantities(StringUtil.merge(fieldsQuantitiesArray));
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ShoppingItemImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		ShoppingItemImpl.class);
 
 	private String[] _fieldsQuantitiesArray;
 

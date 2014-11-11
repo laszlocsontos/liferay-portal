@@ -18,12 +18,20 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.LangBuilder;
+import com.liferay.registry.Filter;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+import com.liferay.registry.ServiceTracker;
+import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.io.InputStream;
 
@@ -41,6 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Shuyang Zhou
+ * @author Kamesh Sampath
  */
 public class LanguageResources {
 
@@ -117,29 +126,6 @@ public class LanguageResources {
 		}
 
 		return superLocale;
-	}
-
-	public static Map<String, String> putLanguageMap(
-		Locale locale, Map<String, String> languageMap) {
-
-		Map<String, String> oldLanguageMap = _languageMaps.get(locale);
-
-		if (oldLanguageMap == null) {
-			_loadLocale(locale);
-			oldLanguageMap = _languageMaps.get(locale);
-		}
-
-		Map<String, String> newLanguageMap = new HashMap<String, String>();
-
-		if (oldLanguageMap != null) {
-			newLanguageMap.putAll(oldLanguageMap);
-		}
-
-		newLanguageMap.putAll(languageMap);
-
-		_languageMaps.put(locale, newLanguageMap);
-
-		return oldLanguageMap;
 	}
 
 	public void setConfig(String config) {
@@ -253,15 +239,56 @@ public class LanguageResources {
 		return properties;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LanguageResources.class);
+	private static Map<String, String> _putLanguageMap(
+		Locale locale, Map<String, String> languageMap) {
 
-	private static Locale _blankLocale = new Locale(StringPool.BLANK);
+		Map<String, String> oldLanguageMap = _languageMaps.get(locale);
+
+		if (oldLanguageMap == null) {
+			_loadLocale(locale);
+
+			oldLanguageMap = _languageMaps.get(locale);
+		}
+
+		Map<String, String> newLanguageMap = new HashMap<String, String>();
+
+		if (oldLanguageMap != null) {
+			newLanguageMap.putAll(oldLanguageMap);
+		}
+
+		newLanguageMap.putAll(languageMap);
+
+		_languageMaps.put(locale, newLanguageMap);
+
+		return oldLanguageMap;
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LanguageResources.class);
+
+	private static final Locale _blankLocale = new Locale(StringPool.BLANK);
 	private static String[] _configNames;
-	private static Map<Locale, Map<String, String>> _languageMaps =
+	private static final Map<Locale, Map<String, String>> _languageMaps =
 		new ConcurrentHashMap<Locale, Map<String, String>>(64);
-	private static Locale _nullLocale = new Locale(StringPool.BLANK);
-	private static Map<Locale, Locale> _superLocales =
+	private static final Locale _nullLocale = new Locale(StringPool.BLANK);
+	private static final ServiceTracker<ResourceBundle, ResourceBundle>
+		_serviceTracker;
+	private static final Map<Locale, Locale> _superLocales =
 		new ConcurrentHashMap<Locale, Locale>();
+
+	static {
+		Registry registry = RegistryUtil.getRegistry();
+
+		Filter languageResourceFilter = registry.getFilter(
+			"(&(!(javax.portlet.name=*))(language.id=*)(objectClass=" +
+				ResourceBundle.class.getName() + "))");
+
+		_serviceTracker = registry.trackServices(
+			languageResourceFilter,
+			new LanguageResourceServiceTrackerCustomizer());
+
+		_serviceTracker.open();
+	}
 
 	private static class LanguageResourcesBundle extends ResourceBundle {
 
@@ -294,11 +321,13 @@ public class LanguageResources {
 		private LanguageResourcesBundle(Locale locale) {
 			_locale = locale;
 
-			_languageMap = _languageMaps.get(locale);
+			Map<String, String> languageMap = _languageMaps.get(locale);
 
-			if (_languageMap == null) {
-				_languageMap = _loadLocale(locale);
+			if (languageMap == null) {
+				languageMap = _loadLocale(locale);
 			}
+
+			_languageMap = languageMap;
 
 			Locale superLocale = getSuperLocale(locale);
 
@@ -307,8 +336,87 @@ public class LanguageResources {
 			}
 		}
 
-		private Map<String, String> _languageMap;
-		private Locale _locale;
+		private final Map<String, String> _languageMap;
+		private final Locale _locale;
+
+	}
+
+	private static class LanguageResourceServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<ResourceBundle, ResourceBundle> {
+
+		@Override
+		public ResourceBundle addingService(
+			ServiceReference<ResourceBundle> serviceReference) {
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			ResourceBundle resourceBundle = registry.getService(
+				serviceReference);
+
+			String languageId = GetterUtil.getString(
+				serviceReference.getProperty("language.id"), StringPool.BLANK);
+			Map<String, String> languageMap = new HashMap<String, String>();
+			Locale locale = null;
+
+			if (Validator.isNotNull(languageId)) {
+				locale = LocaleUtil.fromLanguageId(languageId, true);
+			}
+			else {
+				locale = new Locale(StringPool.BLANK);
+			}
+
+			Enumeration<String> keys = resourceBundle.getKeys();
+
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
+
+				String value = resourceBundle.getString(key);
+
+				languageMap.put(key, value);
+			}
+
+			Map<String, String> oldLanguageMap = _putLanguageMap(
+				locale, languageMap);
+
+			_oldLanguageMaps.put(serviceReference, oldLanguageMap);
+
+			return resourceBundle;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<ResourceBundle> serviceReference,
+			ResourceBundle resourceBundle) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<ResourceBundle> serviceReference,
+			ResourceBundle resourceBundle) {
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			registry.ungetService(serviceReference);
+
+			String languageId = GetterUtil.getString(
+				serviceReference.getProperty("language.id"), StringPool.BLANK);
+			Locale locale = null;
+
+			if (Validator.isNotNull(languageId)) {
+				locale = LocaleUtil.fromLanguageId(languageId, true);
+			}
+			else {
+				locale = new Locale(StringPool.BLANK);
+			}
+
+			Map<String, String> languageMap = _oldLanguageMaps.get(
+				serviceReference);
+
+			_putLanguageMap(locale, languageMap);
+		}
+
+		private final Map<ServiceReference<?>, Map<String, String>>
+			_oldLanguageMaps = new HashMap<>();
 
 	}
 

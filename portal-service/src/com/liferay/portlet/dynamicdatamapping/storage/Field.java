@@ -56,9 +56,9 @@ public class Field implements Serializable {
 		Map<Locale, List<Serializable>> valuesMap, Locale defaultLocale) {
 
 		_ddmStructureId = ddmStructureId;
-		_defaultLocale = defaultLocale;
 		_name = name;
 		_valuesMap = valuesMap;
+		_defaultLocale = defaultLocale;
 	}
 
 	public Field(long ddmStructureId, String name, Serializable value) {
@@ -178,9 +178,7 @@ public class Field implements Serializable {
 				return values.get(0);
 			}
 
-			boolean repeatable = isRepeatable();
-
-			if (repeatable) {
+			if (isRepeatable() || (values.size() > 1)) {
 				return FieldConstants.getSerializable(getDataType(), values);
 			}
 
@@ -304,7 +302,7 @@ public class Field implements Serializable {
 		return values;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(Field.class);
+	private static final Log _log = LogFactoryUtil.getLog(Field.class);
 
 	private long _ddmStructureId;
 	private Locale _defaultLocale;

@@ -80,15 +80,6 @@ public class LiferayPackageAutoDeployer implements AutoDeployer {
 
 				String zipEntryFileName = zipEntry.getName();
 
-				if (!zipEntryFileName.endsWith(".war") &&
-					!zipEntryFileName.endsWith(".xml") &&
-					!zipEntryFileName.endsWith(".zip") &&
-					!zipEntryFileName.equals(
-						"liferay-marketplace.properties")) {
-
-					continue;
-				}
-
 				if (_log.isInfoEnabled()) {
 					_log.info(
 						"Extracting " + zipEntryFileName + " from " +
@@ -143,7 +134,7 @@ public class LiferayPackageAutoDeployer implements AutoDeployer {
 		return new LiferayPackageAutoDeployer();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		LiferayPackageAutoDeployer.class);
 
 	private final String _baseDir;

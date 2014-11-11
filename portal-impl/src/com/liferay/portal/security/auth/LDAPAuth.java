@@ -17,6 +17,7 @@ package com.liferay.portal.security.auth;
 import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.PasswordExpiredException;
 import com.liferay.portal.UserLockoutException;
+import com.liferay.portal.kernel.ldap.LDAPFilterException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
@@ -333,7 +334,8 @@ public class LDAPAuth implements Authenticator {
 			}
 		}
 		catch (Exception e) {
-			if (e instanceof PasswordExpiredException ||
+			if (e instanceof LDAPFilterException ||
+				e instanceof PasswordExpiredException ||
 				e instanceof UserLockoutException) {
 
 				throw e;
@@ -361,7 +363,10 @@ public class LDAPAuth implements Authenticator {
 			String password)
 		throws Exception {
 
-		if (!AuthSettingsUtil.isLDAPAuthEnabled(companyId)) {
+		if (!PrefsPropsUtil.getBoolean(
+				companyId, PropsKeys.LDAP_AUTH_ENABLED,
+				PropsValues.LDAP_AUTH_ENABLED)) {
+
 			if (_log.isDebugEnabled()) {
 				_log.debug("Authenticator is not enabled");
 			}

@@ -23,10 +23,11 @@ import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncUser;
 import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncUserService;
-import com.liferay.sync.engine.util.ReleaseInfo;
-import com.liferay.sync.engine.util.RetryUtil;
 
 import java.util.Map;
+
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpResponseException;
 
 /**
  * @author Shinn Lok
@@ -38,7 +39,11 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 	}
 
 	@Override
-	protected void processResponse(String response) throws Exception {
+	public void processResponse(String response) throws Exception {
+		doProcessResponse(response);
+	}
+
+	protected SyncContext doProcessResponse(String response) throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		SyncContext syncContext = objectMapper.readValue(
@@ -46,6 +51,21 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 
 		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 			getSyncAccountId());
+
+		SyncUser remoteSyncUser = syncContext.getSyncUser();
+
+		if (remoteSyncUser == null) {
+			throw new HttpResponseException(
+				HttpStatus.SC_UNAUTHORIZED, "Authenticated access required");
+		}
+
+		SyncUser localSyncUser = SyncUserService.fetchSyncUser(
+			syncAccount.getSyncAccountId());
+
+		remoteSyncUser.setSyncAccountId(localSyncUser.getSyncAccountId());
+		remoteSyncUser.setSyncUserId(localSyncUser.getSyncUserId());
+
+		SyncUserService.update(remoteSyncUser);
 
 		Map<String, String> portletPreferencesMap =
 			syncContext.getPortletPreferencesMap();
@@ -65,26 +85,9 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 		syncAccount.setSocialOfficeInstalled(
 			syncContext.isSocialOfficeInstalled());
 
-		if (ReleaseInfo.isServerCompatible(syncContext)) {
-			syncAccount.setState(SyncAccount.STATE_CONNECTED);
-
-			RetryUtil.resetRetryDelay(getSyncAccountId());
-		}
-		else {
-			syncAccount.setState(SyncAccount.STATE_DISCONNECTED);
-			syncAccount.setUiEvent(SyncAccount.UI_EVENT_SYNC_WEB_OUT_OF_DATE);
-		}
-
 		SyncAccountService.update(syncAccount);
 
-		SyncUser remoteSyncUser = syncContext.getSyncUser();
-
-		SyncUser localSyncUser = SyncUserService.fetchSyncUser(
-			syncAccount.getSyncAccountId());
-
-		remoteSyncUser.setSyncUserId(localSyncUser.getSyncUserId());
-
-		SyncUserService.update(remoteSyncUser);
+		return syncContext;
 	}
 
 }

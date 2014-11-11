@@ -29,9 +29,6 @@ import com.liferay.portal.util.PortalUtil;
  */
 public class RoleImpl extends RoleBaseImpl {
 
-	public RoleImpl() {
-	}
-
 	@Override
 	public String getDescriptiveName() throws PortalException {
 		String name = getName();
@@ -98,6 +95,6 @@ public class RoleImpl extends RoleBaseImpl {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(RoleImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(RoleImpl.class);
 
 }

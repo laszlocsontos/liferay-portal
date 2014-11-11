@@ -80,8 +80,8 @@ public class PortletDataHandlerBoolean extends PortletDataHandlerControl {
 			namespace, controlName, controlLabel, disabled, className,
 			referrerClassName);
 
-		_children = children;
 		_defaultState = defaultState;
+		_children = children;
 	}
 
 	public PortletDataHandlerControl[] getChildren() {
@@ -92,7 +92,7 @@ public class PortletDataHandlerBoolean extends PortletDataHandlerControl {
 		return _defaultState;
 	}
 
-	private PortletDataHandlerControl[] _children;
-	private boolean _defaultState;
+	private final PortletDataHandlerControl[] _children;
+	private final boolean _defaultState;
 
 }

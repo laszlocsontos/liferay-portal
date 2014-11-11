@@ -37,9 +37,7 @@ if (folder != null) {
 	}
 }
 
-String structureId = ParamUtil.getString(request, "structureId");
-
-String displayStyle = JournalUtil.getDisplayStyle(liferayPortletRequest, displayViews);
+String ddmStructureKey = ParamUtil.getString(request, "ddmStructureKey");
 
 int total = 0;
 
@@ -56,7 +54,6 @@ PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/journal/view");
 portletURL.setParameter("folderId", String.valueOf(folderId));
-portletURL.setParameter("displayStyle", displayStyle);
 
 SearchContainer searchContainer = new SearchContainer(liferayPortletRequest, null, null, "cur2", SearchContainer.DEFAULT_DELTA, portletURL, null, null);
 
@@ -101,7 +98,6 @@ else {
 					<portlet:renderURL var="viewArticlesHomeURL">
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-						<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 					</portlet:renderURL>
 
 					<aui:nav-item
@@ -110,7 +106,7 @@ else {
 						iconCssClass="icon-home"
 						label='<%= HtmlUtil.escape(LanguageUtil.get(request, "home")) %>'
 						localizeLabel="<%= false %>"
-						selected='<%= (navigation.equals("home") && (folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID)) && Validator.isNull(structureId) %>'
+						selected='<%= (navigation.equals("home") && (folderId == JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID)) && Validator.isNull(ddmStructureKey) %>'
 					>
 
 						<%
@@ -124,7 +120,6 @@ else {
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="navigation" value="recent" />
 						<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-						<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 					</portlet:renderURL>
 
 					<aui:nav-item
@@ -141,7 +136,6 @@ else {
 							<portlet:param name="struts_action" value="/journal/view" />
 							<portlet:param name="navigation" value="mine" />
 							<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-							<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 						</portlet:renderURL>
 
 						<aui:nav-item
@@ -159,7 +153,6 @@ else {
 							<portlet:param name="struts_action" value="/journal/view" />
 							<portlet:param name="browseBy" value="structure" />
 							<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-							<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 						</portlet:renderURL>
 
 						<aui:nav-item
@@ -176,7 +169,6 @@ else {
 					<portlet:renderURL var="viewURL">
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-						<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 					</portlet:renderURL>
 
 					<aui:nav-item
@@ -200,8 +192,7 @@ else {
 								<portlet:param name="struts_action" value="/journal/view" />
 								<portlet:param name="browseBy" value="structure" />
 								<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
-								<portlet:param name="displayStyle" value="<%= displayStyle %>" />
-								<portlet:param name="structureId" value="<%= ddmStructure.getStructureKey() %>" />
+								<portlet:param name="ddmStructureKey" value="<%= ddmStructure.getStructureKey() %>" />
 							</portlet:renderURL>
 
 							<aui:nav-item
@@ -210,7 +201,7 @@ else {
 								iconCssClass="<%= assetRendererFactory.getIconCssClass() %>"
 								label="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>"
 								localizeLabel="<%= false %>"
-								selected="<%= structureId.equals(ddmStructure.getStructureKey()) %>"
+								selected="<%= ddmStructureKey.equals(ddmStructure.getStructureKey()) %>"
 							/>
 
 						<%
@@ -223,7 +214,6 @@ else {
 					<portlet:renderURL var="viewURL">
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(parentFolderId) %>" />
-						<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 					</portlet:renderURL>
 
 					<aui:nav-item
@@ -250,7 +240,6 @@ else {
 						<portlet:renderURL var="viewURL">
 							<portlet:param name="struts_action" value="/journal/view" />
 							<portlet:param name="folderId" value="<%= String.valueOf(curFolder.getFolderId()) %>" />
-							<portlet:param name="displayStyle" value="<%= displayStyle %>" />
 						</portlet:renderURL>
 
 						<aui:nav-item

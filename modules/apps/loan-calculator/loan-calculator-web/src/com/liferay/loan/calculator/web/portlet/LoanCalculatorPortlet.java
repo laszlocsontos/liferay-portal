@@ -14,8 +14,8 @@
 
 package com.liferay.loan.calculator.web.portlet;
 
-import com.liferay.loan.calculator.web.upgrade.LoanCalculatorUpgrade;
-import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.liferay.loan.calculator.web.upgrade.LoanCalculatorWebUpgrade;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 
 import javax.portlet.Portlet;
 
@@ -49,8 +49,8 @@ import org.osgi.service.component.annotations.Reference;
 public class LoanCalculatorPortlet extends MVCPortlet {
 
 	@Reference(unbind = "-")
-	protected void setLoanCalculatorUpgrade(
-		LoanCalculatorUpgrade loanCalculatorUpgrade) {
+	protected void setLoanCalculatorWebUpgrade(
+		LoanCalculatorWebUpgrade loanCalculatorWebUpgrade) {
 	}
 
 }

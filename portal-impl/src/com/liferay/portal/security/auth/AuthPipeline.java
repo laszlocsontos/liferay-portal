@@ -141,13 +141,13 @@ public class AuthPipeline {
 	public static void unregisterAuthenticator(
 		String key, Authenticator authenticator) {
 
-		_instance._unregisterAuthenticator(key, authenticator);
+		_instance._unregisterAuthenticator(authenticator);
 	}
 
 	public static void unregisterAuthFailure(
 		String key, AuthFailure authFailure) {
 
-		_instance._unregisterAuthFailure(key, authFailure);
+		_instance._unregisterAuthFailure(authFailure);
 	}
 
 	private AuthPipeline() {
@@ -329,9 +329,7 @@ public class AuthPipeline {
 		_authFailureServiceRegistrations.put(authFailure, serviceRegistration);
 	}
 
-	private void _unregisterAuthenticator(
-		String key, Authenticator authenticator) {
-
+	private void _unregisterAuthenticator(Authenticator authenticator) {
 		ServiceRegistration<Authenticator> serviceRegistration =
 			_authenticatorServiceRegistrations.remove(authenticator);
 
@@ -340,7 +338,7 @@ public class AuthPipeline {
 		}
 	}
 
-	private void _unregisterAuthFailure(String key, AuthFailure authFailure) {
+	private void _unregisterAuthFailure(AuthFailure authFailure) {
 		ServiceRegistration<AuthFailure> serviceRegistration =
 			_authFailureServiceRegistrations.remove(authFailure);
 
@@ -349,21 +347,22 @@ public class AuthPipeline {
 		}
 	}
 
-	private static AuthPipeline _instance = new AuthPipeline();
+	private static final AuthPipeline _instance = new AuthPipeline();
 
-	private Map<String, Authenticator[]> _authenticators =
+	private final Map<String, Authenticator[]> _authenticators =
 		new HashMap<String, Authenticator[]>();
-	private Map<Authenticator, ServiceRegistration<Authenticator>>
+	private final Map<Authenticator, ServiceRegistration<Authenticator>>
 		_authenticatorServiceRegistrations =
 			new ServiceRegistrationMap<Authenticator>();
-	private ServiceTracker<Authenticator, Authenticator>
+	private final ServiceTracker<Authenticator, Authenticator>
 		_authenticatorServiceTracker;
-	private Map<String, AuthFailure[]> _authFailures =
+	private final Map<String, AuthFailure[]> _authFailures =
 		new HashMap<String, AuthFailure[]>();
-	private Map<AuthFailure, ServiceRegistration<AuthFailure>>
+	private final Map<AuthFailure, ServiceRegistration<AuthFailure>>
 		_authFailureServiceRegistrations =
 			new ServiceRegistrationMap<AuthFailure>();
-	private ServiceTracker<AuthFailure, AuthFailure> _authFailureServiceTracker;
+	private final ServiceTracker<AuthFailure, AuthFailure>
+		_authFailureServiceTracker;
 
 	private class AuthenticatorServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<Authenticator, Authenticator> {

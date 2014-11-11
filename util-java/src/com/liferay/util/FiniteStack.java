@@ -22,8 +22,6 @@ import java.util.Stack;
 public class FiniteStack<E> extends Stack<E> {
 
 	public FiniteStack(int maxSize) {
-		super();
-
 		_maxSize = maxSize;
 	}
 
@@ -40,6 +38,6 @@ public class FiniteStack<E> extends Stack<E> {
 		return item;
 	}
 
-	private int _maxSize;
+	private final int _maxSize;
 
 }
