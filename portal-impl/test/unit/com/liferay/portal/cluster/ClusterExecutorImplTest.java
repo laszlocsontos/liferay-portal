@@ -20,20 +20,21 @@ import com.liferay.portal.kernel.cluster.ClusterEventListener;
 import com.liferay.portal.kernel.cluster.ClusterEventType;
 import com.liferay.portal.kernel.cluster.ClusterMessageType;
 import com.liferay.portal.kernel.cluster.ClusterNode;
-import com.liferay.portal.kernel.cluster.ClusterNodeResponses;
+import com.liferay.portal.kernel.cluster.ClusterNodeResponse;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
 import com.liferay.portal.kernel.cluster.FutureClusterResponses;
 import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.runners.AspectJMockingNewJVMJUnitTestRunner;
+import com.liferay.portal.test.AspectJNewEnvMethodRule;
 import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsImpl;
@@ -45,7 +46,7 @@ import java.net.UnknownHostException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -55,13 +56,13 @@ import org.jgroups.Channel;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Tina Tian
  */
-@RunWith(AspectJMockingNewJVMJUnitTestRunner.class)
+@NewEnv(type = NewEnv.Type.JVM)
 public class ClusterExecutorImplTest extends BaseClusterExecutorImplTestCase {
 
 	@ClassRule
@@ -721,7 +722,7 @@ public class ClusterExecutorImplTest extends BaseClusterExecutorImplTestCase {
 			EnableClusterLinkAdvice.class
 		})
 	@Test
-	public void testExecuteWithCallBack1() throws Exception {
+	public void testExecuteWithCallBack() throws Exception {
 		ClusterExecutorImpl clusterExecutorImpl = null;
 
 		try {
@@ -740,87 +741,15 @@ public class ClusterExecutorImplTest extends BaseClusterExecutorImplTestCase {
 			MockClusterResponseCallback mockClusterResponseCallback =
 				new MockClusterResponseCallback();
 
-			clusterExecutorImpl.execute(
-				clusterRequest, mockClusterResponseCallback);
+			FutureClusterResponses futureClusterResponses =
+				clusterExecutorImpl.execute(
+					clusterRequest, mockClusterResponseCallback);
 
-			ClusterNodeResponses clusterNodeResponses =
+			BlockingQueue<ClusterNodeResponse> blockingQueue =
 				mockClusterResponseCallback.waitMessage();
 
-			assertFutureClusterResponsesWithoutException(
-				clusterNodeResponses, clusterRequest.getUuid(), timestamp,
-				address);
-		}
-		finally {
-			if (clusterExecutorImpl != null) {
-				clusterExecutorImpl.destroy();
-			}
-		}
-	}
-
-	@AdviseWith(
-		adviceClasses = {
-			DisableAutodetectedAddressAdvice.class,
-			EnableClusterLinkAdvice.class
-		})
-	@Test
-	public void testExecuteWithCallBack2() throws Exception {
-		ClusterExecutorImpl clusterExecutorImpl = null;
-
-		try {
-			clusterExecutorImpl = getClusterExecutorImpl(false, false);
-
-			String timestamp = String.valueOf(System.currentTimeMillis());
-
-			MethodHandler methodHandler = new MethodHandler(
-				testMethod1MethodKey, timestamp);
-
-			Address address = clusterExecutorImpl.getLocalClusterNodeAddress();
-
-			ClusterRequest clusterRequest = ClusterRequest.createUnicastRequest(
-				methodHandler, address);
-
-			MockClusterResponseCallback mockClusterResponseCallback =
-				new MockClusterResponseCallback();
-
-			clusterExecutorImpl.execute(
-				clusterRequest, mockClusterResponseCallback, 1000,
-				TimeUnit.MILLISECONDS);
-
-			ClusterNodeResponses clusterNodeResponses =
-				mockClusterResponseCallback.waitMessage();
-
-			assertFutureClusterResponsesWithoutException(
-				clusterNodeResponses, clusterRequest.getUuid(), timestamp,
-				address);
-
-			// TimeoutException
-
-			clusterRequest = ClusterRequest.createUnicastRequest(
-				null, new AddressImpl(new MockAddress()));
-
-			clusterExecutorImpl.execute(
-				clusterRequest, mockClusterResponseCallback, 1000,
-				TimeUnit.MILLISECONDS);
-
-			TimeoutException timeoutException =
-				mockClusterResponseCallback.waitTimeoutException();
-
-			Assert.assertNotNull(timeoutException);
-
-			// InterruptedException
-
-			clusterExecutorImpl.execute(
-				clusterRequest, mockClusterResponseCallback);
-
-			ExecutorService executorService = ReflectionTestUtil.getFieldValue(
-				clusterExecutorImpl, "_executorService");
-
-			executorService.shutdownNow();
-
-			InterruptedException interruptedException =
-				mockClusterResponseCallback.waitInterruptedException();
-
-			Assert.assertNotNull(interruptedException);
+			Assert.assertSame(
+				futureClusterResponses.getPartialResults(), blockingQueue);
 		}
 		finally {
 			if (clusterExecutorImpl != null) {
@@ -1213,5 +1142,9 @@ public class ClusterExecutorImplTest extends BaseClusterExecutorImplTestCase {
 			}
 		}
 	}
+
+	@Rule
+	public final AspectJNewEnvMethodRule aspectJNewEnvMethodRule =
+		new AspectJNewEnvMethodRule();
 
 }

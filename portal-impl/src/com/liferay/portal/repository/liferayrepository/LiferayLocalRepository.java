@@ -155,8 +155,18 @@ public class LiferayLocalRepository
 	}
 
 	@Override
+	public FileEntry copyFileEntry(
+			long userId, long groupId, long fileEntryId, long destFolderId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		throw new UnsupportedOperationException(
+			"This method is not supported by this repository");
+	}
+
+	@Override
 	public void deleteAll() throws PortalException {
-		dlFolderLocalService.deleteAll(getGroupId());
+		dlFolderLocalService.deleteAllByRepository(getRepositoryId());
 	}
 
 	@Override
@@ -234,7 +244,7 @@ public class LiferayLocalRepository
 
 		List<DLFileEntry> dlFileEntries =
 			dlFileEntryLocalService.getGroupFileEntries(
-				getGroupId(), 0, rootFolderId, start, end,
+				getGroupId(), 0, getGroupId(), rootFolderId, start, end,
 				DLFileEntryOrderByComparator.getOrderByComparator(obc));
 
 		return RepositoryModelUtil.toFileEntries(dlFileEntries);
