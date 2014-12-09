@@ -15,7 +15,6 @@
 package com.liferay.portal.fabric.netty.handlers;
 
 import com.liferay.portal.fabric.agent.FabricAgent;
-import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
 import com.liferay.portal.fabric.netty.agent.NettyFabricAgentStub;
 import com.liferay.portal.fabric.netty.fileserver.FileHelperUtil;
 import com.liferay.portal.fabric.netty.rpc.ChannelThreadLocal;
@@ -32,11 +31,12 @@ import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFutureConverter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.process.ClassPathUtil;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessConfig;
 import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.process.ProcessException;
-import com.liferay.portal.kernel.process.ProcessExecutor;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -51,6 +51,9 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+
+import java.net.MalformedURLException;
+import java.net.URLClassLoader;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,19 +74,19 @@ public class NettyFabricWorkerExecutionChannelHandler
 	extends SimpleChannelInboundHandler<NettyFabricWorkerConfig<Serializable>> {
 
 	public NettyFabricWorkerExecutionChannelHandler(
-		Repository repository, ProcessExecutor processExecutor,
+		Repository<Channel> repository, FabricAgent fabricAgent,
 		long executionTimeout) {
 
 		if (repository == null) {
 			throw new NullPointerException("Repository is null");
 		}
 
-		if (processExecutor == null) {
-			throw new NullPointerException("Process executor is null");
+		if (fabricAgent == null) {
+			throw new NullPointerException("Fabric agent is null");
 		}
 
 		_repository = repository;
-		_fabricAgent = new LocalFabricAgent(processExecutor);
+		_fabricAgent = fabricAgent;
 		_executionTimeout = executionTimeout;
 	}
 
@@ -116,7 +119,7 @@ public class NettyFabricWorkerExecutionChannelHandler
 		NettyFabricWorkerConfig<Serializable> nettyFabricWorkerConfig) {
 
 		NoticeableFuture<LoadedPaths> noticeableFuture = loadPaths(
-			nettyFabricWorkerConfig);
+			channelHandlerContext.channel(), nettyFabricWorkerConfig);
 
 		noticeableFuture.addFutureListener(
 			new PostLoadPathsFutureListener(
@@ -124,6 +127,7 @@ public class NettyFabricWorkerExecutionChannelHandler
 	}
 
 	protected NoticeableFuture<LoadedPaths> loadPaths(
+		Channel channel,
 		NettyFabricWorkerConfig<Serializable> nettyFabricWorkerConfig) {
 
 		Map<Path, Path> mergedPaths = new HashMap<Path, Path>();
@@ -155,7 +159,7 @@ public class NettyFabricWorkerExecutionChannelHandler
 		mergedPaths.putAll(inputPaths);
 
 		return new NoticeableFutureConverter<LoadedPaths, Map<Path, Path>>(
-			_repository.getFiles(mergedPaths, false)) {
+			_repository.getFiles(channel, mergedPaths, false)) {
 
 			@Override
 			protected LoadedPaths convert(Map<Path, Path> mergedPaths)
@@ -375,13 +379,27 @@ public class NettyFabricWorkerExecutionChannelHandler
 			return _inputPaths;
 		}
 
-		public ProcessConfig toProcessConfig(ProcessConfig processConfig) {
+		public ProcessConfig toProcessConfig(ProcessConfig processConfig)
+			throws ProcessException {
+
 			Builder builder = new Builder();
 
 			builder.setArguments(processConfig.getArguments());
 			builder.setBootstrapClassPath(_bootstrapClassPath);
 			builder.setJavaExecutable(processConfig.getJavaExecutable());
 			builder.setRuntimeClassPath(_runtimeClassPath);
+
+			try {
+				builder.setReactClassLoader(
+					new URLClassLoader(
+						ArrayUtil.append(
+							ClassPathUtil.getClassPathURLs(_bootstrapClassPath),
+							ClassPathUtil.getClassPathURLs(
+								_runtimeClassPath))));
+			}
+			catch (MalformedURLException murle) {
+				throw new ProcessException(murle);
+			}
 
 			return builder.build();
 		}
@@ -568,6 +586,6 @@ public class NettyFabricWorkerExecutionChannelHandler
 
 	private final long _executionTimeout;
 	private final FabricAgent _fabricAgent;
-	private final Repository _repository;
+	private final Repository<Channel> _repository;
 
 }

@@ -15,9 +15,10 @@
 package com.liferay.portal.kernel.security;
 
 import com.liferay.portal.kernel.io.BigEndianCodec;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvMethodRule;
+import com.liferay.portal.kernel.test.NewEnvTestRule;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 
 import java.security.SecureRandom;
@@ -40,8 +41,10 @@ import org.junit.Test;
 public class SecureRandomUtilTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
 
 	@Before
 	public void setUp() {
@@ -371,9 +374,6 @@ public class SecureRandomUtilTest {
 				0);
 		}
 	}
-
-	@Rule
-	public final NewEnvMethodRule newEnvMethodRule = new NewEnvMethodRule();
 
 	protected long getFirstLong() {
 		byte[] bytes = ReflectionTestUtil.getFieldValue(

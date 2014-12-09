@@ -26,11 +26,12 @@ import com.liferay.portal.fabric.status.RemoteFabricStatus;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.process.local.ReturnProcessCallable;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvMethodRule;
+import com.liferay.portal.test.AspectJNewEnvTestRule;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -53,8 +54,10 @@ import org.junit.Test;
 public class NettyFabricWorkerStubTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, AspectJNewEnvTestRule.INSTANCE);
 
 	@Test
 	public void testConstructor() {
@@ -80,7 +83,7 @@ public class NettyFabricWorkerStubTest {
 		try {
 			new NettyFabricWorkerStub<String>(
 				0, NettyTestUtil.createEmptyEmbeddedChannel(),
-				new MockRepository(), null, 0);
+				new MockRepository<Channel>(), null, 0);
 
 			Assert.fail();
 		}
@@ -96,7 +99,7 @@ public class NettyFabricWorkerStubTest {
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				0, channel, new MockRepository(),
+				0, channel, new MockRepository<Channel>(),
 				Collections.<Path, Path>emptyMap(), 0);
 
 		Assert.assertNotNull(
@@ -118,7 +121,7 @@ public class NettyFabricWorkerStubTest {
 		Assert.assertFalse(channelFuture.isDone());
 
 		nettyFabricWorkerStub = new NettyFabricWorkerStub<String>(
-			0, channel, new MockRepository(),
+			0, channel, new MockRepository<Channel>(),
 			Collections.<Path, Path>emptyMap(), 0);
 
 		Assert.assertNotNull(
@@ -138,7 +141,8 @@ public class NettyFabricWorkerStubTest {
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
 				0, NettyTestUtil.createEmptyEmbeddedChannel(),
-				new MockRepository(), Collections.<Path, Path>emptyMap(), 0);
+				new MockRepository<Channel>(),
+				Collections.<Path, Path>emptyMap(), 0);
 
 		FabricStatus fabricStatus = nettyFabricWorkerStub.getFabricStatus();
 
@@ -150,7 +154,8 @@ public class NettyFabricWorkerStubTest {
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
 				0, NettyTestUtil.createEmptyEmbeddedChannel(),
-				new MockRepository(), Collections.<Path, Path>emptyMap(), 0);
+				new MockRepository<Channel>(),
+				Collections.<Path, Path>emptyMap(), 0);
 
 		nettyFabricWorkerStub.setCancel();
 
@@ -165,7 +170,8 @@ public class NettyFabricWorkerStubTest {
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
 				0, NettyTestUtil.createEmptyEmbeddedChannel(),
-				new MockRepository(), Collections.<Path, Path>emptyMap(), 0);
+				new MockRepository<Channel>(),
+				Collections.<Path, Path>emptyMap(), 0);
 
 		Throwable throwable = new Throwable();
 
@@ -192,11 +198,12 @@ public class NettyFabricWorkerStubTest {
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
 				0, NettyTestUtil.createEmptyEmbeddedChannel(),
-				new MockRepository() {
+				new MockRepository<Channel>() {
 
 					@Override
 					public NoticeableFuture<Map<Path, Path>> getFiles(
-						Map<Path, Path> pathMap, boolean deleteAfterFetch) {
+						Channel channel, Map<Path, Path> pathMap,
+						boolean deleteAfterFetch) {
 
 						return defaultNoticeableFuture;
 					}
@@ -226,11 +233,12 @@ public class NettyFabricWorkerStubTest {
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
 				0, NettyTestUtil.createEmptyEmbeddedChannel(),
-				new MockRepository() {
+				new MockRepository<Channel>() {
 
 					@Override
 					public NoticeableFuture<Map<Path, Path>> getFiles(
-						Map<Path, Path> pathMap, boolean deleteAfterFetch) {
+						Channel channel, Map<Path, Path> pathMap,
+						boolean deleteAfterFetch) {
 
 						return defaultNoticeableFuture;
 					}
@@ -256,11 +264,12 @@ public class NettyFabricWorkerStubTest {
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
 				0, NettyTestUtil.createEmptyEmbeddedChannel(),
-				new MockRepository() {
+				new MockRepository<Channel>() {
 
 					@Override
 					public NoticeableFuture<Map<Path, Path>> getFiles(
-						Map<Path, Path> pathMap, boolean deleteAfterFetch) {
+						Channel channel, Map<Path, Path> pathMap,
+						boolean deleteAfterFetch) {
 
 						return defaultNoticeableFuture;
 					}
@@ -298,7 +307,7 @@ public class NettyFabricWorkerStubTest {
 
 		NettyFabricWorkerStub<String> nettyFabricWorkerStub =
 			new NettyFabricWorkerStub<String>(
-				0, embeddedChannel, new MockRepository(),
+				0, embeddedChannel, new MockRepository<Channel>(),
 				Collections.<Path, Path>emptyMap(), 0);
 
 		NettyChannelAttributes.putFabricWorker(
@@ -317,9 +326,5 @@ public class NettyFabricWorkerStubTest {
 
 		Assert.assertEquals(result, noticeableFuture.get());
 	}
-
-	@Rule
-	public final AspectJNewEnvMethodRule aspectJNewEnvMethodRule =
-		new AspectJNewEnvMethodRule();
 
 }

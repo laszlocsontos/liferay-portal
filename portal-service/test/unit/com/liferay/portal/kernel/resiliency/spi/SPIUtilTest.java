@@ -15,9 +15,10 @@
 package com.liferay.portal.kernel.resiliency.spi;
 
 import com.liferay.portal.kernel.process.local.LocalProcessLauncher;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvMethodRule;
+import com.liferay.portal.kernel.test.NewEnvTestRule;
 
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,8 +33,10 @@ import org.junit.Test;
 public class SPIUtilTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
 
 	@Test
 	public void testConstructor() {
@@ -68,8 +71,5 @@ public class SPIUtilTest {
 		Assert.assertTrue(SPIUtil.isSPI());
 		Assert.assertSame(mockSPI, SPIUtil.getSPI());
 	}
-
-	@Rule
-	public final NewEnvMethodRule newEnvMethodRule = new NewEnvMethodRule();
 
 }

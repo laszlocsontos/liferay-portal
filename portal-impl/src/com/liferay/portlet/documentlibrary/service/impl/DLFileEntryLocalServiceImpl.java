@@ -97,6 +97,7 @@ import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 import com.liferay.portlet.documentlibrary.util.DL;
 import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.portlet.documentlibrary.util.DLValidatorUtil;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelModifiedDateComparator;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
@@ -185,8 +186,7 @@ public class DLFileEntryLocalServiceImpl
 			fileEntryTypeId);
 
 		validateFile(
-			groupId, folderId, 0, sourceFileName, fileName, extension, title,
-			file, is);
+			groupId, folderId, 0, sourceFileName, fileName, extension, title);
 
 		long fileEntryId = counterLocalService.increment();
 
@@ -2513,7 +2513,7 @@ public class DLFileEntryLocalServiceImpl
 			validateFile(
 				dlFileEntry.getGroupId(), dlFileEntry.getFolderId(),
 				dlFileEntry.getFileEntryId(), sourceFileName, fileName,
-				extension, title, file, is);
+				extension, title);
 
 			// File version
 
@@ -2667,27 +2667,12 @@ public class DLFileEntryLocalServiceImpl
 	protected void validateFile(
 			long groupId, long folderId, long fileEntryId,
 			String sourceFileName, String fileName, String extension,
-			String title, File file, InputStream is)
+			String title)
 		throws PortalException {
 
-		if (Validator.isNotNull(sourceFileName)) {
-			if (file != null) {
-				DLStoreUtil.validate(
-					sourceFileName, extension, sourceFileName, true, file);
-			}
-			else if (is != null) {
-				DLStoreUtil.validate(
-					sourceFileName, extension, sourceFileName, true, is);
-			}
-			else {
-				DLStoreUtil.validate(
-					sourceFileName, extension, sourceFileName, true);
-			}
-		}
+		DLValidatorUtil.validateFileName(title);
 
 		validateFileExtension(extension);
-
-		DLStoreUtil.validate(title, false);
 
 		validateFile(groupId, folderId, fileEntryId, fileName, title);
 	}

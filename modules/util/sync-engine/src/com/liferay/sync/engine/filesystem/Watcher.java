@@ -14,6 +14,7 @@
 
 package com.liferay.sync.engine.filesystem;
 
+import com.liferay.sync.engine.SyncEngine;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
@@ -42,6 +43,7 @@ import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import name.pachler.nio.file.ClosedWatchServiceException;
 import name.pachler.nio.file.FileSystem;
 import name.pachler.nio.file.FileSystems;
 import name.pachler.nio.file.Paths;
@@ -121,6 +123,15 @@ public class Watcher implements Runnable {
 
 				try {
 					watchKey = _watchService.take();
+				}
+				catch (ClosedWatchServiceException cwse) {
+					if (!SyncEngine.isRunning()) {
+						break;
+					}
+
+					_logger.error(cwse.getMessage(), cwse);
+
+					continue;
 				}
 				catch (Exception e) {
 					if (_logger.isTraceEnabled()) {
@@ -241,7 +252,9 @@ public class Watcher implements Runnable {
 						_logger.trace("Unregistered file path {}", filePath);
 					}
 
-					processMissingFilePath(filePath);
+					if (Files.notExists(filePath)) {
+						processMissingFilePath(filePath);
+					}
 
 					if (_filePaths.isEmpty()) {
 						break;

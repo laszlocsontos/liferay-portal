@@ -156,18 +156,16 @@ public class LiferayLocalRepository
 
 	@Override
 	public void checkInFileEntry(
-			long userId, long fileEntryId, boolean major, String changeLog,
-			ServiceContext serviceContext)
-		throws PortalException {
+		long userId, long fileEntryId, boolean major, String changeLog,
+		ServiceContext serviceContext) {
 
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void checkInFileEntry(
-			long userId, long fileEntryId, String lockUuid,
-			ServiceContext serviceContext)
-		throws PortalException {
+		long userId, long fileEntryId, String lockUuid,
+		ServiceContext serviceContext) {
 
 		throw new UnsupportedOperationException();
 	}
@@ -238,7 +236,8 @@ public class LiferayLocalRepository
 
 	@Override
 	public Folder getFolder(long folderId) throws PortalException {
-		DLFolder dlFolder = dlFolderLocalService.getFolder(folderId);
+		DLFolder dlFolder = dlFolderLocalService.getFolder(
+			toFolderId(folderId));
 
 		return new LiferayFolder(dlFolder);
 	}
@@ -255,12 +254,13 @@ public class LiferayLocalRepository
 
 	@Override
 	public List<FileEntry> getRepositoryFileEntries(
-		long rootFolderId, int start, int end,
+		long userId, long rootFolderId, int start, int end,
 		OrderByComparator<FileEntry> obc) {
 
 		List<DLFileEntry> dlFileEntries =
 			dlFileEntryLocalService.getGroupFileEntries(
-				getGroupId(), 0, getGroupId(), rootFolderId, start, end,
+				getGroupId(), 0, getRepositoryId(), toFolderId(rootFolderId),
+				start, end,
 				DLFileEntryOrderByComparator.getOrderByComparator(obc));
 
 		return RepositoryModelUtil.toFileEntries(dlFileEntries);
@@ -285,16 +285,16 @@ public class LiferayLocalRepository
 		throws PortalException {
 
 		DLFolder dlFolder = dlFolderLocalService.moveFolder(
-			userId, folderId, parentFolderId, serviceContext);
+			userId, toFolderId(folderId), toFolderId(parentFolderId),
+			serviceContext);
 
 		return new LiferayFolder(dlFolder);
 	}
 
 	@Override
 	public void revertFileEntry(
-			long userId, long fileEntryId, String version,
-			ServiceContext serviceContext)
-		throws PortalException {
+		long userId, long fileEntryId, String version,
+		ServiceContext serviceContext) {
 
 		throw new UnsupportedOperationException();
 	}

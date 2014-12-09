@@ -20,6 +20,8 @@ AUI.add(
 
 		var CSS_ENTRY_DISPLAY_STYLE = 'entry-display-style';
 
+		var CSS_ENTRY_SELECTOR = 'entry-selector';
+
 		var CSS_ICON = 'icon';
 
 		var CSS_TAGLIB_ICON = 'taglib-icon';
@@ -44,6 +46,8 @@ AUI.add(
 
 		var REGEX_VIDEO = /\.(avi|flv|mpe|mpg|mpeg|mov|m4v|ogg|wmv)$/i;
 
+		var STR_DOT = '.';
+
 		var SELECTOR_DATA_FOLDER = '[data-folder="true"]';
 
 		var SELECTOR_DATA_FOLDER_DATA_TITLE = '[data-folder="true"][data-title]';
@@ -56,17 +60,17 @@ AUI.add(
 
 		var SELECTOR_ENTRIES_EMPTY = '.entries-empty';
 
+		var SELECTOR_ENTRY_DISPLAY_STYLE = STR_DOT + CSS_ENTRY_DISPLAY_STYLE;
+
 		var SELECTOR_ENTRY_LINK = '.entry-link';
+
+		var SELECTOR_ENTRY_SELECTOR = STR_DOT + CSS_ENTRY_SELECTOR;
 
 		var SELECTOR_ENTRY_TITLE_TEXT = '.entry-title-text';
 
 		var SELECTOR_IMAGE_ICON = 'img.icon';
 
 		var SELECTOR_SEARCH_CONTAINER = '.searchcontainer';
-
-		var STR_DOT = '.';
-
-		var SELECTOR_ENTRY_DISPLAY_STYLE = STR_DOT + CSS_ENTRY_DISPLAY_STYLE;
 
 		var SELECTOR_TAGLIB_ICON = STR_DOT + CSS_TAGLIB_ICON;
 
@@ -127,7 +131,9 @@ AUI.add(
 			'</ul>'
 		);
 
-		var TPL_IMAGE_THUMBNAIL = themeDisplay.getPathContext() + '/documents/' + themeDisplay.getScopeGroupId() + '/{0}/{1}';
+		var TPL_HIDDEN_CHECK_BOX =  '<input class="hide ' + CSS_ENTRY_SELECTOR + '" name="{0}" type="checkbox" value="">';
+
+		var TPL_IMAGE_THUMBNAIL = themeDisplay.getPathContext() + '/documents/{0}/{1}/{2}';
 
 		var DocumentLibraryUpload = A.Component.create(
 			{
@@ -197,6 +203,11 @@ AUI.add(
 						value: STR_BLANK
 					},
 
+					scopeGroupId: {
+						validator: isNumber,
+						value: null
+					},
+
 					uploadURL: {
 						setter: '_decodeURI',
 						validator: isString,
@@ -229,6 +240,7 @@ AUI.add(
 						instance._displayStyle = instance.get('displayStyle');
 						instance._entriesContainer = instance.get('entriesContainer');
 						instance._maxFileSize = instance.get('maxFileSize');
+						instance._scopeGroupId = instance.get('scopeGroupId');
 
 						instance._handles = [];
 
@@ -237,7 +249,6 @@ AUI.add(
 
 						instance._strings = {
 							invalidFileSize: Liferay.Language.get('please-enter-a-file-with-a-valid-file-size-no-larger-than-x'),
-							invalidFileType: Liferay.Language.get('please-enter-a-file-with-a-valid-file-type'),
 							zeroByteFile: Liferay.Language.get('the-file-contains-no-data-and-cannot-be-uploaded.-please-use-the-classic-uploader')
 						};
 
@@ -458,11 +469,15 @@ AUI.add(
 						else {
 							var invisibleEntry = instance._invisibleDescriptiveEntry;
 
+							var hiddenCheckbox = sub(TPL_HIDDEN_CHECK_BOX, [instance.get(STR_HOST).ns('rowIdsFileEntry')]);
+
 							if (displayStyle == CSS_ICON) {
 								invisibleEntry = instance._invisibleIconEntry;
 							}
 
 							entryNode = invisibleEntry.clone();
+
+							entryNode.append(hiddenCheckbox);
 
 							var entryLink = entryNode.one(SELECTOR_ENTRY_LINK);
 
@@ -507,6 +522,9 @@ AUI.add(
 								}
 								else if (item == 'downloads') {
 									value = '0';
+								}
+								else if (index === 0) {
+									value = sub(TPL_HIDDEN_CHECK_BOX, [instance.get(STR_HOST).ns('rowIdsFileEntry')]);
 								}
 
 								return value;
@@ -693,6 +711,7 @@ AUI.add(
 							}
 
 							resultsNode.addClass(uploadResultClass);
+							resultsNode.addClass(CSS_ENTRY_DISPLAY_STYLE);
 						}
 					},
 
@@ -783,7 +802,7 @@ AUI.add(
 						var thumbnailName = STR_THUMBNAIL_DEFAULT;
 
 						if (REGEX_IMAGE.test(fileName)) {
-							thumbnailName = sub(TPL_IMAGE_THUMBNAIL, [instance.get(STR_FOLDER_ID), fileName]);
+							thumbnailName = sub(TPL_IMAGE_THUMBNAIL, [instance._scopeGroupId, instance.get(STR_FOLDER_ID), fileName]);
 						}
 						else {
 							if (LString.endsWith(fileName.toLowerCase(), STR_EXTENSION_PDF)) {
@@ -1055,11 +1074,15 @@ AUI.add(
 							else {
 								var displayStyleList = (displayStyle == STR_LIST);
 
+								var fileEntryId = A.JSON.parse(event.data).fileEntryId;
+
 								if (!displayStyleList) {
 									instance._updateThumbnail(fileNode, file.name);
 								}
 
 								instance._updateFileLink(fileNode, response.message, displayStyleList);
+
+								instance._updateFileHiddenInput(fileNode, fileEntryId);
 							}
 
 							instance._displayResult(fileNode, displayStyle, hasErrors);
@@ -1183,6 +1206,16 @@ AUI.add(
 						}
 					},
 
+					_updateFileHiddenInput: function(node, id) {
+						var instance = this;
+
+						var inputNode = node.one('input');
+
+						if (inputNode) {
+							inputNode.val(id);
+						}
+					},
+
 					_updateFileLink: function(node, id, displayStyleList) {
 						var instance = this;
 
@@ -1272,15 +1305,11 @@ AUI.add(
 								var errorMessage;
 
 								var size = item.get(STR_SIZE) || 0;
-								var type = item.get('type') || STR_BLANK;
 
 								var strings = instance._strings;
 
 								if ((maxFileSize !== 0) && (size > maxFileSize)) {
 									errorMessage = sub(strings.invalidFileSize, [instance.formatStorage(instance._maxFileSize)]);
-								}
-								else if (!type) {
-									errorMessage = strings.invalidFileType;
 								}
 								else if (size === 0) {
 									errorMessage = strings.zeroByteFile;

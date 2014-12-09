@@ -44,8 +44,8 @@ import org.junit.Test;
 public class EhcachePortalCacheTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		CodeCoverageAssertor.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() {
@@ -325,6 +325,15 @@ public class EhcachePortalCacheTest {
 		_defaultCacheReplicator.assertPut(_KEY_1, _VALUE_1);
 
 		_defaultCacheReplicator.reset();
+	}
+
+	@Test
+	public void testReconfigEhcache() {
+		Assert.assertNotNull(_ehcachePortalCache.ehcache);
+
+		_ehcachePortalCache.reconfigEhcache(null);
+
+		Assert.assertNull(_ehcachePortalCache.ehcache);
 	}
 
 	@Test

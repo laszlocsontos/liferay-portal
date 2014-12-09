@@ -34,9 +34,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 
 import java.util.List;
 
+import org.apache.commons.io.input.CountingInputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -93,12 +95,18 @@ public class DownloadFileHandler extends BaseHandler {
 	protected void doHandleResponse(HttpResponse httpResponse)
 		throws Exception {
 
-		Header header = httpResponse.getFirstHeader("Sync-JWT");
+		Header errorHeader = httpResponse.getFirstHeader("Sync-Error");
 
-		if (header != null) {
-			Session session = SessionManager.getSession(getSyncAccountId());
+		if (errorHeader != null) {
+			handleSiteDeactivatedException();
+		}
 
-			session.setToken(header.getValue());
+		final Session session = SessionManager.getSession(getSyncAccountId());
+
+		Header tokenHeader = httpResponse.getFirstHeader("Sync-JWT");
+
+		if (tokenHeader != null) {
+			session.setToken(tokenHeader.getValue());
 		}
 
 		InputStream inputStream = null;
@@ -123,7 +131,16 @@ public class DownloadFileHandler extends BaseHandler {
 		try {
 			HttpEntity httpEntity = httpResponse.getEntity();
 
-			inputStream = httpEntity.getContent();
+			inputStream = new CountingInputStream(httpEntity.getContent()) {
+
+				@Override
+				protected synchronized void afterRead(int n) {
+					session.incrementDownloadedBytes(n);
+
+					super.afterRead(n);
+				}
+
+			};
 
 			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 				getSyncAccountId());
@@ -148,6 +165,10 @@ public class DownloadFileHandler extends BaseHandler {
 			}
 
 			downloadedFilePathNames.add(filePath.toString());
+
+			FileTime fileTime = FileTime.fromMillis(syncFile.getModifiedTime());
+
+			Files.setLastModifiedTime(tempFilePath, fileTime);
 
 			Files.move(
 				tempFilePath, filePath, StandardCopyOption.ATOMIC_MOVE,

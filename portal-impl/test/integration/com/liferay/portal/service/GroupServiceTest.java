@@ -18,7 +18,7 @@ import com.liferay.portal.GroupParentException;
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
@@ -36,11 +36,11 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
+import com.liferay.portal.test.DeleteAfterTestRun;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.test.MainServletTestRule;
 import com.liferay.portal.test.Sync;
-import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.listeners.MainServletExecutionTestListener;
-import com.liferay.portal.test.listeners.ResetDatabaseExecutionTestListener;
-import com.liferay.portal.test.runners.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.SynchronousDestinationTestRule;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.CompanyTestUtil;
@@ -64,23 +64,24 @@ import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Julio Camarero
  * @author Roberto Díaz
  * @author Sergio González
  */
-@ExecutionTestListeners(
-	listeners = {
-		MainServletExecutionTestListener.class,
-		ResetDatabaseExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class
-	})
-@RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
 public class GroupServiceTest {
+
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
+			SynchronousDestinationTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -127,9 +128,9 @@ public class GroupServiceTest {
 
 	@Test
 	public void testAddPermissionsCustomRoleInSubsite() throws Exception {
-		Group group1 = GroupTestUtil.addGroup("Test 1");
+		Group group1 = GroupTestUtil.addGroup();
 
-		Group group11 = GroupTestUtil.addGroup(group1.getGroupId(), "Test 1.1");
+		Group group11 = GroupTestUtil.addGroup(group1.getGroupId());
 
 		User user = UserTestUtil.addUser(null, group11.getGroupId());
 
@@ -166,9 +167,9 @@ public class GroupServiceTest {
 
 	@Test
 	public void testAddPermissionsSubsiteAdmin() throws Exception {
-		Group group1 = GroupTestUtil.addGroup("Test 1");
+		Group group1 = GroupTestUtil.addGroup();
 
-		Group group11 = GroupTestUtil.addGroup(group1.getGroupId(), "Test 1.1");
+		Group group11 = GroupTestUtil.addGroup(group1.getGroupId());
 
 		User user = UserTestUtil.addUser(null, group11.getGroupId());
 
@@ -219,11 +220,8 @@ public class GroupServiceTest {
 
 	@Test
 	public void testFindGroupByDescription() throws Exception {
-		String description = RandomTestUtil.randomString();
-
-		GroupTestUtil.addGroup(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID,
-			RandomTestUtil.randomString(), description);
+		Group group = GroupTestUtil.addGroup(
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
 		LinkedHashMap<String, Object> groupParams =
 			new LinkedHashMap<String, Object>();
@@ -234,19 +232,20 @@ public class GroupServiceTest {
 		Assert.assertEquals(
 			1,
 			GroupLocalServiceUtil.searchCount(
-				TestPropsValues.getCompanyId(), null, description,
+				TestPropsValues.getCompanyId(), null, group.getDescription(),
 				groupParams));
 	}
 
 	@Test
 	public void testFindGroupByDescriptionWithSpaces() throws Exception {
-		String description =
-			RandomTestUtil.randomString() + StringPool.SPACE +
-				RandomTestUtil.randomString();
+		Group group = GroupTestUtil.addGroup(
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
-		GroupTestUtil.addGroup(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID,
-			RandomTestUtil.randomString(), description);
+		group.setDescription(
+			RandomTestUtil.randomString() + StringPool.SPACE +
+				RandomTestUtil.randomString());
+
+		GroupLocalServiceUtil.updateGroup(group);
 
 		LinkedHashMap<String, Object> groupParams =
 			new LinkedHashMap<String, Object>();
@@ -257,15 +256,14 @@ public class GroupServiceTest {
 		Assert.assertEquals(
 			1,
 			GroupLocalServiceUtil.searchCount(
-				TestPropsValues.getCompanyId(), null, description,
+				TestPropsValues.getCompanyId(), null, group.getDescription(),
 				groupParams));
 	}
 
 	@Test
 	public void testFindGroupByName() throws Exception {
-		String name = RandomTestUtil.randomString();
-
-		GroupTestUtil.addGroup(GroupConstants.DEFAULT_PARENT_GROUP_ID, name);
+		Group group = GroupTestUtil.addGroup(
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
 		LinkedHashMap<String, Object> groupParams =
 			new LinkedHashMap<String, Object>();
@@ -276,16 +274,20 @@ public class GroupServiceTest {
 		Assert.assertEquals(
 			1,
 			GroupLocalServiceUtil.searchCount(
-				TestPropsValues.getCompanyId(), null, name, groupParams));
+				TestPropsValues.getCompanyId(), null, group.getName(),
+				groupParams));
 	}
 
 	@Test
 	public void testFindGroupByNameWithSpaces() throws Exception {
-		String name =
-			RandomTestUtil.randomString() + StringPool.SPACE +
-				RandomTestUtil.randomString();
+		Group group = GroupTestUtil.addGroup(
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
-		GroupTestUtil.addGroup(GroupConstants.DEFAULT_PARENT_GROUP_ID, name);
+		group.setName(
+			RandomTestUtil.randomString() + StringPool.SPACE +
+				RandomTestUtil.randomString());
+
+		GroupLocalServiceUtil.updateGroup(group);
 
 		LinkedHashMap<String, Object> groupParams =
 			new LinkedHashMap<String, Object>();
@@ -296,7 +298,8 @@ public class GroupServiceTest {
 		Assert.assertEquals(
 			1,
 			GroupLocalServiceUtil.searchCount(
-				TestPropsValues.getCompanyId(), null, name, groupParams));
+				TestPropsValues.getCompanyId(), null, group.getName(),
+				groupParams));
 	}
 
 	@Test
@@ -412,12 +415,12 @@ public class GroupServiceTest {
 	public void testGroupHasLocalizedName() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
-		Group group = GroupTestUtil.addGroup("Localized Name");
+		Group group = GroupTestUtil.addGroup();
 
 		String scopeDescriptiveName = group.getScopeDescriptiveName(
 			themeDisplay);
 
-		Assert.assertTrue(scopeDescriptiveName.equals("Localized Name"));
+		Assert.assertTrue(scopeDescriptiveName.equals(group.getName()));
 	}
 
 	@Test
@@ -428,8 +431,7 @@ public class GroupServiceTest {
 
 		themeDisplay.setScopeGroupId(group.getGroupId());
 
-		Group subgroup = GroupTestUtil.addGroup(
-			group.getGroupId(), RandomTestUtil.randomString());
+		Group subgroup = GroupTestUtil.addGroup(group.getGroupId());
 
 		String scopeLabel = subgroup.getScopeLabel(themeDisplay);
 
@@ -488,8 +490,7 @@ public class GroupServiceTest {
 
 		Group group = GroupTestUtil.addGroup();
 
-		Group subgroup = GroupTestUtil.addGroup(
-			group.getGroupId(), RandomTestUtil.randomString());
+		Group subgroup = GroupTestUtil.addGroup(group.getGroupId());
 
 		themeDisplay.setScopeGroupId(subgroup.getGroupId());
 
@@ -572,17 +573,17 @@ public class GroupServiceTest {
 
 	@Test
 	public void testSelectFirstChildGroupAsParentSite() throws Exception {
-		Group group1 = GroupTestUtil.addGroup("Test 1");
+		Group group1 = GroupTestUtil.addGroup();
 
-		Group group11 = GroupTestUtil.addGroup(group1.getGroupId(),"Test 1.1");
+		Group group11 = GroupTestUtil.addGroup(group1.getGroupId());
 
 		try {
 			GroupLocalServiceUtil.updateGroup(
 				group1.getGroupId(), group11.getGroupId(), group1.getName(),
 				group1.getDescription(), group1.getType(),
 				group1.isManualMembership(), group1.getMembershipRestriction(),
-				group1.getFriendlyURL(), group1.isActive(),
-				ServiceContextTestUtil.getServiceContext());
+				group1.getFriendlyURL(), group1.isInheritContent(),
+				group1.isActive(), ServiceContextTestUtil.getServiceContext());
 
 			Assert.fail("A child group cannot be its parent group");
 		}
@@ -594,23 +595,21 @@ public class GroupServiceTest {
 
 	@Test
 	public void testSelectLastChildGroupAsParentSite() throws Exception {
-		Group group1 = GroupTestUtil.addGroup("Test 1");
+		Group group1 = GroupTestUtil.addGroup();
 
-		Group group11 = GroupTestUtil.addGroup(group1.getGroupId(), "Test 1.1");
+		Group group11 = GroupTestUtil.addGroup(group1.getGroupId());
 
-		Group group111 = GroupTestUtil.addGroup(
-			group11.getGroupId(), "Test 1.1.1");
+		Group group111 = GroupTestUtil.addGroup(group11.getGroupId());
 
-		Group group1111 = GroupTestUtil.addGroup(
-			group111.getGroupId(), "Test 1.1.1.1");
+		Group group1111 = GroupTestUtil.addGroup(group111.getGroupId());
 
 		try {
 			GroupLocalServiceUtil.updateGroup(
 				group1.getGroupId(), group1111.getGroupId(), group1.getName(),
 				group1.getDescription(), group1.getType(),
 				group1.isManualMembership(), group1.getMembershipRestriction(),
-				group1.getFriendlyURL(), group1.isActive(),
-				ServiceContextTestUtil.getServiceContext());
+				group1.getFriendlyURL(), group1.isInheritContent(),
+				group1.isActive(), ServiceContextTestUtil.getServiceContext());
 
 			Assert.fail("A child group cannot be its parent group");
 		}
@@ -636,7 +635,8 @@ public class GroupServiceTest {
 				stagingGroup.getName(), stagingGroup.getDescription(),
 				stagingGroup.getType(), stagingGroup.isManualMembership(),
 				stagingGroup.getMembershipRestriction(),
-				stagingGroup.getFriendlyURL(), stagingGroup.isActive(),
+				stagingGroup.getFriendlyURL(), stagingGroup.isInheritContent(),
+				stagingGroup.isActive(),
 				ServiceContextTestUtil.getServiceContext());
 
 			Assert.fail("A group cannot have its live group as parent");
@@ -656,8 +656,8 @@ public class GroupServiceTest {
 				group.getGroupId(), group.getGroupId(), group.getName(),
 				group.getDescription(), group.getType(),
 				group.isManualMembership(), group.getMembershipRestriction(),
-				group.getFriendlyURL(), group.isActive(),
-				ServiceContextTestUtil.getServiceContext());
+				group.getFriendlyURL(), group.isInheritContent(),
+				group.isActive(), ServiceContextTestUtil.getServiceContext());
 
 			Assert.fail("A group cannot be its own parent");
 		}
@@ -669,12 +669,11 @@ public class GroupServiceTest {
 
 	@Test
 	public void testSubsites() throws Exception {
-		Group group1 = GroupTestUtil.addGroup("Test 1");
+		Group group1 = GroupTestUtil.addGroup();
 
-		Group group11 = GroupTestUtil.addGroup(group1.getGroupId(), "Test 1.1");
+		Group group11 = GroupTestUtil.addGroup(group1.getGroupId());
 
-		Group group111 = GroupTestUtil.addGroup(
-			group11.getGroupId(), "Test 1.1.1");
+		Group group111 = GroupTestUtil.addGroup(group11.getGroupId());
 
 		Assert.assertTrue(group1.isRoot());
 		Assert.assertFalse(group11.isRoot());
@@ -725,9 +724,9 @@ public class GroupServiceTest {
 
 	@Test
 	public void testUpdatePermissionsCustomRoleInSubsite() throws Exception {
-		Group group1 = GroupTestUtil.addGroup("Test 1");
+		Group group1 = GroupTestUtil.addGroup();
 
-		Group group11 = GroupTestUtil.addGroup(group1.getGroupId(), "Test 1.1");
+		Group group11 = GroupTestUtil.addGroup(group1.getGroupId());
 
 		User user = UserTestUtil.addUser(null, group11.getGroupId());
 
@@ -764,9 +763,9 @@ public class GroupServiceTest {
 
 	@Test
 	public void testUpdatePermissionsSubsiteAdmin() throws Exception {
-		Group group1 = GroupTestUtil.addGroup("Test 1");
+		Group group1 = GroupTestUtil.addGroup();
 
-		Group group11 = GroupTestUtil.addGroup(group1.getGroupId(), "Test 1.1");
+		Group group11 = GroupTestUtil.addGroup(group1.getGroupId());
 
 		User user = UserTestUtil.addUser(null, group11.getGroupId());
 
@@ -797,10 +796,10 @@ public class GroupServiceTest {
 		throws Exception {
 
 		if (site) {
-			return GroupTestUtil.addGroup(RandomTestUtil.randomString());
+			return GroupTestUtil.addGroup();
 		}
 		else if (layout) {
-			Group group = GroupTestUtil.addGroup(RandomTestUtil.randomString());
+			Group group = GroupTestUtil.addGroup();
 
 			Layout scopeLayout = LayoutTestUtil.addLayout(group);
 
@@ -813,7 +812,7 @@ public class GroupServiceTest {
 				true, null);
 		}
 		else if (layoutPrototype) {
-			Group group = GroupTestUtil.addGroup(RandomTestUtil.randomString());
+			Group group = GroupTestUtil.addGroup();
 
 			group.setClassName(LayoutPrototype.class.getName());
 
@@ -858,16 +857,15 @@ public class GroupServiceTest {
 		throws Exception {
 
 		if (group1 == null) {
-			group1 = GroupTestUtil.addGroup("Example1");
+			group1 = GroupTestUtil.addGroup();
 		}
 
 		if (group11 == null) {
-			group11 = GroupTestUtil.addGroup(group1.getGroupId(), "Example11");
+			group11 = GroupTestUtil.addGroup(group1.getGroupId());
 		}
 
 		if (group111 == null) {
-			group111 = GroupTestUtil.addGroup(
-				group11.getGroupId(), "Example111");
+			group111 = GroupTestUtil.addGroup(group11.getGroupId());
 		}
 
 		PermissionChecker permissionChecker =
@@ -882,8 +880,7 @@ public class GroupServiceTest {
 		if (addGroup) {
 			try {
 				GroupTestUtil.addGroup(
-					"Test 2", GroupConstants.DEFAULT_PARENT_GROUP_ID,
-					serviceContext);
+					GroupConstants.DEFAULT_PARENT_GROUP_ID, serviceContext);
 
 				Assert.fail(
 					"The user should not be able to add top level sites");
@@ -892,8 +889,7 @@ public class GroupServiceTest {
 			}
 
 			try {
-				GroupTestUtil.addGroup(
-					"Test 1.2", group1.getGroupId(), serviceContext);
+				GroupTestUtil.addGroup(group1.getGroupId(), serviceContext);
 
 				if (!hasManageSubsitePermisionOnGroup1 && !hasManageSite1) {
 					Assert.fail("The user should not be able to add this site");
@@ -906,8 +902,7 @@ public class GroupServiceTest {
 			}
 
 			try {
-				GroupTestUtil.addGroup(
-					"Test 1.1.2", group11.getGroupId(), serviceContext);
+				GroupTestUtil.addGroup(group11.getGroupId(), serviceContext);
 
 				if (!hasManageSubsitePermisionOnGroup11 && !hasManageSite1) {
 					Assert.fail("The user should not be able to add this site");
@@ -920,8 +915,7 @@ public class GroupServiceTest {
 			}
 
 			try {
-				GroupTestUtil.addGroup(
-					"Test 1.1.1.2", group111.getGroupId(), serviceContext);
+				GroupTestUtil.addGroup(group111.getGroupId(), serviceContext);
 
 				if (!hasManageSubsitePermisionOnGroup111 && !hasManageSite1) {
 					Assert.fail("The user should not be able to add this site");
@@ -1037,8 +1031,7 @@ public class GroupServiceTest {
 			LocaleUtil.getDefault());
 
 		Group group = GroupTestUtil.addGroup(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID,
-			RandomTestUtil.randomString());
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
 		try {
 			GroupTestUtil.updateDisplaySettings(
@@ -1060,6 +1053,7 @@ public class GroupServiceTest {
 		}
 	}
 
+	@DeleteAfterTestRun
 	private Group _group;
 
 }

@@ -473,20 +473,10 @@
 		<var name="key_webContentTranslationLanguage" value="${webContentTranslationLanguage}" />
 
 		<execute action="PGWebcontentdisplayEditwebcontent#assertClick" locator-key1="ADD_TRANSLATION_MENULIST_LANGUAGE" value1="${webContentTranslationLanguage}" />
-		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" value1="relative=top" />
-
-		<execute action="PGWebcontentdisplayEditwebcontentTranslation#selectFrame" locator-key1="WEB_CONTENT_TRANSLATION_IFRAME" />
-
-		<var name="key_lowercaseLanguageCode" value="${lowercaseLanguageCode}" />
-
-		<execute action="PGWebcontentdisplayEditwebcontentTranslation#type" locator-key1="TITLE_FIELD" value1="${webContentTranslationTitle}" />
-		<execute action="PGWebcontentdisplayEditwebcontentTranslation#type" locator-key1="CONTENT_FIELD" value1="${webContentTranslationContent}" />
-		<execute action="PGWebcontentdisplayEditwebcontentTranslation#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
-
-		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" value1="relative=top" />
-		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" locator-key1="WEB_CONTENT_EDIT_IFRAME" />
+		<execute action="PGWebcontentdisplayEditwebcontent#type" locator-key1="TITLE_FIELD" value1="${webContentTranslationTitle}" />
+		<execute action="PGWebcontentdisplayEditwebcontent#type" locator-key1="CONTENT_FIELD" value1="${webContentTranslationContent}" />
 		<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="AVAILABLE_TRANSLATION" value1="${webContentTranslationLanguage}" />
-		<execute action="PGWebcontentdisplayAddwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
+		<execute action="PGWebcontentdisplayEditwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
 
 		<execute action="PGWebcontentdisplay#selectFrame" value1="relative=top" />
 	</command>
@@ -907,7 +897,7 @@
 	<command name="editDisplayPagePGViaAP">
 		<var name="key_assetTitle" value="${assetTitle}" />
 
-		<execute action="PGAssetpublisher#assertClick" locator-key1="DISPLAY_ICON_EDIT" value1="Edit" />
+		<execute action="PGAssetpublisher#click" locator-key1="DISPLAY_ICON_EDIT" />
 
 		<execute action="PGAssetpublisherAddnewwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
 		<execute action="PGAssetpublisherAddnewwebcontent#assertClick" locator-key1="MENU_DISPLAY_PAGE" value1="Display Page" />
@@ -915,9 +905,13 @@
 		<var name="key_displayPageSelection" value="${displayPageSelection}" />
 
 		<execute action="PGAssetpublisherAddnewwebcontentDisplaypage#click" locator-key1="SELECT_DISPLAY_PAGE_BUTTON" />
+		<execute action="PGAssetpublisherAddnewwebcontentDisplaypage#selectFrame" value1="relative=top" />
+		<execute action="PGAssetpublisherAddnewwebcontentDisplaypage#selectFrame" locator-key1="SELECT_DISPLAY_PAGE_IFRAME" />
 		<execute action="PGAssetpublisherAddnewwebcontentDisplaypage#assertClick" locator-key1="PUBLIC_DISPLAY_PAGE_SELECTION" value1="${displayPageSelection}" />
-		<execute action="PGAssetpublisherAddnewwebcontentDisplaypage#assertClick" locator-key1="OK_BUTTON" value1="OK" />
+		<execute action="PGAssetpublisherAddnewwebcontentDisplaypage#assertClick" locator-key1="CHOOSE_BUTTON" value1="Choose" />
 
+		<execute action="PGAssetpublisherAddnewwebcontent#selectFrame" value1="relative=top" />
+		<execute action="PGAssetpublisherAddnewwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
 		<execute action="PGAssetpublisherAddnewwebcontent#assertClick" locator-key1="MENU_CONTENT" value1="Content" />
 		<execute action="PGAssetpublisherAddnewwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
 
@@ -1436,7 +1430,7 @@
 	<command name="viewLinkedAssetPGViaAP">
 		<var name="key_assetTitle" value="${webContentTitle}" />
 
-		<execute action="PGAssetpublisher#assertClick" locator-key1="ASSET_ABSTRACT_VIEW" value1="View" />
+		<execute action="PGAssetpublisher#assertClick" locator-key1="ASSET_ABSTRACT_VIEW" value1="${webContentTitle}" />
 
 		<execute action="PGAssetpublisherAsset#assertTextEquals" locator-key1="ASSET_TITLE" value1="${webContentTitle}" />
 		<execute action="PGAssetpublisherAsset#assertTextEquals" locator-key1="ASSET_CONTENT" value1="${webContentContent}" />
@@ -1617,37 +1611,34 @@
 				<var name="key_webContentTranslationLanguage" value="${webContentTranslationLanguage}" />
 
 				<execute action="PGWebcontentdisplayEditwebcontent#assertClick" locator-key1="AVAILABLE_TRANSLATION" value1="${webContentTranslationLanguage}" />
-				<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" value1="relative=top" />
-
-				<execute action="PGWebcontentdisplayEditwebcontentTranslation#selectFrame" locator-key1="WEB_CONTENT_TRANSLATION_IFRAME" />
-
-				<var name="key_lowercaseLanguageCode" value="${lowercaseLanguageCode}" />
 
 				<if>
 					<isset var="localizedTitle" />
 					<then>
-						<execute action="PGWebcontentdisplayEditwebcontentTranslation#assertTextEquals" locator-key1="TITLE_FIELD" value1="${localizedTitle}" />
+						<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="TITLE_FIELD" value1="${localizedTitle}" />
 					</then>
 				</if>
 
 				<if>
 					<isset var="localizedContent" />
 					<then>
-						<execute action="PGWebcontentdisplayEditwebcontentTranslation#assertTextEquals" locator-key1="CONTENT_FIELD" value1="${localizedContent}" />
+						<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="CONTENT_FIELD" value1="${localizedContent}" />
 					</then>
 				</if>
 
 				<if>
 					<isset var="localizedText" />
 					<then>
-						<execute action="PGWebcontentdisplayEditwebcontentTranslation#assertTextEquals" locator-key1="TEXT_FIELD" value1="${localizedText}" />
+						<var name="key_fieldName" value="${localizedText}" />
+
+						<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="TEXT_FIELD" value1="${localizedText}" />
 					</then>
 				</if>
 
 				<if>
 					<isset var="localizedAbstractDescription" />
 					<then>
-						<execute action="PGWebcontentdisplayEditwebcontentTranslation#assertTextEquals" locator-key1="SUMMARY_FIELD" value1="${localizedAbstractDescription}" />
+						<execute action="PGWebcontentdisplayEditwebcontent#assertTextEquals" locator-key1="SUMMARY_FIELD" value1="${localizedAbstractDescription}" />
 					</then>
 				</if>
 			</then>
