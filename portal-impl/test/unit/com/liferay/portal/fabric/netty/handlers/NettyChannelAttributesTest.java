@@ -22,11 +22,13 @@ import com.liferay.portal.fabric.repository.MockRepository;
 import com.liferay.portal.fabric.worker.FabricWorker;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvMethodRule;
+import com.liferay.portal.test.AspectJNewEnvTestRule;
 
+import io.netty.channel.Channel;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.Attribute;
 
@@ -52,8 +54,10 @@ import org.junit.Test;
 public class NettyChannelAttributesTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, AspectJNewEnvTestRule.INSTANCE);
 
 	@AdviseWith(adviceClasses = AttributeAdvice.class)
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
@@ -179,7 +183,7 @@ public class NettyChannelAttributesTest {
 			NettyChannelAttributes.getNettyFabricAgentStub(_embeddedChannel));
 
 		NettyFabricAgentStub nettyFabricAgentStub = new NettyFabricAgentStub(
-			_embeddedChannel, new MockRepository(),
+			_embeddedChannel, new MockRepository<Channel>(),
 			Paths.get("remoteRepositoryPath"), 0, 0);
 
 		NettyChannelAttributes.setNettyFabricAgentStub(
@@ -195,10 +199,6 @@ public class NettyChannelAttributesTest {
 		Assert.assertEquals(0, NettyChannelAttributes.nextId(_embeddedChannel));
 		Assert.assertEquals(1, NettyChannelAttributes.nextId(_embeddedChannel));
 	}
-
-	@Rule
-	public final AspectJNewEnvMethodRule aspectJNewEnvMethodRule =
-		new AspectJNewEnvMethodRule();
 
 	@Aspect
 	public static class AttributeAdvice {

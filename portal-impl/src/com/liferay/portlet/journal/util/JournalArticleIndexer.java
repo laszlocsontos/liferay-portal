@@ -333,7 +333,7 @@ public class JournalArticleIndexer extends BaseIndexer {
 
 		if ((latestIndexableArticle == null) ||
 			(PropsValues.JOURNAL_ARTICLE_INDEX_ALL_VERSIONS &&
-		 	(latestIndexableArticle.getVersion() > article.getVersion()))) {
+			 (latestIndexableArticle.getVersion() > article.getVersion()))) {
 
 			return;
 		}
@@ -360,12 +360,8 @@ public class JournalArticleIndexer extends BaseIndexer {
 		String articleDefaultLanguageId = LocalizationUtil.getDefaultLanguageId(
 			article.getDocument());
 
-		Locale defaultLocale = LocaleUtil.getSiteDefault();
-
-		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
-
-		String[] languageIds = getLanguageIds(
-			defaultLanguageId, article.getDocument());
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
+			article.getDocument());
 
 		for (String languageId : languageIds) {
 			String content = extractDDMContent(article, languageId);
@@ -658,20 +654,6 @@ public class JournalArticleIndexer extends BaseIndexer {
 		}
 
 		return content;
-	}
-
-	protected String[] getLanguageIds(
-		String defaultLanguageId,
-		com.liferay.portal.kernel.xml.Document document) {
-
-		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
-			document);
-
-		if (languageIds.length == 0) {
-			languageIds = new String[] {defaultLanguageId};
-		}
-
-		return languageIds;
 	}
 
 	@Override

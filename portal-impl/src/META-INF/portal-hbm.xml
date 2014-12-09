@@ -397,6 +397,7 @@
 		<property name="friendlyURL" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="site" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="remoteStagingGroupCount" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+		<property name="inheritContent" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="active" type="com.liferay.portal.dao.orm.hibernate.BooleanType" column="active_" />
 	</class>
 	<class name="com.liferay.portal.model.impl.ImageImpl" table="Image" dynamic-update="true">
@@ -449,7 +450,7 @@
 	</class>
 	<class name="com.liferay.portal.model.impl.LayoutBranchImpl" table="LayoutBranch" dynamic-update="true">
 		<cache usage="read-write" />
-		<id name="LayoutBranchId" type="long">
+		<id name="layoutBranchId" type="long">
 			<generator class="assigned" />
 		</id>
 		<version name="mvccVersion" type="long" access="com.liferay.portal.dao.orm.hibernate.PrivatePropertyAccessor" />

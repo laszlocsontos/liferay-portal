@@ -972,20 +972,17 @@ public class PortalUtil {
 	}
 
 	public static String getGroupFriendlyURL(
-			Group group, boolean privateLayoutSet, ThemeDisplay themeDisplay)
+			LayoutSet layoutSet, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		return getPortal().getGroupFriendlyURL(
-			group, privateLayoutSet, themeDisplay);
+		return getPortal().getGroupFriendlyURL(layoutSet, themeDisplay);
 	}
 
 	public static String getGroupFriendlyURL(
-			Group group, boolean privateLayoutSet, ThemeDisplay themeDisplay,
-			Locale locale)
+			LayoutSet layoutSet, ThemeDisplay themeDisplay, Locale locale)
 		throws PortalException {
 
-		return getPortal().getGroupFriendlyURL(
-			group, privateLayoutSet, themeDisplay, locale);
+		return getPortal().getGroupFriendlyURL(layoutSet, themeDisplay, locale);
 	}
 
 	public static int[] getGroupFriendlyURLIndex(String requestURI) {
@@ -1633,6 +1630,12 @@ public class PortalUtil {
 
 	public static String getPortletTitle(String portletId, Locale locale) {
 		return getPortal().getPortletTitle(portletId, locale);
+	}
+
+	public static String getPortletTitle(
+		String portletId, ResourceBundle resourceBundle) {
+
+		return getPortal().getPortletTitle(portletId, resourceBundle);
 	}
 
 	public static String getPortletTitle(String portletId, String languageId) {

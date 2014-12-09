@@ -798,6 +798,7 @@ create table Group_ (
 	friendlyURL VARCHAR(255) null,
 	site BOOLEAN,
 	remoteStagingGroupCount INTEGER,
+	inheritContent BOOLEAN,
 	active_ BOOLEAN
 );
 
@@ -980,7 +981,7 @@ create table Layout (
 
 create table LayoutBranch (
 	mvccVersion LONG default 0,
-	LayoutBranchId LONG not null primary key,
+	layoutBranchId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,

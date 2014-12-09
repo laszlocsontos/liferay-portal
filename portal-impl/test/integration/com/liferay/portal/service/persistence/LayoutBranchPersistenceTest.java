@@ -21,10 +21,7 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.template.TemplateException;
-import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -34,19 +31,16 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.LayoutBranch;
 import com.liferay.portal.model.impl.LayoutBranchModelImpl;
 import com.liferay.portal.service.LayoutBranchLocalServiceUtil;
-import com.liferay.portal.test.TransactionalMethodRule;
-import com.liferay.portal.test.runners.PersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.tools.DBUpgrader;
+import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.test.PersistenceTestRule;
+import com.liferay.portal.test.TransactionalTestRule;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
@@ -60,22 +54,11 @@ import java.util.Set;
 /**
  * @generated
  */
-@RunWith(PersistenceIntegrationJUnitTestRunner.class)
 public class LayoutBranchPersistenceTest {
 	@Rule
-	public TransactionalMethodRule transactionalMethodRule = new TransactionalMethodRule(Propagation.REQUIRED);
-
-	@BeforeClass
-	public static void setupClass() throws TemplateException {
-		try {
-			DBUpgrader.upgrade();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		TemplateManagerUtil.init();
-	}
+	public final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
+			PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(Propagation.REQUIRED));
 
 	@After
 	public void tearDown() throws Exception {
@@ -258,7 +241,7 @@ public class LayoutBranchPersistenceTest {
 
 	protected OrderByComparator<LayoutBranch> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("LayoutBranch",
-			"mvccVersion", true, "LayoutBranchId", true, "groupId", true,
+			"mvccVersion", true, "layoutBranchId", true, "groupId", true,
 			"companyId", true, "userId", true, "userName", true,
 			"layoutSetBranchId", true, "plid", true, "name", true,
 			"description", true, "master", true);
@@ -394,7 +377,7 @@ public class LayoutBranchPersistenceTest {
 		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LayoutBranch.class,
 				LayoutBranch.class.getClassLoader());
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("LayoutBranchId",
+		dynamicQuery.add(RestrictionsFactoryUtil.eq("layoutBranchId",
 				newLayoutBranch.getLayoutBranchId()));
 
 		List<LayoutBranch> result = _persistence.findWithDynamicQuery(dynamicQuery);
@@ -411,7 +394,7 @@ public class LayoutBranchPersistenceTest {
 		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LayoutBranch.class,
 				LayoutBranch.class.getClassLoader());
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("LayoutBranchId",
+		dynamicQuery.add(RestrictionsFactoryUtil.eq("layoutBranchId",
 				RandomTestUtil.nextLong()));
 
 		List<LayoutBranch> result = _persistence.findWithDynamicQuery(dynamicQuery);
@@ -428,11 +411,11 @@ public class LayoutBranchPersistenceTest {
 				LayoutBranch.class.getClassLoader());
 
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"LayoutBranchId"));
+				"layoutBranchId"));
 
 		Object newLayoutBranchId = newLayoutBranch.getLayoutBranchId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("LayoutBranchId",
+		dynamicQuery.add(RestrictionsFactoryUtil.in("layoutBranchId",
 				new Object[] { newLayoutBranchId }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
@@ -450,9 +433,9 @@ public class LayoutBranchPersistenceTest {
 				LayoutBranch.class.getClassLoader());
 
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"LayoutBranchId"));
+				"layoutBranchId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("LayoutBranchId",
+		dynamicQuery.add(RestrictionsFactoryUtil.in("layoutBranchId",
 				new Object[] { RandomTestUtil.nextLong() }));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
@@ -511,7 +494,6 @@ public class LayoutBranchPersistenceTest {
 		return layoutBranch;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutBranchPersistenceTest.class);
 	private List<LayoutBranch> _layoutBranchs = new ArrayList<LayoutBranch>();
 	private LayoutBranchPersistence _persistence = LayoutBranchUtil.getPersistence();
 }

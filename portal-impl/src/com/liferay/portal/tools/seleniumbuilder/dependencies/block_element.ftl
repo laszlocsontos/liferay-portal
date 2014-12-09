@@ -101,6 +101,28 @@
 
 				${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
 			</#if>
+		<#elseif element.attributeValue("function")??>
+			<#assign function = element.attributeValue("function")>
+
+			<#if testCaseName??>
+				selenium
+			<#else>
+				liferaySelenium
+			</#if>
+
+			.pauseLoggerCheck();
+
+			<#assign functionElement = element>
+
+			<#include "function_log_element.ftl">
+
+			${selenium}.saveScreenshotBeforeAction(false);
+
+			<#include "function_logger.ftl">
+
+			<#assign lineNumber = element.attributeValue("line-number")>
+
+			${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
 		<#elseif element.attributeValue("macro")??>
 			<#assign macroElement = element>
 
@@ -147,6 +169,8 @@
 
 		${selenium}.sendLogger(${lineId} + "${lineNumber}", "pass");
 	<#elseif name == "if">
+		<#assign variableContext = variableContextStack.peek()>
+
 		executeScopeVariables = new HashMap<String, String>();
 
 		executeScopeVariables.putAll(${variableContext});

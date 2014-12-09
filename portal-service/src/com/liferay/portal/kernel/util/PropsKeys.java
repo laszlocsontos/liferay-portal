@@ -89,6 +89,8 @@ public interface PropsKeys {
 
 	public static final String APPLICATION_STARTUP_EVENTS = "application.startup.events";
 
+	public static final String ASSET_BROWSER_SEARCH_WITH_DATABASE = "asset.browser.search.with.database";
+
 	public static final String ASSET_CATEGORIES_NAVIGATION_DISPLAY_TEMPLATES_CONFIG = "asset.categories.navigation.display.templates.config";
 
 	public static final String ASSET_CATEGORIES_PROPERTIES_DEFAULT = "asset.categories.properties.default";
@@ -278,6 +280,8 @@ public interface PropsKeys {
 	public static final String BLOGS_ENTRY_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED = "blogs.entry.previous.and.next.navigation.enabled";
 
 	public static final String BLOGS_FLAGS_ENABLED = "blogs.flags.enabled";
+
+	public static final String BLOGS_IMAGE_COVER_MAX_SIZE = "blogs.image.cover.max.size";
 
 	public static final String BLOGS_IMAGE_EXTENSIONS = "blogs.image.extensions";
 
@@ -1186,8 +1190,6 @@ public interface PropsKeys {
 	public static final String JOURNAL_ARTICLE_VIEW_PERMISSION_CHECK_ENABLED = "journal.article.view.permission.check.enabled";
 
 	public static final String JOURNAL_ARTICLES_SEARCH_WITH_INDEX = "journal.articles.search.with.index";
-
-	public static final String JOURNAL_CONTENT_PUBLISH_TO_LIVE_BY_DEFAULT = "journal.content.publish.to.live.by.default";
 
 	public static final String JOURNAL_CONTENT_SEARCH_SHOW_LISTED = "journal.content.search.show.listed";
 
@@ -2207,8 +2209,6 @@ public interface PropsKeys {
 
 	public static final String RSS_CONNECTION_TIMEOUT = "rss.connection.timeout";
 
-	public static final String RSS_DISPLAY_TEMPLATES_CONFIG = "rss.display.templates.config";
-
 	public static final String RSS_FEED_DISPLAY_STYLE_DEFAULT = "rss.feed.display.style.default";
 
 	public static final String RSS_FEED_TYPE_DEFAULT = "rss.feed.type.default";
@@ -2450,6 +2450,8 @@ public interface PropsKeys {
 	public static final String SITES_FORM_UPDATE_SEO = "sites.form.update.seo";
 
 	public static final String SITES_FRIENDLY_URL_PAGE_NOT_FOUND = "sites.friendly.url.page.not.found";
+
+	public static final String SITES_SHOW_INHERIT_CONTENT_SCOPE_FROM_PARENT_SITE = "sites.show.inherit.content.scope.from.parent.site";
 
 	public static final String SITES_SITEMAP_DEFAULT_CHANGE_FREQUENCY = "sites.sitemap.default.change.frequency";
 

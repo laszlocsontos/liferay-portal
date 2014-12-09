@@ -20,11 +20,12 @@ import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.process.local.LocalProcessLauncher;
 import com.liferay.portal.kernel.resiliency.spi.MockSPI;
 import com.liferay.portal.kernel.resiliency.spi.SPI;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvMethodRule;
+import com.liferay.portal.kernel.test.NewEnvTestRule;
 import com.liferay.portal.kernel.upload.FileItem;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.CookieUtil;
@@ -83,8 +84,10 @@ import org.springframework.mock.web.MockHttpSession;
 public class SPIAgentRequestTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -107,17 +110,12 @@ public class SPIAgentRequestTest {
 			}
 		);
 
-		MemoryPortalCacheManager<Serializable, Serializable>
-			memoryPortalCacheManager =
-				new MemoryPortalCacheManager<Serializable, Serializable>();
-
-		memoryPortalCacheManager.setName("MultiVMPortalCacheManager");
-
-		memoryPortalCacheManager.afterPropertiesSet();
-
 		MultiVMPoolImpl multiVMPoolImpl = new MultiVMPoolImpl();
 
-		multiVMPoolImpl.setPortalCacheManager(memoryPortalCacheManager);
+		multiVMPoolImpl.setPortalCacheManager(
+			MemoryPortalCacheManager.
+				<Serializable, Serializable>createMemoryPortalCacheManager(
+					SPIAgentRequestTest.class.getName()));
 
 		MultiVMPoolUtil multiVMPoolUtil = new MultiVMPoolUtil();
 
@@ -1009,9 +1007,6 @@ public class SPIAgentRequestTest {
 			new String[] {StringPool.FALSE},
 			parameterMap.get("portalResiliencyPortletShowFooter"));
 	}
-
-	@Rule
-	public final NewEnvMethodRule newEnvMethodRule = new NewEnvMethodRule();
 
 	private static final String _HEADER_NAME_1 = "HEADER_NAME_1";
 

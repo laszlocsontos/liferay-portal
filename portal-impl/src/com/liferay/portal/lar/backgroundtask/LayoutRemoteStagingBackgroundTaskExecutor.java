@@ -15,7 +15,6 @@
 package com.liferay.portal.lar.backgroundtask;
 
 import com.liferay.portal.NoSuchLayoutException;
-import com.liferay.portal.RemoteExportException;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -24,6 +23,10 @@ import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.lar.MissingReferences;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
+import com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleConstants;
+import com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleManager;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -41,7 +44,6 @@ import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -104,6 +106,11 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 
 		try {
 			ExportImportThreadLocal.setLayoutStagingInProcess(true);
+
+			ExportImportLifecycleManager.fireExportImportLifecycleEvent(
+				ExportImportLifecycleConstants.
+					EVENT_PUBLICATION_LAYOUT_REMOTE_STARTED,
+				exportImportConfiguration);
 
 			file = exportLayoutsAsFile(
 				sourceGroupId, privateLayout, layoutIdMap, parameterMap,
@@ -169,9 +176,26 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 					sourceGroupId, privateLayout, dateRange,
 					dateRange.getEndDate());
 			}
+
+			ExportImportLifecycleManager.fireExportImportLifecycleEvent(
+				ExportImportLifecycleConstants.
+					EVENT_PUBLICATION_LAYOUT_REMOTE_SUCCEEDED,
+				exportImportConfiguration);
 		}
-		catch (IOException ioe) {
-			throw new SystemException(ioe);
+		catch (Throwable t) {
+			ExportImportLifecycleManager.fireExportImportLifecycleEvent(
+				ExportImportLifecycleConstants.
+					EVENT_PUBLICATION_LAYOUT_REMOTE_FAILED,
+				exportImportConfiguration);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(t, t);
+			}
+			else if (_log.isWarnEnabled()) {
+				_log.warn("Unable to publish layout: " + t.getMessage());
+			}
+
+			throw new SystemException(t);
 		}
 		finally {
 			ExportImportThreadLocal.setLayoutStagingInProcess(false);
@@ -197,14 +221,9 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 			HttpPrincipal httpPrincipal)
 		throws PortalException {
 
-		if ((layoutIdMap == null) || layoutIdMap.isEmpty()) {
-			return LayoutLocalServiceUtil.exportLayoutsAsFile(
-				sourceGroupId, privateLayout, null, parameterMap, startDate,
-				endDate);
-		}
-		else {
-			List<Layout> layouts = new ArrayList<Layout>();
+		List<Layout> layouts = new ArrayList<Layout>();
 
+		if (layoutIdMap != null) {
 			for (Map.Entry<Long, Boolean> entry : layoutIdMap.entrySet()) {
 				long plid = GetterUtil.getLong(String.valueOf(entry.getKey()));
 				boolean includeChildren = entry.getValue();
@@ -232,18 +251,13 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 					}
 				}
 			}
-
-			long[] layoutIds = ExportImportHelperUtil.getLayoutIds(layouts);
-
-			if (layoutIds.length <= 0) {
-				throw new RemoteExportException(
-					RemoteExportException.NO_LAYOUTS);
-			}
-
-			return LayoutLocalServiceUtil.exportLayoutsAsFile(
-				sourceGroupId, privateLayout, layoutIds, parameterMap,
-				startDate, endDate);
 		}
+
+		long[] layoutIds = ExportImportHelperUtil.getLayoutIds(layouts);
+
+		return LayoutLocalServiceUtil.exportLayoutsAsFile(
+			sourceGroupId, privateLayout, layoutIds, parameterMap, startDate,
+			endDate);
 	}
 
 	/**
@@ -280,5 +294,8 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 
 		return missingRemoteParentLayouts;
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		LayoutRemoteStagingBackgroundTaskExecutor.class);
 
 }

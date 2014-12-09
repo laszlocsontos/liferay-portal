@@ -18,6 +18,13 @@
 		<execute action="CPContenttargetingAddcampaign#type" locator-key1="CAMPAIGN_END_DATE_FIELD" value1="${campaignEndDate}" />
 		<execute action="CPContenttargetingAddcampaign#type" locator-key1="CAMPAIGN_END_TIME_FIELD" value1="${campaignEndTime}" />
 		<execute action="CPContenttargetingAddcampaign#type" locator-key1="CAMPAIGN_PRIORITY_FIELD" value1="${campaignPriorityField}" />
+
+		<if>
+			<equals arg1="${campaignInactive}" arg2="true" />
+			<then>
+				<execute action="CPContenttargetingAddcampaign#uncheck" locator-key1="CAMPAIGN_ACTIVE_CHECKBOX" />
+			</then>
+		</if>
 	</command>
 
 	<command name="addTrackingActionContentCP">
@@ -95,6 +102,16 @@
 		<execute action="CPContenttargetingAddcampaign#type" locator-key1="CAMPAIGN_TRACKING_ACTIONS_YOUTUBE_VIDEOS_ALIAS_FIELD" value1="${youtubeAlias}" />
 		<execute action="CPContenttargetingAddcampaign#type" locator-key1="CAMPAIGN_TRACKING_ACTIONS_YOUTUBE_VIDEOS_VIDEO_ID_FIELD" value1="${youtubeVideoId}" />
 		<execute action="CPContenttargetingAddcampaign#select" locator-key1="CAMPAIGN_TRACKING_ACTIONS_YOUTUBE_VIDEOS_TRACKING_ACTION_SELECT" value1="${youtubeTrackingActionSelect}" />
+	</command>
+
+	<command name="deleteAllCP">
+		<execute action="CPContenttargeting#click" locator-key1="NAVIGATION_CAMPAIGNS" />
+
+		<execute action="CPContenttargeting#click" locator-key1="CHECKBOX_ALL" />
+
+		<execute action="CPContenttargeting#click" locator-key1="DELETE_CAMPAIGN_BUTTON" />
+		<execute action="CPContenttargeting#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to delete this? It will be deleted immediately." />
+		<execute action="CPContenttargeting#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="deleteCampaignCP">

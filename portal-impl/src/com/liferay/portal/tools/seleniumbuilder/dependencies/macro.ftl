@@ -3,8 +3,8 @@ package ${seleniumBuilderContext.getMacroPackageName(macroName)};
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.MathUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portalweb.portal.util.RuntimeVariables;
 import com.liferay.portalweb.portal.util.liferayselenium.LiferaySelenium;
+import com.liferay.portalweb.util.RuntimeVariables;
 import com.liferay.portalweb.util.block.macro.BaseMacro;
 
 <#assign rootElement = seleniumBuilderContext.getMacroRootElement(macroName)>
@@ -21,10 +21,28 @@ import com.liferay.portalweb.util.block.macro.BaseMacro;
 	import ${seleniumBuilderContext.getActionClassName(childElementAttributeValue)};
 </#list>
 
+<#assign childElementAttributeValues = seleniumBuilderFileUtil.getChildElementAttributeValues(rootElement, "function")>
+
+<#list childElementAttributeValues as childElementAttributeValue>
+	import ${seleniumBuilderContext.getFunctionClassName(childElementAttributeValue)};
+</#list>
+
 <#assign childElementAttributeValues = seleniumBuilderFileUtil.getChildElementAttributeValues(rootElement, "macro")>
 
 <#list childElementAttributeValues as childElementAttributeValue>
 	import ${seleniumBuilderContext.getMacroClassName(childElementAttributeValue)};
+</#list>
+
+<#assign childElementAttributeValues = seleniumBuilderFileUtil.getChildElementAttributeValues(rootElement, "locator1")>
+
+<#list childElementAttributeValues as childElementAttributeValue>
+	import ${seleniumBuilderContext.getPathClassName(childElementAttributeValue)};
+</#list>
+
+<#assign childElementAttributeValues = seleniumBuilderFileUtil.getChildElementAttributeValues(rootElement, "locator2")>
+
+<#list childElementAttributeValues as childElementAttributeValue>
+	import ${seleniumBuilderContext.getPathClassName(childElementAttributeValue)};
 </#list>
 
 import java.util.HashMap;
@@ -82,6 +100,12 @@ public class ${seleniumBuilderContext.getMacroSimpleClassName(macroName)}
 
 			<#list childElementAttributeValues as childElementAttributeValue>
 				${childElementAttributeValue}Action ${seleniumBuilderFileUtil.getVariableName(childElementAttributeValue)}Action = new ${childElementAttributeValue}Action(liferaySelenium);
+			</#list>
+
+			<#assign childElementAttributeValues = seleniumBuilderFileUtil.getChildElementAttributeValues(commandElement, "function")>
+
+			<#list childElementAttributeValues as childElementAttributeValue>
+				${childElementAttributeValue}Function ${seleniumBuilderFileUtil.getVariableName(childElementAttributeValue)}Function = new ${childElementAttributeValue}Function(liferaySelenium);
 			</#list>
 
 			<#assign childElementAttributeValues = seleniumBuilderFileUtil.getChildElementAttributeValues(commandElement, "macro")>

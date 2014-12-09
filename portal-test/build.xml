@@ -8,6 +8,21 @@
 	<property name="manifest.bundle.name" value="Liferay Portal Test" />
 	<property name="manifest.bundle.symbolic.name" value="portal-test" />
 
+	<path id="portal.test.classpath">
+		<path refid="lib.classpath" />
+		<pathelement location="${project.dir}/portal-service/classes" />
+	</path>
+
+	<target name="compile">
+		<mkdir dir="classes" />
+
+		<antcall target="compile-java">
+			<param name="javac.classpathref" value="portal.test.classpath" />
+			<param name="javac.destdir" value="classes" />
+			<param name="javac.srcdir" value="src" />
+		</antcall>
+	</target>
+
 	<!--<target name="compile">
 		<mkdir dir="classes" />
 

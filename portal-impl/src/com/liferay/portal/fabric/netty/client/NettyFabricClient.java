@@ -15,10 +15,12 @@
 package com.liferay.portal.fabric.netty.client;
 
 import com.liferay.portal.fabric.client.FabricClient;
+import com.liferay.portal.fabric.local.agent.LocalFabricAgent;
 import com.liferay.portal.fabric.netty.agent.NettyFabricAgentConfig;
 import com.liferay.portal.fabric.netty.codec.serialization.AnnotatedObjectDecoder;
 import com.liferay.portal.fabric.netty.codec.serialization.AnnotatedObjectEncoder;
 import com.liferay.portal.fabric.netty.fileserver.handlers.FileRequestChannelHandler;
+import com.liferay.portal.fabric.netty.fileserver.handlers.FileResponseChannelHandler;
 import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
 import com.liferay.portal.fabric.netty.handlers.NettyFabricWorkerExecutionChannelHandler;
 import com.liferay.portal.fabric.netty.repository.NettyRepository;
@@ -126,7 +128,13 @@ public class NettyFabricClient implements FabricClient {
 					Thread.NORM_PRIORITY, null)));
 		_bootstrap.handler(new NettyFabricClientChannelInitializer());
 
-		_reconnectCounter.set(_nettyFabricClientConfig.getReconnectCount());
+		int reconnectCount = _nettyFabricClientConfig.getReconnectCount();
+
+		if (reconnectCount < 0) {
+			reconnectCount = Integer.MAX_VALUE;
+		}
+
+		_reconnectCounter.set(reconnectCount);
 
 		doConnect();
 	}
@@ -139,9 +147,10 @@ public class NettyFabricClient implements FabricClient {
 	}
 
 	protected void disposeRepository(Channel channel) {
-		Attribute<Repository> attribute = channel.attr(_repositoryAttributeKey);
+		Attribute<Repository<Channel>> attribute = channel.attr(
+			_repositoryAttributeKey);
 
-		Repository repository = attribute.getAndRemove();
+		Repository<Channel> repository = attribute.getAndRemove();
 
 		if (repository != null) {
 			repository.dispose(true);
@@ -238,10 +247,13 @@ public class NettyFabricClient implements FabricClient {
 		return attribute.get();
 	}
 
-	protected Repository getRepository(Channel channel) throws IOException {
-		Attribute<Repository> attribute = channel.attr(_repositoryAttributeKey);
+	protected Repository<Channel> getRepository(Channel channel)
+		throws IOException {
 
-		Repository repository = attribute.get();
+		Attribute<Repository<Channel>> attribute = channel.attr(
+			_repositoryAttributeKey);
+
+		Repository<Channel> repository = attribute.get();
 
 		if (repository == null) {
 			Path repositoryPath = _nettyFabricClientConfig.getRepositoryPath();
@@ -249,18 +261,25 @@ public class NettyFabricClient implements FabricClient {
 			Files.createDirectories(repositoryPath);
 
 			repository = new NettyRepository(
-				repositoryPath, channel,
-				getEventExecutorGroup(
-					_channel, _fileServerEventExecutorGroupAttributeKey),
+				repositoryPath,
 				_nettyFabricClientConfig.getRepositoryGetFileTimeout());
 
-			Repository previousRepository = attribute.setIfAbsent(repository);
+			Repository<Channel> previousRepository = attribute.setIfAbsent(
+				repository);
 
 			if (previousRepository != null) {
 				repository.dispose(true);
 
 				repository = previousRepository;
 			}
+
+			ChannelPipeline channelPipeline = channel.pipeline();
+
+			channelPipeline.addLast(
+				new FileResponseChannelHandler(
+					repository.getAsyncBroker(),
+					getEventExecutorGroup(
+						_channel, _fileServerEventExecutorGroupAttributeKey)));
 		}
 
 		return repository;
@@ -269,13 +288,13 @@ public class NettyFabricClient implements FabricClient {
 	protected void registerNettyFabricAgent() throws IOException {
 		ChannelPipeline channelPipeline = _channel.pipeline();
 
-		Repository repository = getRepository(_channel);
+		Repository<Channel> repository = getRepository(_channel);
 
 		channelPipeline.addLast(
 			getEventExecutorGroup(
 				_channel, _executionEventExecutorGroupAttributeKey),
 			new NettyFabricWorkerExecutionChannelHandler(
-				repository, _processExecutor,
+				repository, new LocalFabricAgent(_processExecutor),
 				_nettyFabricClientConfig.getExecutionTimeout()));
 
 		Path repositoryPath = repository.getRepositoryPath();
@@ -477,8 +496,8 @@ public class NettyFabricClient implements FabricClient {
 	private static final AttributeKey<EventExecutorGroup>
 		_fileServerEventExecutorGroupAttributeKey = AttributeKey.valueOf(
 			"FileServerEventExecutorGroup");
-	private static final AttributeKey<Repository> _repositoryAttributeKey =
-		AttributeKey.valueOf("Repository");
+	private static final AttributeKey<Repository<Channel>>
+		_repositoryAttributeKey = AttributeKey.valueOf("Repository");
 	private static final AttributeKey<EventExecutorGroup>
 		_rpcEventExecutorGroupAttributeKey = AttributeKey.valueOf(
 			"RPCEventExecutorGroup");

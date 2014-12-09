@@ -16,6 +16,7 @@ package com.liferay.portal.resiliency.spi.action;
 
 import com.liferay.portal.kernel.portlet.PortletContainerUtil;
 import com.liferay.portal.kernel.resiliency.spi.agent.SPIAgent;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -29,7 +30,7 @@ import com.liferay.portal.resiliency.spi.agent.SPIAgentRequest;
 import com.liferay.portal.resiliency.spi.agent.SPIAgentResponse;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvMethodRule;
+import com.liferay.portal.test.AspectJNewEnvTestRule;
 import com.liferay.portal.util.PropsImpl;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.EventImpl;
@@ -61,8 +62,10 @@ import org.springframework.mock.web.MockHttpServletResponse;
 public class PortalResiliencyActionTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, AspectJNewEnvTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws IOException {
@@ -283,10 +286,6 @@ public class PortalResiliencyActionTest {
 			Assert.assertEquals("Unkown lifecycle UNKNOWN", iae.getMessage());
 		}
 	}
-
-	@Rule
-	public final AspectJNewEnvMethodRule aspectJNewEnvMethodRule =
-		new AspectJNewEnvMethodRule();
 
 	@Aspect
 	public static class LifecycleAdvice {

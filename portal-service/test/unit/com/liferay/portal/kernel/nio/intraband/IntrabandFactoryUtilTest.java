@@ -18,9 +18,10 @@ import com.liferay.portal.kernel.nio.intraband.blocking.ExecutorIntraband;
 import com.liferay.portal.kernel.nio.intraband.nonblocking.SelectorIntraband;
 import com.liferay.portal.kernel.nio.intraband.welder.fifo.FIFOWelder;
 import com.liferay.portal.kernel.nio.intraband.welder.socket.SocketWelder;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.NewEnv;
-import com.liferay.portal.kernel.test.NewEnvMethodRule;
+import com.liferay.portal.kernel.test.NewEnvTestRule;
 import com.liferay.portal.kernel.util.PropsKeys;
 
 import java.io.IOException;
@@ -37,8 +38,10 @@ import org.junit.Test;
 public class IntrabandFactoryUtilTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
 
 	@Test
 	public void testConstructor() {
@@ -130,8 +133,5 @@ public class IntrabandFactoryUtilTest {
 			System.clearProperty(PropsKeys.INTRABAND_WELDER_IMPL);
 		}
 	}
-
-	@Rule
-	public final NewEnvMethodRule newEnvMethodRule = new NewEnvMethodRule();
 
 }

@@ -706,12 +706,11 @@ public interface Portal {
 		throws PortalException;
 
 	public String getGroupFriendlyURL(
-			Group group, boolean privateLayoutSet, ThemeDisplay themeDisplay)
+			LayoutSet layoutSet, ThemeDisplay themeDisplay)
 		throws PortalException;
 
 	public String getGroupFriendlyURL(
-			Group group, boolean privateLayoutSet, ThemeDisplay themeDisplay,
-			Locale locale)
+			LayoutSet layoutSet, ThemeDisplay themeDisplay, Locale locale)
 		throws PortalException;
 
 	public int[] getGroupFriendlyURLIndex(String requestURI);
@@ -1030,6 +1029,9 @@ public interface Portal {
 	public String getPortletTitle(PortletResponse portletResponse);
 
 	public String getPortletTitle(String portletId, Locale locale);
+
+	public String getPortletTitle(
+		String portletId, ResourceBundle resourceBundle);
 
 	public String getPortletTitle(String portletId, String languageId);
 

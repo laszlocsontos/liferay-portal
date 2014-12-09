@@ -14,6 +14,8 @@
 
 package com.liferay.portal.fabric.repository;
 
+import com.liferay.portal.fabric.netty.fileserver.FileResponse;
+import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 
@@ -24,22 +26,28 @@ import java.util.Map;
 /**
  * @author Shuyang Zhou
  */
-public class MockRepository implements Repository {
+public class MockRepository<T> implements Repository<T> {
 
 	@Override
 	public void dispose(boolean delete) {
 	}
 
 	@Override
+	public AsyncBroker<Path, FileResponse> getAsyncBroker() {
+		return _asyncBroker;
+	}
+
+	@Override
 	public NoticeableFuture<Path> getFile(
-		Path remoteFilePath, Path localFilePath, boolean deleteAfterFetch) {
+		T t, Path remoteFilePath, Path localFilePath,
+		boolean deleteAfterFetch) {
 
 		return null;
 	}
 
 	@Override
 	public NoticeableFuture<Map<Path, Path>> getFiles(
-		Map<Path, Path> pathMap, boolean deleteAfterFetch) {
+		T t, Map<Path, Path> pathMap, boolean deleteAfterFetch) {
 
 		DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
 			new DefaultNoticeableFuture<Map<Path, Path>>();
@@ -53,5 +61,8 @@ public class MockRepository implements Repository {
 	public Path getRepositoryPath() {
 		return null;
 	}
+
+	private final AsyncBroker<Path, FileResponse> _asyncBroker =
+		new AsyncBroker<Path, FileResponse>();
 
 }

@@ -22,12 +22,13 @@ import com.liferay.portal.fabric.netty.fileserver.handlers.FileServerTestUtil;
 import com.liferay.portal.fabric.netty.util.NettyUtilAdvice;
 import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
+import com.liferay.portal.kernel.test.AggregateTestRule;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.NewEnv;
 import com.liferay.portal.test.AdviseWith;
-import com.liferay.portal.test.AspectJNewEnvMethodRule;
+import com.liferay.portal.test.AspectJNewEnvTestRule;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -70,8 +71,10 @@ import org.junit.Test;
 public class NettyRepositoryTest {
 
 	@ClassRule
-	public static CodeCoverageAssertor codeCoverageAssertor =
-		new CodeCoverageAssertor();
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, AspectJNewEnvTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws IOException {
@@ -84,11 +87,13 @@ public class NettyRepositoryTest {
 		FileServerTestUtil.registerForCleanUp(
 			Files.createDirectory(_repositoryPath));
 
-		_nettyRepository = new NettyRepository(
-			_repositoryPath, _embeddedChannel, _embeddedChannel.eventLoop(),
-			Long.MAX_VALUE);
+		_nettyRepository = new NettyRepository(_repositoryPath, Long.MAX_VALUE);
 
-		_asyncBroker = _nettyRepository.asyncBroker;
+		_asyncBroker = _nettyRepository.getAsyncBroker();
+
+		_channelPipeline.addLast(
+			new FileResponseChannelHandler(
+				_asyncBroker, _embeddedChannel.eventLoop()));
 	}
 
 	@After
@@ -100,7 +105,7 @@ public class NettyRepositoryTest {
 	@Test
 	public void testConstructor() {
 		try {
-			new NettyRepository(null, null, null, Long.MAX_VALUE);
+			new NettyRepository(null, Long.MAX_VALUE);
 
 			Assert.fail();
 		}
@@ -109,44 +114,24 @@ public class NettyRepositoryTest {
 		}
 
 		try {
-			new NettyRepository(_repositoryPath, null, null, Long.MAX_VALUE);
-
-			Assert.fail();
-		}
-		catch (NullPointerException npe) {
-			Assert.assertEquals("Channel is null", npe.getMessage());
-		}
-
-		try {
-			new NettyRepository(
-				_repositoryPath, _embeddedChannel, null, Long.MAX_VALUE);
-
-			Assert.fail();
-		}
-		catch (NullPointerException npe) {
-			Assert.assertEquals(
-				"Event executor group is null", npe.getMessage());
-		}
-
-		try {
-			new NettyRepository(
-				Paths.get("Unknown"), _embeddedChannel,
-				_embeddedChannel.eventLoop(), Long.MAX_VALUE);
+			new NettyRepository(Paths.get("Unknown"), Long.MAX_VALUE);
 
 			Assert.fail();
 		}
 		catch (IllegalArgumentException iae) {
 		}
 
-		NettyRepository repository = new NettyRepository(
-			_repositoryPath, _embeddedChannel, _embeddedChannel.eventLoop(),
-			Long.MAX_VALUE);
+		NettyRepository nettyRepository = new NettyRepository(
+			_repositoryPath, Long.MAX_VALUE);
 
-		Assert.assertSame(_repositoryPath, repository.getRepositoryPath());
-		Assert.assertSame(_embeddedChannel, repository.channel);
-		Assert.assertEquals(Long.MAX_VALUE, repository.getFileTimeout);
-		Assert.assertNotNull(repository.asyncBroker);
-		Assert.assertNotNull(repository.pathMap);
+		_channelPipeline.addLast(
+			new FileResponseChannelHandler(
+				nettyRepository.getAsyncBroker(),
+				_embeddedChannel.eventLoop()));
+
+		Assert.assertSame(_repositoryPath, nettyRepository.getRepositoryPath());
+		Assert.assertEquals(Long.MAX_VALUE, nettyRepository.getFileTimeout);
+		Assert.assertNotNull(nettyRepository.pathMap);
 		Assert.assertTrue(
 			_annotatedObjectDecoder.removeFirst() instanceof
 				FileResponseChannelHandler);
@@ -169,7 +154,7 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture = _nettyRepository.getFile(
-				remoteFilePath, null, false);
+				_embeddedChannel, remoteFilePath, null, false);
 
 			FileResponse fileResponse = new FileResponse(
 				remoteFilePath, System.currentTimeMillis(), 0, false);
@@ -223,10 +208,10 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture1 = _nettyRepository.getFile(
-				remoteFilePath, null, false);
+				_embeddedChannel, remoteFilePath, null, false);
 
 			NoticeableFuture<Path> noticeableFuture2 = _nettyRepository.getFile(
-				remoteFilePath, null, false);
+				_embeddedChannel, remoteFilePath, null, false);
 
 			Assert.assertNotSame(noticeableFuture1, noticeableFuture2);
 
@@ -300,10 +285,10 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture1 = _nettyRepository.getFile(
-				remoteFilePath, localFilePath1, false);
+				_embeddedChannel, remoteFilePath, localFilePath1, false);
 
 			NoticeableFuture<Path> noticeableFuture2 = _nettyRepository.getFile(
-				remoteFilePath, localFilePath2, false);
+				_embeddedChannel, remoteFilePath, localFilePath2, false);
 
 			Assert.assertNotSame(noticeableFuture1, noticeableFuture2);
 
@@ -349,7 +334,8 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture = _nettyRepository.getFile(
-				Paths.get("remoteFile"), Paths.get("localFile"), false, false);
+				_embeddedChannel, Paths.get("remoteFile"),
+				Paths.get("localFile"), false, false);
 
 			Assert.assertTrue(noticeableFuture.isDone());
 			Assert.assertTrue(noticeableFuture.isCancelled());
@@ -381,7 +367,8 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture = _nettyRepository.getFile(
-				remoteFilePath, Paths.get("localFile"), false, false);
+				_embeddedChannel, remoteFilePath, Paths.get("localFile"), false,
+				false);
 
 			_asyncBroker.takeWithResult(
 				remoteFilePath,
@@ -411,7 +398,8 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture = _nettyRepository.getFile(
-				remoteFilePath, Paths.get("localFile"), false, false);
+				_embeddedChannel, remoteFilePath, Paths.get("localFile"), false,
+				false);
 
 			_asyncBroker.takeWithResult(
 				remoteFilePath,
@@ -447,7 +435,8 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture = _nettyRepository.getFile(
-				remoteFilePath, Paths.get("localFile"), false, false);
+				_embeddedChannel, remoteFilePath, Paths.get("localFile"), false,
+				false);
 
 			_asyncBroker.takeWithResult(
 				remoteFilePath,
@@ -485,7 +474,8 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture = _nettyRepository.getFile(
-				remoteFilePath, Paths.get("localFile"), false, false);
+				_embeddedChannel, remoteFilePath, Paths.get("localFile"), false,
+				false);
 
 			_asyncBroker.takeWithResult(
 				remoteFilePath,
@@ -517,7 +507,7 @@ public class NettyRepositoryTest {
 		pathMap.put(remoteFilePath2, Paths.get("localFile2"));
 
 		NoticeableFuture<Map<Path, Path>> noticeableFuture =
-			_nettyRepository.getFiles(pathMap, true);
+			_nettyRepository.getFiles(_embeddedChannel, pathMap, true);
 
 		Path tempFilePath = FileServerTestUtil.createFileWithData(
 			Paths.get("tempFile"));
@@ -571,7 +561,7 @@ public class NettyRepositoryTest {
 		pathMap.put(Paths.get("remoteFile2"), Paths.get("requestFile2"));
 
 		NoticeableFuture<Map<Path, Path>> noticeableFuture =
-			_nettyRepository.getFiles(pathMap, true);
+			_nettyRepository.getFiles(_embeddedChannel, pathMap, true);
 
 		Map<Path, NoticeableFuture<FileResponse>> openBids =
 			_asyncBroker.getOpenBids();
@@ -599,7 +589,7 @@ public class NettyRepositoryTest {
 		pathMap.put(remoteFilePath, Paths.get("localFile"));
 
 		NoticeableFuture<Map<Path, Path>> noticeableFuture =
-			_nettyRepository.getFiles(pathMap, true);
+			_nettyRepository.getFiles(_embeddedChannel, pathMap, true);
 
 		Exception exception = new Exception();
 
@@ -643,7 +633,8 @@ public class NettyRepositoryTest {
 	@Test
 	public void testGetFilesEmptyMap() throws Exception {
 		NoticeableFuture<Map<Path, Path>> noticeableFuture =
-			_nettyRepository.getFiles(Collections.<Path, Path>emptyMap(), true);
+			_nettyRepository.getFiles(
+				_embeddedChannel, Collections.<Path, Path>emptyMap(), true);
 
 		Assert.assertSame(
 			Collections.<Path, Path>emptyMap(), noticeableFuture.get());
@@ -660,7 +651,7 @@ public class NettyRepositoryTest {
 		pathMap.put(Paths.get("remoteFile2"), Paths.get("requestFile2"));
 
 		NoticeableFuture<Map<Path, Path>> noticeableFuture =
-			_nettyRepository.getFiles(pathMap, true);
+			_nettyRepository.getFiles(_embeddedChannel, pathMap, true);
 
 		Exception exception = new Exception();
 
@@ -680,11 +671,17 @@ public class NettyRepositoryTest {
 	@AdviseWith(adviceClasses = NettyUtilAdvice.class)
 	@Test
 	public void testGetFileTimeoutCancellation() {
-		NettyRepository repository = new NettyRepository(
-			_repositoryPath, _embeddedChannel, _embeddedChannel.eventLoop(), 0);
+		NettyRepository nettyRepository = new NettyRepository(
+			_repositoryPath, 0);
 
-		NoticeableFuture<Path> noticeableFuture = repository.getFile(
-			Paths.get("remoteFile"), Paths.get("localFile"), false, false);
+		_channelPipeline.addLast(
+			new FileResponseChannelHandler(
+				nettyRepository.getAsyncBroker(),
+				_embeddedChannel.eventLoop()));
+
+		NoticeableFuture<Path> noticeableFuture = nettyRepository.getFile(
+			_embeddedChannel, Paths.get("remoteFile"), Paths.get("localFile"),
+			false, false);
 
 		Assert.assertTrue(noticeableFuture.isDone());
 		Assert.assertTrue(noticeableFuture.isCancelled());
@@ -705,10 +702,6 @@ public class NettyRepositoryTest {
 			fileTime.toMillis(),
 			NettyRepository.getLastModifiedTime(_repositoryPath));
 	}
-
-	@Rule
-	public final AspectJNewEnvMethodRule aspectJNewEnvMethodRule =
-		new AspectJNewEnvMethodRule();
 
 	@Aspect
 	public static class DefaultNoticeableFutureAdvice {
@@ -775,7 +768,8 @@ public class NettyRepositoryTest {
 
 		try {
 			NoticeableFuture<Path> noticeableFuture = _nettyRepository.getFile(
-				remoteFilePath, Paths.get("localFile"), false, false);
+				_embeddedChannel, remoteFilePath, Paths.get("localFile"), false,
+				false);
 
 			try {
 				noticeableFuture.get();

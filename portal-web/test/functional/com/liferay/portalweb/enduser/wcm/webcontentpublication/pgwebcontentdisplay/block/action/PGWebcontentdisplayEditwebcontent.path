@@ -80,7 +80,12 @@
 </tr>
 <tr>
 	<td>AVAILABLE_TRANSLATION</td>
-	<td>//div[@id='_15_availableTranslationContainer']//a[contains(.,'${key_webContentTranslationLanguage}')]</td>
+	<td>//span[contains(@class,'lfr-translation-manager') and contains(.,'${key_webContentTranslationLanguage}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUMMARY_FIELD</td>
+	<td>//textarea[contains(@id,'_15_description')]</td>
 	<td></td>
 </tr>
 <tr>

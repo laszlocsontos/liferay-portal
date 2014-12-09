@@ -63,6 +63,7 @@ import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.PortletModel;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.ResourcedModel;
@@ -230,28 +231,26 @@ public class PortletDataContextImpl implements PortletDataContext {
 			}
 		}
 
-		if (isPathProcessed(path)) {
-			return;
+		if (!hasPrimaryKey(String.class, path)) {
+			if (classedModel instanceof AuditedModel) {
+				AuditedModel auditedModel = (AuditedModel)classedModel;
+
+				auditedModel.setUserUuid(auditedModel.getUserUuid());
+			}
+
+			if (isResourceMain(classedModel)) {
+				long classPK = ExportImportClassedModelUtil.getClassPK(
+					classedModel);
+
+				addAssetLinks(clazz, classPK);
+				addAssetTags(clazz, classPK);
+				addExpando(element, path, classedModel, clazz);
+				addLocks(clazz, String.valueOf(classPK));
+				addPermissions(clazz, classPK);
+			}
+
+			_references.add(getReferenceKey(classedModel));
 		}
-
-		if (classedModel instanceof AuditedModel) {
-			AuditedModel auditedModel = (AuditedModel)classedModel;
-
-			auditedModel.setUserUuid(auditedModel.getUserUuid());
-		}
-
-		if (isResourceMain(classedModel)) {
-			long classPK = ExportImportClassedModelUtil.getClassPK(
-				classedModel);
-
-			addAssetLinks(clazz, classPK);
-			addAssetTags(clazz, classPK);
-			addExpando(element, path, classedModel, clazz);
-			addLocks(clazz, String.valueOf(classPK));
-			addPermissions(clazz, classPK);
-		}
-
-		_references.add(getReferenceKey(classedModel));
 
 		addZipEntry(path, classedModel);
 	}
@@ -565,6 +564,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	@Override
 	public void addZipEntry(String path, byte[] bytes) {
+		if (isPathProcessed(path)) {
+			return;
+		}
+
 		if (_portletDataContextListener != null) {
 			_portletDataContextListener.onAddZipEntry(path);
 		}
@@ -581,6 +584,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	@Override
 	public void addZipEntry(String path, InputStream is) {
+		if (isPathProcessed(path)) {
+			return;
+		}
+
 		if (_portletDataContextListener != null) {
 			_portletDataContextListener.onAddZipEntry(path);
 		}
@@ -602,6 +609,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	@Override
 	public void addZipEntry(String path, String s) {
+		if (isPathProcessed(path)) {
+			return;
+		}
+
 		if (_portletDataContextListener != null) {
 			_portletDataContextListener.onAddZipEntry(path);
 		}
@@ -618,18 +629,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	@Override
 	public void addZipEntry(String path, StringBuilder sb) {
-		if (_portletDataContextListener != null) {
-			_portletDataContextListener.onAddZipEntry(path);
-		}
-
-		try {
-			ZipWriter zipWriter = getZipWriter();
-
-			zipWriter.addEntry(path, sb);
-		}
-		catch (IOException ioe) {
-			throw new SystemException(ioe);
-		}
+		addZipEntry(path, sb.toString());
 	}
 
 	@Override
@@ -1043,6 +1043,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _plid;
 	}
 
+	@Override
+	public String getPortletId() {
+		return _portletId;
+	}
+
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             ExportImportPathUtil#getPortletPath(PortletDataContext,
@@ -1213,6 +1218,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public String getRootPath() {
 		return ExportImportPathUtil.getRootPath(this);
+	}
+
+	@Override
+	public String getRootPortletId() {
+		return _rootPortletId;
 	}
 
 	/**
@@ -1854,6 +1864,18 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public void setPortletId(String portletId) {
+		_portletId = portletId;
+
+		if (Validator.isNotNull(portletId)) {
+			_rootPortletId = PortletConstants.getRootPortletId(portletId);
+		}
+		else {
+			_rootPortletId = null;
+		}
+	}
+
+	@Override
 	public void setPrivateLayout(boolean privateLayout) {
 		_privateLayout = privateLayout;
 	}
@@ -2465,9 +2487,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 		new HashMap<String, List<KeyValuePair>>();
 	private long _plid;
 	private PortletDataContextListener _portletDataContextListener;
+	private String _portletId;
 	private final Set<String> _primaryKeys = new HashSet<String>();
 	private boolean _privateLayout;
 	private final Set<String> _references = new HashSet<String>();
+	private String _rootPortletId;
 	private final Set<String> _scopedPrimaryKeys = new HashSet<String>();
 	private long _scopeGroupId;
 	private String _scopeLayoutUuid;

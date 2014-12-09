@@ -69,6 +69,37 @@ import java.util.Set;
  */
 public class GroupServiceImpl extends GroupServiceBaseImpl {
 
+	@Override
+	public Group addGroup(
+			long parentGroupId, long liveGroupId, String name,
+			String description, int type, boolean manualMembership,
+			int membershipRestriction, String friendlyURL, boolean site,
+			boolean inheritContent, boolean active,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		if (parentGroupId == GroupConstants.DEFAULT_PARENT_GROUP_ID) {
+			PortalPermissionUtil.check(
+				getPermissionChecker(), ActionKeys.ADD_COMMUNITY);
+		}
+		else {
+			GroupPermissionUtil.check(
+				getPermissionChecker(), parentGroupId,
+				ActionKeys.ADD_COMMUNITY);
+		}
+
+		Group group = groupLocalService.addGroup(
+			getUserId(), parentGroupId, null, 0, liveGroupId, name, description,
+			type, manualMembership, membershipRestriction, friendlyURL, site,
+			inheritContent, active, serviceContext);
+
+		if (site) {
+			SiteMembershipPolicyUtil.verifyPolicy(group);
+		}
+
+		return group;
+	}
+
 	/**
 	 * Adds a group.
 	 *
@@ -104,26 +135,10 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			boolean active, ServiceContext serviceContext)
 		throws PortalException {
 
-		if (parentGroupId == GroupConstants.DEFAULT_PARENT_GROUP_ID) {
-			PortalPermissionUtil.check(
-				getPermissionChecker(), ActionKeys.ADD_COMMUNITY);
-		}
-		else {
-			GroupPermissionUtil.check(
-				getPermissionChecker(), parentGroupId,
-				ActionKeys.ADD_COMMUNITY);
-		}
-
-		Group group = groupLocalService.addGroup(
-			getUserId(), parentGroupId, null, 0, liveGroupId, name, description,
-			type, manualMembership, membershipRestriction, friendlyURL, site,
+		return addGroup(
+			parentGroupId, liveGroupId, name, description, type,
+			manualMembership, membershipRestriction, friendlyURL, site, false,
 			active, serviceContext);
-
-		if (site) {
-			SiteMembershipPolicyUtil.verifyPolicy(group);
-		}
-
-		return group;
 	}
 
 	/**
@@ -1065,7 +1080,8 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 	public Group updateGroup(
 			long groupId, long parentGroupId, String name, String description,
 			int type, boolean manualMembership, int membershipRestriction,
-			String friendlyURL, boolean active, ServiceContext serviceContext)
+			String friendlyURL, boolean inheritContent, boolean active,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		Group group = groupPersistence.findByPrimaryKey(groupId);
@@ -1102,8 +1118,8 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 
 			group = groupLocalService.updateGroup(
 				groupId, parentGroupId, name, description, type,
-				manualMembership, membershipRestriction, friendlyURL, active,
-				serviceContext);
+				manualMembership, membershipRestriction, friendlyURL,
+				inheritContent, active, serviceContext);
 
 			SiteMembershipPolicyUtil.verifyPolicy(
 				group, oldGroup, oldAssetCategories, oldAssetTags,
@@ -1114,8 +1130,8 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		else {
 			return groupLocalService.updateGroup(
 				groupId, parentGroupId, name, description, type,
-				manualMembership, membershipRestriction, friendlyURL, active,
-				serviceContext);
+				manualMembership, membershipRestriction, friendlyURL,
+				inheritContent, active, serviceContext);
 		}
 	}
 

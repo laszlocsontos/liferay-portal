@@ -46,7 +46,7 @@ response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 
 	var config = ckEditor.config;
 
-	config.allowedContent = true;
+	config.allowedContent = 'b strong i hr h1 h2 h3 h4 h5 h6 em ul ol li pre table tr th; img a[*]';
 
 	config.attachmentURLPrefix = '<%= HtmlUtil.escapeJS(attachmentURLPrefix) %>';
 
@@ -125,22 +125,26 @@ response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 	config.toolbar_phone = [
 		['Bold', 'Italic'],
 		['NumberedList', 'BulletedList'],
-		['Link', 'Unlink']
+		['Link', 'Unlink'],
 
 		<c:if test="<%= (wikiPageResourcePrimKey > 0) %>">
-			, ['Image']
+			['Image'],
 		</c:if>
+
+		['Source']
 	];
 
 	config.toolbar_tablet = [
 		['Bold', 'Italic'],
 		['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
 		['Format'],
-		['Link', 'Unlink']
+		['Link', 'Unlink'],
 
 		<c:if test="<%= (wikiPageResourcePrimKey > 0) %>">
-			, ['Image']
+			['Image'],
 		</c:if>
+
+		['Source']
 	];
 
 	ckEditor.on(

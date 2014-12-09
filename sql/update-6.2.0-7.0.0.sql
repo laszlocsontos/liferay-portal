@@ -48,6 +48,8 @@ create table ExportImportConfiguration (
 	statusDate DATE null
 );
 
+alter table Group_ add inheritContent BOOLEAN;
+
 alter table JournalFolder add restrictionType INTEGER;
 
 create table JournalFolders_DDMStructures (

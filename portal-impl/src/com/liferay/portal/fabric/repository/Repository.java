@@ -14,6 +14,8 @@
 
 package com.liferay.portal.fabric.repository;
 
+import com.liferay.portal.fabric.netty.fileserver.FileResponse;
+import com.liferay.portal.kernel.concurrent.AsyncBroker;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 
 import java.nio.file.Path;
@@ -23,15 +25,17 @@ import java.util.Map;
 /**
  * @author Shuyang Zhou
  */
-public interface Repository {
+public interface Repository<T> {
 
 	public void dispose(boolean delete);
 
+	public AsyncBroker<Path, FileResponse> getAsyncBroker();
+
 	public NoticeableFuture<Path> getFile(
-		Path remoteFilePath, Path localFilePath, boolean deleteAfterFetch);
+		T t, Path remoteFilePath, Path localFilePath, boolean deleteAfterFetch);
 
 	public NoticeableFuture<Map<Path, Path>> getFiles(
-		Map<Path, Path> pathMap, boolean deleteAfterFetch);
+		T t, Map<Path, Path> pathMap, boolean deleteAfterFetch);
 
 	public Path getRepositoryPath();
 

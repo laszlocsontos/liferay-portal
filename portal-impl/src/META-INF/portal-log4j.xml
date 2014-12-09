@@ -1052,10 +1052,6 @@
 		<priority value="INFO" />
 	</category>
 
-	<category name="com.liferay.portlet.journalcontent.JournalContentPortletLayoutListener">
-		<priority value="ERROR" />
-	</category>
-
 	<category name="com.liferay.portlet.mail">
 		<priority value="WARN" />
 	</category>
@@ -1118,6 +1114,10 @@
 
 	<category name="com.liferay.sampletest">
 		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.taglib.util.IncludeTag">
+		<priority value="WARN" />
 	</category>
 
 	<category name="com.liferay.testhook">
