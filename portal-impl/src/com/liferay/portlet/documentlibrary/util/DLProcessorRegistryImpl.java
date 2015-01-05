@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
@@ -92,6 +93,23 @@ public class DLProcessorRegistryImpl implements DLProcessorRegistry {
 			if (dlProcessor.isSupported(fileVersion)) {
 				dlProcessor.cleanUp(fileVersion);
 			}
+		}
+	}
+
+	@Override
+	public void cleanUp(Folder folder) {
+		if (!DLProcessorThreadLocal.isEnabled()) {
+			return;
+		}
+
+		Iterable<String> dlProcessorTypes =
+			_dlProcessorServiceTrackerMap.keySet();
+
+		for (String dlProcessorType : dlProcessorTypes) {
+			DLProcessor dlProcessor = _dlProcessorServiceTrackerMap.getService(
+				dlProcessorType);
+
+			dlProcessor.cleanUp(folder);
 		}
 	}
 
