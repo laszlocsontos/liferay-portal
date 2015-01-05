@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.capabilities.ProcessorCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.repository.util.RepositoryWrapper;
 import com.liferay.portal.service.ServiceContext;
 
@@ -180,6 +181,15 @@ public class LiferayProcessorRepositoryWrapper extends RepositoryWrapper {
 		super.deleteFileVersion(fileEntryId, version);
 
 		_processorCapability.cleanUp(fileVersion);
+	}
+
+	@Override
+	public void deleteFolder(long folderId) throws PortalException {
+		Folder folder = getFolder(folderId);
+
+		_processorCapability.cleanUp(folder);
+
+		super.deleteFolder(folderId);
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.capabilities.ProcessorCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.repository.liferayrepository.LiferayProcessorLocalRepositoryWrapper;
 import com.liferay.portal.repository.liferayrepository.LiferayProcessorRepositoryWrapper;
@@ -42,6 +43,11 @@ public class LiferayProcessorCapability
 	@Override
 	public void cleanUp(FileVersion fileVersion) {
 		DLProcessorRegistryUtil.cleanUp(fileVersion);
+	}
+
+	@Override
+	public void cleanUp(Folder folder) {
+		DLProcessorRegistryUtil.cleanUp(folder);
 	}
 
 	@Override
