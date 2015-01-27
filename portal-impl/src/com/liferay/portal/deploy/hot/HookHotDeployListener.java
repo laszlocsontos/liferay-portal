@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.captcha.Captcha;
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
+import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployListener;
 import com.liferay.portal.kernel.deploy.hot.BaseHotDeployListener;
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
@@ -49,6 +50,7 @@ import com.liferay.portal.kernel.security.pacl.permission.PortalHookPermission;
 import com.liferay.portal.kernel.servlet.DirectServletRegistryUtil;
 import com.liferay.portal.kernel.servlet.LiferayFilter;
 import com.liferay.portal.kernel.servlet.LiferayFilterTracker;
+import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.servlet.TryFilter;
 import com.liferay.portal.kernel.servlet.TryFinallyFilter;
 import com.liferay.portal.kernel.servlet.WrapHttpServletRequestFilter;
@@ -80,6 +82,7 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.language.LiferayResourceBundle;
 import com.liferay.portal.model.ModelListener;
+import com.liferay.portal.plugin.PluginPackageUtil;
 import com.liferay.portal.repository.registry.RepositoryClassDefinitionCatalogUtil;
 import com.liferay.portal.repository.util.ExternalRepositoryFactory;
 import com.liferay.portal.repository.util.ExternalRepositoryFactoryImpl;
@@ -538,6 +541,19 @@ public class HookHotDeployListener
 				hotDeployEvent.getPluginPackage(), rootElement);
 		}
 		catch (DuplicateCustomJspException dcje) {
+			if (_log.isInfoEnabled()) {
+				_log.info(servletContextName + " will be undeployed");
+			}
+
+			doInvokeUndeploy(hotDeployEvent);
+
+			PluginPackageUtil.unregisterInstalledPluginPackage(
+				hotDeployEvent.getPluginPackage());
+
+			DeployManagerUtil.undeploy(servletContextName);
+
+			ServletContextPool.remove(servletContextName);
+
 			return;
 		}
 
