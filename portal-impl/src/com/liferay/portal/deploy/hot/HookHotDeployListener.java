@@ -2403,20 +2403,23 @@ public class HookHotDeployListener
 		for (Map.Entry<String, CustomJspBag> entry :
 				_customJspBagsMap.entrySet()) {
 
-			String servletContextName = (String)entry.getKey();
 			CustomJspBag customJspBag = (CustomJspBag)entry.getValue();
 
-			String customJspDir = customJspBag.getCustomJspDir();
-			List<String> customJsps = customJspBag.getCustomJsps();
+			if (customJspBag.isCustomJspGlobal()) {
+				String servletContextName = (String)entry.getKey();
 
-			for (String customJsp : customJsps) {
-				int pos = customJsp.indexOf(customJspDir);
+				String customJspDir = customJspBag.getCustomJspDir();
+				List<String> customJsps = customJspBag.getCustomJsps();
 
-				String portalJsp = customJsp.substring(
-					pos + customJspDir.length());
+				for (String customJsp : customJsps) {
+					int pos = customJsp.indexOf(customJspDir);
 
-				if (currentCustomJsps.contains(portalJsp)) {
-					collidingCustomJsps.put(portalJsp, servletContextName);
+					String portalJsp = customJsp.substring(
+						pos + customJspDir.length());
+
+					if (currentCustomJsps.contains(portalJsp)) {
+						collidingCustomJsps.put(portalJsp, servletContextName);
+					}
 				}
 			}
 		}
