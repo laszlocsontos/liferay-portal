@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -45,7 +46,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
+import org.jets3t.service.Jets3tProperties;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
@@ -65,13 +68,19 @@ import org.jets3t.service.security.AWSCredentials;
 public class S3Store extends BaseStore {
 
 	public S3Store() {
+		S3Service s3Service = null;
+		S3Bucket s3Bucket = null;
+
 		try {
-			_s3Service = getS3Service();
-			_s3Bucket = getS3Bucket();
+			s3Service = getS3Service();
+			s3Bucket = getS3Bucket();
 		}
 		catch (S3ServiceException s3se) {
 			_log.error(s3se.getMessage());
 		}
+
+		_s3Service = s3Service;
+		_s3Bucket = s3Bucket;
 	}
 
 	@Override
@@ -549,6 +558,18 @@ public class S3Store extends BaseStore {
 		}
 	}
 
+	protected Jets3tProperties getJets3tProperties() {
+		Jets3tProperties jets3tProperties = new Jets3tProperties();
+
+		jets3tProperties.loadAndReplaceProperties(_jets3tProperties, "liferay");
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Jets3t properties: " + jets3tProperties.getProperties());
+		}
+
+		return jets3tProperties;
+	}
+
 	protected String getKey(long companyId, long repositoryId) {
 		return companyId + StringPool.SLASH + repositoryId;
 	}
@@ -609,7 +630,10 @@ public class S3Store extends BaseStore {
 	protected S3Service getS3Service() throws S3ServiceException {
 		AWSCredentials credentials = getAWSCredentials();
 
-		return new RestS3Service(credentials);
+		Jets3tProperties jets3tProperties = getJets3tProperties();
+
+		return new RestS3Service(
+			credentials, ReleaseInfo.getServerInfo(), null, jets3tProperties);
 	}
 
 	protected File getTempFile(S3Object s3Object, String fileName)
@@ -675,10 +699,13 @@ public class S3Store extends BaseStore {
 
 	private static final String _TEMP_DIR_PATTERN = "/yyyy/MM/dd/HH/";
 
-	private static Log _log = LogFactoryUtil.getLog(S3Store.class);
+	private static final Log _log = LogFactoryUtil.getLog(S3Store.class);
+
+	private static final Properties _jets3tProperties = PropsUtil.getProperties(
+		PropsKeys.DL_STORE_S3_JETS3T, true);
 
 	private int _calledGetFileCount;
-	private S3Bucket _s3Bucket;
-	private S3Service _s3Service;
+	private final S3Bucket _s3Bucket;
+	private final S3Service _s3Service;
 
 }

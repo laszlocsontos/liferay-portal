@@ -359,7 +359,7 @@ public class FileEventUtil {
 		parameters.put("syncFile", syncFile);
 		parameters.put("title", name);
 
-		if (sourceChecksum.equals(targetChecksum)) {
+		if (FileUtil.checksumsEqual(sourceChecksum, targetChecksum)) {
 			parameters.put("-file", null);
 		}
 		else {
@@ -395,7 +395,7 @@ public class FileEventUtil {
 
 		parameters.put("description", syncFile.getDescription());
 		parameters.put("folderId", syncFile.getTypePK());
-		parameters.put("name", filePath.getFileName());
+		parameters.put("name", String.valueOf(filePath.getFileName()));
 		parameters.put("syncFile", syncFile);
 
 		UpdateFolderEvent updateFolderEvent = new UpdateFolderEvent(

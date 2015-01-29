@@ -222,7 +222,8 @@ public class AssetVocabularyLocalServiceImpl
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public void deleteVocabulary(AssetVocabulary vocabulary)
 		throws PortalException {
 
@@ -462,7 +463,7 @@ public class AssetVocabularyLocalServiceImpl
 				AssetVocabularyUtil.getVocabularies(hits);
 
 			if (vocabularies != null) {
-				return new BaseModelSearchResult<AssetVocabulary>(
+				return new BaseModelSearchResult<>(
 					vocabularies, hits.getLength());
 			}
 		}

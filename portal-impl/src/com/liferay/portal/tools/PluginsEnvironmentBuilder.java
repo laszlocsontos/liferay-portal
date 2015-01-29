@@ -163,6 +163,15 @@ public class PluginsEnvironmentBuilder {
 			String version)
 		throws Exception {
 
+		String string = sb.toString();
+
+		if (string.contains(dependencyName)) {
+			System.out.println(
+				"Skipping duplicate " + dependencyName + " " + version);
+
+			return;
+		}
+
 		System.out.println("Adding " + dependencyName + " " + version);
 
 		if (version.equals("latest.integration")) {
@@ -222,7 +231,7 @@ public class PluginsEnvironmentBuilder {
 					String rev = GetterUtil.getString(
 						dependencyElement.attributeValue("rev"));
 
-					String string = sb.toString();
+					string = sb.toString();
 
 					if (string.contains(name)) {
 						continue;
@@ -260,7 +269,12 @@ public class PluginsEnvironmentBuilder {
 				continue;
 			}
 
-			addClasspathEntry(sb, dirName + "/" + fileName);
+			int index = dirName.indexOf("/.ivy");
+
+			String eclipseRelativeDirName =
+				"/portal" + dirName.substring(index);
+
+			addClasspathEntry(sb, eclipseRelativeDirName + "/" + fileName);
 
 			return;
 		}
@@ -391,6 +405,17 @@ public class PluginsEnvironmentBuilder {
 		return jars;
 	}
 
+	protected boolean hasModulesGitIgnore(String dirName) {
+		int index = dirName.indexOf("/modules/");
+
+		if (index == -1) {
+			return false;
+		}
+
+		return _fileUtil.exists(
+			dirName.substring(0, index) + "/modules/.gitignore");
+	}
+
 	protected void setupJarProject(
 			String dirName, String fileName, List<String> dependencyJars,
 			boolean sharedProject)
@@ -418,6 +443,12 @@ public class PluginsEnvironmentBuilder {
 
 		File gitignoreFile = new File(
 			projectDir.getCanonicalPath() + "/.gitignore");
+
+		if (hasModulesGitIgnore(dirName)) {
+			gitignoreFile.delete();
+
+			return;
+		}
 
 		String[] gitIgnores = importSharedJars.toArray(
 			new String[importSharedJars.size()]);
@@ -854,7 +885,8 @@ public class PluginsEnvironmentBuilder {
 
 	private static final String[] _TEST_TYPES = {"integration", "unit"};
 
-	private static FileImpl _fileUtil = FileImpl.getInstance();
-	private static SAXReaderImpl _saxReaderUtil = SAXReaderImpl.getInstance();
+	private static final FileImpl _fileUtil = FileImpl.getInstance();
+	private static final SAXReaderImpl _saxReaderUtil =
+		SAXReaderImpl.getInstance();
 
 }

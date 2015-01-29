@@ -78,7 +78,7 @@ public class ServiceTrackerWrapper<S, T> implements ServiceTracker<S, T> {
 
 	@Override
 	public ServiceReference<S> getServiceReference() {
-		return new ServiceReferenceWrapper<S>(
+		return new ServiceReferenceWrapper<>(
 			_serviceTracker.getServiceReference());
 	}
 
@@ -111,7 +111,7 @@ public class ServiceTrackerWrapper<S, T> implements ServiceTracker<S, T> {
 			org.osgi.framework.ServiceReference<S> osgiServiceReference =
 				osgiServiceReferences[i];
 
-			serviceReferences[i] = new ServiceReferenceWrapper<S>(
+			serviceReferences[i] = new ServiceReferenceWrapper<>(
 				osgiServiceReference);
 		}
 
@@ -148,7 +148,7 @@ public class ServiceTrackerWrapper<S, T> implements ServiceTracker<S, T> {
 			T service = entry.getValue();
 
 			ServiceReferenceWrapper<S> serviceReferenceWrapper =
-				new ServiceReferenceWrapper<S>(osgiServiceReference);
+				new ServiceReferenceWrapper<>(osgiServiceReference);
 
 			trackedServiceReferences.put(serviceReferenceWrapper, service);
 		}
@@ -224,6 +224,6 @@ public class ServiceTrackerWrapper<S, T> implements ServiceTracker<S, T> {
 		return _serviceTracker.waitForService(timeout);
 	}
 
-	private org.osgi.util.tracker.ServiceTracker<S, T> _serviceTracker;
+	private final org.osgi.util.tracker.ServiceTracker<S, T> _serviceTracker;
 
 }

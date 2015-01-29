@@ -129,10 +129,9 @@ public class SPIAgentSerializableTest {
 
 		mockHttpServletRequest.setAttribute(nondistributed, nondistributed);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			SPIAgentSerializable.class.getName(), Level.OFF);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					SPIAgentSerializable.class.getName(), Level.OFF)) {
 
 			// Without log
 
@@ -199,9 +198,6 @@ public class SPIAgentSerializableTest {
 				distributedSerializable,
 				distributedRequestAttributes.get(distributedSerializable));
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	@Test
@@ -262,10 +258,9 @@ public class SPIAgentSerializableTest {
 
 	@Test
 	public void testExtractSessionAttributes() {
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			SPIAgentSerializable.class.getName(), Level.OFF);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					SPIAgentSerializable.class.getName(), Level.OFF)) {
 
 			// Without log, no portlet session
 
@@ -468,9 +463,6 @@ public class SPIAgentSerializableTest {
 			Assert.assertEquals(
 				serializeableAttribute,
 				portletSessionAttributes.get(serializeableAttribute));
-		}
-		finally {
-			captureHandler.close();
 		}
 	}
 
@@ -713,7 +705,8 @@ public class SPIAgentSerializableTest {
 
 		@Around(
 			"execution(public * " +
-				"com.liferay.portal.kernel.io.Deserializer.readObject())")
+				"com.liferay.portal.kernel.io.Deserializer.readObject())"
+		)
 		public Object readObject(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -730,8 +723,7 @@ public class SPIAgentSerializableTest {
 
 	private static final String _SERVLET_CONTEXT_NAME = "SERVLET_CONTEXT_NAME";
 
-	private static final ThreadLocal<String> _threadLocal =
-		new ThreadLocal<String>();
+	private static final ThreadLocal<String> _threadLocal = new ThreadLocal<>();
 
 	private ClassLoader _classLoader;
 

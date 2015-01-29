@@ -1,7 +1,6 @@
 @import "aui/alloy-font-awesome/scss/mixins-alloy";
 @import "aui/alloy-font-awesome/scss/variables";
-@import "compass";
-@import "compass/css3/user-interface";
+@import "bourbon";
 @import "mixins";
 
 @import url(custom_responsive.css);
@@ -129,7 +128,7 @@ select:focus {
 }
 
 .btn.disabled, .btn[disabled] {
-	@include opacity(0.4);
+	opacity: 0.4;
 }
 
 .btn-link {
@@ -226,12 +225,12 @@ select:focus {
 
 .taglib-icon-help {
 	img {
-		@include opacity(0.5);
+		opacity: 0.5;
 
 		vertical-align: top;
 
 		&:hover {
-			@include opacity(1);
+			opacity: 1;
 		}
 	}
 }
@@ -436,7 +435,7 @@ select:focus {
 	}
 
 	.dropdown-menu {
-		@include border-radius(0);
+		border-radius: 0;
 
 		> li > a {
 			padding: 9px 15px;
@@ -569,7 +568,7 @@ select:focus {
 	z-index: 300;
 
 	&:hover {
-		@include box-shadow(0 1px 1px -1px #000)
+		box-shadow: 0 1px 1px -1px #000;
 	}
 }
 
@@ -678,6 +677,42 @@ select:focus {
 	}
 }
 
+/* ---------- Switches ---------- */
+
+input.switch {
+	&:empty ~ .switch-bar {
+		&:before {
+			background-color: #868B96;
+		}
+
+		.switch-toggle {
+			&:after {
+				font-weight: bold;
+			}
+		}
+
+		.button-icon {
+			color: #868B96;
+		}
+	}
+
+	&:checked ~ .switch-bar {
+		&:before {
+			background-color: #34ADAB;
+		}
+
+		.switch-toggle {
+			&:after {
+				color: #34ADAB;
+			}
+		}
+
+		.button-icon {
+			color: #34ADAB;
+		}
+	}
+}
+
 /* ---------- Hidden accessible ---------- */
 
 #banner h2, #banner h3, .site-breadcrumbs h1 {
@@ -730,7 +765,7 @@ select:focus {
 			.panel-toggle:before {
 				@extend %toggler-header-icon-base;
 
-				@include opacity(0.5);
+				opacity: 0.5;
 			}
 		}
 
@@ -901,7 +936,7 @@ body.yui3-skin-sam .yui3-widget-mask {
 
 .lfr-add-panel, .lfr-edit-layout-panel, .portal-add-content {
 	.panel {
-		@include border-radius(0);
+		border-radius: 0;
 	}
 
 	.panel.panel-default {
@@ -968,15 +1003,121 @@ body.yui3-skin-sam .yui3-widget-mask {
 	}
 }
 
-/* ---------- Alloy editor ---------- */
+/* ---------- Liferay source editor ---------- */
 
-.alloy-editor {
-	outline: 0;
+.lfr-source-editor {
+	border-color: #CCC;
 
-	a {
-		cursor: auto;
+	.lfr-source-editor-toolbar {
+		li {
+			> .btn {
+				background-color: #FFF;
+				border: transparent;
+				color: #717383;
+				outline: 0;
+			}
+		}
+	}
+
+	.lfr-source-editor-code {
+		background-color: #FFF;
+		color: #2B4259;
+
+		.ace_gutter {
+			background-color: #EDEDEF;
+			color: #868896;
+			overflow : hidden;
+
+			.ace_fold-widget {
+				font-family: fontawesome-alloy;
+				text-align: center;
+				vertical-align: middle;
+
+				&.ace_open, &.ace_closed {
+					background-image: none;
+				}
+
+				&.ace_open:before {
+					content: "\f0d7";
+				}
+
+				&.ace_closed:before {
+					content: "\f0dA";
+				}
+			}
+
+			.ace_gutter-active-cell {
+				color: #FFF;
+			}
+
+			.ace_gutter-active-line {
+				background-color : #717383;
+			}
+
+			.ace_gutter-layer {
+				border-right: solid 1px #CCC;
+			}
+
+			.ace_info {
+				background-image: none;
+			}
+		}
+
+		.ace_content {
+			.ace_active-line {
+				background-color: #EDEDEF;
+			}
+
+			.ace_constant {
+				color: #34ADAB;
+			}
+
+			.ace_tag {
+				color: #1D5EC7;
+			}
+
+			.ace_string {
+				color: #FF6C58;
+
+				&.ace_regex {
+					color: #F00;
+				}
+			}
+		}
+	}
+
+	&.ace_dark {
+		.lfr-source-editor-code {
+			background-color: #47474F;
+			color: #FFF;
+
+			.ace_gutter {
+				background: #54555E;
+				color: #FFF;
+
+				.ace_gutter-active-line {
+					background-color : #009AED;
+				}
+			}
+
+			.ace_content {
+				.ace_active-line {
+					background-color: #11394E;
+				}
+
+				.ace_cursor {
+					color: #FFF;
+				}
+
+				.ace_tag {
+					color: #4D91FF;
+				}
+			}
+		}
 	}
 }
+
+/* ---------- Alloy editor ---------- */
 
 .alloy-editor-toolbar {
 	.alloy-editor-button {
@@ -999,6 +1140,17 @@ body.yui3-skin-sam .yui3-widget-mask {
 	line-height: 20px;
 }
 
+.alloy-editor-switch .btn {
+	background-color: #DDD;
+	border-color: transparent;
+	border-radius: 0;
+	color: #868896;
+
+	&:focus {
+		outline: none;
+	}
+}
+
 /* ---------- Extras ---------- */
 
 $prefixes: ("-webkit-", "-moz-", "-o-", "");
@@ -1008,14 +1160,14 @@ $prefixes: ("-webkit-", "-moz-", "-o-", "");
 		background: #2AAAE6 !important;
 		color: #FFF;
 
-		@include text-shadow(-1px -1px rgba(0, 0, 0, 0.3));
+		text-shadow: -1px -1px rgba(0, 0, 0, 0.3);
 	}
 
 	.alloy-editor ::#{$prefix}selection {
 		background: #E6F1FA !important;
 		color: #555;
 
-		@include text-shadow(none);
+		text-shadow: none;
 	}
 
 	.alloyeditor-add-toolbar ::#{$prefix}selection {
@@ -1024,51 +1176,51 @@ $prefixes: ("-webkit-", "-moz-", "-o-", "");
 }
 
 @mixin user-avatar-circle() {
-	@include border-radius(50%);
-	@include box-shadow(0 0 0 2px #5594E0);
+	border-radius: 50%;
+	box-shadow: 0 0 0 2px #5594E0;
 }
 
 @include respond-to(phone, tablet) {
 	#navigation.open .navbar-inner .navbar-collapse li a {
-		@include border-radius(0);
+		border-radius: 0;
 	}
 }
 
 .breadcrumb > li {
-	@include text-shadow(none);
+	text-shadow: none;
 }
 
 .modify-pages .delete-tab {
-	@include border-radius(50%);
-	@include text-shadow(none);
+	border-radius: 50%;
+	text-shadow: none;
 }
 
 .panel.panel-default {
-	@include box-shadow(none);
+	box-shadow: none;
 }
 
 .table {
-	@include border-radius(5px);
+	border-radius: 5px;
 }
 
 #{$form_text_fields} {
-	@include border-radius(0);
-	@include box-shadow(none);
+	border-radius: 0;
+	box-shadow: none;
 
 	&:focus {
-		@include box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6));
+		box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
 	}
 }
 
 .tagselector-focused .tagselector-content .textboxlistentry-holder {
-	@include box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6));
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
 }
 
 .dockbar {
 	.nav {
 		> li {
 			> a {
-				@include text-shadow(none);
+				text-shadow: none;
 			}
 		}
 	}
@@ -1086,28 +1238,28 @@ $prefixes: ("-webkit-", "-moz-", "-o-", "");
 	.container, .container-fluid {
 		.btn {
 			.icon-bar {
-				@include box-shadow(0 1px 0 #FFF);
+				box-shadow: 0 1px 0 #FFF;
 			}
 		}
 	}
 
 	.icon-caret-down {
-		@include border-radius(50%);
+		border-radius: 50%;
 	}
 }
 
 .dockbar {
 	.container, .container-fluid {
 		.btn {
-			@include box-shadow(none);
+			box-shadow: none;
 		}
 	}
 }
 
 .alloy-editor-toolbar.alloy-editor-toolbar-styles .link-wrapper .input-container input:focus {
-	@include box-shadow(none);
+	box-shadow: none;
 }
 
 body.yui3-skin-sam .yui3-widget-mask {
-	@include opacity(0.8);
+	opacity: 0.8;
 }

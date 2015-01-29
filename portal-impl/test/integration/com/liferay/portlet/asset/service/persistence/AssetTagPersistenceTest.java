@@ -159,6 +159,16 @@ public class AssetTagPersistenceTest {
 	}
 
 	@Test
+	public void testCountByGroupIdArrayable() {
+		try {
+			_persistence.countByGroupId(new long[] { RandomTestUtil.nextLong(), 0L });
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testCountByG_N() {
 		try {
 			_persistence.countByG_N(RandomTestUtil.nextLong(), StringPool.BLANK);
@@ -166,6 +176,32 @@ public class AssetTagPersistenceTest {
 			_persistence.countByG_N(0L, StringPool.NULL);
 
 			_persistence.countByG_N(0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_LikeN() {
+		try {
+			_persistence.countByG_LikeN(RandomTestUtil.nextLong(),
+				StringPool.BLANK);
+
+			_persistence.countByG_LikeN(0L, StringPool.NULL);
+
+			_persistence.countByG_LikeN(0L, (String)null);
+		}
+		catch (Exception e) {
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testCountByG_LikeNArrayable() {
+		try {
+			_persistence.countByG_LikeN(new long[] { RandomTestUtil.nextLong(), 0L },
+				RandomTestUtil.randomString());
 		}
 		catch (Exception e) {
 			Assert.fail(e.getMessage());

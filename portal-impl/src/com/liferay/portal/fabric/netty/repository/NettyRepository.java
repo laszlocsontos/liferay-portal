@@ -39,7 +39,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -65,11 +67,17 @@ public class NettyRepository implements Repository<Channel> {
 
 	@Override
 	public void dispose(boolean delete) {
-		for (Path path : pathMap.values()) {
-			FileHelperUtil.delete(true, path);
-		}
+		Set<Map.Entry<Path, Path>> entrySet = pathMap.entrySet();
 
-		pathMap.clear();
+		Iterator<Map.Entry<Path, Path>> iterator = entrySet.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<Path, Path> entry = iterator.next();
+
+			iterator.remove();
+
+			FileHelperUtil.delete(true, entry.getValue());
+		}
 
 		if (delete) {
 			FileHelperUtil.delete(true, repositoryPath);
@@ -103,7 +111,7 @@ public class NettyRepository implements Repository<Channel> {
 		Channel channel, Map<Path, Path> pathMap, boolean deleteAfterFetch) {
 
 		final DefaultNoticeableFuture<Map<Path, Path>> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<Map<Path, Path>>();
+			new DefaultNoticeableFuture<>();
 
 		if (pathMap.isEmpty()) {
 			defaultNoticeableFuture.set(pathMap);
@@ -186,7 +194,7 @@ public class NettyRepository implements Repository<Channel> {
 		final Path cachedLocalFilePath = pathMap.get(remoteFilePath);
 
 		final DefaultNoticeableFuture<FileResponse> defaultNoticeableFuture =
-			new DefaultNoticeableFuture<FileResponse>();
+			new DefaultNoticeableFuture<>();
 
 		NoticeableFuture<FileResponse> noticeableFuture = asyncBroker.post(
 			remoteFilePath, defaultNoticeableFuture);
@@ -307,7 +315,7 @@ public class NettyRepository implements Repository<Channel> {
 	}
 
 	protected final AsyncBroker<Path, FileResponse> asyncBroker =
-		new AsyncBroker<Path, FileResponse>();
+		new AsyncBroker<>();
 	protected final long getFileTimeout;
 	protected final Map<Path, Path> pathMap = new ConcurrentHashMap<>();
 	protected final Path repositoryPath;

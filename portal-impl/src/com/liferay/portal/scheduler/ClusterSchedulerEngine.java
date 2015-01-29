@@ -620,7 +620,8 @@ public class ClusterSchedulerEngine
 	}
 
 	@BeanReference(
-		name = "com.liferay.portal.scheduler.ClusterSchedulerEngineService")
+		name = "com.liferay.portal.scheduler.ClusterSchedulerEngineService"
+	)
 	protected SchedulerEngine schedulerEngine;
 
 	private static final String _PLUGIN_READY = "plugin.ready";
@@ -649,7 +650,7 @@ public class ClusterSchedulerEngine
 
 		@Override
 		public boolean accept(Map<String, Serializable> context) {
-			if (!ClusterInvokeThreadLocal.isEnabled()) {
+			if (ClusterInvokeThreadLocal.isEnabled()) {
 				return false;
 			}
 

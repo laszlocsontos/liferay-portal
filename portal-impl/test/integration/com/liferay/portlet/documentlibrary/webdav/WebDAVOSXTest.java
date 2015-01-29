@@ -14,12 +14,24 @@
 
 package com.liferay.portlet.documentlibrary.webdav;
 
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.test.AggregateTestRule;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.webdav.WebDAVUtil;
 import com.liferay.portal.kernel.webdav.methods.Method;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.test.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.test.ServiceContextTestUtil;
+import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +69,39 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 		_testDeltaBytes = FileUtil.getBytes(clazz, _OFFICE_TEST_DELTA_DOCX);
 
 		servicePut(_TEST_FILE_NAME, _testFileBytes, getLock(_TEST_FILE_NAME));
+	}
+
+	@Test
+	public void testGetFileWithEscapedCharactersInFileName() throws Exception {
+		FileEntry fileEntry = null;
+
+		try {
+			Group group = GroupLocalServiceUtil.getFriendlyURLGroup(
+				PortalUtil.getDefaultCompanyId(), getGroupFriendlyURL());
+
+			Folder folder = DLAppLocalServiceUtil.getFolder(
+				group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				getFolderName());
+
+			fileEntry = DLAppLocalServiceUtil.addFileEntry(
+				TestPropsValues.getUserId(), group.getGroupId(),
+				folder.getFolderId(), _TEST_FILE_NAME_ILLEGAL_CHARACTERS,
+				ContentTypes.APPLICATION_MSWORD,
+				_TEST_FILE_NAME_ILLEGAL_CHARACTERS, StringPool.BLANK,
+				StringPool.BLANK, _testFileBytes,
+				ServiceContextTestUtil.getServiceContext(group.getGroupId()));
+
+			String fileName = HttpUtil.encodeURL(
+				_TEST_FILE_NAME_ILLEGAL_CHARACTERS);
+
+			assertCode(HttpServletResponse.SC_OK, serviceGet(fileName));
+		}
+		finally {
+			if (fileEntry != null) {
+				DLAppLocalServiceUtil.deleteFileEntry(
+					fileEntry.getFileEntryId());
+			}
+		}
 	}
 
 	@Test
@@ -379,6 +424,9 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 
 	private static final String _TEST_FILE_NAME = "Test.docx";
 
+	private static final String _TEST_FILE_NAME_ILLEGAL_CHARACTERS =
+		"Test/0.docx";
+
 	private static final String _TEST_META_NAME = "._Test.docx";
 
 	private static final String _USER_AGENT =
@@ -388,6 +436,6 @@ public class WebDAVOSXTest extends BaseWebDAVTestCase {
 	private static byte[] _testFileBytes;
 	private static byte[] _testMetaBytes;
 
-	private Map<String, String> _lockMap = new HashMap<>();
+	private final Map<String, String> _lockMap = new HashMap<>();
 
 }

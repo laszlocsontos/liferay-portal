@@ -24,7 +24,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.DLPortletInstanceSettings;
-import com.liferay.portlet.documentlibrary.context.DLActionsDisplayContext;
+import com.liferay.portlet.documentlibrary.display.context.DLActionsDisplayContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -185,8 +185,8 @@ public class DLDisplayConfigurationDisplayContext {
 	private List<KeyValuePair> _availableFolderColumns;
 	private List<KeyValuePair> _currentFileEntryColumns;
 	private List<KeyValuePair> _currentFolderColumns;
-	private DLActionsDisplayContext _dlActionsDisplayContext;
-	private DLPortletInstanceSettings _dlPortletInstanceSettings;
-	private ThemeDisplay _themeDisplay;
+	private final DLActionsDisplayContext _dlActionsDisplayContext;
+	private final DLPortletInstanceSettings _dlPortletInstanceSettings;
+	private final ThemeDisplay _themeDisplay;
 
 }

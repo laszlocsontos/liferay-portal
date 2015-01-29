@@ -18,8 +18,11 @@ import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,10 +32,14 @@ import java.util.Set;
  * @author Marcellus Tavares
  * @author Pablo Carvalho
  */
-public class DDMFormValues {
+public class DDMFormValues implements Serializable {
 
 	public DDMFormValues(DDMForm ddmForm) {
 		_ddmForm = ddmForm;
+	}
+
+	public void addAvailableLocale(Locale locale) {
+		_availableLocales.add(locale);
 	}
 
 	public void addDDMFormFieldValue(DDMFormFieldValue ddmFormFieldValue) {
@@ -129,7 +136,7 @@ public class DDMFormValues {
 		_defaultLocale = defaultLocale;
 	}
 
-	private Set<Locale> _availableLocales;
+	private Set<Locale> _availableLocales = new LinkedHashSet<>();
 	private final DDMForm _ddmForm;
 	private List<DDMFormFieldValue> _ddmFormFieldValues = new ArrayList<>();
 	private Locale _defaultLocale;

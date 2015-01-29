@@ -295,8 +295,6 @@ public class EditLayoutsAction extends PortletAction {
 			else if (e instanceof SystemException) {
 				SessionErrors.add(actionRequest, e.getClass(), e);
 
-				redirect = ParamUtil.getString(actionRequest, "pagesRedirect");
-
 				sendRedirect(
 					portletConfig, actionRequest, actionResponse, redirect,
 					closeRedirect);
@@ -1280,6 +1278,7 @@ public class EditLayoutsAction extends PortletAction {
 
 	private static final boolean _CHECK_METHOD_ON_PROCESS_ACTION = false;
 
-	private static Log _log = LogFactoryUtil.getLog(EditLayoutsAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditLayoutsAction.class);
 
 }

@@ -1008,8 +1008,8 @@
 		<priority value="WARN" />
 	</category>
 
-	<category name="com.liferay.portlet.documentlibrary.store.StoreFactory">
-		<priority value="WARN" />
+	<category name="com.liferay.portlet.documentlibrary.store">
+		<priority value="INFO" />
 	</category>
 
 	<category name="com.liferay.portlet.documentlibrary.util">
@@ -1094,14 +1094,6 @@
 
 	<category name="com.liferay.portlet.webproxy">
 		<priority value="INFO" />
-	</category>
-
-	<category name="com.liferay.portlet.wiki.action.ExportPageAction">
-		<priority value="ERROR" />
-	</category>
-
-	<category name="com.liferay.portlet.wiki.importers">
-		<priority value="WARN" />
 	</category>
 
 	<category name="com.liferay.resourcesimporter">

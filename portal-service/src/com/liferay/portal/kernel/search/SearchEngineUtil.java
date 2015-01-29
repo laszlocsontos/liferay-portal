@@ -297,33 +297,8 @@ public class SearchEngineUtil {
 		indexWriter.deleteDocuments(searchContext, uids);
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #deletePortletDocuments(String, long, String, boolean)}
-	 */
-	@Deprecated
-	public static void deletePortletDocuments(long companyId, String portletId)
-		throws SearchException {
-
-		for (String searchEngineId : _searchEngines.keySet()) {
-			deletePortletDocuments(searchEngineId, companyId, portletId, true);
-		}
-	}
-
-	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             #deletePortletDocuments(String, long, String, boolean)}
-	 */
-	@Deprecated
-	public static void deletePortletDocuments(
-			String searchEngineId, long companyId, String portletId)
-		throws SearchException {
-
-		deletePortletDocuments(searchEngineId, companyId, portletId, false);
-	}
-
-	public static void deletePortletDocuments(
-			String searchEngineId, long companyId, String portletId,
+	public static void deleteEntityDocuments(
+			String searchEngineId, long companyId, String className,
 			boolean commitImmediately)
 		throws SearchException {
 
@@ -345,7 +320,32 @@ public class SearchEngineUtil {
 		searchContext.setCompanyId(companyId);
 		searchContext.setSearchEngineId(searchEngineId);
 
-		indexWriter.deletePortletDocuments(searchContext, portletId);
+		indexWriter.deleteEntityDocuments(searchContext, className);
+	}
+
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #deleteEntityDocuments(String, long, String, boolean)}
+	 */
+	@Deprecated
+	public static void deletePortletDocuments(long companyId, String portletId)
+		throws SearchException {
+
+		for (String searchEngineId : _searchEngines.keySet()) {
+			deleteEntityDocuments(searchEngineId, companyId, portletId, true);
+		}
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #deleteEntityDocuments(String, long, String, boolean)}
+	 */
+	@Deprecated
+	public static void deletePortletDocuments(
+			String searchEngineId, long companyId, String portletId)
+		throws SearchException {
+
+		deleteEntityDocuments(searchEngineId, companyId, portletId, false);
 	}
 
 	public static String getDefaultSearchEngineId() {
@@ -360,7 +360,7 @@ public class SearchEngineUtil {
 		Set<String> assetEntryClassNames = new HashSet<>();
 
 		for (Indexer indexer : IndexerRegistryUtil.getIndexers()) {
-			for (String className : indexer.getClassNames()) {
+			for (String className : indexer.getSearchClassNames()) {
 				if (!_excludedEntryClassNames.contains(className)) {
 					assetEntryClassNames.add(className);
 				}
@@ -1096,19 +1096,20 @@ public class SearchEngineUtil {
 		_serviceTracker.open();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SearchEngineUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		SearchEngineUtil.class);
 
-	private static Set<Long> _companyIds = new HashSet<>();
+	private static final Set<Long> _companyIds = new HashSet<>();
 	private static String _defaultSearchEngineId;
-	private static Set<String> _excludedEntryClassNames = new HashSet<>();
+	private static final Set<String> _excludedEntryClassNames = new HashSet<>();
 	private static boolean _indexReadOnly = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.INDEX_READ_ONLY));
-	private static Map<String, SearchEngine> _searchEngines =
+	private static final Map<String, SearchEngine> _searchEngines =
 		new ConcurrentHashMap<>();
 	private static SearchPermissionChecker _searchPermissionChecker;
 
-	private ServiceTracker<SearchEngineConfigurator, SearchEngineConfigurator>
-		_serviceTracker;
+	private final ServiceTracker
+		<SearchEngineConfigurator, SearchEngineConfigurator> _serviceTracker;
 
 	private class SearchEngineConfiguratorServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer

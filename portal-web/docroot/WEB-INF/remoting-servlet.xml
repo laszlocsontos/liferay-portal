@@ -393,14 +393,6 @@
 		<property name="service" ref="com.liferay.portlet.asset.service.AssetTagService" />
 		<property name="serviceInterface" value="com.liferay.portlet.asset.service.AssetTagService" />
 	</bean>
-	<bean name="/com_liferay_portlet_asset_service_spring_AssetTagPropertyService-hessian" class="org.springframework.remoting.caucho.HessianServiceExporter">
-		<property name="service" ref="com.liferay.portlet.asset.service.AssetTagPropertyService" />
-		<property name="serviceInterface" value="com.liferay.portlet.asset.service.AssetTagPropertyService" />
-	</bean>
-	<bean name="/com_liferay_portlet_asset_service_spring_AssetTagPropertyService-http" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
-		<property name="service" ref="com.liferay.portlet.asset.service.AssetTagPropertyService" />
-		<property name="serviceInterface" value="com.liferay.portlet.asset.service.AssetTagPropertyService" />
-	</bean>
 	<bean name="/com_liferay_portlet_asset_service_spring_AssetVocabularyService-hessian" class="org.springframework.remoting.caucho.HessianServiceExporter">
 		<property name="service" ref="com.liferay.portlet.asset.service.AssetVocabularyService" />
 		<property name="serviceInterface" value="com.liferay.portlet.asset.service.AssetVocabularyService" />
@@ -736,21 +728,5 @@
 	<bean name="/com_liferay_portlet_trash_service_spring_TrashEntryService-http" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
 		<property name="service" ref="com.liferay.portlet.trash.service.TrashEntryService" />
 		<property name="serviceInterface" value="com.liferay.portlet.trash.service.TrashEntryService" />
-	</bean>
-	<bean name="/com_liferay_portlet_wiki_service_spring_WikiNodeService-hessian" class="org.springframework.remoting.caucho.HessianServiceExporter">
-		<property name="service" ref="com.liferay.portlet.wiki.service.WikiNodeService" />
-		<property name="serviceInterface" value="com.liferay.portlet.wiki.service.WikiNodeService" />
-	</bean>
-	<bean name="/com_liferay_portlet_wiki_service_spring_WikiNodeService-http" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
-		<property name="service" ref="com.liferay.portlet.wiki.service.WikiNodeService" />
-		<property name="serviceInterface" value="com.liferay.portlet.wiki.service.WikiNodeService" />
-	</bean>
-	<bean name="/com_liferay_portlet_wiki_service_spring_WikiPageService-hessian" class="org.springframework.remoting.caucho.HessianServiceExporter">
-		<property name="service" ref="com.liferay.portlet.wiki.service.WikiPageService" />
-		<property name="serviceInterface" value="com.liferay.portlet.wiki.service.WikiPageService" />
-	</bean>
-	<bean name="/com_liferay_portlet_wiki_service_spring_WikiPageService-http" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
-		<property name="service" ref="com.liferay.portlet.wiki.service.WikiPageService" />
-		<property name="serviceInterface" value="com.liferay.portlet.wiki.service.WikiPageService" />
 	</bean>
 </beans>

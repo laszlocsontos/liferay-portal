@@ -38,7 +38,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.asset.model.BaseAssetRenderer;
-import com.liferay.portlet.asset.model.DDMFieldReader;
+import com.liferay.portlet.asset.model.DDMFormValuesReader;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleConstants;
 import com.liferay.portlet.journal.model.JournalArticleDisplay;
@@ -103,8 +103,8 @@ public class JournalArticleAssetRenderer
 	}
 
 	@Override
-	public DDMFieldReader getDDMFieldReader() {
-		return new JournalArticleDDMFieldReader(_article);
+	public DDMFormValuesReader getDDMFormValuesReader() {
+		return new JournalArticleDDMFormValuesReader(_article);
 	}
 
 	@Override
@@ -218,13 +218,15 @@ public class JournalArticleAssetRenderer
 
 	@Override
 	public PortletURL getURLExport(
-		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse) {
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse)
+		throws Exception {
 
-		PortletURL portletURL = liferayPortletResponse.createActionURL();
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
+			getControlPanelPlid(liferayPortletRequest), PortletKeys.JOURNAL,
+			PortletRequest.ACTION_PHASE);
 
-		portletURL.setParameter(
-			"struts_action", "/asset_publisher/export_journal_article");
+		portletURL.setParameter("struts_action", "/journal/export_article");
 		portletURL.setParameter(
 			"groupId", String.valueOf(_article.getGroupId()));
 		portletURL.setParameter("articleId", _article.getArticleId());

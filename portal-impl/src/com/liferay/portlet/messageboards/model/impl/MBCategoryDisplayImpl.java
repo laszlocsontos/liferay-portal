@@ -136,7 +136,7 @@ public class MBCategoryDisplayImpl implements MBCategoryDisplay {
 
 		_rootCategory.setCategoryId(categoryId);
 
-		_categoryTree = new ListTree<MBCategory>(_rootCategory);
+		_categoryTree = new ListTree<>(_rootCategory);
 
 		_categoryNodesMap = new HashMap<>();
 
@@ -187,7 +187,7 @@ public class MBCategoryDisplayImpl implements MBCategoryDisplay {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		MBCategoryDisplayImpl.class);
 
 	private List<MBCategory> _allCategories;

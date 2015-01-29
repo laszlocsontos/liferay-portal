@@ -1,5 +1,5 @@
 @import "aui/alloy-font-awesome/scss/variables";
-@import "compass";
+@import "bourbon";
 
 /* ---------- Dragging/sorting indicators ---------- */
 
@@ -16,7 +16,7 @@
 }
 
 .portlet-boundary.yui3-dd-dragging {
-	@include opacity(0.6);
+	opacity: 0.6;
 
 	.portlet {
 		border: 2px dashed #CCC;
@@ -24,7 +24,7 @@
 }
 
 .sortable-layout-proxy {
-	@include opacity(1);
+	opacity: 1;
 
 	.portlet-topper {
 		background-image: none;
@@ -34,7 +34,7 @@
 .proxy {
 	cursor: move;
 
-	@include opacity(0.65);
+	opacity: 0.65;
 
 	position: absolute;
 
@@ -269,6 +269,111 @@
 	padding: 1px;
 }
 
+/* ---------- Switches ---------- */
+
+input.switch {
+	float: left;
+	font-size: 62.5%;
+	margin-left: -999em;
+
+	&:empty ~ .switch-bar {
+		cursor: pointer;
+		display: block;
+		font-size: 1.2rem;
+		line-height: 2.6rem;
+		min-height: 2.6rem;
+		position: relative;
+
+		@include user-select(none);
+
+		text-indent: 5rem;
+
+		&:after, &:before {
+			background-color: #DDD;
+			bottom: 0;
+			content: ' ';
+			display: block;
+			left: 0;
+			position: absolute;
+			top: 0;
+			width: 4.4rem;
+		}
+
+		&:after {
+			background-color: #FFF;
+			bottom: 0.4rem;
+			left: 0.4rem;
+			top: 0.4rem;
+			width: 1.8rem;
+		}
+
+		.switch-toggle:after {
+			content: attr(data-label-off);
+			text-transform: uppercase;
+		}
+
+		.switch-icon {
+			color: #FFF;
+			font-size: 1.4rem;
+			left: 0.4rem;
+			line-height: 1.8rem;
+			position: absolute;
+			text-align: center;
+			text-indent: 0;
+			top: 0.4rem;
+			width: 1.8rem;
+			z-index: 1;
+		}
+
+		.button-icon {
+			color: #DDD;
+		}
+
+		.button-icon-on, .switch-icon-on {
+			opacity: 0;
+		}
+
+		.switch-icon-on {
+			left: 0.2rem;
+		}
+
+		.switch-icon-off {
+			left: 2.4rem;
+		}
+	}
+
+	&:checked ~ .switch-bar {
+		&:after {
+			left: 2.2rem;
+		}
+
+		&:before {
+			background-color: #1E9C38;
+		}
+
+		.switch-toggle:after {
+			content: attr(data-label-on);
+		}
+
+		.button-icon {
+			left: 2.2rem;
+		}
+
+		.button-icon-on, .switch-icon-on {
+			opacity: 1;
+		}
+
+		.button-icon-off, .switch-icon-off {
+			opacity: 0;
+		}
+	}
+
+	&:disabled ~ .switch-bar {
+		cursor: auto;
+		opacity: 0.4;
+	}
+}
+
 /* ---------- Miscellaneous ---------- */
 
 .hsv-palette {
@@ -349,7 +454,7 @@
 	display: inline-block;
 	white-space: normal;
 
-	@include word-break(break-all);
+	@include word-wrap(break-all);
 }
 
 /* ---------- Menus ---------- */
@@ -452,7 +557,8 @@
 		position: absolute;
 		right: 0;
 		top: 0;
-		-webkit-overflow-scrolling: touch;
+
+		@include prefixer(overflow-scrolling, touch, 'webkit');
 	}
 }
 
@@ -589,7 +695,7 @@
 	font-size: 1.5em;
 	margin: 1em;
 
-	@include opacity(0.9);
+	opacity: 0.9;
 
 	padding: 1em;
 	position: absolute;
@@ -736,6 +842,76 @@
 		background: #F9F9F9;
 		border: 1px solid #777;
 		padding: 0.5em;
+	}
+}
+
+/* ---------- Liferay source editor ---------- */
+
+.lfr-source-editor {
+	border: solid 0 transparent;
+	border-bottom-width: 2px;
+	padding-right: 30px;
+	position: relative;
+
+	.lfr-source-editor-toolbar {
+		padding: 0;
+		position: absolute;
+		right: 0;
+		text-align: center;
+		top: 0;
+		width: 30px;
+
+		li {
+			list-style-type: none;
+
+			.btn {
+				padding: 0 5px;
+			}
+		}
+	}
+}
+
+/* ---------- Alloy editor ---------- */
+
+.alloy-editor {
+	outline: 0;
+
+	a {
+		cursor: auto;
+	}
+}
+
+.alloy-editor-switch {
+	border: dashed 0 #DDD;
+	border-bottom-width: 1px;
+	position: relative;
+
+	&.show-source {
+		border-bottom-width: 2px;
+		border-style: solid;
+	}
+
+	.btn {
+		bottom: 0;
+		padding: 0 5px;
+		position: absolute;
+		right: 0;
+	}
+}
+
+.alloy-editor-container {
+	.lfr-source-editor {
+		display: none;
+	}
+
+	&.show-source {
+		.alloy-editor-placeholder {
+			display: none;
+		}
+
+		.lfr-source-editor {
+			display: block;
+		}
 	}
 }
 

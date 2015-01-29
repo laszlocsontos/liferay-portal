@@ -38,8 +38,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.resiliency.mpi.MPIHelperUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
-import com.liferay.portal.kernel.template.TemplateManagerUtil;
-import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.kernel.util.CentralizedThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -196,22 +194,6 @@ public class GlobalShutdownAction extends SimpleAction {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// Template manager
-
-		try {
-			TemplateManagerUtil.destroy();
-		}
-		catch (Exception e) {
-		}
-
-		// Template resource loader
-
-		try {
-			TemplateResourceLoaderUtil.destroy();
-		}
-		catch (Exception e) {
-		}
 	}
 
 	protected void shutdownLevel2() {
@@ -337,6 +319,7 @@ public class GlobalShutdownAction extends SimpleAction {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(GlobalShutdownAction.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		GlobalShutdownAction.class);
 
 }

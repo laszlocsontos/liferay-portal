@@ -26,6 +26,7 @@ import com.liferay.portal.upgrade.v7_0_0.UpgradeDynamicDataLists;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeDynamicDataMapping;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeEmailNotificationPreferences;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeExpando;
+import com.liferay.portal.upgrade.v7_0_0.UpgradeGroup;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeJournal;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeJournalArticleType;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeJournalDisplayPreferences;
@@ -39,7 +40,6 @@ import com.liferay.portal.upgrade.v7_0_0.UpgradeSchema;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeShopping;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeShoppingPreferences;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeSubscription;
-import com.liferay.portal.upgrade.v7_0_0.UpgradeWiki;
 
 /**
  * @author Julio Camarero
@@ -64,6 +64,7 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 		upgrade(UpgradeDynamicDataMapping.class);
 		upgrade(UpgradeEmailNotificationPreferences.class);
 		upgrade(UpgradeExpando.class);
+		upgrade(UpgradeGroup.class);
 		upgrade(UpgradeLanguagePreferences.class);
 		upgrade(UpgradeJournal.class);
 		upgrade(UpgradeJournalDisplayPreferences.class);
@@ -75,7 +76,6 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 		upgrade(UpgradeShopping.class);
 		upgrade(UpgradeShoppingPreferences.class);
 		upgrade(UpgradeSubscription.class);
-		upgrade(UpgradeWiki.class);
 
 		// This must be the last upgrade process. Otherwise, upgrades based on
 		// BaseUpgradePortletPreferences will fail because the portlet

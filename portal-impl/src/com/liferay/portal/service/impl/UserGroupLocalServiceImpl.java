@@ -354,7 +354,8 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public UserGroup deleteUserGroup(UserGroup userGroup)
 		throws PortalException {
 
@@ -830,7 +831,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			List<UserGroup> userGroups = UsersAdminUtil.getUserGroups(hits);
 
 			if (userGroups != null) {
-				return new BaseModelSearchResult<UserGroup>(
+				return new BaseModelSearchResult<>(
 					userGroups, hits.getLength());
 			}
 		}

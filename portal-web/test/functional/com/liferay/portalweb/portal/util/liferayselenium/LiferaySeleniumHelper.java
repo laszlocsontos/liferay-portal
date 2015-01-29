@@ -950,7 +950,7 @@ public class LiferaySeleniumHelper {
 
 		// LPS-50936
 
-		if (line.matches(
+		if (line.contains(
 				"Liferay does not have the Xuggler native libraries " +
 					"installed.")) {
 
@@ -982,6 +982,12 @@ public class LiferaySeleniumHelper {
 
 				return true;
 			}
+		}
+
+		// WCM-202
+
+		if (line.contains("No score point assigners available")) {
+			return true;
 		}
 
 		if (Validator.equals(
@@ -1739,9 +1745,10 @@ public class LiferaySeleniumHelper {
 		}
 	}
 
-	private static List<Exception> _javaScriptExceptions = new ArrayList<>();
-	private static List<Exception> _liferayExceptions = new ArrayList<>();
-	private static Screen _screen = new Screen();
+	private static final List<Exception> _javaScriptExceptions =
+		new ArrayList<>();
+	private static final List<Exception> _liferayExceptions = new ArrayList<>();
+	private static final Screen _screen = new Screen();
 	private static int _screenshotCount = 0;
 	private static int _screenshotErrorCount = 0;
 

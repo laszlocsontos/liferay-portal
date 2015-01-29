@@ -71,8 +71,7 @@ public class ServiceBeanPostProcessor
 			return bean;
 		}
 
-		Dictionary<String, Object> properties =
-			new HashMapDictionary<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put("bean.id", beanName);
 
@@ -113,7 +112,7 @@ public class ServiceBeanPostProcessor
 
 	private BundleContext _bundleContext;
 	private ClassLoader _classLoader;
-	private List<ServiceRegistration<?>> _serviceRegistrations =
+	private final List<ServiceRegistration<?>> _serviceRegistrations =
 		new CopyOnWriteArrayList<>();
 
 }

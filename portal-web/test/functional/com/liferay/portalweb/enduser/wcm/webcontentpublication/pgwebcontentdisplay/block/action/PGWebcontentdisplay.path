@@ -65,7 +65,12 @@
 </tr>
 <tr>
 	<td>ALERT_MESSAGE</td>
-	<td>//div[contains(@class,'alert') and contains(@class,'alert-warning')]/a</td>
+	<td>//div[@class='portlet-body']/div[contains(@class,'alert') and contains(@class,'alert-warning')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ALERT_MESSAGE_LINK</td>
+	<td>//div[@class='portlet-body']/div[contains(@class,'alert') and contains(@class,'alert-warning')]/a</td>
 	<td></td>
 </tr>
 <tr>

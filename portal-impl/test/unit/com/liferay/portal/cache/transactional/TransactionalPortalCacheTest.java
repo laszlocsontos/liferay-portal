@@ -70,16 +70,16 @@ public class TransactionalPortalCacheTest {
 			new MockPortalCacheManager<String, String>(
 				_PORTAL_CACHE_MANAGER_NAME),
 			_PORTAL_CACHE_NAME, 16);
-		_transactionalPortalCache =
-			new TransactionalPortalCache<String, String>(_portalCache);
+		_transactionalPortalCache = new TransactionalPortalCache<>(
+			_portalCache);
 
 		_portalCache.put(_KEY_1, _VALUE_1);
 
-		_testCacheListener = new TestCacheListener<String, String>();
+		_testCacheListener = new TestCacheListener<>();
 
 		_portalCache.registerCacheListener(_testCacheListener);
 
-		_testCacheReplicator = new TestCacheReplicator<String, String>();
+		_testCacheReplicator = new TestCacheReplicator<>();
 
 		_portalCache.registerCacheListener(_testCacheReplicator);
 	}
@@ -387,7 +387,8 @@ public class TransactionalPortalCacheTest {
 
 		@Around(
 			"set(* com.liferay.portal.util.PropsValues." +
-				"TRANSACTIONAL_CACHE_ENABLED)")
+				"TRANSACTIONAL_CACHE_ENABLED)"
+		)
 		public Object disableTransactionalCache(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -402,7 +403,8 @@ public class TransactionalPortalCacheTest {
 
 		@Around(
 			"set(* com.liferay.portal.util.PropsValues." +
-				"TRANSACTIONAL_CACHE_ENABLED)")
+				"TRANSACTIONAL_CACHE_ENABLED)"
+		)
 		public Object enableTransactionalCache(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {

@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.messaging.sender.MessageSender;
 import com.liferay.portal.kernel.messaging.sender.SynchronousMessageSender;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
-import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -126,7 +125,7 @@ public class ServiceTestUtil {
 			setUser(TestPropsValues.getUser());
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 	}
 
@@ -138,16 +137,7 @@ public class ServiceTestUtil {
 			JCRFactoryUtil.prepare();
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
-		}
-
-		// Template manager
-
-		try {
-			TemplateManagerUtil.init();
-		}
-		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 
 		// Indexers
@@ -160,10 +150,10 @@ public class ServiceTestUtil {
 			DBUpgrader.upgrade();
 		}
 		catch (AssertionError ae) {
-			_log.warn(ae.getMessage(), ae);
+			_log.error(ae.getMessage(), ae);
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 
 		// Messaging
@@ -201,7 +191,7 @@ public class ServiceTestUtil {
 			SchedulerEngineHelperUtil.start();
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 
 		// Verify
@@ -210,7 +200,7 @@ public class ServiceTestUtil {
 			DBUpgrader.verify();
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 
 		// Class names
@@ -223,7 +213,7 @@ public class ServiceTestUtil {
 			_checkResourceActions();
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 
 		// Trash
@@ -249,7 +239,7 @@ public class ServiceTestUtil {
 				TestPropsValues.COMPANY_WEB_ID);
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 
 		// Directories
@@ -265,7 +255,7 @@ public class ServiceTestUtil {
 			SearchEngineUtil.initialize(TestPropsValues.getCompanyId());
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 	}
 
@@ -339,7 +329,7 @@ public class ServiceTestUtil {
 				PropsValues.LUCENE_DIR + TestPropsValues.getCompanyId());
 		}
 		catch (Exception e) {
-			_log.warn(e.getMessage(), e);
+			_log.error(e.getMessage(), e);
 		}
 	}
 

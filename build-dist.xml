@@ -13,6 +13,36 @@
 		</else>
 	</if>
 
+	<macrodef name="download-dynamic-jars">
+		<attribute name="app.server.lib.portal.dir" />
+
+		<sequential>
+			<propertyregex
+				input="${portal.setup.liferay.pool.provider.jar.url[hikaricp]}"
+				property="mirrors.hikaricp.url"
+				regexp="http://"
+				replace="http://mirrors/"
+			/>
+
+			<trycatch>
+				<try>
+					<get
+						dest="@{app.server.lib.portal.dir}/${portal.setup.liferay.pool.provider.jar.name[hikaricp]}"
+						skipexisting="true"
+						src="${mirrors.hikaricp.url}"
+					/>
+				</try>
+				<catch>
+					<get
+						dest="@{app.server.lib.portal.dir}/${portal.setup.liferay.pool.provider.jar.name[hikaricp]}"
+						skipexisting="true"
+						src="${portal.setup.liferay.pool.provider.jar.url[hikaricp]}"
+					/>
+				</catch>
+			</trycatch>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="update-plugins-includes-plugin">
 		<attribute name="plugins.includes.plugin.bundle" />
 		<attribute name="plugins.includes.plugin.dependent-apps" />
@@ -57,6 +87,8 @@
 
 		<antcall target="deploy" inheritAll="false" />
 
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
+
 		<app-server-properties-reset />
 
 		<antcall target="deploy-plugins">
@@ -74,6 +106,8 @@
 		</app-server-properties-update>
 
 		<ant target="deploy" inheritAll="false" />
+
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
 
 		<app-server-properties-reset />
 
@@ -94,6 +128,8 @@
 		<delete dir="${project.dir}/portal-web/classes" />
 
 		<ant target="deploy" inheritAll="false" />
+
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
 
 		<app-server-properties-reset />
 
@@ -131,6 +167,8 @@
 
 		<ant target="deploy" inheritAll="false" />
 
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
+
 		<app-server-properties-reset />
 
 		<antcall target="deploy-plugins">
@@ -155,6 +193,8 @@
 
 		<ant target="deploy" inheritAll="false" />
 
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
+
 		<app-server-properties-reset />
 
 		<antcall target="deploy-plugins">
@@ -175,6 +215,8 @@
 
 		<ant target="deploy" inheritAll="false" />
 
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
+
 		<app-server-properties-reset />
 
 		<antcall target="deploy-plugins">
@@ -194,6 +236,8 @@
 		<delete dir="${project.dir}/portal-web/classes" />
 
 		<ant target="deploy" inheritAll="false" />
+
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
 
 		<app-server-properties-reset />
 
@@ -295,6 +339,8 @@
 		<delete dir="${project.dir}/portal-web/classes" />
 
 		<ant target="deploy" inheritAll="false" />
+
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
 
 		<app-server-properties-reset />
 
@@ -531,6 +577,8 @@
 
 		<antcall target="all" inheritAll="false" />
 
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
+
 		<app-server-properties-reset />
 
 		<antcall target="deploy-plugins">
@@ -567,6 +615,8 @@
 				<app-server-properties-reset />
 			</then>
 		</if>
+
+		<antcall target="resolve-dynamic-jars" inheritAll="false" />
 
 		<antcall target="deploy-plugins">
 			<param name="deployer.dest.dir" value="${app.server.parent.dir}/tomcat-${app.server.tomcat.version}/webapps" />
@@ -949,6 +999,42 @@ release was successful.</echo>
 		<delete file="prepare-generated-files.txt" />
 
 		<echo file="prepare-generated-files.tstamp">${prepare-generated-files.tstamp}</echo>
+	</target>
+
+	<target name="resolve-dynamic-jars">
+		<sequential>
+			<property file="${project.dir}/portal-impl/src/portal.properties" prefix="portal" />
+
+			<if>
+				<equals arg1="${app.server.type}" arg2="glassfish" />
+				<then>
+					<tstamp>
+						<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
+					</tstamp>
+
+					<unzip
+						dest="${app.server.glassfish.deploy.dir}/${tstamp.value}"
+						src="${app.server.glassfish.deploy.dir}/liferay-portal.war"
+					/>
+
+					<download-dynamic-jars
+						app.server.lib.portal.dir="${app.server.glassfish.deploy.dir}/${tstamp.value}/WEB-INF/lib"
+					/>
+
+					<zip
+						basedir="${app.server.glassfish.deploy.dir}/${tstamp.value}"
+						destfile="${app.server.glassfish.deploy.dir}/liferay-portal.war"
+					/>
+
+					<delete dir="${app.server.glassfish.deploy.dir}/${tstamp.value}" />
+				</then>
+				<else>
+					<download-dynamic-jars
+						app.server.lib.portal.dir="${app.server.lib.portal.dir}"
+					/>
+				</else>
+			</if>
+		</sequential>
 	</target>
 
 	<target name="update-java-security-tomcat">

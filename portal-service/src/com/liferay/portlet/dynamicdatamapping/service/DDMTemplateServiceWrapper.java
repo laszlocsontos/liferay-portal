@@ -39,6 +39,8 @@ public class DDMTemplateServiceWrapper implements DDMTemplateService,
 	* @param classNameId the primary key of the class name for template's
 	related model
 	* @param classPK the primary key of the template's related entity
+	* @param sourceClassNameId the primary key of the class name for
+	template's source model
 	* @param nameMap the template's locales and localized names
 	* @param descriptionMap the template's locales and localized descriptions
 	* @param type the template's type. For more information, see {@link
@@ -59,7 +61,7 @@ public class DDMTemplateServiceWrapper implements DDMTemplateService,
 	*/
 	@Override
 	public com.liferay.portlet.dynamicdatamapping.model.DDMTemplate addTemplate(
-		long groupId, long classNameId, long classPK,
+		long groupId, long classNameId, long classPK, long sourceClassNameId,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String type, java.lang.String mode,
@@ -67,8 +69,8 @@ public class DDMTemplateServiceWrapper implements DDMTemplateService,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmTemplateService.addTemplate(groupId, classNameId, classPK,
-			nameMap, descriptionMap, type, mode, language, script,
-			serviceContext);
+			sourceClassNameId, nameMap, descriptionMap, type, mode, language,
+			script, serviceContext);
 	}
 
 	/**
@@ -78,6 +80,8 @@ public class DDMTemplateServiceWrapper implements DDMTemplateService,
 	* @param classNameId the primary key of the class name for template's
 	related model
 	* @param classPK the primary key of the template's related entity
+	* @param sourceClassNameId the primary key of the class name for
+	template's source model
 	* @param templateKey the unique string identifying the template
 	(optionally <code>null</code>)
 	* @param nameMap the template's locales and localized names
@@ -106,7 +110,7 @@ public class DDMTemplateServiceWrapper implements DDMTemplateService,
 	*/
 	@Override
 	public com.liferay.portlet.dynamicdatamapping.model.DDMTemplate addTemplate(
-		long groupId, long classNameId, long classPK,
+		long groupId, long classNameId, long classPK, long sourceClassNameId,
 		java.lang.String templateKey,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
@@ -117,8 +121,9 @@ public class DDMTemplateServiceWrapper implements DDMTemplateService,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _ddmTemplateService.addTemplate(groupId, classNameId, classPK,
-			templateKey, nameMap, descriptionMap, type, mode, language, script,
-			cacheable, smallImage, smallImageURL, smallImageFile, serviceContext);
+			sourceClassNameId, templateKey, nameMap, descriptionMap, type,
+			mode, language, script, cacheable, smallImage, smallImageURL,
+			smallImageFile, serviceContext);
 	}
 
 	/**
@@ -164,7 +169,9 @@ public class DDMTemplateServiceWrapper implements DDMTemplateService,
 	*
 	* @param classNameId the primary key of the class name for template's
 	related model
-	* @param classPK the primary key of the original template's related entity
+	* @param oldClassPK the primary key of the old template's related entity
+	* @param sourceClassNameId the primary key of the class name for
+	template's source model
 	* @param newClassPK the primary key of the new template's related entity
 	* @param type the template's type. For more information, see {@link
 	com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants}.
@@ -178,11 +185,12 @@ public class DDMTemplateServiceWrapper implements DDMTemplateService,
 	*/
 	@Override
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> copyTemplates(
-		long classNameId, long classPK, long newClassPK, java.lang.String type,
+		long classNameId, long oldClassPK, long sourceClassNameId,
+		long newClassPK, java.lang.String type,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _ddmTemplateService.copyTemplates(classNameId, classPK,
-			newClassPK, type, serviceContext);
+		return _ddmTemplateService.copyTemplates(classNameId, oldClassPK,
+			sourceClassNameId, newClassPK, type, serviceContext);
 	}
 
 	/**

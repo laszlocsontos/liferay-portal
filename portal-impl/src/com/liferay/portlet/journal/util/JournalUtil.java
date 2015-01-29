@@ -74,6 +74,7 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.templateparser.Transformer;
+import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -947,9 +948,11 @@ public class JournalUtil {
 
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]",
-			HtmlUtil.escape(PortalUtil.getPortletTitle(portletRequest)));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$TO_ADDRESS$]",
 			LanguageUtil.get(
@@ -1034,8 +1037,7 @@ public class JournalUtil {
 				WebKeys.JOURNAL_RECENT_ARTICLES);
 
 		if (recentArticles == null) {
-			recentArticles = new FiniteUniqueStack<JournalArticle>(
-				MAX_STACK_SIZE);
+			recentArticles = new FiniteUniqueStack<>(MAX_STACK_SIZE);
 
 			portletSession.setAttribute(
 				WebKeys.JOURNAL_RECENT_ARTICLES, recentArticles);
@@ -1054,8 +1056,7 @@ public class JournalUtil {
 				WebKeys.JOURNAL_RECENT_DYNAMIC_DATA_MAPPING_STRUCTURES);
 
 		if (recentDDMStructures == null) {
-			recentDDMStructures = new FiniteUniqueStack<DDMStructure>(
-				MAX_STACK_SIZE);
+			recentDDMStructures = new FiniteUniqueStack<>(MAX_STACK_SIZE);
 
 			portletSession.setAttribute(
 				WebKeys.JOURNAL_RECENT_DYNAMIC_DATA_MAPPING_STRUCTURES,
@@ -1075,8 +1076,7 @@ public class JournalUtil {
 				WebKeys.JOURNAL_RECENT_DYNAMIC_DATA_MAPPING_TEMPLATES);
 
 		if (recentDDMTemplates == null) {
-			recentDDMTemplates = new FiniteUniqueStack<DDMTemplate>(
-				MAX_STACK_SIZE);
+			recentDDMTemplates = new FiniteUniqueStack<>(MAX_STACK_SIZE);
 
 			portletSession.setAttribute(
 				WebKeys.JOURNAL_RECENT_DYNAMIC_DATA_MAPPING_TEMPLATES,
@@ -1304,6 +1304,12 @@ public class JournalUtil {
 			Attribute availableLocalesAttribute = newRootElement.attribute(
 				"available-locales");
 
+			if (availableLocalesAttribute == null) {
+				availableLocalesAttribute =
+					(Attribute)newRootElement.addAttribute(
+						"available-locales", StringPool.BLANK);
+			}
+
 			String defaultImportLanguageId = LocaleUtil.toLanguageId(
 				defaultImportLocale);
 
@@ -1311,9 +1317,14 @@ public class JournalUtil {
 					availableLocalesAttribute.getValue(),
 					defaultImportLanguageId)) {
 
-				availableLocalesAttribute.setValue(
-					availableLocalesAttribute.getValue() + StringPool.COMMA +
-						defaultImportLanguageId);
+				if (Validator.isNull(availableLocalesAttribute.getValue())) {
+					availableLocalesAttribute.setValue(defaultImportLanguageId);
+				}
+				else {
+					availableLocalesAttribute.setValue(
+						availableLocalesAttribute.getValue() +
+							StringPool.COMMA + defaultImportLanguageId);
+				}
 
 				_mergeArticleContentUpdate(
 					oldDocument, newRootElement,
@@ -1324,6 +1335,11 @@ public class JournalUtil {
 
 			Attribute defaultLocaleAttribute = newRootElement.attribute(
 				"default-locale");
+
+			if (defaultLocaleAttribute == null) {
+				defaultLocaleAttribute = (Attribute)newRootElement.addAttribute(
+					"default-locale", StringPool.BLANK);
+			}
 
 			Locale defaultContentLocale = LocaleUtil.fromLanguageId(
 				defaultLocaleAttribute.getValue());
@@ -1412,7 +1428,7 @@ public class JournalUtil {
 
 			Element contentRoot = contentDoc.getRootElement();
 
-			Stack<String> path = new Stack<String>();
+			Stack<String> path = new Stack<>();
 
 			path.push(contentRoot.getName());
 
@@ -1960,11 +1976,12 @@ public class JournalUtil {
 		path.pop();
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(JournalUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(JournalUtil.class);
 
 	private static Map<String, String> _customTokens;
-	private static Pattern _friendlyURLPattern = Pattern.compile("[^a-z0-9_-]");
-	private static Transformer _transformer = new Transformer(
+	private static final Pattern _friendlyURLPattern = Pattern.compile(
+		"[^a-z0-9_-]");
+	private static final Transformer _transformer = new Transformer(
 		PropsKeys.JOURNAL_TRANSFORMER_LISTENER,
 		PropsKeys.JOURNAL_ERROR_TEMPLATE, true);
 

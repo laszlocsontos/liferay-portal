@@ -70,8 +70,10 @@ import java.net.URLStreamHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -534,7 +536,8 @@ public class LuceneHelperImplTest {
 	public static class DisableClusterLinkAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)"
+		)
 		public Object disableClusterLink(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -548,7 +551,8 @@ public class LuceneHelperImplTest {
 	public static class DisableIndexOnStartUpAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.INDEX_ON_STARTUP)")
+			"set(* com.liferay.portal.util.PropsValues.INDEX_ON_STARTUP)"
+		)
 		public Object disableIndexOnStartUp(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -562,7 +566,8 @@ public class LuceneHelperImplTest {
 	public static class EnableClusterLinkAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)"
+		)
 		public Object enableClusterLink(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -575,7 +580,8 @@ public class LuceneHelperImplTest {
 	public static class EnableLuceneReplicateWriteAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.LUCENE_REPLICATE_WRITE)")
+			"set(* com.liferay.portal.util.PropsValues.LUCENE_REPLICATE_WRITE)"
+		)
 		public Object enableLuceneReplicateWrite(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -602,7 +608,8 @@ public class LuceneHelperImplTest {
 
 		@Around(
 			"execution(* com.liferay.portal.search.lucene.cluster." +
-				"LuceneClusterUtil.loadIndexesFromCluster(long))")
+				"LuceneClusterUtil.loadIndexesFromCluster(long))"
+		)
 		public void loadIndexesFromCluster(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -630,9 +637,10 @@ public class LuceneHelperImplTest {
 
 		@Around(
 			"execution(* com.liferay.portal.search.lucene.LuceneHelperImpl." +
-				"_getBootupClusterNodeObjectValuePair(..))")
+				"_getBootupClusterNodeObjectValuePair(..))"
+		)
 		public Object _getBootupClusterNodeObjectValuePair() {
-			return new ObjectValuePair<String, URL>(StringPool.BLANK, _url);
+			return new ObjectValuePair<>(StringPool.BLANK, _url);
 		}
 
 		private static URL _url;
@@ -646,7 +654,8 @@ public class LuceneHelperImplTest {
 			"execution(* com.liferay.portal.search.lucene.LuceneHelperImpl." +
 				"getLoadIndexesInputStreamFromCluster(" +
 					"long, com.liferay.portal.kernel.cluster.Address)) && " +
-						"args(companyId, bootupAddress)")
+						"args(companyId, bootupAddress)"
+		)
 		public Object getLoadIndexesInputStreamFromCluster(
 			long companyId, Address bootupAddress) {
 
@@ -777,7 +786,7 @@ public class LuceneHelperImplTest {
 			return _blockingQueue.poll(1000, TimeUnit.MILLISECONDS);
 		}
 
-		private BlockingQueue<E> _blockingQueue;
+		private final BlockingQueue<E> _blockingQueue;
 
 	}
 
@@ -800,11 +809,17 @@ public class LuceneHelperImplTest {
 		public FutureClusterResponses execute(ClusterRequest clusterRequest) {
 			if (!_autoResponse) {
 				return new FutureClusterResponses(
-					Collections.<Address>emptyList());
+					Collections.<String>emptySet());
+			}
+
+			Set<String> clusterNodeIds = new HashSet<>();
+
+			for (Address address : _addresses) {
+				clusterNodeIds.add(address.toString());
 			}
 
 			FutureClusterResponses futureClusterResponses =
-				new FutureClusterResponses(_addresses);
+				new FutureClusterResponses(clusterNodeIds);
 
 			for (Address address : _addresses) {
 				ClusterNodeResponse clusterNodeResponse =
@@ -816,8 +831,7 @@ public class LuceneHelperImplTest {
 				clusterNodeResponse.setMulticast(clusterRequest.isMulticast());
 				clusterNodeResponse.setUuid(clusterRequest.getUuid());
 
-				ClusterNode clusterNode = new ClusterNode(
-					String.valueOf(System.currentTimeMillis()));
+				ClusterNode clusterNode = new ClusterNode(address.toString());
 
 				try {
 					clusterNode.setPortalInetSocketAddress(
@@ -858,7 +872,7 @@ public class LuceneHelperImplTest {
 					futureClusterResponses.get().getClusterResponses();
 
 				MockBlockingQueue<ClusterNodeResponse> mockBlockingQueue =
-					new MockBlockingQueue<ClusterNodeResponse>(blockingQueue);
+					new MockBlockingQueue<>(blockingQueue);
 
 				clusterResponseCallback.callback(mockBlockingQueue);
 			}
@@ -973,7 +987,7 @@ public class LuceneHelperImplTest {
 			return null;
 		}
 
-		private List<Address> _addresses = new ArrayList<>();
+		private final List<Address> _addresses = new ArrayList<>();
 		private boolean _autoResponse = true;
 		private final List<ClusterEventListener> _clusterEventListeners =
 			new ArrayList<>();

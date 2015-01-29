@@ -225,6 +225,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertEquals(3, schedulerResponses.size());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -239,6 +242,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertTrue(schedulerResponses.isEmpty());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -260,6 +266,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertEquals(3, schedulerResponses.size());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -274,6 +283,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertTrue(schedulerResponses.isEmpty());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -307,6 +319,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertTrue(schedulerResponses.isEmpty());
 		Assert.assertEquals(3, _memoryClusteredJobs.size());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -333,6 +348,9 @@ public class ClusterSchedulerEngineTest {
 		schedulerResponses = _getMemoryClusteredJobs(_NOT_EXISTED_GROUP_NAME);
 
 		Assert.assertTrue(schedulerResponses.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -347,6 +365,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertTrue(schedulerResponses.isEmpty());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -399,71 +420,73 @@ public class ClusterSchedulerEngineTest {
 		Assert.assertEquals(4, schedulerResponses.size());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			ClusterSchedulerEngine.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ClusterSchedulerEngine.class.getName(), Level.OFF)) {
 
-		_mockClusterMasterExecutor.reset(false, 4, 2);
+			_mockClusterMasterExecutor.reset(false, 4, 2);
 
-		ClusterMasterTokenTransitionListener
+			ClusterMasterTokenTransitionListener
+				clusterMasterTokenTransitionListener =
+					_mockClusterMasterExecutor.
+						getClusterMasterTokenTransitionListener();
+
+			clusterMasterTokenTransitionListener.masterTokenReleased();
+
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+			Assert.assertTrue(logRecords.isEmpty());
+			Assert.assertFalse(ClusterMasterExecutorUtil.isMaster());
+
+			schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
+				StorageType.MEMORY_CLUSTERED);
+
+			Assert.assertTrue(schedulerResponses.isEmpty());
+			Assert.assertEquals(4, _memoryClusteredJobs.size());
+
+			// Test 2, with log enabled
+
+			_mockClusterMasterExecutor.reset(true, 0, 0);
+
+			_mockSchedulerEngine.resetJobs(4, 2);
+
+			_clusterSchedulerEngine.start();
+
+			_memoryClusteredJobs.clear();
+
+			Assert.assertTrue(ClusterMasterExecutorUtil.isMaster());
+
+			schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
+				StorageType.MEMORY_CLUSTERED);
+
+			Assert.assertEquals(4, schedulerResponses.size());
+			Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+			logRecords = captureHandler.resetLogLevel(Level.ALL);
+
+			_mockClusterMasterExecutor.reset(false, 4, 2);
+
 			clusterMasterTokenTransitionListener =
 				_mockClusterMasterExecutor.
 					getClusterMasterTokenTransitionListener();
 
-		clusterMasterTokenTransitionListener.masterTokenReleased();
+			clusterMasterTokenTransitionListener.masterTokenReleased();
 
-		List<LogRecord> logRecords = captureHandler.getLogRecords();
+			Assert.assertEquals(1, logRecords.size());
 
-		Assert.assertTrue(logRecords.isEmpty());
-		Assert.assertFalse(ClusterMasterExecutorUtil.isMaster());
+			LogRecord logRecord = logRecords.get(0);
 
-		schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
-			StorageType.MEMORY_CLUSTERED);
+			Assert.assertEquals(
+				"MEMORY_CLUSTERED jobs stopped running on this node",
+				logRecord.getMessage());
+			Assert.assertFalse(ClusterMasterExecutorUtil.isMaster());
 
-		Assert.assertTrue(schedulerResponses.isEmpty());
-		Assert.assertEquals(4, _memoryClusteredJobs.size());
+			schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
+				StorageType.MEMORY_CLUSTERED);
 
-		// Test 2, with log enabled
-
-		_mockClusterMasterExecutor.reset(true, 0, 0);
-
-		_mockSchedulerEngine.resetJobs(4, 2);
-
-		_clusterSchedulerEngine.start();
-
-		_memoryClusteredJobs.clear();
-
-		Assert.assertTrue(ClusterMasterExecutorUtil.isMaster());
-
-		schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
-			StorageType.MEMORY_CLUSTERED);
-
-		Assert.assertEquals(4, schedulerResponses.size());
-		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
-
-		logRecords = captureHandler.resetLogLevel(Level.ALL);
-
-		_mockClusterMasterExecutor.reset(false, 4, 2);
-
-		clusterMasterTokenTransitionListener =
-			_mockClusterMasterExecutor.
-				getClusterMasterTokenTransitionListener();
-
-		clusterMasterTokenTransitionListener.masterTokenReleased();
-
-		Assert.assertEquals(1, logRecords.size());
-
-		LogRecord logRecord = logRecords.get(0);
-
-		Assert.assertEquals(
-			"MEMORY_CLUSTERED jobs stopped running on this node",
-			logRecord.getMessage());
-		Assert.assertFalse(ClusterMasterExecutorUtil.isMaster());
-
-		schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
-			StorageType.MEMORY_CLUSTERED);
-
-		Assert.assertTrue(schedulerResponses.isEmpty());
-		Assert.assertEquals(4, _memoryClusteredJobs.size());
+			Assert.assertTrue(schedulerResponses.isEmpty());
+			Assert.assertEquals(4, _memoryClusteredJobs.size());
+		}
 	}
 
 	@AdviseWith(adviceClasses = {ClusterableContextThreadLocalAdvice.class})
@@ -498,6 +521,9 @@ public class ClusterSchedulerEngineTest {
 		_assertTriggerState(schedulerResponse, TriggerState.PAUSED);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -513,6 +539,9 @@ public class ClusterSchedulerEngineTest {
 		_assertTriggerState(schedulerResponse, TriggerState.NORMAL);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -540,6 +569,9 @@ public class ClusterSchedulerEngineTest {
 		}
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -555,6 +587,9 @@ public class ClusterSchedulerEngineTest {
 		}
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -580,6 +615,9 @@ public class ClusterSchedulerEngineTest {
 		_assertTriggerState(schedulerResponse, TriggerState.PAUSED);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -595,6 +633,9 @@ public class ClusterSchedulerEngineTest {
 		_assertTriggerState(schedulerResponse, TriggerState.NORMAL);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -621,6 +662,9 @@ public class ClusterSchedulerEngineTest {
 		}
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -636,6 +680,9 @@ public class ClusterSchedulerEngineTest {
 		}
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -677,6 +724,8 @@ public class ClusterSchedulerEngineTest {
 
 		_assertTriggerState(schedulerResponse, TriggerState.PAUSED);
 
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -694,6 +743,8 @@ public class ClusterSchedulerEngineTest {
 			_TEST_JOB_NAME_0, _MEMORY_CLUSTER_TEST_GROUP_NAME);
 
 		_assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+
+		ClusterInvokeThreadLocal.setEnabled(false);
 
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
@@ -729,6 +780,8 @@ public class ClusterSchedulerEngineTest {
 			_assertTriggerState(curSchedulerResponse, TriggerState.PAUSED);
 		}
 
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -747,6 +800,8 @@ public class ClusterSchedulerEngineTest {
 		for (SchedulerResponse curSchedulerResponse : schedulerResponses) {
 			_assertTriggerState(curSchedulerResponse, TriggerState.NORMAL);
 		}
+
+		ClusterInvokeThreadLocal.setEnabled(false);
 
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
@@ -771,6 +826,9 @@ public class ClusterSchedulerEngineTest {
 				StorageType.MEMORY_CLUSTERED));
 		Assert.assertNull(
 			_getMemoryClusteredJob(_TEST_JOB_NAME_0, _NOT_EXISTED_GROUP_NAME));
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -797,6 +855,9 @@ public class ClusterSchedulerEngineTest {
 		schedulerResponses = _getMemoryClusteredJobs(_NOT_EXISTED_GROUP_NAME);
 
 		Assert.assertTrue(schedulerResponses.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -834,6 +895,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertEquals(2, schedulerResponses.size());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -859,6 +923,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertEquals(2, schedulerResponses.size());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -893,6 +960,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertTrue(schedulerResponses.isEmpty());
 		Assert.assertEquals(2, _memoryClusteredJobs.size());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -939,77 +1009,79 @@ public class ClusterSchedulerEngineTest {
 			_TEST_JOB_NAME_0, _MEMORY_CLUSTER_TEST_GROUP_NAME,
 			StorageType.MEMORY_CLUSTERED);
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			ClusterSchedulerEngine.class.getName(), Level.OFF);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					ClusterSchedulerEngine.class.getName(), Level.OFF)) {
 
-		_mockClusterMasterExecutor.reset(true, 0, 0);
+			_mockClusterMasterExecutor.reset(true, 0, 0);
 
-		ClusterMasterTokenTransitionListener
+			ClusterMasterTokenTransitionListener
+				clusterMasterTokenTransitionListener =
+					_mockClusterMasterExecutor.
+						getClusterMasterTokenTransitionListener();
+
+			clusterMasterTokenTransitionListener.masterTokenAcquired();
+
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+			Assert.assertTrue(logRecords.isEmpty());
+			Assert.assertTrue(ClusterMasterExecutorUtil.isMaster());
+
+			schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
+				StorageType.MEMORY_CLUSTERED);
+
+			Assert.assertEquals(4, schedulerResponses.size());
+
+			SchedulerResponse schedulerResponse =
+				_clusterSchedulerEngine.getScheduledJob(
+					_TEST_JOB_NAME_0, _MEMORY_CLUSTER_TEST_GROUP_NAME,
+					StorageType.MEMORY_CLUSTERED);
+
+			_assertTriggerState(schedulerResponse, TriggerState.PAUSED);
+
+			Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+			// Test 2, with log enabled
+
+			_mockClusterMasterExecutor.reset(false, 4, 0);
+
+			_mockSchedulerEngine.resetJobs(0, 0);
+
+			_clusterSchedulerEngine.start();
+
+			Assert.assertFalse(ClusterMasterExecutorUtil.isMaster());
+
+			schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
+				StorageType.MEMORY_CLUSTERED);
+
+			Assert.assertTrue(schedulerResponses.isEmpty());
+			Assert.assertEquals(4, _memoryClusteredJobs.size());
+
+			logRecords = captureHandler.resetLogLevel(Level.ALL);
+
+			_mockClusterMasterExecutor.reset(true, 0, 0);
+
 			clusterMasterTokenTransitionListener =
 				_mockClusterMasterExecutor.
 					getClusterMasterTokenTransitionListener();
 
-		clusterMasterTokenTransitionListener.masterTokenAcquired();
+			clusterMasterTokenTransitionListener.masterTokenAcquired();
 
-		List<LogRecord> logRecords = captureHandler.getLogRecords();
+			Assert.assertEquals(1, logRecords.size());
 
-		Assert.assertTrue(logRecords.isEmpty());
-		Assert.assertTrue(ClusterMasterExecutorUtil.isMaster());
+			LogRecord logRecord = logRecords.get(0);
 
-		schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
-			StorageType.MEMORY_CLUSTERED);
+			Assert.assertEquals(
+				"MEMORY_CLUSTERED jobs are running on this node",
+				logRecord.getMessage());
+			Assert.assertTrue(ClusterMasterExecutorUtil.isMaster());
 
-		Assert.assertEquals(4, schedulerResponses.size());
-
-		SchedulerResponse schedulerResponse =
-			_clusterSchedulerEngine.getScheduledJob(
-				_TEST_JOB_NAME_0, _MEMORY_CLUSTER_TEST_GROUP_NAME,
+			schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
 				StorageType.MEMORY_CLUSTERED);
 
-		_assertTriggerState(schedulerResponse, TriggerState.PAUSED);
-
-		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
-
-		// Test 2, with log enabled
-
-		_mockClusterMasterExecutor.reset(false, 4, 0);
-
-		_mockSchedulerEngine.resetJobs(0, 0);
-
-		_clusterSchedulerEngine.start();
-
-		Assert.assertFalse(ClusterMasterExecutorUtil.isMaster());
-
-		schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
-			StorageType.MEMORY_CLUSTERED);
-
-		Assert.assertTrue(schedulerResponses.isEmpty());
-		Assert.assertEquals(4, _memoryClusteredJobs.size());
-
-		logRecords = captureHandler.resetLogLevel(Level.ALL);
-
-		_mockClusterMasterExecutor.reset(true, 0, 0);
-
-		clusterMasterTokenTransitionListener =
-			_mockClusterMasterExecutor.
-				getClusterMasterTokenTransitionListener();
-
-		clusterMasterTokenTransitionListener.masterTokenAcquired();
-
-		Assert.assertEquals(1, logRecords.size());
-
-		LogRecord logRecord = logRecords.get(0);
-
-		Assert.assertEquals(
-			"MEMORY_CLUSTERED jobs are running on this node",
-			logRecord.getMessage());
-		Assert.assertTrue(ClusterMasterExecutorUtil.isMaster());
-
-		schedulerResponses = _clusterSchedulerEngine.getScheduledJobs(
-			StorageType.MEMORY_CLUSTERED);
-
-		Assert.assertEquals(4, schedulerResponses.size());
-		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+			Assert.assertEquals(4, schedulerResponses.size());
+			Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+		}
 	}
 
 	@AdviseWith(adviceClasses = {ClusterableContextThreadLocalAdvice.class})
@@ -1062,6 +1134,9 @@ public class ClusterSchedulerEngineTest {
 		_assertSuppressErrorValue(schedulerResponse, Boolean.TRUE);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1087,6 +1162,9 @@ public class ClusterSchedulerEngineTest {
 		_assertSuppressErrorValue(schedulerResponse, Boolean.TRUE);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1125,6 +1203,8 @@ public class ClusterSchedulerEngineTest {
 
 		_assertSuppressErrorValue(schedulerResponse, null);
 
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1136,7 +1216,8 @@ public class ClusterSchedulerEngineTest {
 
 		// Test 1, PERSISTED when portal is starting
 
-		ClusterInvokeThreadLocal.setEnabled(true);
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1149,7 +1230,8 @@ public class ClusterSchedulerEngineTest {
 
 		// Test 2, MEMORY_CLUSTERED when portal is starting
 
-		ClusterInvokeThreadLocal.setEnabled(true);
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1164,7 +1246,8 @@ public class ClusterSchedulerEngineTest {
 
 		// Test 3, PERSISTED when portal is started
 
-		ClusterInvokeThreadLocal.setEnabled(true);
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1177,7 +1260,8 @@ public class ClusterSchedulerEngineTest {
 
 		// Test 4, MEMORY_CLUSTERED when portal is started
 
-		ClusterInvokeThreadLocal.setEnabled(true);
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1190,7 +1274,8 @@ public class ClusterSchedulerEngineTest {
 
 		// Test 5, PERSISTED when plugin is starting
 
-		ClusterInvokeThreadLocal.setEnabled(true);
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(true);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1203,7 +1288,8 @@ public class ClusterSchedulerEngineTest {
 
 		// Test 6, MEMORY_CLUSTERED when plugin is starting
 
-		ClusterInvokeThreadLocal.setEnabled(true);
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(true);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1216,7 +1302,8 @@ public class ClusterSchedulerEngineTest {
 
 		// Test 7, PERSISTED when plugin is destroying
 
-		ClusterInvokeThreadLocal.setEnabled(true);
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(true);
 
@@ -1229,7 +1316,8 @@ public class ClusterSchedulerEngineTest {
 
 		// Test 8, MEMORY_CLUSTERED when plugin is destroying
 
-		ClusterInvokeThreadLocal.setEnabled(true);
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(true);
 
@@ -1240,22 +1328,10 @@ public class ClusterSchedulerEngineTest {
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
 
-		// Test 9, PERSISTED when cluster invoke is enabled
-
-		ClusterInvokeThreadLocal.setEnabled(true);
-		PluginContextLifecycleThreadLocal.setInitializing(false);
-		PluginContextLifecycleThreadLocal.setDestroying(false);
-
-		_clusterSchedulerEngine.setClusterableThreadLocal(
-			StorageType.PERSISTED);
-
-		Assert.assertFalse(
-			_clusterInvokeAcceptor.accept(
-				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
-
-		// Test 10, PERSISTED when cluster invoke is disabled
+		// Test 9, PERSISTED when cluster invoke is disabled
 
 		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1266,9 +1342,24 @@ public class ClusterSchedulerEngineTest {
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
 
-		// Test 11, MEMORY_CLUSTERED when cluster invoke is enabled
+		// Test 10, PERSISTED when cluster invoke is enabled
 
 		ClusterInvokeThreadLocal.setEnabled(true);
+
+		PluginContextLifecycleThreadLocal.setInitializing(false);
+		PluginContextLifecycleThreadLocal.setDestroying(false);
+
+		_clusterSchedulerEngine.setClusterableThreadLocal(
+			StorageType.PERSISTED);
+
+		Assert.assertFalse(
+			_clusterInvokeAcceptor.accept(
+				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
+
+		// Test 11, MEMORY_CLUSTERED when cluster invoke is disabled
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1279,9 +1370,10 @@ public class ClusterSchedulerEngineTest {
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
 
-		// Test 12, MEMORY_CLUSTERED when cluster invoke is disabled
+		// Test 12, MEMORY_CLUSTERED when cluster invoke is enabled
 
-		ClusterInvokeThreadLocal.setEnabled(false);
+		ClusterInvokeThreadLocal.setEnabled(true);
+
 		PluginContextLifecycleThreadLocal.setInitializing(false);
 		PluginContextLifecycleThreadLocal.setDestroying(false);
 
@@ -1325,6 +1417,9 @@ public class ClusterSchedulerEngineTest {
 		_assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1358,6 +1453,9 @@ public class ClusterSchedulerEngineTest {
 		}
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1383,6 +1481,9 @@ public class ClusterSchedulerEngineTest {
 		_assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1415,6 +1516,9 @@ public class ClusterSchedulerEngineTest {
 		}
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1453,6 +1557,9 @@ public class ClusterSchedulerEngineTest {
 		Assert.assertNull(
 			_getMemoryClusteredJob(
 				_TEST_JOB_NAME_0, _MEMORY_CLUSTER_TEST_GROUP_NAME));
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1480,6 +1587,9 @@ public class ClusterSchedulerEngineTest {
 
 		Assert.assertTrue(schedulerResponses.isEmpty());
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1519,6 +1629,9 @@ public class ClusterSchedulerEngineTest {
 		_assertTriggerContent(schedulerResponse, _DEFAULT_INTERVAL * 2);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertTrue(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1546,6 +1659,9 @@ public class ClusterSchedulerEngineTest {
 		_assertTriggerContent(schedulerResponse, _DEFAULT_INTERVAL * 2);
 
 		Assert.assertTrue(_memoryClusteredJobs.isEmpty());
+
+		ClusterInvokeThreadLocal.setEnabled(false);
+
 		Assert.assertFalse(
 			_clusterInvokeAcceptor.accept(
 				ClusterableContextThreadLocalAdvice.getAndClearThreadLocals()));
@@ -1642,12 +1758,13 @@ public class ClusterSchedulerEngineTest {
 			"execution(void com.liferay.portal.cluster." +
 				"ClusterableContextThreadLocal.putThreadLocalContext(" +
 					"java.lang.String, java.io.Serializable)) && " +
-						"args(key, value)")
+						"args(key, value)"
+		)
 		public void loadIndexesFromCluster(String key, Serializable value) {
 			_threadLocals.put(key, value);
 		}
 
-		private static Map<String, Serializable> _threadLocals =
+		private static final Map<String, Serializable> _threadLocals =
 			new HashMap<>();
 
 	}
@@ -1656,7 +1773,8 @@ public class ClusterSchedulerEngineTest {
 	public static class DisableClusterLinkEnabledAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)"
+		)
 		public Object clusterLinkEnabled(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -1670,7 +1788,8 @@ public class ClusterSchedulerEngineTest {
 	public static class DisableSchedulerEnabledAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.SCHEDULER_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.SCHEDULER_ENABLED)"
+		)
 		public Object schedulerEnabled(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -1683,7 +1802,8 @@ public class ClusterSchedulerEngineTest {
 	public static class EnableClusterLinkEnabledAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.CLUSTER_LINK_ENABLED)"
+		)
 		public Object clusterLinkEnabled(
 				ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
@@ -1697,7 +1817,8 @@ public class ClusterSchedulerEngineTest {
 	public static class EnableSchedulerEnabledAdvice {
 
 		@Around(
-			"set(* com.liferay.portal.util.PropsValues.SCHEDULER_ENABLED)")
+			"set(* com.liferay.portal.util.PropsValues.SCHEDULER_ENABLED)"
+		)
 		public Object schedulerEnabled(ProceedingJoinPoint proceedingJoinPoint)
 			throws Throwable {
 
@@ -1790,7 +1911,7 @@ public class ClusterSchedulerEngineTest {
 
 	private static final String _TEST_JOB_NAME_PREFIX = "test.job.";
 
-	private static MethodKey _getScheduledJobsMethodKey = new MethodKey(
+	private static final MethodKey _getScheduledJobsMethodKey = new MethodKey(
 		SchedulerEngineHelperUtil.class, "getScheduledJobs", StorageType.class);
 
 	private ClusterInvokeAcceptor _clusterInvokeAcceptor;
@@ -1823,7 +1944,7 @@ public class ClusterSchedulerEngineTest {
 			}
 
 			DefaultNoticeableFuture<T> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<T>();
+				new DefaultNoticeableFuture<>();
 
 			defaultNoticeableFuture.set(result);
 

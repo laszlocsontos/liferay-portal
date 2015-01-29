@@ -46,6 +46,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.expando.model.ExpandoBridge;
+import com.liferay.portlet.ratings.transformer.RatingsDataTransformerUtil;
 
 import java.io.Serializable;
 
@@ -469,11 +470,11 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the group associated with the user.
+	 * Returns the group directly associated with the user.
 	 *
 	 * @param  companyId the primary key of the company
 	 * @param  userId the primary key of the user
-	 * @return the group associated with the user
+	 * @return the group directly associated with the user
 	 * @throws PortalException if a matching group could not be found or if the
 	 *         current user did not have permission to view the group
 	 */
@@ -1206,6 +1207,10 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 				oldGroup.getTypeSettingsProperties();
 
 			group = groupLocalService.updateGroup(groupId, typeSettings);
+
+			RatingsDataTransformerUtil.transformGroupRatingsData(
+				groupId, oldTypeSettingsProperties,
+				group.getTypeSettingsProperties());
 
 			SiteMembershipPolicyUtil.verifyPolicy(
 				group, oldGroup, null, null, null, oldTypeSettingsProperties);

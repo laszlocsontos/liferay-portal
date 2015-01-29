@@ -55,13 +55,11 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
-import com.liferay.portlet.asset.NoSuchTagException;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetCategoryProperty;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.AssetTag;
-import com.liferay.portlet.asset.model.AssetTagProperty;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.model.ClassType;
 import com.liferay.portlet.asset.model.ClassTypeReader;
@@ -69,7 +67,6 @@ import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetCategoryPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetTagPropertyLocalServiceUtil;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 import com.liferay.portlet.asset.service.permission.AssetTagPermission;
 import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
@@ -471,7 +468,8 @@ public class AssetUtil {
 					PortletRequest.RENDER_PHASE, false);
 
 			redirectURL.setParameter(
-				"struts_action", "/asset_publisher/add_asset_redirect");
+				"mvcPath",
+				"/html/portlet/asset_publisher/add_asset_redirect.jsp");
 			redirectURL.setParameter("redirect", themeDisplay.getURLCurrent());
 			redirectURL.setWindowState(LiferayWindowState.POP_UP);
 
@@ -723,8 +721,7 @@ public class AssetUtil {
 
 		List<AssetEntry> assetEntries = getAssetEntries(hits);
 
-		return new BaseModelSearchResult<AssetEntry>(
-			assetEntries, hits.getLength());
+		return new BaseModelSearchResult<>(assetEntries, hits.getLength());
 	}
 
 	public static String substituteCategoryPropertyVariables(
@@ -747,37 +744,6 @@ public class AssetUtil {
 				result = StringUtil.replace(
 					result, "[$" + categoryProperty.getKey() + "$]",
 					categoryProperty.getValue());
-			}
-		}
-
-		return StringUtil.stripBetween(result, "[$", "$]");
-	}
-
-	public static String substituteTagPropertyVariables(
-			long groupId, String tagName, String s)
-		throws PortalException {
-
-		String result = s;
-
-		AssetTag tag = null;
-
-		if (tagName != null) {
-			try {
-				tag = AssetTagLocalServiceUtil.getTag(groupId, tagName);
-			}
-			catch (NoSuchTagException nste) {
-			}
-		}
-
-		if (tag != null) {
-			List<AssetTagProperty> tagProperties =
-				AssetTagPropertyLocalServiceUtil.getTagProperties(
-					tag.getTagId());
-
-			for (AssetTagProperty tagProperty : tagProperties) {
-				result = StringUtil.replace(
-					result, "[$" + tagProperty.getKey() + "$]",
-					tagProperty.getValue());
 			}
 		}
 
@@ -873,9 +839,9 @@ public class AssetUtil {
 
 		if (sortField.startsWith(
 				DDMIndexerImpl.DDM_FIELD_NAMESPACE +
-					StringPool.FORWARD_SLASH)) {
+					StringPool.DOUBLE_UNDERLINE)) {
 
-			String[] sortFields = sortField.split(StringPool.FORWARD_SLASH);
+			String[] sortFields = sortField.split(StringPool.DOUBLE_UNDERLINE);
 
 			long ddmStructureId = GetterUtil.getLong(sortFields[1]);
 			String fieldName = sortFields[2];
@@ -943,6 +909,6 @@ public class AssetUtil {
 		return sortType;
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(AssetUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(AssetUtil.class);
 
 }

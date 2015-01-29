@@ -341,10 +341,12 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 					expectedLog =
 						"Deadlock found when trying to get lock; try " +
 							"restarting transaction",
-					expectedType = ExpectedType.EXACT),
+					expectedType = ExpectedType.EXACT
+				),
 				@ExpectedLog(
 					expectedLog = "Duplicate entry ",
-					expectedType = ExpectedType.PREFIX)
+					expectedType = ExpectedType.PREFIX
+				)
 			},
 			level = "ERROR", loggerClass = JDBCExceptionReporter.class
 		)
@@ -1535,6 +1537,7 @@ public class DLAppServiceTest extends BaseDLAppTestCase {
 
 	private static final String _STRIPPED_FILE_NAME = "Title";
 
-	private static Log _log = LogFactoryUtil.getLog(DLAppServiceTest.class);
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLAppServiceTest.class);
 
 }

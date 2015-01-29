@@ -209,17 +209,15 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 	}
 
 	@Override
-	@SystemEvent(
-		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
 	public void deleteCategory(MBCategory category) throws PortalException {
-		deleteCategory(category, true);
+		mbCategoryLocalService.deleteCategory(category, true);
 	}
 
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public void deleteCategory(
 			MBCategory category, boolean includeTrashedEntries)
 		throws PortalException {
@@ -231,7 +229,8 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 		for (MBCategory curCategory : categories) {
 			if (includeTrashedEntries || !curCategory.isInTrashExplicitly()) {
-				deleteCategory(curCategory, includeTrashedEntries);
+				mbCategoryLocalService.deleteCategory(
+					curCategory, includeTrashedEntries);
 			}
 		}
 
@@ -506,9 +505,8 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 	public List<MBCategory> getSubscribedCategories(
 		long groupId, long userId, int start, int end) {
 
-		QueryDefinition<MBCategory> queryDefinition =
-			new QueryDefinition<MBCategory>(
-				WorkflowConstants.STATUS_ANY, start, end, null);
+		QueryDefinition<MBCategory> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_ANY, start, end, null);
 
 		return mbCategoryFinder.findByS_G_U_P(
 			groupId, userId, null, queryDefinition);
@@ -516,8 +514,8 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 	@Override
 	public int getSubscribedCategoriesCount(long groupId, long userId) {
-		QueryDefinition<MBCategory> queryDefinition =
-			new QueryDefinition<MBCategory>(WorkflowConstants.STATUS_ANY);
+		QueryDefinition<MBCategory> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_ANY);
 
 		return mbCategoryFinder.countByS_G_U_P(
 			groupId, userId, null, queryDefinition);

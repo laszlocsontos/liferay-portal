@@ -304,7 +304,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		if (className.equals(Group.class.getName())) {
 			if (!site && (liveGroupId == 0) &&
-				!groupKey.equals(GroupConstants.CONTROL_PANEL)) {
+				!groupKey.equals(GroupConstants.CONTROL_PANEL) &&
+				!groupKey.equals(GroupConstants.USER_PERSONAL_SPACE)) {
 
 				throw new IllegalArgumentException();
 			}
@@ -708,6 +709,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 						GroupConstants.USER_PERSONAL_SITE_FRIENDLY_URL;
 					site = false;
 				}
+				else if (groupKey.equals(GroupConstants.USER_PERSONAL_SPACE)) {
+					type = GroupConstants.TYPE_SITE_PRIVATE;
+					friendlyURL =
+						GroupConstants.USER_PERSONAL_SPACE_FRIENDLY_URL;
+					site = false;
+				}
 
 				group = groupLocalService.addGroup(
 					defaultUserId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
@@ -736,6 +743,15 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 				if (layoutSet.getPageCount() == 0) {
 					addDefaultGuestPublicLayouts(group);
+				}
+			}
+
+			if (group.isUserPersonalSpace()) {
+				LayoutSet layoutSet = layoutSetLocalService.getLayoutSet(
+					group.getGroupId(), true);
+
+				if (layoutSet.getPageCount() == 0) {
+					addUserPersonalSpaceLayouts(group);
 				}
 			}
 
@@ -1727,11 +1743,11 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the group associated with the user.
+	 * Returns the group directly associated with the user.
 	 *
 	 * @param  companyId the primary key of the company
 	 * @param  userId the primary key of the user
-	 * @return the group associated with the user
+	 * @return the group directly associated with the user
 	 * @throws PortalException if a matching group could not be found
 	 */
 	@Override
@@ -3458,9 +3474,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			String defaultLanguageId = typeSettingsProperties.getProperty(
 				"languageId", LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
 
-			if (!Validator.equals(oldLanguageIds, newLanguageIds)) {
-				validateLanguageIds(defaultLanguageId, newLanguageIds);
+			validateLanguageIds(defaultLanguageId, newLanguageIds);
 
+			if (!Validator.equals(oldLanguageIds, newLanguageIds)) {
 				LanguageUtil.resetAvailableGroupLocales(groupId);
 			}
 		}
@@ -3675,6 +3691,25 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		}
 	}
 
+	protected void addUserPersonalSpaceLayouts(Group group)
+		throws PortalException {
+
+		long defaultUserId = userLocalService.getDefaultUserId(
+			group.getCompanyId());
+
+		String friendlyURL = getFriendlyURL(
+			PropsValues.USER_PERSONAL_SPACE_LAYOUT_FRIENDLY_URL);
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		layoutLocalService.addLayout(
+			defaultUserId, group.getGroupId(), true,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			PropsValues.USER_PERSONAL_SPACE_LAYOUT_NAME, StringPool.BLANK,
+			StringPool.BLANK, LayoutConstants.TYPE_PORTLET, false, friendlyURL,
+			serviceContext);
+	}
+
 	protected void deletePortletData(Group group) throws PortalException {
 		PortletDataContext portletDataContext =
 			PortletDataContextFactoryUtil.createPreparePortletDataContext(
@@ -3773,7 +3808,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 			String groupKey = group.getGroupKey();
 
-			if (groupKey.equals(GroupConstants.CONTROL_PANEL)) {
+			if (groupKey.equals(GroupConstants.CONTROL_PANEL) ||
+				groupKey.equals(GroupConstants.USER_PERSONAL_SPACE)) {
+
 				iterator.remove();
 
 				continue;
@@ -4629,11 +4666,11 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 	protected File publicLARFile;
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		GroupLocalServiceImpl.class);
 
 	private volatile long[] _classNameIds;
 	private volatile long[] _complexSQLClassNameIds;
-	private Map<String, Group> _systemGroupsMap = new HashMap<>();
+	private final Map<String, Group> _systemGroupsMap = new HashMap<>();
 
 }
