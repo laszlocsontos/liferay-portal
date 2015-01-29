@@ -24,11 +24,15 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageType;
+import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureLayoutTestHelper;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestHelper;
 
 import java.io.File;
@@ -45,6 +49,7 @@ public class BaseDDMServiceTestCase {
 		group = GroupTestUtil.addGroup();
 
 		ddmStructureTestHelper = new DDMStructureTestHelper(group);
+		ddmStructureLayoutTestHelper = new DDMStructureLayoutTestHelper(group);
 	}
 
 	protected DDMTemplate addDisplayTemplate(
@@ -87,16 +92,38 @@ public class BaseDDMServiceTestCase {
 			String name, String definition, String storageType, int type)
 		throws Exception {
 
+		return addStructure(
+			parentStructureId, classNameId, structureKey, name,
+			StringPool.BLANK, definition, storageType, type);
+	}
+
+	protected DDMStructure addStructure(
+			long parentStructureId, long classNameId, String structureKey,
+			String name, String description, String definition,
+			String storageType, int type)
+		throws Exception {
+
+		DDMForm ddmForm = ddmStructureTestHelper.toDDMForm(definition);
+
+		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
+
 		return ddmStructureTestHelper.addStructure(
-			parentStructureId, classNameId, structureKey, name, definition,
-			storageType, type);
+			parentStructureId, classNameId, structureKey, name, description,
+			ddmForm, ddmFormLayout, storageType, type);
 	}
 
 	protected DDMStructure addStructure(long classNameId, String name)
 		throws Exception {
 
+		return addStructure(classNameId, name, null);
+	}
+
+	protected DDMStructure addStructure(
+			long classNameId, String name, String description)
+		throws Exception {
+
 		return addStructure(
-			classNameId, null, name, read("test-structure.xsd"),
+			0, classNameId, null, name, description, read("test-structure.xsd"),
 			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 	}
 
@@ -137,7 +164,7 @@ public class BaseDDMServiceTestCase {
 
 		return DDMTemplateLocalServiceUtil.addTemplate(
 			TestPropsValues.getUserId(), group.getGroupId(), classNameId,
-			classPK, templateKey, LocaleTestUtil.getDefaultLocaleMap(name),
+			classPK, 0, templateKey, LocaleTestUtil.getDefaultLocaleMap(name),
 			null, type, mode, language, script, cacheable, smallImage,
 			smallImageURL, smallFile,
 			ServiceContextTestUtil.getServiceContext());
@@ -167,6 +194,7 @@ public class BaseDDMServiceTestCase {
 			clazz.getClassLoader(), getBasePath() + fileName);
 	}
 
+	protected DDMStructureLayoutTestHelper ddmStructureLayoutTestHelper;
 	protected DDMStructureTestHelper ddmStructureTestHelper;
 
 	@DeleteAfterTestRun

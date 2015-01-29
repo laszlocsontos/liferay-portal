@@ -327,40 +327,6 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>36</portlet-name>
-		<display-name>Wiki</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/wiki/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/wiki/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/wiki/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-		<supported-public-render-parameter>categoryId</supported-public-render-parameter>
-		<supported-public-render-parameter>nodeId</supported-public-render-parameter>
-		<supported-public-render-parameter>nodeName</supported-public-render-parameter>
-		<supported-public-render-parameter>resetCur</supported-public-render-parameter>
-		<supported-public-render-parameter>tag</supported-public-render-parameter>
-		<supported-public-render-parameter>title</supported-public-render-parameter>
-	</portlet>
-	<portlet>
 		<portlet-name>47</portlet-name>
 		<display-name>Hello World</display-name>
 		<portlet-class>com.liferay.portlet.helloworld.HelloWorldPortlet</portlet-class>
@@ -394,34 +360,6 @@
 		<init-param>
 			<name>view-action</name>
 			<value>/my_sites/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>54</portlet-name>
-		<display-name>Wiki Display</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/wiki_display/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/wiki_display/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/wiki_display/view</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -780,30 +718,9 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>99</portlet-name>
-		<display-name>Asset Tag Admin</display-name>
-		<portlet-class>com.liferay.portlet.assettagsadmin.AssetTagsAdminPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/asset_tag_admin/</value>
-		</init-param>
-		<init-param>
-			<name>view-template</name>
-			<value>/html/portlet/asset_tag_admin/view.jsp</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>administrator</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
 		<portlet-name>101</portlet-name>
 		<display-name>Asset Publisher</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.assetpublisher.AssetPublisherPortlet</portlet-class>
 		<init-param>
 			<name>config-template</name>
 			<value>/html/portlet/asset_publisher/configuration.jsp</value>
@@ -813,8 +730,8 @@
 			<value>/html/portlet/asset_publisher/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/asset_publisher/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/asset_publisher/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -1446,14 +1363,14 @@
 	<portlet>
 		<portlet-name>147</portlet-name>
 		<display-name>Asset Category Admin</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.assetcategoryadmin.AssetCategoryAdminPortlet</portlet-class>
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/asset_category_admin/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/asset_category_admin/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/asset_category_admin/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -1573,31 +1490,6 @@
 		</security-role-ref>
 		<security-role-ref>
 			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>154</portlet-name>
-		<display-name>Wiki Admin</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>config-template</name>
-			<value>/html/portlet/wiki_admin/configuration.jsp</value>
-		</init-param>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/wiki/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/wiki_admin/view_nodes</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>administrator</role-name>
 		</security-role-ref>
 	</portlet>
 	<portlet>
@@ -1884,36 +1776,9 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>172</portlet-name>
-		<display-name>Asset Browser</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/asset_browser/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/asset_browser/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>guest</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
 		<portlet-name>173</portlet-name>
 		<display-name>Summary</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.assetpublisher.AssetPublisherPortlet</portlet-class>
 		<init-param>
 			<name>config-template</name>
 			<value>/html/portlet/asset_publisher/configuration.jsp</value>
@@ -1923,8 +1788,8 @@
 			<value>/html/portlet/asset_publisher/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/asset_publisher/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/asset_publisher/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -1978,7 +1843,7 @@
 	<portlet>
 		<portlet-name>175</portlet-name>
 		<display-name>Related Assets</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.assetpublisher.AssetPublisherPortlet</portlet-class>
 		<init-param>
 			<name>config-template</name>
 			<value>/html/portlet/asset_publisher/configuration.jsp</value>
@@ -1988,8 +1853,8 @@
 			<value>/html/portlet/asset_publisher/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/related_assets/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/asset_publisher/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -2256,14 +2121,14 @@
 	<portlet>
 		<portlet-name>185</portlet-name>
 		<display-name>Site Browser</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet</portlet-class>
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/site_browser/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/site_browser/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/site_browser/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -2415,7 +2280,7 @@
 	<portlet>
 		<portlet-name>193</portlet-name>
 		<display-name>Most Viewed Assets</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.assetpublisher.AssetPublisherPortlet</portlet-class>
 		<init-param>
 			<name>config-template</name>
 			<value>/html/portlet/asset_publisher/configuration.jsp</value>
@@ -2425,8 +2290,8 @@
 			<value>/html/portlet/asset_publisher/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/asset_publisher/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/asset_publisher/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -2460,7 +2325,7 @@
 	<portlet>
 		<portlet-name>194</portlet-name>
 		<display-name>Highest Rated Assets</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.assetpublisher.AssetPublisherPortlet</portlet-class>
 		<init-param>
 			<name>config-template</name>
 			<value>/html/portlet/asset_publisher/configuration.jsp</value>
@@ -2470,8 +2335,8 @@
 			<value>/html/portlet/asset_publisher/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/asset_publisher/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/asset_publisher/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -2839,18 +2704,6 @@
 	<public-render-parameter>
 		<identifier>tags</identifier>
 		<qname xmlns:x="http://www.liferay.com/public-render-parameters">x:tags</qname>
-	</public-render-parameter>
-	<public-render-parameter>
-		<identifier>nodeId</identifier>
-		<qname xmlns:w="http://www.liferay.com/public-render-parameters/wiki">w:nodeId</qname>
-	</public-render-parameter>
-	<public-render-parameter>
-		<identifier>nodeName</identifier>
-		<qname xmlns:w="http://www.liferay.com/public-render-parameters/wiki">w:nodeName</qname>
-	</public-render-parameter>
-	<public-render-parameter>
-		<identifier>title</identifier>
-		<qname xmlns:w="http://www.liferay.com/public-render-parameters/wiki">w:title</qname>
 	</public-render-parameter>
 	<container-runtime-option>
 		<name>javax.portlet.escapeXml</name>

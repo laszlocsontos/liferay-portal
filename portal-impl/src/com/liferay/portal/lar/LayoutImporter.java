@@ -1039,6 +1039,13 @@ public class LayoutImporter {
 
 				Layout layout = layouts.get(layoutId);
 
+				// Layout might have not been imported due to a controlled
+				// error. See SitesImpl#addMergeFailFriendlyURLLayout.
+
+				if (layout == null) {
+					continue;
+				}
+
 				int layoutPriority = GetterUtil.getInteger(
 					layoutElement.attributeValue("layout-priority"));
 
@@ -1252,15 +1259,16 @@ public class LayoutImporter {
 		XStreamAliasRegistryUtil.register(LayoutImpl.class, "Layout");
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(LayoutImporter.class);
+	private static final Log _log = LogFactoryUtil.getLog(LayoutImporter.class);
 
-	private static LayoutImporter _instance = new LayoutImporter();
+	private static final LayoutImporter _instance = new LayoutImporter();
 
-	private DeletionSystemEventImporter _deletionSystemEventImporter =
+	private final DeletionSystemEventImporter _deletionSystemEventImporter =
 		DeletionSystemEventImporter.getInstance();
-	private PermissionImporter _permissionImporter =
+	private final PermissionImporter _permissionImporter =
 		PermissionImporter.getInstance();
-	private PortletImporter _portletImporter = PortletImporter.getInstance();
-	private ThemeImporter _themeImporter = ThemeImporter.getInstance();
+	private final PortletImporter _portletImporter =
+		PortletImporter.getInstance();
+	private final ThemeImporter _themeImporter = ThemeImporter.getInstance();
 
 }

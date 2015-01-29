@@ -33,73 +33,29 @@ if (Validator.isNotNull(assetTagName)) {
 	PortalUtil.setPageKeywords(assetTagName, request);
 }
 
-if (assetPublisherDisplayContext.isMergeURLTags() || assetPublisherDisplayContext.isMergeLayoutTags()) {
-	String[] compilerTagNames = assetPublisherDisplayContext.getCompilerTagNames();
-
-	String titleEntry = ArrayUtil.isNotEmpty(compilerTagNames) ? compilerTagNames[compilerTagNames.length - 1] : null;
-
-	String portletTitle = portletDisplay.getTitle();
-
-	portletTitle = AssetUtil.substituteTagPropertyVariables(scopeGroupId, titleEntry, portletTitle);
-
-	renderResponse.setTitle(portletTitle);
-}
-
-for (String curAssetTagName : assetPublisherDisplayContext.getAllAssetTagNames()) {
-	try {
-		AssetTag assetTag = AssetTagLocalServiceUtil.getTag(scopeGroupId, curAssetTagName);
-
-		AssetTagProperty journalTemplateIdProperty = AssetTagPropertyLocalServiceUtil.getTagProperty(assetTag.getTagId(), "journal-template-id");
-
-		String journalTemplateId = journalTemplateIdProperty.getValue();
-
-		request.setAttribute(WebKeys.JOURNAL_TEMPLATE_ID, journalTemplateId);
-
-		break;
-	}
-	catch (NoSuchTagException nste) {
-	}
-	catch (NoSuchTagPropertyException nstpe) {
-	}
-}
-
 if (assetPublisherDisplayContext.isEnableTagBasedNavigation() && assetPublisherDisplayContext.isSelectionStyleManual() && ((assetPublisherDisplayContext.getAllAssetCategoryIds().length > 0) || (assetPublisherDisplayContext.getAllAssetTagNames().length > 0))) {
 	assetPublisherDisplayContext.setSelectionStyle("dynamic");
 }
 
 Group scopeGroup = themeDisplay.getScopeGroup();
-
-boolean hasAddPortletURLs = false;
 %>
 
 <c:if test="<%= assetPublisherDisplayContext.isShowAddContentButton() && (scopeGroup != null) && (!scopeGroup.hasStagingGroup() || scopeGroup.isStagingGroup()) && !portletName.equals(PortletKeys.HIGHEST_RATED_ASSETS) && !portletName.equals(PortletKeys.MOST_VIEWED_ASSETS) && !portletName.equals(PortletKeys.RELATED_ASSETS) %>">
 
 	<%
-	boolean defaultAssetPublisher = AssetUtil.isDefaultAssetPublisher(layout, portletDisplay.getId(), assetPublisherDisplayContext.getPortletResource());
-
 	long[] groupIds = assetPublisherDisplayContext.getGroupIds();
 	%>
 
 	<c:if test="<%= groupIds.length > 0 %>">
 		<aui:nav-bar cssClass='<%= "add-asset-selector lfr-meta-actions" + ((groupIds.length == 1) ? " single-item-button" : StringPool.BLANK) %>'>
-
-			<%
-			for (long groupId : groupIds) {
-				Map<String, PortletURL> addPortletURLs = AssetUtil.getAddPortletURLs(liferayPortletRequest, liferayPortletResponse, groupId, assetPublisherDisplayContext.getClassNameIds(), assetPublisherDisplayContext.getClassTypeIds(), assetPublisherDisplayContext.getAllAssetCategoryIds(), assetPublisherDisplayContext.getAllAssetTagNames(), null);
-
-				if ((addPortletURLs != null) && !addPortletURLs.isEmpty()) {
-					hasAddPortletURLs = true;
-				}
-			%>
-
-				<c:if test="<%= !addPortletURLs.isEmpty() %>">
-					<%@ include file="/html/portlet/asset_publisher/add_asset.jspf" %>
-				</c:if>
-
-			<%
-			}
-			%>
-
+			<liferay-ui:asset-add-button
+				addDisplayPageParameter="<%= AssetUtil.isDefaultAssetPublisher(layout, portletDisplay.getId(), assetPublisherDisplayContext.getPortletResource()) %>"
+				allAssetCategoryIds="<%= assetPublisherDisplayContext.getAllAssetCategoryIds() %>"
+				allAssetTagNames="<%= assetPublisherDisplayContext.getAllAssetTagNames() %>"
+				classNameIds="<%= assetPublisherDisplayContext.getClassNameIds() %>"
+				classTypeIds="<%= assetPublisherDisplayContext.getClassTypeIds() %>"
+				groupIds="<%= groupIds %>"
+			/>
 		</aui:nav-bar>
 	</c:if>
 </c:if>
@@ -108,9 +64,7 @@ boolean hasAddPortletURLs = false;
 	<c:if test="<%= !portletName.equals(PortletKeys.HIGHEST_RATED_ASSETS) && !portletName.equals(PortletKeys.MOST_VIEWED_ASSETS) && !portletName.equals(PortletKeys.RECENT_CONTENT) && !portletName.equals(PortletKeys.RELATED_ASSETS) && PortletPermissionUtil.contains(permissionChecker, plid, portletDisplay.getId(), ActionKeys.SUBSCRIBE) && AssetPublisherUtil.getEmailAssetEntryAddedEnabled(portletPreferences) %>">
 		<c:choose>
 			<c:when test="<%= AssetPublisherUtil.isSubscribed(themeDisplay.getCompanyId(), user.getUserId(), themeDisplay.getPlid(), portletDisplay.getId()) %>">
-				<portlet:actionURL var="unsubscribeURL">
-					<portlet:param name="struts_action" value="/asset_publisher/edit_subscription" />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UNSUBSCRIBE %>" />
+				<portlet:actionURL name="unsubscribe" var="unsubscribeURL">
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 				</portlet:actionURL>
 
@@ -122,9 +76,7 @@ boolean hasAddPortletURLs = false;
 				/>
 			</c:when>
 			<c:otherwise>
-				<portlet:actionURL var="subscribeURL">
-					<portlet:param name="struts_action" value="/asset_publisher/edit_subscription" />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.SUBSCRIBE %>" />
+				<portlet:actionURL name="subscribe" var="subscribeURL">
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 				</portlet:actionURL>
 
@@ -144,7 +96,7 @@ boolean hasAddPortletURLs = false;
 
 	<c:if test="<%= enableRSS %>">
 		<liferay-portlet:resourceURL varImpl="rssURL">
-			<portlet:param name="struts_action" value="/asset_publisher/rss" />
+			<portlet:param name="<%= Constants.CMD %>" value="rss" />
 		</liferay-portlet:resourceURL>
 
 		<liferay-ui:rss resourceURL="<%= rssURL %>" />

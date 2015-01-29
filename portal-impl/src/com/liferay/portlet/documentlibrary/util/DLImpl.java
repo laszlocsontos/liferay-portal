@@ -562,9 +562,11 @@ public class DLImpl implements DL {
 
 		definitionTerms.put("[$PORTAL_URL$]", company.getVirtualHostname());
 
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		definitionTerms.put(
-			"[$PORTLET_NAME$]",
-			HtmlUtil.escape(PortalUtil.getPortletTitle(portletRequest)));
+			"[$PORTLET_NAME$]", HtmlUtil.escape(portletDisplay.getTitle()));
+
 		definitionTerms.put(
 			"[$SITE_NAME$]",
 			LanguageUtil.get(
@@ -940,24 +942,22 @@ public class DLImpl implements DL {
 		OrderByComparator<T> orderByComparator = null;
 
 		if (orderByCol.equals("creationDate")) {
-			orderByComparator = new RepositoryModelCreateDateComparator<T>(
+			orderByComparator = new RepositoryModelCreateDateComparator<>(
 				orderByAsc);
 		}
 		else if (orderByCol.equals("downloads")) {
-			orderByComparator = new RepositoryModelReadCountComparator<T>(
+			orderByComparator = new RepositoryModelReadCountComparator<>(
 				orderByAsc);
 		}
 		else if (orderByCol.equals("modifiedDate")) {
-			orderByComparator = new RepositoryModelModifiedDateComparator<T>(
+			orderByComparator = new RepositoryModelModifiedDateComparator<>(
 				orderByAsc);
 		}
 		else if (orderByCol.equals("size")) {
-			orderByComparator = new RepositoryModelSizeComparator<T>(
-				orderByAsc);
+			orderByComparator = new RepositoryModelSizeComparator<>(orderByAsc);
 		}
 		else {
-			orderByComparator = new RepositoryModelNameComparator<T>(
-				orderByAsc);
+			orderByComparator = new RepositoryModelNameComparator<>(orderByAsc);
 		}
 
 		return orderByComparator;
@@ -1466,11 +1466,12 @@ public class DLImpl implements DL {
 
 	private static final String _STRUCTURE_KEY_PREFIX = "AUTO_";
 
-	private static Log _log = LogFactoryUtil.getLog(DLImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(DLImpl.class);
 
-	private static Set<String> _allMediaGalleryMimeTypes = new TreeSet<>();
-	private static Set<String> _fileIcons = new HashSet<>();
-	private static Map<String, String> _genericNames = new HashMap<>();
+	private static final Set<String> _allMediaGalleryMimeTypes =
+		new TreeSet<>();
+	private static final Set<String> _fileIcons = new HashSet<>();
+	private static final Map<String, String> _genericNames = new HashMap<>();
 
 	static {
 		_allMediaGalleryMimeTypes.addAll(

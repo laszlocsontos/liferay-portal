@@ -95,10 +95,9 @@ public class BaseSPIProviderTest {
 
 	@Test
 	public void testCreateSPI() throws PortalResiliencyException {
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			MPIHelperUtil.class.getName(), Level.OFF);
-
-		try {
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					MPIHelperUtil.class.getName(), Level.OFF)) {
 
 			// Timeout
 
@@ -175,9 +174,6 @@ public class BaseSPIProviderTest {
 				Assert.assertEquals("ProcessException", throwable.getMessage());
 			}
 		}
-		finally {
-			captureHandler.close();
-		}
 	}
 
 	private final MockProcessExecutor _mockProcessExecutor =
@@ -229,7 +225,7 @@ public class BaseSPIProviderTest {
 			}
 
 			DefaultNoticeableFuture<T> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<T>();
+				new DefaultNoticeableFuture<>();
 
 			defaultNoticeableFuture.set((T)mockSPI);
 

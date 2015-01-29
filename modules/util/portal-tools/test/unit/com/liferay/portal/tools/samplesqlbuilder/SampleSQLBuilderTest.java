@@ -14,12 +14,17 @@
 
 package com.liferay.portal.tools.samplesqlbuilder;
 
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.SortedProperties;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.test.log.LogAssertionTestRule;
 import com.liferay.portal.tools.DBLoader;
 import com.liferay.portal.tools.ToolDependencies;
+import com.liferay.portal.tools.sql.SQLQueryProvider;
 
 import java.io.File;
 
@@ -28,13 +33,19 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 
 import java.util.Properties;
+import java.util.ServiceLoader;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
  * @author Tina Tian
  */
 public class SampleSQLBuilderTest {
+
+	@ClassRule
+	public static final LogAssertionTestRule logAssertionTestRule =
+		LogAssertionTestRule.INSTANCE;
 
 	@Test
 	public void testGenerateAndInsertSampleSQL() throws Exception {
@@ -56,6 +67,21 @@ public class SampleSQLBuilderTest {
 		finally {
 			FileUtil.deltree(tempDir);
 		}
+	}
+
+	private void _executeSQLQueryProvider(
+			Connection connection, SQLQueryProvider sqlQueryProvider)
+		throws Exception {
+
+		DB db = DBFactoryUtil.getDB();
+
+		String tablesSQL = StringUtil.read(sqlQueryProvider.getTablesSQL());
+
+		db.runSQLTemplateString(connection, tablesSQL, false, true);
+
+		String indexesSQL = StringUtil.read(sqlQueryProvider.getIndexesSQL());
+
+		db.runSQLTemplateString(connection, indexesSQL, false, true);
 	}
 
 	private void _initProperties(Properties properties, String outputDir) {
@@ -122,6 +148,9 @@ public class SampleSQLBuilderTest {
 				connection, sqlDir + "/portal/portal-hypersonic.sql");
 			DBLoader.loadHypersonic(
 				connection, sqlDir + "/indexes/indexes-hypersonic.sql");
+
+			_loadSQLQueryProviders(connection);
+
 			DBLoader.loadHypersonic(
 				connection, outputDir + "/sample-hypersonic.sql");
 
@@ -131,6 +160,19 @@ public class SampleSQLBuilderTest {
 		}
 		finally {
 			DataAccess.cleanUp(connection, statement);
+		}
+	}
+
+	private void _loadSQLQueryProviders(Connection connection)
+		throws Exception {
+
+		ServiceLoader<SQLQueryProvider> serviceLoader = ServiceLoader.load(
+			SQLQueryProvider.class);
+
+		DBFactoryUtil.setDB(DB.TYPE_HYPERSONIC);
+
+		for (SQLQueryProvider sqlQueryProvider : serviceLoader) {
+			_executeSQLQueryProvider(connection, sqlQueryProvider);
 		}
 	}
 

@@ -153,7 +153,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testFindByExpirationDate() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -224,7 +224,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testQueryByC_G_F_C_A_V_T_D_C_T_S_T_D_R() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -260,7 +260,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testQueryByG_C_S() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -293,7 +293,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testQueryByG_F() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -326,7 +326,7 @@ public class JournalArticleFinderTest {
 	@Test
 	public void testQueryByG_U_F_C() throws Exception {
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
 
@@ -445,7 +445,7 @@ public class JournalArticleFinderTest {
 		prepareSortedArticles();
 
 		QueryDefinition<JournalArticle> queryDefinition =
-			new QueryDefinition<JournalArticle>();
+			new QueryDefinition<>();
 
 		queryDefinition.setOrderByComparator(orderByComparator);
 
@@ -488,11 +488,11 @@ public class JournalArticleFinderTest {
 	private static final long _USER_ID = 1234L;
 
 	private JournalArticle _article;
-	private List<JournalArticle> _articles = new ArrayList<>();
+	private final List<JournalArticle> _articles = new ArrayList<>();
 	private DDMStructure _basicWebContentDDMStructure;
 	private DDMStructure _ddmStructure;
 	private JournalFolder _folder;
-	private List<Long> _folderIds = new ArrayList<>();
+	private final List<Long> _folderIds = new ArrayList<>();
 
 	@DeleteAfterTestRun
 	private Group _group;

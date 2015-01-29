@@ -76,6 +76,8 @@ public class DDMTemplateServiceSoap {
 	* @param classNameId the primary key of the class name for template's
 	related model
 	* @param classPK the primary key of the template's related entity
+	* @param sourceClassNameId the primary key of the class name for
+	template's source model
 	* @param nameMap the template's locales and localized names
 	* @param descriptionMap the template's locales and localized descriptions
 	* @param type the template's type. For more information, see {@link
@@ -95,7 +97,7 @@ public class DDMTemplateServiceSoap {
 	template or if a portal exception occurred
 	*/
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMTemplateSoap addTemplate(
-		long groupId, long classNameId, long classPK,
+		long groupId, long classNameId, long classPK, long sourceClassNameId,
 		java.lang.String[] nameMapLanguageIds,
 		java.lang.String[] nameMapValues,
 		java.lang.String[] descriptionMapLanguageIds,
@@ -112,8 +114,8 @@ public class DDMTemplateServiceSoap {
 
 			com.liferay.portlet.dynamicdatamapping.model.DDMTemplate returnValue =
 				DDMTemplateServiceUtil.addTemplate(groupId, classNameId,
-					classPK, nameMap, descriptionMap, type, mode, language,
-					script, serviceContext);
+					classPK, sourceClassNameId, nameMap, descriptionMap, type,
+					mode, language, script, serviceContext);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMTemplateSoap.toSoapModel(returnValue);
 		}
@@ -191,7 +193,9 @@ public class DDMTemplateServiceSoap {
 	*
 	* @param classNameId the primary key of the class name for template's
 	related model
-	* @param classPK the primary key of the original template's related entity
+	* @param oldClassPK the primary key of the old template's related entity
+	* @param sourceClassNameId the primary key of the class name for
+	template's source model
 	* @param newClassPK the primary key of the new template's related entity
 	* @param type the template's type. For more information, see {@link
 	com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants}.
@@ -204,13 +208,14 @@ public class DDMTemplateServiceSoap {
 	template or if a portal exception occurred
 	*/
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMTemplateSoap[] copyTemplates(
-		long classNameId, long classPK, long newClassPK, java.lang.String type,
+		long classNameId, long oldClassPK, long sourceClassNameId,
+		long newClassPK, java.lang.String type,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> returnValue =
-				DDMTemplateServiceUtil.copyTemplates(classNameId, classPK,
-					newClassPK, type, serviceContext);
+				DDMTemplateServiceUtil.copyTemplates(classNameId, oldClassPK,
+					sourceClassNameId, newClassPK, type, serviceContext);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMTemplateSoap.toSoapModels(returnValue);
 		}

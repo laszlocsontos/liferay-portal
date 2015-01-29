@@ -66,7 +66,7 @@ public class BatchEvent {
 			String zipFileId =
 				syncFile.getSyncFileId() + "_" + System.currentTimeMillis();
 
-			Path deltaFilePath = (Path)parameters.get("filePath");
+			Path deltaFilePath = (Path)parameters.get("deltaFilePath");
 			Path filePath = (Path)parameters.get("filePath");
 
 			if (deltaFilePath != null) {
@@ -85,6 +85,7 @@ public class BatchEvent {
 
 			parameters = new HashMap<String, Object>(parameters);
 
+			parameters.remove("deltaFilePath");
 			parameters.remove("filePath");
 			parameters.remove("syncFile");
 
@@ -211,11 +212,12 @@ public class BatchEvent {
 	private static final Logger _logger = LoggerFactory.getLogger(
 		BatchEvent.class);
 
-	private List<Map<String, Object>> _batchParameters = new ArrayList<>();
+	private final List<Map<String, Object>> _batchParameters =
+		new ArrayList<>();
 	private boolean _closed;
 	private int _eventCount;
-	private Map<String, Handler<Void>> _handlers = new HashMap<>();
-	private long _syncAccountId;
+	private final Map<String, Handler<Void>> _handlers = new HashMap<>();
+	private final long _syncAccountId;
 	private long _totalFileSize;
 	private Path _zipFilePath;
 	private ZipOutputStream _zipOutputStream;

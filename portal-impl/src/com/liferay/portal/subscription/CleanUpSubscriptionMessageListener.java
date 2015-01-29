@@ -41,8 +41,6 @@ import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
-import com.liferay.portlet.wiki.model.WikiNode;
-import com.liferay.portlet.wiki.service.WikiNodeLocalServiceUtil;
 
 import java.io.Serializable;
 
@@ -180,9 +178,6 @@ public class CleanUpSubscriptionMessageListener extends BaseMessageListener {
 		else if (className.equals(MBThread.class.getName())) {
 			processMBThread(subscription, groupId, groupIds);
 		}
-		else if (className.equals(WikiNode.class.getName())) {
-			processWikiNode(subscription, groupId, groupIds);
-		}
 		else if (className.equals(WorkflowInstance.class.getName())) {
 			processWorkflowInstance(subscription, groupId, groupIds);
 		}
@@ -230,22 +225,6 @@ public class CleanUpSubscriptionMessageListener extends BaseMessageListener {
 		}
 	}
 
-	protected void processWikiNode(
-			Subscription subscription, long groupId, long[] groupIds)
-		throws PortalException {
-
-		WikiNode wikiNode = WikiNodeLocalServiceUtil.fetchWikiNode(
-			subscription.getClassPK());
-
-		if ((wikiNode != null) &&
-			((wikiNode.getGroupId() == groupId) ||
-			 !ArrayUtil.contains(groupIds, wikiNode.getGroupId()))) {
-
-			SubscriptionLocalServiceUtil.deleteSubscription(
-				subscription.getSubscriptionId());
-		}
-	}
-
 	protected void processWorkflowInstance(
 			Subscription subscription, long groupId, long[] groupIds)
 		throws PortalException {
@@ -269,7 +248,7 @@ public class CleanUpSubscriptionMessageListener extends BaseMessageListener {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		CleanUpSubscriptionMessageListener.class);
 
 }

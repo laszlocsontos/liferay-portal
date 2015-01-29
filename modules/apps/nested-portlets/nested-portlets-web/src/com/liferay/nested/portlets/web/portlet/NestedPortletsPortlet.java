@@ -71,7 +71,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
-		"com.liferay.portlet.render-weight=50",
+		"com.liferay.portlet.render-weight=1",
 		"com.liferay.portlet.single-page-application=false",
 		"com.liferay.portlet.struts-path=nested_portlets",
 		"com.liferay.portlet.use-default-template=true",
@@ -99,7 +99,7 @@ public class NestedPortletsPortlet extends MVCPortlet {
 
 		String layoutTemplateId = portletPreferences.getValue(
 			"layoutTemplateId",
-			_nestedPortletsConfiguration.getLayoutTemplateDefault());
+			_nestedPortletsConfiguration.layoutTemplateDefault());
 
 		String templateId = StringPool.BLANK;
 		String templateContent = StringPool.BLANK;

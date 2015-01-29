@@ -73,7 +73,7 @@ public class ProcessUtilTest {
 	@Test
 	public void testConcurrentCreateExecutorService() throws Exception {
 		final AtomicReference<ExecutorService> atomicReference =
-			new AtomicReference<ExecutorService>();
+			new AtomicReference<>();
 
 		Thread thread = new Thread() {
 
@@ -200,10 +200,10 @@ public class ProcessUtilTest {
 
 		// Logging
 
-		CaptureHandler captureHandler = JDKLoggerTestUtil.configureJDKLogger(
-			LoggingOutputProcessor.class.getName(), Level.INFO);
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					LoggingOutputProcessor.class.getName(), Level.INFO)) {
 
-		try {
 			List<LogRecord> logRecords = captureHandler.getLogRecords();
 
 			Future<ObjectValuePair<Void, Void>> loggingFuture =
@@ -229,9 +229,6 @@ public class ProcessUtilTest {
 				messageRecords.contains(Echo.buildMessage(true, 0)));
 			Assert.assertTrue(
 				messageRecords.contains(Echo.buildMessage(true, 1)));
-		}
-		finally {
-			captureHandler.close();
 		}
 
 		// Collector
@@ -578,7 +575,7 @@ public class ProcessUtilTest {
 			_countDownLatch.await();
 		}
 
-		private CountDownLatch _countDownLatch;
+		private final CountDownLatch _countDownLatch;
 
 	}
 

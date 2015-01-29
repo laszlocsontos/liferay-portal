@@ -76,6 +76,7 @@ public class DDMStructureServiceSoap {
 		java.lang.String[] descriptionMapLanguageIds,
 		java.lang.String[] descriptionMapValues,
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
@@ -87,7 +88,7 @@ public class DDMStructureServiceSoap {
 			com.liferay.portlet.dynamicdatamapping.model.DDMStructure returnValue =
 				DDMStructureServiceUtil.addStructure(userId, groupId,
 					classNameId, nameMap, descriptionMap, ddmForm,
-					serviceContext);
+					ddmFormLayout, serviceContext);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModel(returnValue);
 		}
@@ -120,7 +121,7 @@ public class DDMStructureServiceSoap {
 	structure, if the XSD was not well-formed, or if a portal
 	exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	long, Map, Map, DDMForm, ServiceContext)}
+	long, Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap addStructure(
@@ -157,6 +158,7 @@ public class DDMStructureServiceSoap {
 		java.lang.String[] descriptionMapLanguageIds,
 		java.lang.String[] descriptionMapValues,
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
 		java.lang.String storageType, int type,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
@@ -169,7 +171,8 @@ public class DDMStructureServiceSoap {
 			com.liferay.portlet.dynamicdatamapping.model.DDMStructure returnValue =
 				DDMStructureServiceUtil.addStructure(groupId,
 					parentStructureId, classNameId, structureKey, nameMap,
-					descriptionMap, ddmForm, storageType, type, serviceContext);
+					descriptionMap, ddmForm, ddmFormLayout, storageType, type,
+					serviceContext);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModel(returnValue);
 		}
@@ -208,7 +211,7 @@ public class DDMStructureServiceSoap {
 	the structure, if the XSD is not well formed, or if a portal
 	exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	long, String, Map, Map, DDMForm, String, int,
+	long, String, Map, Map, DDMForm, DDMFormLayout, String, int,
 	ServiceContext)}
 	*/
 	@Deprecated
@@ -249,6 +252,7 @@ public class DDMStructureServiceSoap {
 		java.lang.String[] descriptionMapLanguageIds,
 		java.lang.String[] descriptionMapValues,
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
 		java.lang.String storageType, int type,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
@@ -261,7 +265,8 @@ public class DDMStructureServiceSoap {
 			com.liferay.portlet.dynamicdatamapping.model.DDMStructure returnValue =
 				DDMStructureServiceUtil.addStructure(userId, groupId,
 					parentStructureKey, classNameId, structureKey, nameMap,
-					descriptionMap, ddmForm, storageType, type, serviceContext);
+					descriptionMap, ddmForm, ddmFormLayout, storageType, type,
+					serviceContext);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModel(returnValue);
 		}
@@ -304,8 +309,8 @@ public class DDMStructureServiceSoap {
 	structure, if the XSD was not well-formed, or if a portal
 	exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
-	String, long, String, Map, Map, DDMForm, String, int,
-	ServiceContext)}
+	String, long, String, Map, Map, DDMForm, DDMFormLayout,
+	String, int, ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap addStructure(
@@ -664,8 +669,8 @@ public class DDMStructureServiceSoap {
 	*
 	* @param companyId the primary key of the structure's company
 	* @param groupIds the primary keys of the groups
-	* @param classNameIds the primary keys of the class names of the models
-	the structures are related to
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
 	* @param keywords the keywords (space separated), which may occur in the
 	structure's name or description (optionally <code>null</code>)
 	* @param start the lower bound of the range of structures to return
@@ -676,14 +681,14 @@ public class DDMStructureServiceSoap {
 	* @return the range of matching structures ordered by the comparator
 	*/
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap[] search(
-		long companyId, long[] groupIds, long[] classNameIds,
+		long companyId, long[] groupIds, long classNameId,
 		java.lang.String keywords, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> orderByComparator)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> returnValue =
 				DDMStructureServiceUtil.search(companyId, groupIds,
-					classNameIds, keywords, start, end, orderByComparator);
+					classNameId, keywords, start, end, orderByComparator);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModels(returnValue);
 		}
@@ -710,8 +715,8 @@ public class DDMStructureServiceSoap {
 	*
 	* @param companyId the primary key of the structure's company
 	* @param groupIds the primary keys of the groups
-	* @param classNameIds the primary keys of the class names of the models
-	the structures are related to
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
 	* @param name the name keywords
 	* @param description the description keywords
 	* @param storageType the structure's storage type. It can be "xml" or
@@ -729,7 +734,7 @@ public class DDMStructureServiceSoap {
 	* @return the range of matching structures ordered by the comparator
 	*/
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap[] search(
-		long companyId, long[] groupIds, long[] classNameIds,
+		long companyId, long[] groupIds, long classNameId,
 		java.lang.String name, java.lang.String description,
 		java.lang.String storageType, int type, boolean andOperator, int start,
 		int end,
@@ -738,7 +743,7 @@ public class DDMStructureServiceSoap {
 		try {
 			java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMStructure> returnValue =
 				DDMStructureServiceUtil.search(companyId, groupIds,
-					classNameIds, name, description, storageType, type,
+					classNameId, name, description, storageType, type,
 					andOperator, start, end, orderByComparator);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModels(returnValue);
@@ -756,18 +761,17 @@ public class DDMStructureServiceSoap {
 	*
 	* @param companyId the primary key of the structure's company
 	* @param groupIds the primary keys of the groups
-	* @param classNameIds the primary keys of the class names of the models
-	the structures are related to
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
 	* @param keywords the keywords (space separated), which may occur in the
 	structure's name or description (optionally <code>null</code>)
 	* @return the number of matching structures
 	*/
 	public static int searchCount(long companyId, long[] groupIds,
-		long[] classNameIds, java.lang.String keywords)
-		throws RemoteException {
+		long classNameId, java.lang.String keywords) throws RemoteException {
 		try {
 			int returnValue = DDMStructureServiceUtil.searchCount(companyId,
-					groupIds, classNameIds, keywords);
+					groupIds, classNameId, keywords);
 
 			return returnValue;
 		}
@@ -784,8 +788,8 @@ public class DDMStructureServiceSoap {
 	*
 	* @param companyId the primary key of the structure's company
 	* @param groupIds the primary keys of the groups
-	* @param classNameIds the primary keys of the class names of the models
-	the structure's are related to
+	* @param classNameId the primary key of the class name of the model the
+	structure is related to
 	* @param name the name keywords
 	* @param description the description keywords
 	* @param storageType the structure's storage type. It can be "xml" or
@@ -798,12 +802,12 @@ public class DDMStructureServiceSoap {
 	* @return the number of matching structures
 	*/
 	public static int searchCount(long companyId, long[] groupIds,
-		long[] classNameIds, java.lang.String name,
-		java.lang.String description, java.lang.String storageType, int type,
-		boolean andOperator) throws RemoteException {
+		long classNameId, java.lang.String name, java.lang.String description,
+		java.lang.String storageType, int type, boolean andOperator)
+		throws RemoteException {
 		try {
 			int returnValue = DDMStructureServiceUtil.searchCount(companyId,
-					groupIds, classNameIds, name, description, storageType,
+					groupIds, classNameId, name, description, storageType,
 					type, andOperator);
 
 			return returnValue;
@@ -822,6 +826,7 @@ public class DDMStructureServiceSoap {
 		java.lang.String[] descriptionMapLanguageIds,
 		java.lang.String[] descriptionMapValues,
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
@@ -833,7 +838,7 @@ public class DDMStructureServiceSoap {
 			com.liferay.portlet.dynamicdatamapping.model.DDMStructure returnValue =
 				DDMStructureServiceUtil.updateStructure(groupId,
 					parentStructureId, classNameId, structureKey, nameMap,
-					descriptionMap, ddmForm, serviceContext);
+					descriptionMap, ddmForm, ddmFormLayout, serviceContext);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModel(returnValue);
 		}
@@ -864,7 +869,8 @@ public class DDMStructureServiceSoap {
 	* @throws PortalException if the user did not have permission to update
 	the structure or if a portal exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #updateStructure(long, long,
-	long, String, Map, Map, DDMForm, ServiceContext)}
+	long, String, Map, Map, DDMForm, DDMFormLayout,
+	ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap updateStructure(
@@ -902,6 +908,7 @@ public class DDMStructureServiceSoap {
 		java.lang.String[] descriptionMapLanguageIds,
 		java.lang.String[] descriptionMapValues,
 		com.liferay.portlet.dynamicdatamapping.model.DDMForm ddmForm,
+		com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout ddmFormLayout,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
@@ -913,7 +920,7 @@ public class DDMStructureServiceSoap {
 			com.liferay.portlet.dynamicdatamapping.model.DDMStructure returnValue =
 				DDMStructureServiceUtil.updateStructure(structureId,
 					parentStructureId, nameMap, descriptionMap, ddmForm,
-					serviceContext);
+					ddmFormLayout, serviceContext);
 
 			return com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap.toSoapModel(returnValue);
 		}
@@ -940,7 +947,7 @@ public class DDMStructureServiceSoap {
 	* @throws PortalException if the user did not have permission to update
 	the structure or if a portal exception occurred
 	* @deprecated As of 7.0.0, replaced by {@link #updateStructure(long, long,
-	Map, Map, DDMForm, ServiceContext)}
+	Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
 	*/
 	@Deprecated
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMStructureSoap updateStructure(

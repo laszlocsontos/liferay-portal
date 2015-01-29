@@ -210,9 +210,8 @@ public class PortletTracker
 
 		BundleContext bundleContext = _componentContext.getBundleContext();
 
-		_serviceTracker =
-			new ServiceTracker<Portlet, com.liferay.portal.model.Portlet>(
-				bundleContext, Portlet.class, this);
+		_serviceTracker = new ServiceTracker<>(
+			bundleContext, Portlet.class, this);
 
 		_serviceTracker.open();
 
@@ -932,15 +931,15 @@ public class PortletTracker
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		Dictionary<String, Object> properties =
-			new HashMapDictionary<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
 			bundlePortletApp.getServletContextName());
 
-		bundleContext.registerService(
-			EventListener.class, bundlePortletApp, properties);
+		serviceRegistrations.addServiceRegistration(
+			bundleContext.registerService(
+				EventListener.class, bundlePortletApp, properties));
 
 		return bundlePortletApp;
 	}
@@ -954,8 +953,7 @@ public class PortletTracker
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
-		Dictionary<String, Object> properties =
-			new HashMapDictionary<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME,
@@ -973,8 +971,7 @@ public class PortletTracker
 	protected ServiceRegistration<Servlet> createDefaultServlet(
 		BundleContext bundleContext, String contextName) {
 
-		Dictionary<String, Object> properties =
-			new HashMapDictionary<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
@@ -997,7 +994,7 @@ public class PortletTracker
 
 		try {
 			Class<?> clazz = Class.forName(
-				"com.liferay.portal.servlet.jsp.JspServlet");
+				"com.liferay.portal.servlet.jsp.compiler.JspServlet");
 
 			servlet = (Servlet)clazz.newInstance();
 		}
@@ -1011,8 +1008,7 @@ public class PortletTracker
 			return null;
 		}
 
-		Dictionary<String, Object> properties =
-			new HashMapDictionary<String, Object>();
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
@@ -1208,14 +1204,14 @@ public class PortletTracker
 		255 - PortletConstants.INSTANCE_SEPARATOR.length() +
 			PortletConstants.USER_SEPARATOR.length() + 39;
 
-	private static Log _log = LogFactoryUtil.getLog(PortletTracker.class);
+	private static final Log _log = LogFactoryUtil.getLog(PortletTracker.class);
 
 	private CompanyLocalService _companyLocalService;
 	private ComponentContext _componentContext;
 	private String _httpServiceEndpoint;
 	private PortletInstanceFactory _portletInstanceFactory;
 	private PortletLocalService _portletLocalService;
-	private PortletPropertyValidator _portletPropertyValidator =
+	private final PortletPropertyValidator _portletPropertyValidator =
 		new PortletPropertyValidator();
 	private ResourceActionLocalService _resourceActionLocalService;
 	private ResourceActions _resourceActions;

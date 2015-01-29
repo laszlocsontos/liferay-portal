@@ -1,4 +1,4 @@
-@import "compass";
+@import "bourbon";
 @import "mixins";
 
 /* ---------- Logo ---------- */
@@ -147,13 +147,12 @@
 	visibility: hidden !important;
 }
 
+.entry-status {
+	border-left: 4px solid transparent;
+}
+
 .unselectable, .unselectable * {
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	-webkit-user-select: none;
-	user-select: none;
+	@include user-select(none);
 }
 
 span.alert {

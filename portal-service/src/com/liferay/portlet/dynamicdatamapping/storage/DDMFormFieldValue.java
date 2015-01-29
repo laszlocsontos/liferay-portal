@@ -16,7 +16,11 @@ package com.liferay.portlet.dynamicdatamapping.storage;
 
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.Value;
+
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +31,7 @@ import java.util.Map;
  * @author Marcellus Tavares
  * @author Pablo Carvalho
  */
-public class DDMFormFieldValue {
+public class DDMFormFieldValue implements Serializable {
 
 	public void addNestedDDMFormFieldValue(
 		DDMFormFieldValue nestedDDMFormFieldValue) {
@@ -103,6 +107,17 @@ public class DDMFormFieldValue {
 		}
 
 		return nestedDDMFormFieldValuesMap;
+	}
+
+	public String getType() {
+		DDMForm ddmForm = _ddmFormValues.getDDMForm();
+
+		Map<String, DDMFormField> ddmFormFieldsMap =
+			ddmForm.getDDMFormFieldsMap(true);
+
+		DDMFormField ddmFormField = ddmFormFieldsMap.get(_name);
+
+		return ddmFormField.getType();
 	}
 
 	public Value getValue() {

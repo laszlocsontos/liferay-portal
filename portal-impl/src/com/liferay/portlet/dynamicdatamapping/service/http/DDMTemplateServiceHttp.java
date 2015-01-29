@@ -57,7 +57,7 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateServiceUtil;
 public class DDMTemplateServiceHttp {
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMTemplate addTemplate(
 		HttpPrincipal httpPrincipal, long groupId, long classNameId,
-		long classPK,
+		long classPK, long sourceClassNameId,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String type, java.lang.String mode,
@@ -69,8 +69,8 @@ public class DDMTemplateServiceHttp {
 					"addTemplate", _addTemplateParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
-					classNameId, classPK, nameMap, descriptionMap, type, mode,
-					language, script, serviceContext);
+					classNameId, classPK, sourceClassNameId, nameMap,
+					descriptionMap, type, mode, language, script, serviceContext);
 
 			Object returnObj = null;
 
@@ -96,7 +96,7 @@ public class DDMTemplateServiceHttp {
 
 	public static com.liferay.portlet.dynamicdatamapping.model.DDMTemplate addTemplate(
 		HttpPrincipal httpPrincipal, long groupId, long classNameId,
-		long classPK, java.lang.String templateKey,
+		long classPK, long sourceClassNameId, java.lang.String templateKey,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String type, java.lang.String mode,
@@ -110,9 +110,10 @@ public class DDMTemplateServiceHttp {
 					"addTemplate", _addTemplateParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
-					classNameId, classPK, templateKey, nameMap, descriptionMap,
-					type, mode, language, script, cacheable, smallImage,
-					smallImageURL, smallImageFile, serviceContext);
+					classNameId, classPK, sourceClassNameId, templateKey,
+					nameMap, descriptionMap, type, mode, language, script,
+					cacheable, smallImage, smallImageURL, smallImageFile,
+					serviceContext);
 
 			Object returnObj = null;
 
@@ -205,8 +206,8 @@ public class DDMTemplateServiceHttp {
 	}
 
 	public static java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> copyTemplates(
-		HttpPrincipal httpPrincipal, long classNameId, long classPK,
-		long newClassPK, java.lang.String type,
+		HttpPrincipal httpPrincipal, long classNameId, long oldClassPK,
+		long sourceClassNameId, long newClassPK, java.lang.String type,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		try {
@@ -214,7 +215,8 @@ public class DDMTemplateServiceHttp {
 					"copyTemplates", _copyTemplatesParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
-					classNameId, classPK, newClassPK, type, serviceContext);
+					classNameId, oldClassPK, sourceClassNameId, newClassPK,
+					type, serviceContext);
 
 			Object returnObj = null;
 
@@ -957,17 +959,17 @@ public class DDMTemplateServiceHttp {
 
 	private static Log _log = LogFactoryUtil.getLog(DDMTemplateServiceHttp.class);
 	private static final Class<?>[] _addTemplateParameterTypes0 = new Class[] {
-			long.class, long.class, long.class, java.util.Map.class,
+			long.class, long.class, long.class, long.class, java.util.Map.class,
 			java.util.Map.class, java.lang.String.class, java.lang.String.class,
 			java.lang.String.class, java.lang.String.class,
 			com.liferay.portal.service.ServiceContext.class
 		};
 	private static final Class<?>[] _addTemplateParameterTypes1 = new Class[] {
-			long.class, long.class, long.class, java.lang.String.class,
-			java.util.Map.class, java.util.Map.class, java.lang.String.class,
+			long.class, long.class, long.class, long.class,
+			java.lang.String.class, java.util.Map.class, java.util.Map.class,
 			java.lang.String.class, java.lang.String.class,
-			java.lang.String.class, boolean.class, boolean.class,
-			java.lang.String.class, java.io.File.class,
+			java.lang.String.class, java.lang.String.class, boolean.class,
+			boolean.class, java.lang.String.class, java.io.File.class,
 			com.liferay.portal.service.ServiceContext.class
 		};
 	private static final Class<?>[] _copyTemplateParameterTypes2 = new Class[] {
@@ -978,7 +980,8 @@ public class DDMTemplateServiceHttp {
 			long.class, com.liferay.portal.service.ServiceContext.class
 		};
 	private static final Class<?>[] _copyTemplatesParameterTypes4 = new Class[] {
-			long.class, long.class, long.class, java.lang.String.class,
+			long.class, long.class, long.class, long.class,
+			java.lang.String.class,
 			com.liferay.portal.service.ServiceContext.class
 		};
 	private static final Class<?>[] _deleteTemplateParameterTypes5 = new Class[] {

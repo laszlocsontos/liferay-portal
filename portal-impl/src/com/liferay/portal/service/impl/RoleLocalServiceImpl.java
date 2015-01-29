@@ -444,11 +444,10 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public Role deleteRole(Role role) throws PortalException {
-		if (PortalUtil.isSystemRole(role.getName()) &&
-			!CompanyThreadLocal.isDeleteInProcess()) {
-
+		if (role.isSystem() && !CompanyThreadLocal.isDeleteInProcess()) {
 			throw new RequiredRoleException();
 		}
 
@@ -1409,7 +1408,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		validate(roleId, role.getCompanyId(), role.getClassNameId(), name);
 
-		if (PortalUtil.isSystemRole(role.getName())) {
+		if (role.isSystem()) {
 			name = role.getName();
 			subtype = null;
 		}

@@ -63,7 +63,14 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 					thumbnailId = "entry_" + fileEntry.getFileEntryId();
 				}
 
-				DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = DLViewFileVersionDisplayContextUtil.getIGFileVersionActionsDisplayContext(request, response, fileEntry.getFileVersion());
+				IGViewFileVersionDisplayContext igViewFileVersionDisplayContext = null;
+
+				if (fileShortcut == null) {
+					igViewFileVersionDisplayContext = IGDisplayContextProviderUtil.getIGFileVersionActionsDisplayContext(request, response, fileEntry.getFileVersion());
+				}
+				else {
+					igViewFileVersionDisplayContext = IGDisplayContextProviderUtil.getIGFileVersionActionsDisplayContext(request, response, fileShortcut);
+				}
 				%>
 
 				<c:if test="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.VIEW) %>">
@@ -208,6 +215,9 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 							<a class="image-link" href="<%= viewFolderURL.toString() %>" title="<%= HtmlUtil.escape(curFolder.getName()) + " - " + HtmlUtil.escape(curFolder.getDescription()) %>">
 
 								<%
+								String folderImageSrc = themeDisplay.getPathThemeImages() + "/file_system/large/folder_empty.png";
+
+								if (PropsValues.DL_FOLDER_ICON_CHECK_COUNT) {
 									int curFoldersCount = DLAppServiceUtil.getFoldersCount(curFolder.getRepositoryId(), curFolder.getFolderId());
 
 									int curImagesCount = 0;
@@ -219,11 +229,10 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 										curImagesCount = DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(curFolder.getRepositoryId(), curFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED);
 									}
 
-									String folderImageSrc = themeDisplay.getPathThemeImages() + "/file_system/large/folder_empty.png";
-
 									if ((curFoldersCount + curImagesCount) > 0) {
 										folderImageSrc = themeDisplay.getPathThemeImages() + "/file_system/large/folder_full_image.png";
 									}
+								}
 								%>
 
 								<span class="image-thumbnail">

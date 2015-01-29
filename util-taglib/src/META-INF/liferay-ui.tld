@@ -387,6 +387,47 @@
 		</attribute>
 	</tag>
 	<tag>
+		<name>asset-add-button</name>
+		<tag-class>com.liferay.taglib.ui.AssetAddButtonTag</tag-class>
+		<body-content>JSP</body-content>
+
+		<attribute>
+			<name>addDisplayPageParameter</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>allAssetCategoryIds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>allAssetTagNames</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>classNameIds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>classTypeIds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>groupIds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>redirect</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
 		<name>asset-categories-error</name>
 		<tag-class>com.liferay.taglib.ui.AssetCategoriesErrorTag</tag-class>
 		<body-content>JSP</body-content>
@@ -432,6 +473,11 @@
 		</attribute>
 		<attribute>
 			<name>curCategoryIds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>groupIds</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -483,6 +529,31 @@
 		<attribute>
 			<name>classPK</name>
 			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<name>asset-metadata</name>
+		<tag-class>com.liferay.taglib.ui.AssetMetadataTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>className</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>classPK</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>filterByMetadata</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>metadataFields</name>
+			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
@@ -2077,6 +2148,12 @@
 			<type>boolean</type>
 		</attribute>
 		<attribute>
+			<description>Sets whether to enable editing the HTML source code of the content. The default value is <![CDATA[<code>true</code>]]>.</description>
+			<name>showSource</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<description>Sets whether to skip loading resources necessary for the CKEditor. The default value is <![CDATA[<code>false</code>]]>.</description>
 			<name>skipEditorLoading</name>
 			<required>false</required>
@@ -2099,6 +2176,11 @@
 		<name>input-field</name>
 		<tag-class>com.liferay.taglib.ui.InputFieldTag</tag-class>
 		<body-content>JSP</body-content>
+		<attribute>
+			<name>autoComplete</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 		<attribute>
 			<name>autoFocus</name>
 			<required>false</required>
@@ -2964,6 +3046,16 @@
 		<attribute>
 			<name>provider</name>
 			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<name>menu</name>
+		<tag-class>com.liferay.taglib.ui.MenuTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>menu</name>
+			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
@@ -4828,6 +4920,11 @@
 		<tag-class>com.liferay.taglib.ui.UserDisplayTag</tag-class>
 		<tei-class>com.liferay.taglib.ui.UserDisplayTei</tei-class>
 		<body-content>JSP</body-content>
+		<attribute>
+			<name>author</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 		<attribute>
 			<name>displayStyle</name>
 			<required>false</required>

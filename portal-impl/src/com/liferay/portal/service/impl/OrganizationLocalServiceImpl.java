@@ -833,16 +833,23 @@ public class OrganizationLocalServiceImpl
 	}
 
 	/**
-	 * Returns all the organization IDs associated with the user. If
-	 * <code>includeAdministrative</code> is <code>true</code>, the result
-	 * includes those organization IDs that are indirectly associated to the
-	 * user because he is an administrator or owner of the organization.
+	 * Returns all the IDs of organizations with which the user is explicitly
+	 * associated, optionally including the IDs of organizations that the user
+	 * administers or owns.
+	 *
+	 * <p>
+	 * A user is considered to be <i>explicitly</i> associated with an
+	 * organization if his account is individually created within the
+	 * organization or if the user is later added to it.
+	 * </p>
 	 *
 	 * @param  userId the primary key of the user
-	 * @param  includeAdministrative whether to include organizations that are
-	 *         indirectly associated to the user because he is an administrator
-	 *         or owner of the organization
-	 * @return the organization IDs of organizations associated with the user
+	 * @param  includeAdministrative whether to include the IDs of organizations
+	 *         that the user administers or owns, even if he's not a member of
+	 *         the organizations
+	 * @return the IDs of organizations with which the user is explicitly
+	 *         associated, optionally including the IDs of organizations that
+	 *         the user administers or owns
 	 * @throws PortalException if a user with the primary key could not be found
 	 *         or if a portal exception occurred
 	 */
@@ -879,16 +886,23 @@ public class OrganizationLocalServiceImpl
 	}
 
 	/**
-	 * Returns all the organizations associated with the user. If
-	 * <code>includeAdministrative</code> is <code>true</code>, the result
-	 * includes those organizations that are indirectly associated to the user
-	 * because he is an administrator or owner of the organization.
+	 * Returns all the organizations with which the user is explicitly
+	 * associated, optionally including the organizations that the user
+	 * administers or owns.
+	 *
+	 * <p>
+	 * A user is considered to be <i>explicitly</i> associated with an
+	 * organization if his account is individually created within the
+	 * organization or if the user is later added as a member.
+	 * </p>
 	 *
 	 * @param  userId the primary key of the user
-	 * @param  includeAdministrative whether to include organizations that are
-	 *         indirectly associated to the user because he is an administrator
-	 *         or owner of the organization
-	 * @return the organizations associated with the user
+	 * @param  includeAdministrative whether to include the IDs of organizations
+	 *         that the user administers or owns, even if he's not a member of
+	 *         the organizations
+	 * @return the organizations with which the user is explicitly associated,
+	 *         optionally including the organizations that the user administers
+	 *         or owns
 	 * @throws PortalException if a user with the primary key could not be found
 	 */
 	@Override
@@ -1629,7 +1643,7 @@ public class OrganizationLocalServiceImpl
 				hits);
 
 			if (organizations != null) {
-				return new BaseModelSearchResult<Organization>(
+				return new BaseModelSearchResult<>(
 					organizations, hits.getLength());
 			}
 		}

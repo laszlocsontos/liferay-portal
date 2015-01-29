@@ -81,6 +81,8 @@ public class SassExecutorUtil {
 
 		_scriptingContainer = rubyExecutor.getScriptingContainer();
 
+		_scriptingContainer.setCurrentDirectory(System.getProperty("user.dir"));
+
 		String rubyScript = StringUtil.read(
 			SassExecutorUtil.class.getClassLoader(),
 			"com/liferay/portal/servlet/filters/dynamiccss" +
@@ -178,7 +180,7 @@ public class SassExecutorUtil {
 	private static ExecutorService _executorService;
 	private static Thread _mainThread;
 	private static String _portalCommonDirName;
-	private static ConcurrentMap<String, SassFile> _sassFileCache =
+	private static final ConcurrentMap<String, SassFile> _sassFileCache =
 		new ConcurrentHashMap<>();
 	private static ScriptingContainer _scriptingContainer;
 	private static Object _scriptObject;

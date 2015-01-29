@@ -940,6 +940,7 @@ create database lportal${database.index} character set utf8;</echo>
 					<property name="operating.system.type" value="${operating.system.type}" />
 					<property name="operating.system.version" value="${operating.system.version}" />
 					<property name="testray.build.name" value="${testray.build.name}" />
+					<property name="testray.build.time" value="${testray.build.time}" />
 					<property name="testray.build.type" value="${testray.build.type}" />
 					<property name="testray.product.type" value="${testray.product.type}" />
 					<property name="testray.product.version" value="${testray.product.version}" />
@@ -1894,6 +1895,9 @@ ${marketplace.portlet.properties}</echo>
 		<mkdir dir="test-results" />
 
 		<junitreport todir="test-results">
+			<fileset dir="modules" erroronmissingdir="false">
+				<include name="**/TEST-*.xml" />
+			</fileset>
 			<fileset dir="portal-impl/test-results" erroronmissingdir="false">
 				<include name="**/TEST-*.xml" />
 			</fileset>
@@ -1909,16 +1913,12 @@ ${marketplace.portlet.properties}</echo>
 			<report format="frames" todir="test-results/html" />
 		</junitreport>
 
-		<loadfile property="test.suites.xml.content" srcfile="test-results/TESTS-TestSuites.xml" />
-
 		<replaceregexp
 			file="test-results/TESTS-TestSuites.xml"
 			flags="g"
 			match="\s*\&lt;/?propert[^\n^\r]*[\n\r]"
 			replace=""
 		/>
-
-		<echo file="test-results/TESTS-TestSuites.xml">${test.suites.xml.content}</echo>
 
 		<echo message="A report with all the test results can be found at test-results/html/index.html." />
 	</target>
@@ -2249,8 +2249,6 @@ organizations.membership.strict=true
 lucene.dir=$${liferay.home}/lucene/
 
 jcr.jackrabbit.repository.root=$${liferay.home}/jackrabbit
-
-discussion.thread.view=combination
 
 dl.hook.impl=com.liferay.documentlibrary.util.JCRHook
 
@@ -2703,15 +2701,13 @@ module.framework.properties.osgi.console=11312</echo>
 					<then>
 						<exec executable="/bin/bash" os="${os.unix}" outputproperty="sharepoint.vm.host.name">
 							<arg value="-c" />
-							<arg value="curl" />
-							<arg value="&quot;http://it.liferay.com/osb-ici-controller-web/vm/allocation/borrow?leaseTime=30000&amp;resourceType=qa%2Esharepoint2010&quot;" />
+							<arg value="curl &quot;http://it.liferay.com/osb-ici-controller-web/vm/allocation/borrow?leaseTime=30000&amp;resourceType=qa%2Esharepoint2010&quot;" />
 						</exec>
 					</then>
 					<else>
 						<exec executable="cmd" outputproperty="sharepoint.vm.host.name">
 							<arg value="/c" />
-							<arg value="curl" />
-							<arg value="&quot;http://it.liferay.com/osb-ici-controller-web/vm/allocation/borrow?leaseTime=30000&amp;resourceType=qa%2Esharepoint2010&quot;" />
+							<arg value="curl &quot;http://it.liferay.com/osb-ici-controller-web/vm/allocation/borrow?leaseTime=30000&amp;resourceType=qa%2Esharepoint2010&quot;" />
 						</exec>
 					</else>
 				</if>
@@ -3444,8 +3440,7 @@ cluster.link.autodetect.address=
 
 cluster.link.bind.addr["cluster-link-control"]=127.0.0.1
 
-cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1
-		</echo>
+cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 	</target>
 
 	<target name="print-scm-revision">
@@ -4154,6 +4149,10 @@ if (ppstate.equals("normal")) {
 				<equals arg1="${tcat.enabled}" arg2="true" />
 			</not>
 			<then>
+				<waitfor maxwait="150" maxwaitunit="second">
+					<available file="${liferay.home}/logs" type="dir" />
+				</waitfor>
+
 				<for param="log.file">
 					<path>
 						<fileset dir="${liferay.home}/logs">
@@ -4315,25 +4314,18 @@ if (ppstate.equals("normal")) {
 
 		<sleep seconds="120" />
 
-		<exec executable="/bin/bash" os="${os.unix}">
-			<arg value="-c" />
-			<arg value="adb push ${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/dependencies/mobile/swipe_down.sh /data/local" />
-		</exec>
+		<execute>
+			adb push ${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/dependencies/mobile/swipe_down.sh /data/local
+			adb push ${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/dependencies/mobile/swipe_up.sh /data/local
+			adb push ${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/dependencies/mobile/tap.sh /data/local
 
-		<exec executable="/bin/bash" os="${os.unix}">
-			<arg value="-c" />
-			<arg value="adb push ${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/dependencies/mobile/swipe_up.sh /data/local" />
-		</exec>
+			adb -s emulator-5554 shell chmod 0777 /data/local/swipe_down.sh
+			adb -s emulator-5554 shell chmod 0777 /data/local/swipe_up.sh
+			adb -s emulator-5554 shell chmod 0777 /data/local/tap.sh
 
-		<exec executable="/bin/bash" os="${os.unix}">
-			<arg value="-c" />
-			<arg value="adb -s emulator-5554 shell chmod 0777 /data/local/swipe_down.sh" />
-		</exec>
-
-		<exec executable="/bin/bash" os="${os.unix}">
-			<arg value="-c" />
-			<arg value="adb -s emulator-5554 shell chmod 0777 /data/local/swipe_up.sh" />
-		</exec>
+			adb -s emulator-5554 shell settings put system pointer_location 1
+			adb -s emulator-5554 shell settings put system show_touches 1
+		</execute>
 	</target>
 
 	<target name="start-appium">
@@ -4463,6 +4455,11 @@ Please set "ie.driver.zip" in test.properties to point to "IEDriverServer_x64_2.
 		<exec executable="/bin/bash" os="${os.unix}" >
 			<arg value="-c" />
 			<arg value="killall node" />
+		</exec>
+
+		<exec executable="/bin/bash" os="${os.unix}" >
+			<arg value="-c" />
+			<arg value="fuser -k 9515/tcp" />
 		</exec>
 
 		<exec executable="cmd.exe" os="${os.windows}" >

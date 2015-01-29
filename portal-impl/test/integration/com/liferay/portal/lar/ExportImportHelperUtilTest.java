@@ -587,6 +587,15 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
 				_stagingPublicLayout.getUuid(), _liveGroup.getGroupId(), false);
 
+		Map<Long, Long> layoutPlids =
+			(Map<Long, Long>)_portletDataContextImport.getNewPrimaryKeysMap(
+				Layout.class);
+
+		layoutPlids.put(
+			_stagingPrivateLayout.getPlid(), importedPrivateLayout.getPlid());
+		layoutPlids.put(
+			_stagingPublicLayout.getPlid(), importedPublicLayout.getPlid());
+
 		String content = getContent("layout_links_ids_replacement.txt");
 
 		String expectedContent = replaceLinksToLayoutsParameters(
@@ -664,9 +673,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		}
 
 		sb.append(CharPool.AT);
-		sb.append(layout.getUuid());
-		sb.append(StringPool.AT);
-		sb.append(layout.getFriendlyURL());
+		sb.append(layout.getPlid());
 
 		if (group != null) {
 			sb.append(CharPool.AT);
@@ -830,7 +837,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 	private Group _liveGroup;
 
 	private Layout _livePublicLayout;
-	private Pattern _pattern = Pattern.compile("href=|\\{|\\[");
+	private final Pattern _pattern = Pattern.compile("href=|\\{|\\[");
 	private PortletDataContext _portletDataContextExport;
 	private PortletDataContext _portletDataContextImport;
 	private StagedModel _referrerStagedModel;
@@ -911,8 +918,8 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			return StringPool.BLANK;
 		}
 
-		private List<String> _binaryEntries = new ArrayList<>();
-		private Map<String, String> _entries = new HashMap<>();
+		private final List<String> _binaryEntries = new ArrayList<>();
+		private final Map<String, String> _entries = new HashMap<>();
 
 	}
 

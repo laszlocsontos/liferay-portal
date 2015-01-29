@@ -49,9 +49,9 @@ if (assetRendererFactory != null) {
 
 	downloadURL = assetRenderer.getURLDownload(themeDisplay);
 
-	viewFullContentURL = _getViewFullContentURL(request, themeDisplay, PortletKeys.ASSET_PUBLISHER, document);
+	viewFullContentURL = _getViewFullContentURL(request, themeDisplay, className, document);
 
-	viewFullContentURL.setParameter("struts_action", "/asset_publisher/view_content");
+	viewFullContentURL.setParameter("mvcPath", "/html/portlet/asset_publisher/view_content.jsp");
 
 	if (Validator.isNotNull(returnToFullPageURL)) {
 		viewFullContentURL.setParameter("returnToFullPageURL", returnToFullPageURL);
@@ -84,9 +84,7 @@ if (assetRendererFactory != null) {
 	}
 }
 else {
-	String portletId = document.get(Field.PORTLET_ID);
-
-	viewFullContentURL = _getViewFullContentURL(request, themeDisplay, portletId, document);
+	viewFullContentURL = _getViewFullContentURL(request, themeDisplay, className, document);
 
 	if (Validator.isNotNull(returnToFullPageURL)) {
 		viewFullContentURL.setParameter("returnToFullPageURL", returnToFullPageURL);
@@ -148,6 +146,7 @@ if (summary != null) {
 					iconCssClass="icon-download-alt"
 					label="<%= false %>"
 					message='<%= LanguageUtil.format(request, "download-x", HtmlUtil.escape(summary.getTitle()), false) %>'
+					method="get"
 					url="<%= downloadURL %>"
 				/>
 			</c:if>

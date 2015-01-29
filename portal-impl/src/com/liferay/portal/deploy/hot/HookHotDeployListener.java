@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.captcha.Captcha;
 import com.liferay.portal.kernel.captcha.CaptchaUtil;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
+import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployListener;
 import com.liferay.portal.kernel.deploy.hot.BaseHotDeployListener;
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lock.LockListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.log.SanitizerLogWrapper;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
@@ -118,8 +120,6 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.ControlPanelEntry;
-import com.liferay.portlet.assetpublisher.util.AssetEntryQueryProcessor;
-import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.antivirus.AntivirusScanner;
 import com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerUtil;
 import com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerWrapper;
@@ -132,7 +132,6 @@ import com.liferay.portlet.dynamicdatamapping.render.DDMFormFieldValueRenderer;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
-import com.liferay.taglib.FileAvailabilityUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -436,27 +435,6 @@ public class HookHotDeployListener
 
 		resetPortalProperties(servletContextName, portalProperties, false);
 
-		if (portalProperties.containsKey(
-				PropsKeys.ASSET_PUBLISHER_ASSET_ENTRY_QUERY_PROCESSORS)) {
-
-			String[] assetQueryProcessorClassNames = StringUtil.split(
-				portalProperties.getProperty(
-					PropsKeys.ASSET_PUBLISHER_ASSET_ENTRY_QUERY_PROCESSORS));
-
-			for (String assetQueryProcessorClassName :
-					assetQueryProcessorClassNames) {
-
-				AssetPublisherUtil.unregisterAssetQueryProcessor(
-					assetQueryProcessorClassName);
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Unregistered asset query processor " +
-							assetQueryProcessorClassName);
-				}
-			}
-		}
-
 		if (portalProperties.containsKey(PropsKeys.CAPTCHA_ENGINE_IMPL)) {
 			CaptchaImpl captchaImpl = null;
 
@@ -556,9 +534,23 @@ public class HookHotDeployListener
 		initLanguageProperties(
 			servletContextName, portletClassLoader, rootElement);
 
-		initCustomJspDir(
-			servletContext, servletContextName, portletClassLoader,
-			hotDeployEvent.getPluginPackage(), rootElement);
+		try {
+			initCustomJspDir(
+				servletContext, servletContextName, portletClassLoader,
+				hotDeployEvent.getPluginPackage(), rootElement);
+		}
+		catch (DuplicateCustomJspException dcje) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(servletContextName + " will be undeployed");
+			}
+
+			HotDeployUtil.fireUndeployEvent(
+				new HotDeployEvent(servletContext, portletClassLoader));
+
+			DeployManagerUtil.undeploy(servletContextName);
+
+			return;
+		}
 
 		initDynamicDataMappingFormFieldRenderers(
 			servletContextName, portletClassLoader, rootElement);
@@ -606,7 +598,6 @@ public class HookHotDeployListener
 		registerClpMessageListeners(servletContext, portletClassLoader);
 
 		DirectServletRegistryUtil.clearServlets();
-		FileAvailabilityUtil.reset();
 
 		if (_log.isInfoEnabled()) {
 			_log.info(
@@ -755,6 +746,19 @@ public class HookHotDeployListener
 		}
 
 		return new File(filePath);
+	}
+
+	protected String getPortalJspName(String customJsp, String customJspDir) {
+		if (Validator.isNull(customJsp) || Validator.isNull(customJspDir)) {
+			return null;
+		}
+
+		int customJspDirIndex = customJsp.indexOf(customJspDir);
+
+		String portalJspName = customJsp.substring(
+			customJspDirIndex + customJspDir.length());
+
+		return portalJspName;
 	}
 
 	protected Map<Object, ServiceRegistration<?>> getServiceRegistrations(
@@ -932,9 +936,7 @@ public class HookHotDeployListener
 		String portalWebDir = PortalUtil.getPortalWebDir();
 
 		for (String customJsp : customJsps) {
-			int pos = customJsp.indexOf(customJspDir);
-
-			String portalJsp = customJsp.substring(pos + customJspDir.length());
+			String portalJsp = getPortalJspName(customJsp, customJspDir);
 
 			if (customJspGlobal) {
 				File portalJspFile = new File(portalWebDir + portalJsp);
@@ -1012,6 +1014,8 @@ public class HookHotDeployListener
 
 			_log.debug(sb.toString());
 		}
+
+		verifyCustomJsps(servletContextName, customJspBag);
 
 		_customJspBagsMap.put(servletContextName, customJspBag);
 
@@ -1456,32 +1460,6 @@ public class HookHotDeployListener
 		}
 
 		resetPortalProperties(servletContextName, portalProperties, true);
-
-		if (portalProperties.containsKey(
-				PropsKeys.ASSET_PUBLISHER_ASSET_ENTRY_QUERY_PROCESSORS)) {
-
-			String[] assetQueryProcessorClassNames = StringUtil.split(
-				portalProperties.getProperty(
-					PropsKeys.ASSET_PUBLISHER_ASSET_ENTRY_QUERY_PROCESSORS));
-
-			for (String assetQueryProcessorClassName :
-					assetQueryProcessorClassNames) {
-
-				AssetEntryQueryProcessor assetQueryProcessor =
-					(AssetEntryQueryProcessor)newInstance(
-						portletClassLoader, AssetEntryQueryProcessor.class,
-						assetQueryProcessorClassName);
-
-				AssetPublisherUtil.registerAssetQueryProcessor(
-					assetQueryProcessorClassName, assetQueryProcessor);
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Registered asset query processor " +
-							assetQueryProcessorClassName);
-				}
-			}
-		}
 
 		if (portalProperties.containsKey(PropsKeys.AUTH_PUBLIC_PATHS)) {
 			initAuthPublicPaths(servletContextName, portalProperties);
@@ -2402,6 +2380,85 @@ public class HookHotDeployListener
 		field.set(null, value);
 	}
 
+	protected void verifyCustomJsps(
+			String currentServletContextName, CustomJspBag currentCustomJspBag)
+		throws DuplicateCustomJspException {
+
+		if (_customJspBagsMap.isEmpty() ||
+			_customJspBagsMap.containsKey(currentServletContextName) ||
+			!currentCustomJspBag.isCustomJspGlobal()) {
+
+			return;
+		}
+
+		String currentCustomJspDir = currentCustomJspBag.getCustomJspDir();
+		Set<String> currentCustomJsps = new HashSet<>();
+
+		for (String currentCustomJsp : currentCustomJspBag.getCustomJsps()) {
+			String portalJsp = getPortalJspName(
+				currentCustomJsp, currentCustomJspDir);
+
+			currentCustomJsps.add(portalJsp);
+		}
+
+		Map<String, String> collidingCustomJsps = new HashMap<>();
+
+		for (Map.Entry<String, CustomJspBag> entry :
+				_customJspBagsMap.entrySet()) {
+
+			CustomJspBag customJspBag = (CustomJspBag)entry.getValue();
+
+			if (!customJspBag.isCustomJspGlobal()) {
+				continue;
+			}
+
+			String servletContextName = (String)entry.getKey();
+
+			String customJspDir = customJspBag.getCustomJspDir();
+			List<String> customJsps = customJspBag.getCustomJsps();
+
+			for (String customJsp : customJsps) {
+				String portalJsp = getPortalJspName(customJsp, customJspDir);
+
+				if (currentCustomJsps.contains(portalJsp)) {
+					collidingCustomJsps.put(portalJsp, servletContextName);
+				}
+			}
+		}
+
+		if ((collidingCustomJsps != null) && !collidingCustomJsps.isEmpty()) {
+			_log.error(
+				currentServletContextName + " is colliding with the " +
+					"currently installed hooks");
+
+			if (_log.isDebugEnabled()) {
+				Log log = SanitizerLogWrapper.allowCRLF(_log);
+
+				StringBundler sb = new StringBundler(
+					collidingCustomJsps.size() * 4 + 3);
+
+				sb.append("Colliding JSP files in ");
+				sb.append(currentServletContextName);
+				sb.append(StringPool.NEW_LINE);
+
+				for (Map.Entry<String, String> entry :
+						collidingCustomJsps.entrySet()) {
+
+					sb.append((String)entry.getKey());
+					sb.append(" with ");
+					sb.append((String)entry.getValue());
+					sb.append(StringPool.NEW_LINE);
+				}
+
+				sb.setIndex(sb.index() - 1);
+
+				log.debug(sb.toString());
+			}
+
+			throw new DuplicateCustomJspException();
+		}
+	}
+
 	private static final String[] _PROPS_KEYS_EVENTS = {
 		LOGIN_EVENTS_POST, LOGIN_EVENTS_PRE, LOGOUT_EVENTS_POST,
 		LOGOUT_EVENTS_PRE, SERVLET_SERVICE_EVENTS_POST,
@@ -2501,28 +2558,29 @@ public class HookHotDeployListener
 		"theme.shortcut.icon"
 	};
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		HookHotDeployListener.class);
 
-	private Map<String, CustomJspBag> _customJspBagsMap = new HashMap<>();
-	private Map<String, DLFileEntryProcessorContainer>
+	private final Map<String, CustomJspBag> _customJspBagsMap = new HashMap<>();
+	private final Map<String, DLFileEntryProcessorContainer>
 		_dlFileEntryProcessorContainerMap = new HashMap<>();
-	private Map<String, DLRepositoryContainer> _dlRepositoryContainerMap =
+	private final Map<String, DLRepositoryContainer> _dlRepositoryContainerMap =
 		new HashMap<>();
-	private Map<String, HotDeployListenersContainer>
+	private final Map<String, HotDeployListenersContainer>
 		_hotDeployListenersContainerMap = new HashMap<>();
-	private Map<String, StringArraysContainer> _mergeStringArraysContainerMap =
-		new HashMap<>();
-	private Map<String, StringArraysContainer>
+	private final Map<String, StringArraysContainer>
+		_mergeStringArraysContainerMap = new HashMap<>();
+	private final Map<String, StringArraysContainer>
 		_overrideStringArraysContainerMap = new HashMap<>();
-	private Map<String, Properties> _portalPropertiesMap = new HashMap<>();
-	private Set<String> _propsKeysEvents = SetUtil.fromArray(
+	private final Map<String, Properties> _portalPropertiesMap =
+		new HashMap<>();
+	private final Set<String> _propsKeysEvents = SetUtil.fromArray(
 		_PROPS_KEYS_EVENTS);
-	private Set<String> _propsKeysSessionEvents = SetUtil.fromArray(
+	private final Set<String> _propsKeysSessionEvents = SetUtil.fromArray(
 		_PROPS_KEYS_SESSION_EVENTS);
-	private Map<String, Map<Object, ServiceRegistration<?>>>
+	private final Map<String, Map<Object, ServiceRegistration<?>>>
 		_serviceRegistrations = newMap();
-	private Set<String> _servletContextNames = new HashSet<>();
+	private final Set<String> _servletContextNames = new HashSet<>();
 
 	private class CustomJspBag {
 
@@ -2547,9 +2605,9 @@ public class HookHotDeployListener
 			return _customJspGlobal;
 		}
 
-		private String _customJspDir;
-		private boolean _customJspGlobal;
-		private List<String> _customJsps;
+		private final String _customJspDir;
+		private final boolean _customJspGlobal;
+		private final List<String> _customJsps;
 
 	}
 
@@ -2569,7 +2627,7 @@ public class HookHotDeployListener
 			_dlProcessors.clear();
 		}
 
-		private List<DLProcessor> _dlProcessors = new ArrayList<>();
+		private final List<DLProcessor> _dlProcessors = new ArrayList<>();
 
 	}
 
@@ -2595,7 +2653,7 @@ public class HookHotDeployListener
 			_classNames.clear();
 		}
 
-		private List<String> _classNames = new ArrayList<>();
+		private final List<String> _classNames = new ArrayList<>();
 
 	}
 
@@ -2615,7 +2673,8 @@ public class HookHotDeployListener
 			}
 		}
 
-		private List<HotDeployListener> _hotDeployListeners = new ArrayList<>();
+		private final List<HotDeployListener> _hotDeployListeners =
+			new ArrayList<>();
 
 	}
 
@@ -2653,7 +2712,8 @@ public class HookHotDeployListener
 			_portalStringArray = PropsUtil.getArray(key);
 		}
 
-		private Map<String, String[]> _pluginStringArrayMap = new HashMap<>();
+		private final Map<String, String[]> _pluginStringArrayMap =
+			new HashMap<>();
 		private String[] _portalStringArray;
 
 	}

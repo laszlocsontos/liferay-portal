@@ -47,7 +47,9 @@ public abstract class BaseWebDriverImpl
 		String dependenciesDirName =
 			"portal-web//test//functional//com//liferay//portalweb//" +
 				"dependencies//";
+
 		String outputDirName = PropsValues.OUTPUT_DIR_NAME;
+
 		String sikuliImagesDirName = dependenciesDirName + "sikuli//linux//";
 
 		if (OSDetector.isWindows()) {
@@ -782,11 +784,6 @@ public abstract class BaseWebDriverImpl
 	}
 
 	@Override
-	public void tap(String locator) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void typeAceEditor(String locator, String value) {
 		WebElement webElement = getWebElement(locator);
 
@@ -945,7 +942,7 @@ public abstract class BaseWebDriverImpl
 	private final String _dependenciesDirName;
 	private final String _outputDirName;
 	private String _primaryTestSuiteName;
-	private String _projectDirName;
+	private final String _projectDirName;
 	private final String _sikuliImagesDirName;
 
 }

@@ -34,13 +34,11 @@ List<AssetVocabulary> vocabularies = AssetVocabularyServiceUtil.getGroupVocabula
 	title='<%= LanguageUtil.format(request, "move-x", category.getTitle(locale)) %>'
 />
 
-<portlet:actionURL var="editCategoryURL">
-	<portlet:param name="struts_action" value="/asset_category_admin/edit_category" />
+<portlet:actionURL name="moveCategory" var="moveCategoryURL">
 	<portlet:param name="redirect" value="<%= redirect %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= editCategoryURL %>" name="fm" onSubmit="event.preventDefault();">
-	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.MOVE %>" />
+<aui:form action="<%= moveCategoryURL %>" name="fm" onSubmit="event.preventDefault();">
 	<aui:input name="categoryId" type="hidden" value="<%= categoryId %>" />
 
 	<aui:select label="vocabulary" name="vocabularyId">
@@ -79,9 +77,9 @@ List<AssetVocabulary> vocabularies = AssetVocabularyServiceUtil.getGroupVocabula
 						</c:if>
 
 						hiddenInput: '#<portlet:namespace />parentCategoryId',
-						singleSelect: <%= true %>,
 						instanceVar: '<portlet:namespace />',
 						label: '<%= UnicodeLanguageUtil.format(request, "select-x", curVocabulary.getTitle(locale), false) %>',
+						singleSelect: <%= true %>,
 						vocabularyGroupIds: '<%= scopeGroupId %>',
 						vocabularyIds: '<%= curVocabulary.getVocabularyId() %>'
 					}

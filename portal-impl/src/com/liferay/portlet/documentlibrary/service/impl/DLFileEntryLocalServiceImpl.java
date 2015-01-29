@@ -100,6 +100,7 @@ import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.documentlibrary.util.DLValidatorUtil;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelModifiedDateComparator;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil;
 import com.liferay.portlet.expando.NoSuchRowException;
@@ -688,7 +689,8 @@ public class DLFileEntryLocalServiceImpl
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public DLFileEntry deleteFileEntry(DLFileEntry dlFileEntry)
 		throws PortalException {
 
@@ -1106,8 +1108,8 @@ public class DLFileEntryLocalServiceImpl
 
 		folderIds.add(folderId);
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>(status, false, start, end, obc);
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>(
+			status, false, start, end, obc);
 
 		return dlFileEntryFinder.findByG_F(groupId, folderIds, queryDefinition);
 	}
@@ -1326,9 +1328,8 @@ public class DLFileEntryLocalServiceImpl
 			return Collections.emptyList();
 		}
 
-		QueryDefinition<DLFileEntry> queryDefinition =
-			new QueryDefinition<DLFileEntry>(
-				WorkflowConstants.STATUS_ANY, start, end, obc);
+		QueryDefinition<DLFileEntry> queryDefinition = new QueryDefinition<>(
+			WorkflowConstants.STATUS_ANY, start, end, obc);
 
 		if (repositoryId == 0) {
 			if (userId <= 0) {
@@ -1430,7 +1431,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	@BufferedIncrement(
-		configuration = "DLFileEntry", incrementClass = NumberIncrement.class)
+		configuration = "DLFileEntry", incrementClass = NumberIncrement.class
+	)
 	@Override
 	public void incrementViewCounter(DLFileEntry dlFileEntry, int increment) {
 		if (ExportImportThreadLocal.isImportInProcess()) {
@@ -2264,12 +2266,14 @@ public class DLFileEntryLocalServiceImpl
 					ddmStructure.getStructureId(),
 					latestDLFileVersion.getFileVersionId());
 
-			Fields lastFields = StorageEngineUtil.getFields(
-				lastFileEntryMetadata.getDDMStorageId());
-			Fields latestFields = StorageEngineUtil.getFields(
-				latestFileEntryMetadata.getDDMStorageId());
+			DDMFormValues lastDDMFormValues =
+				StorageEngineUtil.getDDMFormValues(
+					lastFileEntryMetadata.getDDMStorageId());
+			DDMFormValues latestDDMFormValues =
+				StorageEngineUtil.getDDMFormValues(
+					latestFileEntryMetadata.getDDMStorageId());
 
-			if (!lastFields.equals(latestFields, false)) {
+			if (!lastDDMFormValues.equals(latestDDMFormValues)) {
 				return false;
 			}
 		}
@@ -2704,7 +2708,7 @@ public class DLFileEntryLocalServiceImpl
 
 	private static final int _DELETE_INTERVAL = 100;
 
-	private static Log _log = LogFactoryUtil.getLog(
+	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileEntryLocalServiceImpl.class);
 
 }

@@ -175,7 +175,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
-		type = SystemEventConstants.TYPE_DELETE)
+		type = SystemEventConstants.TYPE_DELETE
+	)
 	public DDLRecord deleteRecord(DDLRecord record) throws PortalException {
 
 		// Record
@@ -437,8 +438,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 			List<DDLRecord> ddlRecords = DDLUtil.getRecords(hits);
 
-			return new BaseModelSearchResult<DDLRecord>(
-				ddlRecords, hits.getLength());
+			return new BaseModelSearchResult<>(ddlRecords, hits.getLength());
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
