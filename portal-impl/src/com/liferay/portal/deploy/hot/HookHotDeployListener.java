@@ -1005,12 +1005,17 @@ public class HookHotDeployListener
 
 			sb.append("Custom JSP files:\n");
 
+			int index = 0;
+
 			for (String customJsp : customJsps) {
 				sb.append(customJsp);
-				sb.append(StringPool.NEW_LINE);
-			}
 
-			sb.setIndex(sb.index() - 1);
+				if ((index + 1) < customJsps.size()) {
+					sb.append(StringPool.NEW_LINE);
+				}
+
+				index++;
+			}
 
 			_log.debug(sb.toString());
 		}
@@ -2443,16 +2448,21 @@ public class HookHotDeployListener
 			sb.append(servletContextName);
 			sb.append(StringPool.NEW_LINE);
 
+			int index = 0;
+
 			for (Map.Entry<String, String> entry :
 					collidingCustomJsps.entrySet()) {
 
 				sb.append((String)entry.getKey());
 				sb.append(" with ");
 				sb.append((String)entry.getValue());
-				sb.append(StringPool.NEW_LINE);
-			}
 
-			sb.setIndex(sb.index() - 1);
+				if ((index + 1) < collidingCustomJsps.size()) {
+					sb.append(StringPool.NEW_LINE);
+				}
+
+				index++;
+			}
 
 			log.debug(sb.toString());
 		}
