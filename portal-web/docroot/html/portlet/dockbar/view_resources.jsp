@@ -78,18 +78,9 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 					assetEntryQuery.setOrderByType2("ASC");
 					assetEntryQuery.setStart(0);
 
-					List<AssetEntry> results = null;
+					BaseModelSearchResult<AssetEntry> baseModelSearchResult = AssetUtil.searchAssetEntries(request, assetEntryQuery, 0, delta);
 
-					if (PropsValues.ASSET_PUBLISHER_SEARCH_WITH_INDEX && (assetEntryQuery.getLinkedAssetEntryId() == 0)) {
-						BaseModelSearchResult<AssetEntry> baseModelSearchResult = AssetUtil.searchAssetEntries(request, assetEntryQuery, 0, delta);
-
-						results = baseModelSearchResult.getBaseModels();
-					}
-					else {
-						results = AssetEntryServiceUtil.getEntries(assetEntryQuery);
-					}
-
-					for (AssetEntry assetEntry : results) {
+					for (AssetEntry assetEntry : baseModelSearchResult.getBaseModels()) {
 						String className = PortalUtil.getClassName(assetEntry.getClassNameId());
 						long classPK = assetEntry.getClassPK();
 
@@ -113,7 +104,7 @@ boolean viewPreview = ParamUtil.getBoolean(request, "viewPreview");
 
 						String title = HtmlUtil.escape(StringUtil.shorten(assetRenderer.getTitle(themeDisplay.getLocale()), 60));
 
-						String portletId = PortletProviderUtil.getPortletId(assetEntry.getClassName(), PortletProvider.ACTION_ADD);
+						String portletId = PortletProviderUtil.getPortletId(assetEntry.getClassName(), PortletProvider.Action.ADD);
 
 						boolean hasAddToPagePermission = PortletPermissionUtil.contains(permissionChecker, layout, portletId, ActionKeys.ADD_TO_PAGE);
 

@@ -35,7 +35,6 @@
 	<property name="plink.executable" location="${project.dir}/tools/putty/plink.exe" />
 	<property name="pscp.executable" location="${project.dir}/tools/putty/pscp.exe" />
 
-	<propertycopy from="testray.build.${testray.build.type}.name" name="testray.build.name" />
 	<propertycopy from="testray.product.${testray.product.type}.version" name="testray.product.version" />
 
 	<if>
@@ -456,6 +455,44 @@
 				property="liferay.portal.git.id"
 				srcfile="git-commit-portal"
 			/>
+
+			<if>
+				<or>
+					<not>
+						<isset property="env.SOURCE_JOB_BUILD_NUMBER" />
+					</not>
+					<equals arg1="${env.SOURCE_JOB_BUILD_NUMBER}" arg2="1" />
+				</or>
+				<then>
+					<property name="liferay.previous.plugins.git.id" value="${liferay.plugins.git.id}" />
+					<property name="liferay.previous.portal.git.id" value="${liferay.portal.git.id}" />
+				</then>
+				<else>
+					<math
+						datatype="int"
+						operand1="${env.SOURCE_JOB_BUILD_NUMBER}"
+						operand2="1"
+						operation="-"
+						result="previous.build.number"
+					/>
+
+					<property name="previous.commit.id.dir" value="${env.JENKINS_HOME}/jobs/${env.SOURCE_JOB_NAME}/builds/${previous.build.number}" />
+
+					<loadfile failonerror="false" property="liferay.previous.plugins.git.id" srcfile="${previous.commit.id.dir}/git-commit-plugins">
+						<filterchain>
+							<striplinebreaks/>
+						</filterchain>
+					</loadfile>
+
+					<loadfile failonerror="false" property="liferay.previous.portal.git.id" srcfile="${previous.commit.id.dir}/git-commit-portal">
+						<filterchain>
+							<striplinebreaks/>
+						</filterchain>
+					</loadfile>
+				</else>
+			</if>
+
+			<property name="liferay.compare.urls" value="https://github.com/liferay/liferay-plugins-ee/compare/${liferay.previous.plugins.git.id}...${liferay.plugins.git.id},https://github.com/liferay/liferay-portal-ee/compare/${liferay.previous.portal.git.id}...${liferay.portal.git.id}" />
 		</sequential>
 	</macrodef>
 
@@ -503,6 +540,28 @@
 		</sequential>
 	</macrodef>
 
+	<macrodef name="record-testray-logs">
+		<sequential>
+			<if>
+				<isset property="jenkins.testray.results.dir" />
+				<then>
+					<antelope:stringutil property="job.name" string="${env.JOB_NAME}">
+						<antelope:replace regex="," replacement="_" />
+					</antelope:stringutil>
+
+					<property name="testray.logs.dir" value="${jenkins.testray.results.dir}/logs/${job.name}/builds/${env.TOP_LEVEL_BUILD_NUMBER}" />
+
+					<property name="testray.logs.console" value="${testray.logs.dir}/console.txt" />
+					<property name="testray.logs.report" value="${testray.logs.dir}/report.html" />
+				</then>
+				<else>
+					<property name="testray.logs.console" value="" />
+					<property name="testray.logs.report" value="" />
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="record-testray-project-name">
 		<sequential>
 			<propertyregex
@@ -528,6 +587,39 @@
 				name="testray.project.name"
 				override="true"
 			/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="record-testray-team-name">
+		<sequential>
+			<script classpathref="project.classpath" language="beanshell">
+				<![CDATA[
+					import org.apache.commons.lang.WordUtils;
+
+					String testrayMainComponentName = project.getProperty("testray.main.component.name");
+					String testrayTeamNamesString = project.getProperty("testray.team.names");
+
+					String[] testrayTeamNames = testrayTeamNamesString.split(",");
+
+					for (String testrayTeamName : testrayTeamNames) {
+						StringBuilder sb = new StringBuilder();
+
+						sb.append("testray.team.");
+						sb.append(testrayTeamName);
+						sb.append(".component.names");
+
+						String testrayTeamComponentNamesString = project.getProperty(sb.toString());
+
+						Set testrayTeamComponentNames = new HashSet(Arrays.asList(testrayTeamComponentNamesString.split(",")));
+
+						if (testrayTeamComponentNames.contains(testrayMainComponentName)) {
+							project.setProperty("testray.team.name", WordUtils.capitalize(testrayTeamName.replace('-', ' ')));
+
+							break;
+						}
+					}
+				]]>
+			</script>
 		</sequential>
 	</macrodef>
 
@@ -892,7 +984,7 @@ create database lportal${database.index} character set utf8;</echo>
 		</if>
 	</target>
 
-	<target name="build-test-results-xml">
+	<target name="build-test-results-xml" depends="generate-test-properties">
 		<record-env-app-server />
 		<record-env-browser />
 		<record-env-database />
@@ -900,13 +992,18 @@ create database lportal${database.index} character set utf8;</echo>
 		<record-env-liferay-portal />
 		<record-env-operating-system />
 		<record-testray-components />
+		<record-testray-logs />
 		<record-testray-project-name />
+		<record-testray-team-name />
 
 		<property name="test.case.properties">
 			<![CDATA[
 				<properties>
 					<property name="testray.component.names" value="${testray.component.names}" />
+					<property name="testray.logs.console" value="${testray.logs.console}" />
+					<property name="testray.logs.report" value="${testray.logs.report}" />
 					<property name="testray.main.component.name" value="${testray.main.component.name}" />
+					<property name="testray.team.name" value="${testray.team.name}" />
 					<property name="testray.testcase.description" value="${testray.testcase.description}" />
 					<property name="testray.testcase.name" value="${testray.testcase.name}" />
 					<property name="testray.testcase.priority" value="${testray.testcase.priority}" />
@@ -931,6 +1028,7 @@ create database lportal${database.index} character set utf8;</echo>
 					<property name="browser.version" value="${browser.version}" />
 					<property name="database.type" value="${database.type}" />
 					<property name="database.version" value="${database.version}" />
+					<property name="liferay.compare.urls" value="${liferay.compare.urls}" />
 					<property name="liferay.plugins.git.id" value="${liferay.plugins.git.id}" />
 					<property name="liferay.portal.branch" value="${liferay.portal.branch}" />
 					<property name="liferay.portal.bundle" value="${liferay.portal.bundle}" />
@@ -3941,6 +4039,19 @@ if (ppstate.equals("normal")) {
 
 				<if>
 					<and>
+						<available file="portal-web/test-results/functional/report.html" />
+						<equals arg1="${test.selenium.logger.enabled}" arg2="true" />
+					</and>
+					<then>
+						<copy
+							file="portal-web/test-results/functional/report.html"
+							tofile="${jenkins.shared.results.dir}/${job.name}/builds/${env.BUILD_NUMBER}/report.html"
+						/>
+					</then>
+				</if>
+
+				<if>
+					<and>
 						<available file="portal-web/test-results/functional/screenshots" />
 						<equals arg1="${test.save.screenshot}" arg2="true" />
 					</and>
@@ -3950,19 +4061,6 @@ if (ppstate.equals("normal")) {
 								dir="portal-web/test-results/functional/screenshots"
 							/>
 						</copy>
-					</then>
-				</if>
-
-				<if>
-					<and>
-						<available file="portal-web/test-results/functional/report.html" />
-						<equals arg1="${test.selenium.logger.enabled}" arg2="true" />
-					</and>
-					<then>
-						<copy
-							file="portal-web/test-results/functional/report.html"
-							tofile="${jenkins.shared.results.dir}/${job.name}/builds/${env.BUILD_NUMBER}/report.html"
-						/>
 					</then>
 				</if>
 
@@ -3990,6 +4088,29 @@ if (ppstate.equals("normal")) {
 							file="${jenkins.results.xml.file}"
 							tofile="${jenkins.shared.results.dir}/${env.BUILD_FLOW_JOB_NAME}/builds/${env.BUILD_FLOW_BUILD_NUMBER}/test-results/TEST-${env.BUILD_FLOW_JOB_NAME}_${env.BUILD_FLOW_BUILD_NUMBER}_${test.class}.xml"
 						/>
+					</then>
+				</if>
+
+				<if>
+					<isset property="jenkins.testray.results.dir" />
+					<then>
+						<property name="testray.logs.dir" value="${jenkins.testray.results.dir}/logs/${job.name}/builds/${env.TOP_LEVEL_BUILD_NUMBER}" />
+
+						<mkdir dir="${testray.logs.dir}" />
+
+						<copy
+							failonerror="false"
+							file="portal-web/test-results/functional/report.html"
+							tofile="${testray.logs.dir}/report.html"
+						/>
+
+						<copy failonerror="false" todir="${testray.logs.dir}/screenshots">
+							<fileset
+								dir="portal-web/test-results/functional/screenshots"
+							/>
+						</copy>
+
+						<get dest="${testray.logs.dir}/console.txt" ignoreerrors="true" src="${env.BUILD_URL}/consoleText" />
 					</then>
 				</if>
 			</then>

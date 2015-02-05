@@ -25,6 +25,7 @@ import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
+import com.liferay.sync.engine.util.OSDetector;
 import com.liferay.sync.engine.util.StreamUtil;
 
 import java.io.InputStream;
@@ -127,6 +128,17 @@ public class DownloadFileHandler extends BaseHandler {
 
 			downloadedFilePathNames.add(filePath.toString());
 
+			if (syncFile.getFileKey() == null) {
+				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
+			}
+			else {
+				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_UPDATE);
+			}
+
+			if (OSDetector.isWindows()) {
+				SyncFileService.updateFileKeySyncFile(syncFile, tempFilePath);
+			}
+
 			FileTime fileTime = FileTime.fromMillis(syncFile.getModifiedTime());
 
 			Files.setLastModifiedTime(tempFilePath, fileTime);
@@ -135,18 +147,13 @@ public class DownloadFileHandler extends BaseHandler {
 				tempFilePath, filePath, StandardCopyOption.ATOMIC_MOVE,
 				StandardCopyOption.REPLACE_EXISTING);
 
-			if (syncFile.getFileKey() == null) {
-				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
-			}
-			else {
-				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_UPDATE);
-			}
-
 			syncFile.setState(SyncFile.STATE_SYNCED);
 
 			SyncFileService.update(syncFile);
 
-			SyncFileService.updateFileKeySyncFile(syncFile);
+			if (!OSDetector.isWindows()) {
+				SyncFileService.updateFileKeySyncFile(syncFile);
+			}
 
 			IODeltaUtil.checksums(syncFile);
 		}

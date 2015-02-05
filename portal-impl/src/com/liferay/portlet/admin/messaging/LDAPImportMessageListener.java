@@ -26,14 +26,7 @@ public class LDAPImportMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		long time =
-			System.currentTimeMillis() - UserImporterUtil.getLastImportTime();
-
-		time = Math.round(time / 60000.0);
-
-		if (time >= PropsValues.LDAP_IMPORT_INTERVAL) {
-			UserImporterUtil.importUsers();
-		}
+		UserImporterUtil.importUsers();
 	}
 
 }
