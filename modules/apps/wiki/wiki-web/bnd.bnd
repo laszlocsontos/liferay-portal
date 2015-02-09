@@ -35,12 +35,14 @@ Import-Package: \
 	com.liferay.portlet.social.service,\
 	\
 	com.liferay.wiki.asset,\
+	com.liferay.wiki.configuration,\
 	com.liferay.wiki.indexer,\
 	com.liferay.wiki.lar,\
 	com.liferay.wiki.model.impl,\
 	com.liferay.wiki.notifications,\
 	com.liferay.wiki.search,\
 	com.liferay.wiki.service.permission,\
+	com.liferay.wiki.settings,\
 	com.liferay.wiki.social,\
 	com.liferay.wiki.trash,\
 	com.liferay.wiki.util,\

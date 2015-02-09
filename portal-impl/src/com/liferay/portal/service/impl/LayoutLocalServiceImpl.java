@@ -371,6 +371,14 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		layoutPersistence.update(layout);
 
+		// Layout friendly URLs
+
+		layoutFriendlyURLLocalService.updateLayoutFriendlyURLs(
+			user.getUserId(), user.getCompanyId(), groupId, plid, privateLayout,
+			friendlyURLMap, serviceContext);
+
+		// Layout prototype
+
 		if (Validator.isNotNull(layoutPrototypeUuid) &&
 			!layoutPrototypeLinkEnabled) {
 
@@ -408,6 +416,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		if (!privateLayout ||
 			type.equals(LayoutConstants.TYPE_CONTROL_PANEL) ||
+			type.equals(LayoutConstants.TYPE_USER_PERSONAL_PANEL) ||
 			group.isLayoutSetPrototype()) {
 
 			addGuestPermissions = true;
@@ -421,12 +430,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		// Group
 
 		groupLocalService.updateSite(groupId, true);
-
-		// Layout friendly URLs
-
-		layoutFriendlyURLLocalService.updateLayoutFriendlyURLs(
-			user.getUserId(), user.getCompanyId(), groupId, plid, privateLayout,
-			friendlyURLMap, serviceContext);
 
 		// Layout set
 
@@ -2915,9 +2918,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layouts = ListUtil.sort(
 			layouts, new LayoutPriorityComparator(layout, lessThan));
 
-		Layout firstLayout = layouts.get(0);
+		if (layout.getParentLayoutId() ==
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) {
 
-		layoutLocalServiceHelper.validateFirstLayout(firstLayout);
+			Layout firstLayout = layouts.get(0);
+
+			layoutLocalServiceHelper.validateFirstLayout(firstLayout);
+		}
 
 		int newPriority = LayoutConstants.FIRST_PRIORITY;
 

@@ -19,7 +19,7 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.display.context.util.DLRequestHelper;
 
 /**
- * @author Ivan Zaera
+ * @author Iván Zaera
  */
 public class DLVisualizationHelper {
 

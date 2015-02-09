@@ -21,8 +21,6 @@ import com.liferay.portal.model.User;
  */
 public interface UserImporter {
 
-	public long getLastImportTime() throws Exception;
-
 	public User importUser(
 			long ldapServerId, long companyId, String emailAddress,
 			String screenName)

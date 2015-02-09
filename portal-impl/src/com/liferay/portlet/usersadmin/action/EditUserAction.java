@@ -363,8 +363,8 @@ public class EditUserAction extends PortletAction {
 		String firstName = ParamUtil.getString(actionRequest, "firstName");
 		String middleName = ParamUtil.getString(actionRequest, "middleName");
 		String lastName = ParamUtil.getString(actionRequest, "lastName");
-		int prefixId = ParamUtil.getInteger(actionRequest, "prefixId");
-		int suffixId = ParamUtil.getInteger(actionRequest, "suffixId");
+		long prefixId = ParamUtil.getInteger(actionRequest, "prefixId");
+		long suffixId = ParamUtil.getInteger(actionRequest, "suffixId");
 		boolean male = ParamUtil.getBoolean(actionRequest, "male", true);
 		int birthdayMonth = ParamUtil.getInteger(
 			actionRequest, "birthdayMonth");
@@ -590,9 +590,9 @@ public class EditUserAction extends PortletAction {
 			user, actionRequest, "middleName");
 		String lastName = BeanParamUtil.getString(
 			user, actionRequest, "lastName");
-		int prefixId = BeanParamUtil.getInteger(
+		long prefixId = BeanParamUtil.getInteger(
 			contact, actionRequest, "prefixId");
-		int suffixId = BeanParamUtil.getInteger(
+		long suffixId = BeanParamUtil.getInteger(
 			contact, actionRequest, "suffixId");
 		boolean male = BeanParamUtil.getBoolean(
 			user, actionRequest, "male", true);

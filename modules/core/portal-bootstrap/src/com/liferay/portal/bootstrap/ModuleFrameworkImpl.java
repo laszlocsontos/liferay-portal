@@ -53,7 +53,9 @@ import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.collections.ServiceTrackerMapFactoryUtil;
 import com.liferay.registry.internal.RegistryImpl;
+import com.liferay.registry.internal.ServiceTrackerMapFactoryImpl;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -114,6 +116,10 @@ import org.springframework.context.ApplicationContext;
  * @author Miguel Pastor
  */
 public class ModuleFrameworkImpl implements ModuleFramework {
+
+	public ModuleFrameworkImpl() {
+		_liferayLibPortalDir = _getLiferayLibPortalDir();
+	}
 
 	@Override
 	public Object addBundle(String location) throws PortalException {
@@ -417,6 +423,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		RegistryUtil.setRegistry(
 			new RegistryImpl(_framework.getBundleContext()));
+
+		ServiceTrackerMapFactoryUtil.setServiceTrackerMapFactory(
+			new ServiceTrackerMapFactoryImpl(_framework.getBundleContext()));
 
 		_setupInitialBundles();
 	}
@@ -860,7 +869,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			liferayLibPortalDir = liferayLibPortalDir.substring(1);
 		}
 
-		return liferayLibPortalDir;
+		return StringUtil.toLowerCase(liferayLibPortalDir);
 	}
 
 	private String _getSystemPackagesExtra() {
@@ -1175,7 +1184,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		if (Validator.isNull(bundleSymbolicName)) {
 			String urlString = _decodePath(url.toString());
 
-			if (urlString.contains(_getLiferayLibPortalDir())) {
+			urlString = StringUtil.toLowerCase(urlString);
+
+			if (urlString.contains(_liferayLibPortalDir)) {
 				manifest = _calculateManifest(url, manifest);
 
 				attributes = manifest.getMainAttributes();
@@ -1356,6 +1367,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	private Map<String, List<URL>> _extraPackageMap;
 	private List<URL> _extraPackageURLs;
 	private Framework _framework;
+	private final String _liferayLibPortalDir;
 
 	private class StartupFrameworkListener implements FrameworkListener {
 

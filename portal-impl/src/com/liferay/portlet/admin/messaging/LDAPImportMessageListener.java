@@ -17,7 +17,6 @@ package com.liferay.portlet.admin.messaging;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.security.exportimport.UserImporterUtil;
-import com.liferay.portal.util.PropsValues;
 
 /**
  * @author Shuyang Zhou
@@ -26,14 +25,7 @@ public class LDAPImportMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		long time =
-			System.currentTimeMillis() - UserImporterUtil.getLastImportTime();
-
-		time = Math.round(time / 60000.0);
-
-		if (time >= PropsValues.LDAP_IMPORT_INTERVAL) {
-			UserImporterUtil.importUsers();
-		}
+		UserImporterUtil.importUsers();
 	}
 
 }

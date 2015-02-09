@@ -79,6 +79,7 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
+import com.liferay.portlet.asset.util.AssetEntryQueryProcessor;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.sites.util.SitesUtil;
 import com.liferay.registry.Registry;
@@ -352,8 +353,8 @@ public class AssetPublisherImpl implements AssetPublisher {
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
 	 *             AssetEntryLocalServiceUtil#getEntries(long[], long[], String,
-	 *             String, String, String, boolean, boolean, int, int,
-	 *             String, String, String, String)}
+	 *             String, String, String, boolean, boolean, int, int, String,
+	 *             String, String, String)}
 	 */
 	@Deprecated
 	@Override
@@ -617,7 +618,7 @@ public class AssetPublisherImpl implements AssetPublisher {
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
 	 *             AssetEntryLocalServiceUtil#getEntriesCount(long[], long[],
-	 *             String, String, String, String, boolean, boolean, int, int)}
+	 *             String, String, String, String, boolean, boolean)}
 	 */
 	@Deprecated
 	@Override
