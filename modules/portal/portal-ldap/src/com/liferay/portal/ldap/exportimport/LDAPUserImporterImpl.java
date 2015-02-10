@@ -337,43 +337,44 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 	public void importUsers() throws Exception {
 		long companyId = PortalUtil.getDefaultCompanyId();
 
-		ShardUtil.pushCompanyService(companyId);
+		try {
+			ShardUtil.pushCompanyService(companyId);
 
-		long defaultUserId = UserLocalServiceUtil.getDefaultUserId(
-			companyId);
+			long defaultUserId = UserLocalServiceUtil.getDefaultUserId(
+				companyId);
 
-		if (LockLocalServiceUtil.hasLock(
-				defaultUserId, UserImporterUtil.class.getName(),
-				companyId)) {
+			if (LockLocalServiceUtil.hasLock(
+					defaultUserId, UserImporterUtil.class.getName(),
+					companyId)) {
 
-			ShardUtil.popCompanyService();
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Skipping LDAP scheduled import because another " +
+							"LDAP import is in process");
+				}
 
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Skipping LDAP scheduled import because another " +
-						"LDAP import is in process");
+				return;
 			}
 
-			return;
-		}
+			try {
+				LockLocalServiceUtil.lock(
+					defaultUserId, UserImporterUtil.class.getName(), companyId,
+					LDAPUserImporterImpl.class.getName(), false,
+					_ldapConfiguration.importLockExpirationTime());
 
-		try {
-			LockLocalServiceUtil.lock(
-				defaultUserId, UserImporterUtil.class.getName(), companyId,
-				LDAPUserImporterImpl.class.getName(), false,
-				_ldapConfiguration.importLockExpirationTime());
+				List<Company> companies = CompanyLocalServiceUtil.getCompanies(
+					false);
 
-			List<Company> companies = CompanyLocalServiceUtil.getCompanies(
-				false);
-
-			for (Company company : companies) {
-				importUsers(company.getCompanyId());
+				for (Company company : companies) {
+					importUsers(company.getCompanyId());
+				}
+			}
+			finally {
+				LockLocalServiceUtil.unlock(
+					UserImporterUtil.class.getName(), companyId);
 			}
 		}
 		finally {
-			LockLocalServiceUtil.unlock(
-				UserImporterUtil.class.getName(), companyId);
-
 			ShardUtil.popCompanyService();
 		}
 	}
