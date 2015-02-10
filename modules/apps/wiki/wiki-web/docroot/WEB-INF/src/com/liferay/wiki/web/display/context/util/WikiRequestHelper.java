@@ -24,7 +24,7 @@ import com.liferay.wiki.web.settings.WikiPortletInstanceSettings;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author Ivan Zaera
+ * @author Iván Zaera
  */
 public class WikiRequestHelper extends BaseRequestHelper {
 
@@ -64,10 +64,10 @@ public class WikiRequestHelper extends BaseRequestHelper {
 
 				if (portletId.equals(PortletKeys.PORTLET_CONFIGURATION)) {
 					_wikiSettings = WikiSettings.getInstance(
-						getScopeGroupId(), getRequest().getParameterMap());
+						getSiteGroupId(), getRequest().getParameterMap());
 				}
 				else {
-					_wikiSettings = WikiSettings.getInstance(getScopeGroupId());
+					_wikiSettings = WikiSettings.getInstance(getSiteGroupId());
 				}
 			}
 

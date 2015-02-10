@@ -25,6 +25,7 @@ import com.liferay.sync.engine.session.Session;
 import com.liferay.sync.engine.session.SessionManager;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
+import com.liferay.sync.engine.util.OSDetector;
 import com.liferay.sync.engine.util.StreamUtil;
 
 import java.io.InputStream;
@@ -34,7 +35,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileTime;
 
 import java.util.List;
 
@@ -127,14 +127,6 @@ public class DownloadFileHandler extends BaseHandler {
 
 			downloadedFilePathNames.add(filePath.toString());
 
-			FileTime fileTime = FileTime.fromMillis(syncFile.getModifiedTime());
-
-			Files.setLastModifiedTime(tempFilePath, fileTime);
-
-			Files.move(
-				tempFilePath, filePath, StandardCopyOption.ATOMIC_MOVE,
-				StandardCopyOption.REPLACE_EXISTING);
-
 			if (syncFile.getFileKey() == null) {
 				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_NEW);
 			}
@@ -142,11 +134,23 @@ public class DownloadFileHandler extends BaseHandler {
 				syncFile.setUiEvent(SyncFile.UI_EVENT_DOWNLOADED_UPDATE);
 			}
 
+			if (OSDetector.isWindows()) {
+				SyncFileService.updateFileKeySyncFile(syncFile, tempFilePath);
+			}
+
+			FileUtil.setModifiedTime(tempFilePath, syncFile.getModifiedTime());
+
+			Files.move(
+				tempFilePath, filePath, StandardCopyOption.ATOMIC_MOVE,
+				StandardCopyOption.REPLACE_EXISTING);
+
 			syncFile.setState(SyncFile.STATE_SYNCED);
 
 			SyncFileService.update(syncFile);
 
-			SyncFileService.updateFileKeySyncFile(syncFile);
+			if (!OSDetector.isWindows()) {
+				SyncFileService.updateFileKeySyncFile(syncFile);
+			}
 
 			IODeltaUtil.checksums(syncFile);
 		}

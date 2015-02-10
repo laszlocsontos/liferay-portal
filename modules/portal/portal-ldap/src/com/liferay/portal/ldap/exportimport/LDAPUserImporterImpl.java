@@ -64,6 +64,7 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
@@ -110,11 +111,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = {LDAPUserImporter.class, UserImporter.class}
 )
 public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
-
-	@Override
-	public long getLastImportTime() {
-		return _lastImportTime;
-	}
 
 	@Override
 	public User importUser(
@@ -339,18 +335,7 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 
 	@Override
 	public void importUsers() throws Exception {
-		List<Company> companies = CompanyLocalServiceUtil.getCompanies(false);
-
-		for (Company company : companies) {
-			importUsers(company.getCompanyId());
-		}
-	}
-
-	@Override
-	public void importUsers(long companyId) throws Exception {
-		if (!LDAPSettingsUtil.isImportEnabled(companyId)) {
-			return;
-		}
+		long companyId = PortalUtil.getDefaultCompanyId();
 
 		try {
 			ShardUtil.pushCompanyService(companyId);
@@ -364,44 +349,60 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Skipping LDAP import for company " + companyId +
-							" because another LDAP import is in process");
+						"Skipping LDAP scheduled import because another " +
+							"LDAP import is in process");
 				}
 
 				return;
 			}
 
-			LockLocalServiceUtil.lock(
-				defaultUserId, UserImporterUtil.class.getName(), companyId,
-				LDAPUserImporterImpl.class.getName(), false,
-				_ldapConfiguration.importLockExpirationTime());
+			try {
+				LockLocalServiceUtil.lock(
+					defaultUserId, UserImporterUtil.class.getName(), companyId,
+					LDAPUserImporterImpl.class.getName(), false,
+					_ldapConfiguration.importLockExpirationTime());
 
-			long[] ldapServerIds = StringUtil.split(
-				PrefsPropsUtil.getString(companyId, "ldap.server.ids"), 0L);
+				List<Company> companies = CompanyLocalServiceUtil.getCompanies(
+					false);
 
-			for (long ldapServerId : ldapServerIds) {
-				importUsers(ldapServerId, companyId);
-			}
-
-			for (int ldapServerId = 0;; ldapServerId++) {
-				String postfix = LDAPSettingsUtil.getPropertyPostfix(
-					ldapServerId);
-
-				String providerUrl = PrefsPropsUtil.getString(
-					companyId, PropsKeys.LDAP_BASE_PROVIDER_URL + postfix);
-
-				if (Validator.isNull(providerUrl)) {
-					break;
+				for (Company company : companies) {
+					importUsers(company.getCompanyId());
 				}
-
-				importUsers(ldapServerId, companyId);
+			}
+			finally {
+				LockLocalServiceUtil.unlock(
+					UserImporterUtil.class.getName(), companyId);
 			}
 		}
 		finally {
-			LockLocalServiceUtil.unlock(
-				UserImporterUtil.class.getName(), companyId);
-
 			ShardUtil.popCompanyService();
+		}
+	}
+
+	@Override
+	public void importUsers(long companyId) throws Exception {
+		if (!LDAPSettingsUtil.isImportEnabled(companyId)) {
+			return;
+		}
+
+		long[] ldapServerIds = StringUtil.split(
+			PrefsPropsUtil.getString(companyId, "ldap.server.ids"), 0L);
+
+		for (long ldapServerId : ldapServerIds) {
+			importUsers(ldapServerId, companyId);
+		}
+
+		for (int ldapServerId = 0;; ldapServerId++) {
+			String postfix = LDAPSettingsUtil.getPropertyPostfix(ldapServerId);
+
+			String providerUrl = PrefsPropsUtil.getString(
+				companyId, PropsKeys.LDAP_BASE_PROVIDER_URL + postfix);
+
+			if (Validator.isNull(providerUrl)) {
+				break;
+			}
+
+			importUsers(ldapServerId, companyId);
 		}
 	}
 
@@ -419,8 +420,6 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 		if (ldapContext == null) {
 			return;
 		}
-
-		_lastImportTime = System.currentTimeMillis();
 
 		try {
 			Properties userMappings = LDAPSettingsUtil.getUserMappings(
@@ -1387,7 +1386,6 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 		LDAPUserImporterImpl.class);
 
 	private AttributesTransformer _attributesTransformer;
-	private long _lastImportTime;
 	private volatile LDAPConfiguration _ldapConfiguration;
 	private LDAPToPortalConverter _ldapToPortalConverter;
 	private Set<String> _ldapUserIgnoreAttributes;

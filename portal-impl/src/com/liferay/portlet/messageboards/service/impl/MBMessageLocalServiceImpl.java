@@ -891,11 +891,9 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			classNameId, classPK);
 
 		if (discussion != null) {
-			List<MBMessage> messages = mbMessagePersistence.findByT_P(
+			message = mbMessagePersistence.findByT_P_First(
 				discussion.getThreadId(),
-				MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID);
-
-			message = messages.get(0);
+				MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID, null);
 		}
 		else {
 			boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
@@ -918,14 +916,12 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 							MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID + "}");
 				}
 
-				List<MBMessage> messages = mbMessagePersistence.findByT_P(
-					0, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID);
+				message = mbMessagePersistence.fetchByT_P_First(
+					0, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID, null);
 
-				if (messages.isEmpty()) {
+				if (message == null) {
 					throw se;
 				}
-
-				message = messages.get(0);
 			}
 			finally {
 				WorkflowThreadLocal.setEnabled(workflowEnabled);
@@ -938,8 +934,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #getDiscussionMessageDisplay(
-	 *             long, long, String, long, int)}
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getDiscussionMessageDisplay(long, long, String, long, int)}
 	 */
 	@Deprecated
 	@Override

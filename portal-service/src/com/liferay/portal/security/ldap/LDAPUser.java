@@ -131,7 +131,7 @@ public class LDAPUser {
 		return _user.getPortraitId();
 	}
 
-	public int getPrefixId() {
+	public long getPrefixId() {
 		return _contact.getPrefixId();
 	}
 
@@ -167,7 +167,7 @@ public class LDAPUser {
 		return _user.getStatus();
 	}
 
-	public int getSuffixId() {
+	public long getSuffixId() {
 		return _contact.getSuffixId();
 	}
 

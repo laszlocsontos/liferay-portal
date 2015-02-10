@@ -162,6 +162,7 @@ request.setAttribute("view.jsp-showIconLabel", true);
 		%>
 
 		<liferay-util:include page="<%= path %>" portletId="<%= assetRendererFactory.getPortletId() %>">
+			<liferay-util:param name="showComments" value="<%= Boolean.FALSE.toString() %>" />
 			<liferay-util:param name="showExtraInfo" value="<%= String.valueOf(assetPublisherDisplayContext.isShowExtraInfo()) %>" />
 			<liferay-util:param name="showHeader" value="<%= Boolean.FALSE.toString() %>" />
 		</liferay-util:include>
@@ -226,11 +227,16 @@ request.setAttribute("view.jsp-showIconLabel", true);
 
 			<portlet:actionURL name="invokeTaglibDiscussion" var="discussionURL" />
 
+			<portlet:resourceURL var="discussionPaginationURL">
+				<portlet:param name="invokeTaglibDiscussion" value="<%= Boolean.TRUE.toString() %>" />
+			</portlet:resourceURL>
+
 			<liferay-ui:discussion
 				className="<%= assetEntry.getClassName() %>"
 				classPK="<%= assetEntry.getClassPK() %>"
 				formAction="<%= discussionURL %>"
 				formName='<%= "fm" + assetEntry.getClassPK() %>'
+				paginationURL="<%= discussionPaginationURL %>"
 				ratingsEnabled="<%= assetPublisherDisplayContext.isEnableCommentRatings() %>"
 				redirect="<%= currentURL %>"
 				userId="<%= assetRenderer.getUserId() %>"
