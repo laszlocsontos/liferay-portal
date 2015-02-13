@@ -399,7 +399,11 @@ public class JournalArticleIndexer extends BaseIndexer {
 			articleId = TrashUtil.getOriginalTitle(articleId);
 		}
 
-		document.addKeyword(Field.ARTICLE_ID, articleId);
+		if (Validator.isNumber(articleId)) {
+			document.addKeyword(Field.ARTICLE_ID, articleId);
+		} else {
+			document.addText(Field.ARTICLE_ID, articleId);
+		}
 
 		document.addKeyword(Field.LAYOUT_UUID, article.getLayoutUuid());
 		document.addKeyword(
