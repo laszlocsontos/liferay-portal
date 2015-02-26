@@ -26,6 +26,7 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Theme;
 import com.liferay.portal.service.ThemeLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +69,8 @@ public class ThemeServicePreAction extends Action {
 
 		Layout layout = themeDisplay.getLayout();
 
-		boolean wapTheme = BrowserSnifferUtil.isWap(request);
+		boolean wapTheme = BrowserSnifferUtil.isWap(request) &&
+			PropsValues.MOBILE_DEVICE_STYLING_WAP_ENABLED;
 
 		if (layout != null) {
 			if (wapTheme) {

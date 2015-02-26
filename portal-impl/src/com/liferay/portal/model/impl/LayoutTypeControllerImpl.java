@@ -28,6 +28,7 @@ import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutTypeController;
 import com.liferay.portal.struts.StrutsUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
@@ -110,9 +111,6 @@ public class LayoutTypeControllerImpl implements LayoutTypeController {
 			else if (_type.equals(LayoutConstants.TYPE_CONTROL_PANEL)) {
 				path += "/portal/layout/view/control_panel.jsp";
 			}
-			else if (_type.equals(LayoutConstants.TYPE_USER_PERSONAL_PANEL)) {
-				path += "/portal/layout/view/user_personal_panel.jsp";
-			}
 			else {
 				path += "/portal/layout/view/portlet.jsp";
 			}
@@ -135,7 +133,9 @@ public class LayoutTypeControllerImpl implements LayoutTypeController {
 
 		String portletId = ParamUtil.getString(request, "p_p_id");
 
-		String path = getViewPath(portletId, BrowserSnifferUtil.isWap(request));
+		boolean wapTheme = BrowserSnifferUtil.isWap(request) &&
+			PropsValues.MOBILE_DEVICE_STYLING_WAP_ENABLED;
+		String path = getViewPath(portletId, wapTheme);
 
 		RequestDispatcher requestDispatcher =
 			servletContext.getRequestDispatcher(path);

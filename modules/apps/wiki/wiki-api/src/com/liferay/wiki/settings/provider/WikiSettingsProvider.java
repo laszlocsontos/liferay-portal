@@ -15,7 +15,6 @@
 package com.liferay.wiki.settings.provider;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.resource.manager.ClassLoaderResourceManager;
 import com.liferay.portal.kernel.settings.ParameterMapSettings;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsFactory;
@@ -67,18 +66,15 @@ public class WikiSettingsProvider implements SettingsProvider<WikiSettings> {
 	@Activate
 	protected void activate() {
 		_settingsFactory.registerSettingsMetadata(
-			WikiConstants.SERVICE_NAME, WikiSettings.getFallbackKeys(),
-			WikiSettings.MULTI_VALUED_KEYS, _wikiConfiguration,
-			new ClassLoaderResourceManager(
-				WikiSettings.class.getClassLoader()));
+			WikiSettings.class, _wikiConfiguration, null);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
 	protected void setSettingsFactory(SettingsFactory settingsFactory) {
 		_settingsFactory = settingsFactory;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
 	protected void setWikiConfiguration(WikiConfiguration wikiConfiguration) {
 		_wikiConfiguration = wikiConfiguration;
 	}
