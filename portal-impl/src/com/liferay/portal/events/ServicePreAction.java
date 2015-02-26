@@ -686,7 +686,8 @@ public class ServicePreAction extends Action {
 		Theme theme = null;
 		ColorScheme colorScheme = null;
 
-		boolean wapTheme = BrowserSnifferUtil.isWap(request);
+		boolean wapTheme = BrowserSnifferUtil.isWap(request) &&
+			PropsValues.MOBILE_DEVICE_STYLING_WAP_ENABLED;
 
 		if ((layout != null) && group.isControlPanel()) {
 			String themeId = PrefsPropsUtil.getString(

@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
 
+import com.liferay.portal.util.PropsValues;
 import org.apache.struts.Globals;
 
 /**
@@ -63,7 +64,9 @@ public class StrutsUtil {
 		if (!response.isCommitted()) {
 			String path = TEXT_HTML_DIR + uri;
 
-			if (BrowserSnifferUtil.isWap(request)) {
+			boolean wapTheme = BrowserSnifferUtil.isWap(request) &&
+				PropsValues.MOBILE_DEVICE_STYLING_WAP_ENABLED;
+			if (wapTheme) {
 				path = TEXT_WAP_DIR + uri;
 			}
 
@@ -87,7 +90,7 @@ public class StrutsUtil {
 
 				String errorPath = TEXT_HTML_DIR + "/common/error.jsp";
 
-				if (BrowserSnifferUtil.isWap(request)) {
+				if (wapTheme) {
 					path = TEXT_WAP_DIR + "/common/error.jsp";
 				}
 
@@ -123,7 +126,9 @@ public class StrutsUtil {
 
 		String path = TEXT_HTML_DIR + uri;
 
-		if (BrowserSnifferUtil.isWap(request)) {
+		boolean wapTheme = BrowserSnifferUtil.isWap(request) &&
+			PropsValues.MOBILE_DEVICE_STYLING_WAP_ENABLED;
+		if (wapTheme) {
 			path = TEXT_WAP_DIR + uri;
 		}
 
