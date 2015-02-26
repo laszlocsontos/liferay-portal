@@ -827,7 +827,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 		_request = dynamicRequest;
 		_originalRequest = request;
-		_wapTheme = BrowserSnifferUtil.isWap(_request);
+		_wapTheme = BrowserSnifferUtil.isWap(_request) &&
+			PropsValues.MOBILE_DEVICE_STYLING_WAP_ENABLED;
 		_portlet = portlet;
 		_portalContext = new PortalContextImpl();
 		_portletContext = portletContext;
