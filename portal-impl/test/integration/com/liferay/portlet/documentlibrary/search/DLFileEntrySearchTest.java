@@ -196,17 +196,18 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 		DDMFormValues ddmFormValues =
 			FieldsToDDMFormValuesConverterUtil.convert(ddmStructure, fields);
 
-		serviceContext.setAttribute(
-			"fileEntryTypeId", dlFileEntryType.getFileEntryTypeId());
+		DLAppTestUtil.populateServiceContext(
+			serviceContext, dlFileEntryType.getFileEntryTypeId());
+
 		serviceContext.setAttribute(
 			DDMFormValues.class.getName() + ddmStructure.getStructureId(),
 			ddmFormValues);
 
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			serviceContext.getScopeGroupId(),
+		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Text.txt",
 			ContentTypes.TEXT_PLAIN, RandomTestUtil.randomString(),
-			content.getBytes(), WorkflowConstants.ACTION_PUBLISH,
+			StringPool.BLANK, StringPool.BLANK, content.getBytes(),
 			serviceContext);
 
 		return (DLFileEntry)fileEntry.getModel();
@@ -242,7 +243,8 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 			folderId = dlFolder.getFolderId();
 		}
 
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
+		FileEntry fileEntry = DLAppTestUtil.addFileEntryWithWorkflow(
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 			folderId, keywords + ".txt", keywords, approved, serviceContext);
 
 		return (DLFileEntry)fileEntry.getModel();
@@ -287,10 +289,11 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 			BaseModel<?> parentBaseModel, ServiceContext serviceContext)
 		throws Exception {
 
-		Folder folder = DLAppTestUtil.addFolder(
+		Folder folder = DLAppServiceUtil.addFolder(
+			serviceContext.getScopeGroupId(),
 			(Long)parentBaseModel.getPrimaryKeyObj(),
 			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH),
-			serviceContext);
+			RandomTestUtil.randomString(), serviceContext);
 
 		return (DLFolder)folder.getModel();
 	}
@@ -300,10 +303,11 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 			Group group, ServiceContext serviceContext)
 		throws Exception {
 
-		Folder folder = DLAppTestUtil.addFolder(
+		Folder folder = DLAppServiceUtil.addFolder(
+			serviceContext.getScopeGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH),
-			serviceContext);
+			RandomTestUtil.randomString(), serviceContext);
 
 		return (DLFolder)folder.getModel();
 	}
@@ -354,9 +358,10 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 
 		DLFileEntry dlFileEntry = (DLFileEntry)baseModel;
 
-		FileEntry fileEntry = DLAppTestUtil.updateFileEntry(
-			serviceContext.getScopeGroupId(), dlFileEntry.getFileEntryId(),
-			null, dlFileEntry.getMimeType(), keywords, true, serviceContext);
+		FileEntry fileEntry = DLAppServiceUtil.updateFileEntry(
+			dlFileEntry.getFileEntryId(), null, dlFileEntry.getMimeType(),
+			keywords, StringPool.BLANK, StringPool.BLANK, true, (byte[])null,
+			serviceContext);
 
 		return (DLFileEntry)fileEntry.getModel();
 	}

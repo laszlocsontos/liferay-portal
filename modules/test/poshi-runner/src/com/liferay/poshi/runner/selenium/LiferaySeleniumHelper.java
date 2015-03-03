@@ -60,8 +60,12 @@ import org.dom4j.io.SAXReader;
 
 import org.sikuli.api.DesktopScreenRegion;
 import org.sikuli.api.ImageTarget;
+import org.sikuli.api.Location;
 import org.sikuli.api.ScreenRegion;
+import org.sikuli.api.robot.Key;
+import org.sikuli.api.robot.Keyboard;
 import org.sikuli.api.robot.Mouse;
+import org.sikuli.api.robot.desktop.DesktopKeyboard;
 import org.sikuli.api.robot.desktop.DesktopMouse;
 import org.sikuli.api.visual.Canvas;
 import org.sikuli.api.visual.CanvasBuilder.ElementAdder;
@@ -590,6 +594,17 @@ public class LiferaySeleniumHelper {
 
 	public static String getEmailSubject(String index) throws Exception {
 		return EmailCommands.getEmailSubject(GetterUtil.getInteger(index));
+	}
+
+	public static ImageTarget getImageTarget(
+			LiferaySelenium liferaySelenium, String image)
+		throws Exception {
+
+		File file = new File(
+			getPortalRootDirName() + liferaySelenium.getSikuliImagesDirName() +
+				image);
+
+		return new ImageTarget(file);
 	}
 
 	public static String getNumberDecrement(String value) {
@@ -1132,13 +1147,7 @@ public class LiferaySeleniumHelper {
 
 		ScreenRegion screenRegion = new DesktopScreenRegion();
 
-		liferaySelenium.pause("1000");
-
-		File file = new File(
-			getPortalRootDirName() + liferaySelenium.getSikuliImagesDirName() +
-				image);
-
-		ImageTarget imageTarget = new ImageTarget(file);
+		ImageTarget imageTarget = getImageTarget(liferaySelenium, image);
 
 		if (screenRegion.wait(imageTarget, 5000) != null) {
 			throw new Exception("Element is present");
@@ -1151,13 +1160,7 @@ public class LiferaySeleniumHelper {
 
 		ScreenRegion screenRegion = new DesktopScreenRegion();
 
-		liferaySelenium.pause("1000");
-
-		File file = new File(
-			getPortalRootDirName() + liferaySelenium.getSikuliImagesDirName() +
-				image);
-
-		ImageTarget imageTarget = new ImageTarget(file);
+		ImageTarget imageTarget = getImageTarget(liferaySelenium, image);
 
 		screenRegion = screenRegion.wait(imageTarget, 5000);
 
@@ -1180,14 +1183,51 @@ public class LiferaySeleniumHelper {
 			LiferaySelenium liferaySelenium, String image)
 		throws Exception {
 
-		throw new UnsupportedOperationException();
+		ScreenRegion screenRegion = new DesktopScreenRegion();
+
+		ImageTarget imageTarget = getImageTarget(liferaySelenium, image);
+
+		screenRegion = screenRegion.find(imageTarget);
+
+		Mouse mouse = new DesktopMouse();
+
+		mouse.click(screenRegion.getCenter());
 	}
 
 	public static void sikuliDragAndDrop(
 			LiferaySelenium liferaySelenium, String image, String coordString)
 		throws Exception {
 
-		throw new UnsupportedOperationException();
+		ScreenRegion screenRegion = new DesktopScreenRegion();
+
+		ImageTarget imageTarget = getImageTarget(liferaySelenium, image);
+
+		screenRegion = screenRegion.find(imageTarget);
+
+		Mouse mouse = new DesktopMouse();
+
+		mouse.move(screenRegion.getCenter());
+
+		Robot robot = new Robot();
+
+		robot.delay(1000);
+
+		mouse.press();
+
+		robot.delay(2000);
+
+		String[] coords = coordString.split(",");
+
+		Location location = screenRegion.getCenter();
+
+		int x = location.getX() + GetterUtil.getInteger(coords[0]);
+		int y = location.getY() + GetterUtil.getInteger(coords[1]);
+
+		robot.mouseMove(x, y);
+
+		robot.delay(1000);
+
+		mouse.release();
 	}
 
 	public static void sikuliLeftMouseDown(LiferaySelenium liferaySelenium)
@@ -1214,7 +1254,15 @@ public class LiferaySeleniumHelper {
 			LiferaySelenium liferaySelenium, String image)
 		throws Exception {
 
-		throw new UnsupportedOperationException();
+		ScreenRegion screenRegion = new DesktopScreenRegion();
+
+		ImageTarget imageTarget = getImageTarget(liferaySelenium, image);
+
+		screenRegion = screenRegion.find(imageTarget);
+
+		Mouse mouse = new DesktopMouse();
+
+		mouse.move(screenRegion.getCenter());
 	}
 
 	public static void sikuliRightMouseDown(LiferaySelenium liferaySelenium)
@@ -1241,7 +1289,30 @@ public class LiferaySeleniumHelper {
 			LiferaySelenium liferaySelenium, String image, String value)
 		throws Exception {
 
-		throw new UnsupportedOperationException();
+		sikuliClick(liferaySelenium, image);
+
+		liferaySelenium.pause("1000");
+
+		Keyboard keyboard = new DesktopKeyboard();
+
+		if (value.contains("${line.separator}")) {
+			String[] tokens = StringUtil.split(value, "${line.separator}");
+
+			for (int i = 0; i < tokens.length; i++) {
+				keyboard.type(tokens[i]);
+
+				if ((i + 1) < tokens.length) {
+					keyboard.type(Key.ENTER);
+				}
+			}
+
+			if (value.endsWith("${line.separator}")) {
+				keyboard.type(Key.ENTER);
+			}
+		}
+		else {
+			keyboard.type(value);
+		}
 	}
 
 	public static void sikuliUploadCommonFile(

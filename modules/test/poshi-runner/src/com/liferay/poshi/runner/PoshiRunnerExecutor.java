@@ -144,7 +144,12 @@ public class PoshiRunnerExecutor {
 					runMacroElement(childElement);
 				}
 				else if (childElement.attributeValue("selenium") != null) {
-					runSeleniumElement(childElement);
+					try {
+						runSeleniumElement(childElement);
+					}
+					catch (Exception e) {
+						throw new PoshiRunnerException(e);
+					}
 				}
 			}
 			else if (childElementName.equals("if")) {
@@ -154,17 +159,24 @@ public class PoshiRunnerExecutor {
 				String message = childElement.attributeValue("message");
 
 				if (message != null) {
-					throw new Exception(
-						PoshiRunnerVariablesUtil.replaceCommandVars(message));
+					throw new PoshiRunnerException(
+						"BUILD FAILED: " +
+							PoshiRunnerVariablesUtil.replaceCommandVars(
+								message));
 				}
 
-				throw new Exception();
+				throw new PoshiRunnerException();
 			}
 			else if (childElementName.equals("for")) {
 				runForElement(childElement);
 			}
 			else if (childElementName.equals("var")) {
-				runVarElement(childElement);
+				try {
+					runVarElement(childElement);
+				}
+				catch (Exception e) {
+					throw new PoshiRunnerException(e);
+				}
 			}
 			else if (childElementName.equals("while")) {
 				runWhileElement(childElement);
@@ -209,6 +221,8 @@ public class PoshiRunnerExecutor {
 
 				locator = PoshiRunnerContext.getPathLocator(
 					pathClassName + "#" + locatorKey);
+
+				locator = PoshiRunnerVariablesUtil.replaceExecuteVars(locator);
 
 				PoshiRunnerVariablesUtil.putIntoExecuteMap(
 					"locator" + (i + 1), locator);
@@ -345,11 +359,15 @@ public class PoshiRunnerExecutor {
 							locator);
 
 					String locatorKey =
-						PoshiRunnerGetterUtil.
-							getCommandNameFromClassCommandName(locator);
+						PoshiRunnerVariablesUtil.replaceCommandVars(
+							PoshiRunnerGetterUtil.
+								getCommandNameFromClassCommandName(locator));
 
 					locator = PoshiRunnerContext.getPathLocator(
 						pathClassName + "#" + locatorKey);
+
+					locator = PoshiRunnerVariablesUtil.replaceExecuteVars(
+						locator);
 				}
 
 				PoshiRunnerVariablesUtil.putIntoExecuteMap(
@@ -497,6 +515,10 @@ public class PoshiRunnerExecutor {
 				else if (i == 1) {
 					argument = PoshiRunnerVariablesUtil.getValueFromCommandMap(
 						"value1");
+
+					if (selenium.equals("clickAt")) {
+						argument = "";
+					}
 				}
 				else if (i == 2) {
 					argument = PoshiRunnerVariablesUtil.getValueFromCommandMap(
