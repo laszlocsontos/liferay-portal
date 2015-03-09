@@ -202,10 +202,9 @@ public class GroupServiceTest {
 		User user = UserTestUtil.addUser(
 			RandomTestUtil.randomString(), group.getGroupId());
 
-		BlogsEntry blogsEntry =
-			BlogsEntryLocalServiceUtil.addEntry(
-				user.getUserId(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), serviceContext);
+		BlogsEntry blogsEntry = BlogsEntryLocalServiceUtil.addEntry(
+			user.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), serviceContext);
 
 		Assert.assertNotNull(
 			BlogsEntryLocalServiceUtil.fetchBlogsEntry(
@@ -463,7 +462,7 @@ public class GroupServiceTest {
 	public void testGroupIsGlobalScopeLabel() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
-		Group group  = addGroup(false, false, false);
+		Group group = addGroup(false, false, false);
 
 		Company company = CompanyLocalServiceUtil.getCompany(
 			group.getCompanyId());

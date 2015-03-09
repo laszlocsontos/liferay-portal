@@ -15,6 +15,7 @@
 package com.liferay.poshi.runner;
 
 import com.liferay.poshi.runner.util.FileUtil;
+import com.liferay.poshi.runner.util.PropsValues;
 import com.liferay.poshi.runner.util.StringUtil;
 
 import java.util.ArrayList;
@@ -71,6 +72,10 @@ public class PoshiRunnerContext {
 
 	public static Element getActionRootElement(String className) {
 		return _rootElements.get("action#" + className);
+	}
+
+	public static String getFilePath(String fileName) {
+		return _filePaths.get(fileName);
 	}
 
 	public static Element getFunctionCommandElement(String classCommandName) {
@@ -162,7 +167,7 @@ public class PoshiRunnerContext {
 			String locator = locatorElement.getText();
 
 			if (locatorKey.equals("EXTEND_ACTION_PATH")) {
-				for (String extendFilePath : _filePaths) {
+				for (String extendFilePath : _filePathsArray) {
 					if (extendFilePath.endsWith("/" + locator + ".path")) {
 						extendFilePath = _BASE_DIR + "/" + extendFilePath;
 
@@ -191,15 +196,17 @@ public class PoshiRunnerContext {
 
 		directoryScanner.scan();
 
-		_filePaths = directoryScanner.getIncludedFiles();
+		_filePathsArray = directoryScanner.getIncludedFiles();
 
-		for (String filePath : _filePaths) {
+		for (String filePath : _filePathsArray) {
 			filePath = _BASE_DIR + "/" + filePath;
 
 			String className = PoshiRunnerGetterUtil.getClassNameFromFilePath(
 				filePath);
 			String classType = PoshiRunnerGetterUtil.getClassTypeFromFilePath(
 				filePath);
+
+			_filePaths.put(className + "." + classType, filePath);
 
 			if (classType.equals("action") || classType.equals("function") ||
 				classType.equals("macro") || classType.equals("testcase")) {
@@ -305,14 +312,14 @@ public class PoshiRunnerContext {
 	}
 
 	private static final String _BASE_DIR =
-		PoshiRunnerGetterUtil.getCanonicalPath(
-			"../../../portal-web/test/functional/com/liferay/portalweb/");
+		PoshiRunnerGetterUtil.getCanonicalPath(PropsValues.TEST_BASE_DIR_NAME);
 
 	private static final Map<String, String> _actionExtendClassName =
 		new HashMap<>();
 	private static final Map<String, Element> _commandElements =
 		new HashMap<>();
-	private static String[] _filePaths;
+	private static final Map<String, String> _filePaths = new HashMap<>();
+	private static String[] _filePathsArray;
 	private static final Map<String, Integer> _functionLocatorCounts =
 		new HashMap<>();
 	private static final Map<String, String> _pathLocators = new HashMap<>();

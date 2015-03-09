@@ -5112,6 +5112,8 @@ public class JournalArticleLocalServiceImpl
 			article.setResourcePrimKey(latestArticle.getResourcePrimKey());
 			article.setGroupId(latestArticle.getGroupId());
 			article.setCompanyId(latestArticle.getCompanyId());
+			article.setUserId(user.getUserId());
+			article.setUserName(user.getFullName());
 			article.setCreateDate(latestArticle.getCreateDate());
 			article.setClassNameId(latestArticle.getClassNameId());
 			article.setClassPK(latestArticle.getClassPK());
@@ -5128,8 +5130,6 @@ public class JournalArticleLocalServiceImpl
 			user, groupId, articleId, article.getVersion(), addNewVersion,
 			content, ddmStructureKey, images);
 
-		article.setUserId(user.getUserId());
-		article.setUserName(user.getFullName());
 		article.setModifiedDate(serviceContext.getModifiedDate(now));
 		article.setFolderId(folderId);
 		article.setTreePath(article.buildTreePath());
@@ -6785,7 +6785,7 @@ public class JournalArticleLocalServiceImpl
 		List<JournalArticle> articles) {
 
 		List<ObjectValuePair<Long, Integer>> articleVersionStatusOVPs =
-			new ArrayList<ObjectValuePair<Long, Integer>>(articles.size());
+			new ArrayList<>(articles.size());
 
 		for (JournalArticle article : articles) {
 			int status = article.getStatus();
@@ -6905,7 +6905,7 @@ public class JournalArticleLocalServiceImpl
 	}
 
 	protected void notifySubscribers(
-			long contextUserId, JournalArticle article, String articleURL,
+			long creatorUserId, JournalArticle article, String articleURL,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -7008,7 +7008,7 @@ public class JournalArticleLocalServiceImpl
 			"[$ARTICLE_ID$]", article.getArticleId(), "[$ARTICLE_TITLE$]",
 			articleTitle, "[$ARTICLE_URL$]", articleURL, "[$ARTICLE_VERSION$]",
 			article.getVersion());
-		subscriptionSender.setContextUserId(contextUserId);
+		subscriptionSender.setCreatorUserId(creatorUserId);
 		subscriptionSender.setContextUserPrefix("ARTICLE");
 		subscriptionSender.setEntryTitle(articleTitle);
 		subscriptionSender.setEntryURL(articleURL);

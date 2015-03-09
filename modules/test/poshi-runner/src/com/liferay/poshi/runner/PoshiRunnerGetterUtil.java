@@ -145,9 +145,8 @@ public class PoshiRunnerGetterUtil {
 		return document.getRootElement();
 	}
 
-	public static String getVarMethodValue(Element element) throws Exception {
-		String classCommandName = PoshiRunnerVariablesUtil.replaceCommandVars(
-			element.attributeValue("method"));
+	public static String getVarMethodValue(String classCommandName)
+		throws Exception {
 
 		Matcher matcher = _parameterPattern.matcher(classCommandName);
 
@@ -188,7 +187,7 @@ public class PoshiRunnerGetterUtil {
 					}
 					else {
 						Object returnObject = method.invoke(
-							null, new Object[]{integers});
+							null, new Object[] {integers});
 
 						return returnObject.toString();
 					}

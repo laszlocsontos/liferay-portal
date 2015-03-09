@@ -185,6 +185,11 @@ public class PortletTracker
 			return;
 		}
 
+		BundlePortletApp bundlePortletApp =
+			serviceRegistrations.getBundlePortletApp();
+
+		bundlePortletApp.removePortlet(portletModel);
+
 		serviceRegistrations.removeServiceReference(serviceReference);
 
 		BundleContext bundleContext = _componentContext.getBundleContext();
@@ -305,10 +310,11 @@ public class PortletTracker
 		com.liferay.portal.model.Portlet portletModel =
 			_portletLocalService.createPortlet(0);
 
+		portletModel.setPortletId(portletId);
+
 		portletModel.setCompanyId(CompanyConstants.SYSTEM);
 		portletModel.setPluginPackage(bundlePortletApp.getPluginPackage());
 		portletModel.setPortletApp(bundlePortletApp);
-		portletModel.setPortletId(portletId);
 		portletModel.setRoleMappers(bundlePortletApp.getRoleMappers());
 		portletModel.setStrutsPath(portletId);
 
@@ -1122,7 +1128,9 @@ public class PortletTracker
 			properties.get(
 				HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT_ATTRIBUTE));
 
-		_httpServiceEndpoint = httpServiceEndpoints.get(0);
+		if (!httpServiceEndpoints.isEmpty()) {
+			_httpServiceEndpoint = httpServiceEndpoints.get(0);
+		}
 	}
 
 	@Reference(unbind = "-")
@@ -1198,7 +1206,7 @@ public class PortletTracker
 
 	private CompanyLocalService _companyLocalService;
 	private ComponentContext _componentContext;
-	private String _httpServiceEndpoint;
+	private String _httpServiceEndpoint = StringPool.BLANK;
 	private PortletInstanceFactory _portletInstanceFactory;
 	private PortletLocalService _portletLocalService;
 	private final PortletPropertyValidator _portletPropertyValidator =

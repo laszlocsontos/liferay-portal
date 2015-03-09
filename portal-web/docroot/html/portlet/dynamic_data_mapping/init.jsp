@@ -50,9 +50,11 @@ page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMStruct
 page import="com.liferay.portlet.dynamicdatamapping.storage.StorageType" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMDisplay" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMDisplayRegistryUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.util.DDMPermissionHandler" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMUtil" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %>
+page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %><%@
+page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplate" %>
 
 <%@ page import="java.util.StringTokenizer" %>
 
@@ -67,6 +69,8 @@ boolean showManageTemplates = ParamUtil.getBoolean(request, "showManageTemplates
 boolean showToolbar = ParamUtil.getBoolean(request, "showToolbar", true);
 
 DDMDisplay ddmDisplay = DDMDisplayRegistryUtil.getDDMDisplay(refererPortletName);
+
+DDMPermissionHandler ddmPermissionHandler = ddmDisplay.getDDMPermissionHandler();
 
 long scopeClassNameId = PortalUtil.getClassNameId(ddmDisplay.getStructureType());
 

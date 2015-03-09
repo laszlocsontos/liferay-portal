@@ -101,30 +101,6 @@ public interface PropsKeys {
 
 	public static final String ASSET_FILTER_SEARCH_LIMIT = "asset.filter.search.limit";
 
-	public static final String ASSET_PUBLISHER_DISPLAY_STYLE_DEFAULT = "asset.publisher.display.style.default";
-
-	public static final String ASSET_PUBLISHER_DISPLAY_STYLES = "asset.publisher.display.styles";
-
-	public static final String ASSET_PUBLISHER_DISPLAY_TEMPLATES_CONFIG = "asset.publisher.display.templates.config";
-
-	public static final String ASSET_PUBLISHER_DYNAMIC_SUBSCRIPTION_LIMIT = "asset.publisher.dynamic.subscription.limit";
-
-	public static final String ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_BODY = "asset.publisher.email.asset.entry.added.body";
-
-	public static final String ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_ENABLED = "asset.publisher.email.asset.entry.added.enabled";
-
-	public static final String ASSET_PUBLISHER_EMAIL_ASSET_ENTRY_ADDED_SUBJECT = "asset.publisher.email.asset.entry.added.subject";
-
-	public static final String ASSET_PUBLISHER_EMAIL_FROM_ADDRESS = "asset.publisher.email.from.address";
-
-	public static final String ASSET_PUBLISHER_EMAIL_FROM_NAME = "asset.publisher.email.from.name";
-
-	public static final String ASSET_PUBLISHER_PERMISSION_CHECKING_CONFIGURABLE = "asset.publisher.permission.checking.configurable";
-
-	public static final String ASSET_PUBLISHER_QUERY_FORM_CONFIGURATION = "asset.publisher.query.form.configuration";
-
-	public static final String ASSET_PUBLISHER_SEARCH_WITH_INDEX = "asset.publisher.search.with.index";
-
 	public static final String ASSET_RENDERER_ENABLED = "asset.renderer.enabled.";
 
 	public static final String ASSET_TAG_SUGGESTIONS_ENABLED = "asset.tag.suggestions.enabled";
@@ -1987,7 +1963,7 @@ public interface PropsKeys {
 
 	public static final String PERMISSIONS_INLINE_SQL_CHECK_ENABLED = "permissions.inline.sql.check.enabled";
 
-	public static final String PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHHOLD = "permissions.inline.sql.resource.block.query.threshhold";
+	public static final String PERMISSIONS_INLINE_SQL_RESOURCE_BLOCK_QUERY_THRESHOLD = "permissions.inline.sql.resource.block.query.threshold";
 
 	public static final String PERMISSIONS_OBJECT_BLOCKING_CACHE = "permissions.object.blocking.cache";
 
@@ -2257,8 +2233,6 @@ public interface PropsKeys {
 
 	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA = "search.container.show.pagination.top.delta";
 
-	public static final String SEARCH_FACET_CONFIGURATION = "search.facet.configuration";
-
 	public static final String SERVICE_BUILDER_SERVICE_READ_ONLY_PREFIXES = "service.builder.service.read.only.prefixes";
 
 	public static final String SERVLET_SERVICE_EVENTS_POST = "servlet.service.events.post";
@@ -2519,7 +2493,7 @@ public interface PropsKeys {
 
 	public static final String STAGING_LIVE_GROUP_REMOTE_STAGING_ENABLED = "staging.live.group.remote.staging.enabled";
 
-	public static final String STAGING_PUBLISH_BUTTON_EXPORT_IMPORT_CONFIGURATION_DISPLAY_COUNT = "staging.publish.button.export.import.configuration.display.count";
+	public static final String STAGING_LOCK_ENABLED = "staging.lock.enabled";
 
 	public static final String STAGING_REMOTE_TRANSFER_BUFFER_SIZE = "staging.remote.transfer.buffer.size";
 
