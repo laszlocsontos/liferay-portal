@@ -27,11 +27,15 @@
 		<dirset dir="network-utilities" includes="*" />
 		<dirset dir="password-generator" includes="*" />
 		<dirset dir="polls" includes="*" />
+		<dirset dir="productivity-center" includes="*" />
 		<dirset dir="quick-note" includes="*" />
 		<dirset dir="rss" includes="*" />
+		<dirset dir="search" includes="*" />
 		<dirset dir="site" includes="*" />
-		<dirset dir="social" includes="*" />
+		<dirset dir="sites-directory" includes="*" />
+		<dirset dir="social" excludes="social-networking-*" includes="*" />
 		<dirset dir="translator" includes="*" />
+		<dirset dir="trash" includes="*" />
 		<dirset dir="unit-converter" includes="*" />
 		<dirset dir="web-proxy" includes="*" />
 		<dirset dir="wiki" includes="*" />

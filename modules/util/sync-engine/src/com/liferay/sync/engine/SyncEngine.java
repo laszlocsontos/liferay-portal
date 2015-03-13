@@ -37,6 +37,7 @@ import com.liferay.sync.engine.service.SyncWatchEventService;
 import com.liferay.sync.engine.service.persistence.SyncAccountPersistence;
 import com.liferay.sync.engine.upgrade.util.UpgradeUtil;
 import com.liferay.sync.engine.util.ConnectionRetryUtil;
+import com.liferay.sync.engine.util.FileLockRetryUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.LoggerUtil;
 import com.liferay.sync.engine.util.OSDetector;
@@ -45,16 +46,12 @@ import com.liferay.sync.engine.util.SyncEngineUtil;
 
 import java.io.IOException;
 
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -103,6 +100,10 @@ public class SyncEngine {
 
 	public static ExecutorService getEventProcessorExecutorService() {
 		return _eventProcessorExecutorService;
+	}
+
+	public static ExecutorService getExecutorService() {
+		return _executorService;
 	}
 
 	public static synchronized boolean isRunning() {
@@ -165,6 +166,11 @@ public class SyncEngine {
 		SyncAccount syncAccount = ServerEventUtil.synchronizeSyncAccount(
 			syncAccountId);
 
+		syncAccount.setState(SyncAccount.STATE_CONNECTED);
+		syncAccount.setUiEvent(SyncAccount.UI_EVENT_NONE);
+
+		SyncAccountService.update(syncAccount);
+
 		Path filePath = Paths.get(syncAccount.getFilePathName());
 
 		SyncFile syncFile = SyncFileService.fetchSyncFile(
@@ -195,11 +201,6 @@ public class SyncEngine {
 		}
 
 		if (!ConnectionRetryUtil.retryInProgress(syncAccountId)) {
-			syncAccount.setState(SyncAccount.STATE_CONNECTED);
-			syncAccount.setUiEvent(SyncAccount.UI_EVENT_NONE);
-
-			SyncAccountService.update(syncAccount);
-
 			ServerEventUtil.synchronizeSyncSites(syncAccountId);
 		}
 
@@ -244,6 +245,8 @@ public class SyncEngine {
 
 		UpgradeUtil.upgrade();
 
+		FileLockRetryUtil.init();
+
 		for (SyncAccount syncAccount : SyncAccountService.findAll()) {
 			scheduleSyncAccountTasks(syncAccount.getSyncAccountId());
 		}
@@ -267,6 +270,8 @@ public class SyncEngine {
 		_localEventsScheduledExecutorService.shutdownNow();
 		_remoteEventsScheduledExecutorService.shutdownNow();
 
+		FileLockRetryUtil.shutdown();
+
 		SyncAccountPersistence syncAccountPersistence =
 			SyncAccountService.getSyncAccountPersistence();
 
@@ -279,79 +284,6 @@ public class SyncEngine {
 			SyncEngineUtil.SYNC_ENGINE_STATE_STOPPED);
 
 		_running = false;
-	}
-
-	protected static void fireDeleteEvents(Path filePath) throws IOException {
-		long startTime = System.currentTimeMillis();
-
-		Files.walkFileTree(
-			filePath,
-			new SimpleFileVisitor<Path>() {
-
-				@Override
-				public FileVisitResult preVisitDirectory(
-					Path filePath, BasicFileAttributes basicFileAttributes) {
-
-					SyncFile syncFile = SyncFileService.fetchSyncFile(
-						filePath.toString());
-
-					if (syncFile == null) {
-						syncFile = SyncFileService.fetchSyncFile(
-							FileUtil.getFileKey(filePath));
-					}
-
-					if (syncFile != null) {
-						syncFile.setLocalSyncTime(System.currentTimeMillis());
-
-						SyncFileService.update(syncFile);
-					}
-
-					return FileVisitResult.CONTINUE;
-				}
-
-				@Override
-				public FileVisitResult visitFile(
-					Path filePath, BasicFileAttributes basicFileAttributes) {
-
-					SyncFile syncFile = SyncFileService.fetchSyncFile(
-						filePath.toString());
-
-					if (syncFile == null) {
-						syncFile = SyncFileService.fetchSyncFile(
-							FileUtil.getFileKey(filePath));
-					}
-
-					if (syncFile != null) {
-						syncFile.setLocalSyncTime(System.currentTimeMillis());
-
-						SyncFileService.update(syncFile);
-					}
-
-					return FileVisitResult.CONTINUE;
-				}
-
-			}
-		);
-
-		List<SyncFile> deletedSyncFiles = SyncFileService.findSyncFiles(
-			filePath.toString(), startTime);
-
-		for (SyncFile deletedSyncFile : deletedSyncFiles) {
-			if (deletedSyncFile.getTypePK() == 0) {
-				SyncFileService.deleteSyncFile(deletedSyncFile);
-
-				continue;
-			}
-
-			if (deletedSyncFile.isFolder()) {
-				FileEventUtil.deleteFolder(
-					deletedSyncFile.getSyncAccountId(), deletedSyncFile);
-			}
-			else {
-				FileEventUtil.deleteFile(
-					deletedSyncFile.getSyncAccountId(), deletedSyncFile);
-			}
-		}
 	}
 
 	protected static void scheduleGetSyncDLObjectUpdateEvent(
@@ -427,7 +359,7 @@ public class SyncEngine {
 			Path filePath, long syncAccountId)
 		throws IOException {
 
-		fireDeleteEvents(filePath);
+		FileUtil.fireDeleteEvents(filePath);
 
 		FileEventUtil.retryFileTransfers(syncAccountId);
 	}

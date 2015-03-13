@@ -17,7 +17,9 @@
 <%@ include file="/html/taglib/ui/discussion/init.jsp" %>
 
 <%
-boolean hideControls = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:discussion:hideControls"));
+CommentsEditorDisplayContext commentsEditorDisplayContext = (CommentsEditorDisplayContext)request.getAttribute("liferay-ui:discussion:commentsEditorDisplayContext");
+boolean hideControls = GetterUtil.getBoolean((String) request.getAttribute("liferay-ui:discussion:hideControls"));
+MBMessageDisplay messageDisplay = (MBMessageDisplay)request.getAttribute("liferay-ui:discussion:messageDisplay");
 String permissionClassName = (String)request.getAttribute("liferay-ui:discussion:permissionClassName");
 long permissionClassPK = GetterUtil.getLong((String)request.getAttribute("liferay-ui:discussion:permissionClassPK"));
 boolean ratingsEnabled = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:discussion:ratingsEnabled"));
@@ -141,9 +143,42 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 				}
 				%>
 
-				<div class="lfr-discussion-message-body">
+				<div class="lfr-discussion-message-body" id='<portlet:namespace /><%= randomNamespace + "discussionMessage" + index %>'>
 					<%= msgBody %>
 				</div>
+
+				<c:if test="<%= !hideControls && MBDiscussionPermission.contains(permissionChecker, company.getCompanyId(), scopeGroupId, permissionClassName, permissionClassPK, message.getMessageId(), message.getUserId(), ActionKeys.UPDATE_DISCUSSION) %>">
+					<div class="lfr-discussion-form lfr-discussion-form-edit" id="<%= namespace + randomNamespace %>editForm<%= index %>" style='<%= "display: none; max-width: " + ModelHintsConstants.TEXTAREA_DISPLAY_WIDTH + "px;" %>'>
+						<liferay-ui:input-editor autoCreate="<%= false %>" contents="<%= message.getBody() %>" data="<%= commentsEditorDisplayContext.getEditorData() %>" editorImpl="<%= EDITOR_TEXT_IMPL_KEY %>" name='<%= randomNamespace + "editReplyBody" + index %>' />
+
+						<aui:input name='<%= "editReplyBody" + index %>' type="hidden" value="<%= message.getBody() %>" />
+
+						<%
+						boolean pending = message.isPending();
+
+						String publishButtonLabel = LanguageUtil.get(request, "publish");
+
+						if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, MBDiscussion.class.getName())) {
+							if (pending) {
+								publishButtonLabel = "save";
+							}
+							else {
+								publishButtonLabel = LanguageUtil.get(request, "submit-for-publication");
+							}
+						}
+						%>
+
+						<aui:button-row>
+							<aui:button name='<%= randomNamespace + "editReplyButton" + index %>' onClick='<%= randomNamespace + "updateMessage(" + index + ");" %>' value="<%= publishButtonLabel %>" />
+
+							<%
+							String taglibCancel = randomNamespace + "showEl('" + namespace + randomNamespace + "discussionMessage" + index + "');" + randomNamespace + "hideEditor('" + namespace + randomNamespace + "editReplyBody" + index + "','" + namespace + randomNamespace + "editForm" + index + "');";
+							%>
+
+							<aui:button onClick="<%= taglibCancel %>" type="cancel" />
+						</aui:button-row>
+					</div>
+				</c:if>
 			</div>
 
 			<div class="lfr-discussion-controls">
@@ -168,25 +203,27 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 						<%
 						String taglibPostReplyURL = "javascript:"
 							+ randomNamespace + "showEditor('" + namespace + randomNamespace + "postReplyBody" + index + "','" + namespace + randomNamespace + "postReplyForm" + index + "'); "
-							+ randomNamespace + "hideEditor('" + namespace + randomNamespace + "editReplyBody" + index + "','" + namespace + randomNamespace + "editForm" + index + "');";
+							+ randomNamespace + "hideEditor('" + namespace + randomNamespace + "editReplyBody" + index + "','" + namespace + randomNamespace + "editForm" + index + "');" + randomNamespace + "showEl('" + namespace + randomNamespace + "discussionMessage" + index + "')";
 						%>
 
-						<c:choose>
-							<c:when test="<%= themeDisplay.isSignedIn() || !SSOUtil.isLoginRedirectRequired(themeDisplay.getCompanyId()) %>">
-								<liferay-ui:icon
-									label="<%= true %>"
-									message="reply"
-									url="<%= taglibPostReplyURL %>"
-								/>
-							</c:when>
-							<c:otherwise>
-								<liferay-ui:icon
-									label="<%= true %>"
-									message="please-sign-in-to-reply"
-									url="<%= themeDisplay.getURLSignIn() %>"
-								/>
-							</c:otherwise>
-						</c:choose>
+						<c:if test="<%= !messageDisplay.isDiscussionMaxComments() %>">
+							<c:choose>
+								<c:when test="<%= themeDisplay.isSignedIn() || !SSOUtil.isLoginRedirectRequired(themeDisplay.getCompanyId()) %>">
+									<liferay-ui:icon
+										label="<%= true %>"
+										message="reply"
+										url="<%= taglibPostReplyURL %>"
+										/>
+								</c:when>
+								<c:otherwise>
+									<liferay-ui:icon
+										label="<%= true %>"
+										message="please-sign-in-to-reply"
+										url="<%= themeDisplay.getURLSignIn() %>"
+										/>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
 					</c:if>
 
 					<ul class="lfr-discussion-actions">
@@ -197,7 +234,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 								<%
 								String taglibEditURL = "javascript:"
 									+ randomNamespace + "showEditor('" + namespace + randomNamespace + "editReplyBody" + index + "','" + namespace + randomNamespace + "editForm" + index + "'); "
-									+ randomNamespace + "hideEditor('" + namespace + randomNamespace + "postReplyBody" + index + "','" + namespace + randomNamespace + "postReplyForm" + index + "')";
+									+ randomNamespace + "hideEditor('" + namespace + randomNamespace + "postReplyBody" + index + "','" + namespace + randomNamespace + "postReplyForm" + index + "');" + randomNamespace + "hideEl('" + namespace + randomNamespace + "discussionMessage" + index + "');";
 								%>
 
 								<li class="lfr-discussion-edit">
@@ -230,22 +267,6 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 		</div>
 
 		<div class="lfr-discussion-form-container">
-
-			<%
-			Map<String, Object> dataTextEditor = new HashMap<String, Object>();
-
-			JSONObject editorConfig = JSONFactoryUtil.createJSONObject();
-			editorConfig.put("allowedContent", "p strong em u");
-			editorConfig.put("toolbars", JSONFactoryUtil.createJSONObject());
-
-			JSONObject editorOptions = JSONFactoryUtil.createJSONObject();
-			editorOptions.put("textMode", Boolean.FALSE);
-			editorOptions.put("showSource", Boolean.FALSE);
-
-			dataTextEditor.put("editorConfig", editorConfig);
-			dataTextEditor.put("editorOptions", editorOptions);
-			%>
-
 			<div class="lfr-discussion lfr-discussion-form-reply" id='<portlet:namespace /><%= randomNamespace + "postReplyForm" + index %>' style="display: none;">
 				<div class="lfr-discussion-details">
 					<liferay-ui:user-display
@@ -256,7 +277,7 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 				</div>
 
 				<div class="lfr-discussion-body">
-					<liferay-ui:input-editor autoCreate="<%= false %>" contents="" data="<%= dataTextEditor %>" editorImpl="<%= EDITOR_TEXT_IMPL_KEY %>" name='<%= randomNamespace + "postReplyBody" + index %>' onChangeMethod='<%= randomNamespace + index + "OnChange" %>' placeholder="type-your-comment-here" />
+					<liferay-ui:input-editor autoCreate="<%= false %>" contents="" data="<%= commentsEditorDisplayContext.getEditorData() %>" editorImpl="<%= EDITOR_TEXT_IMPL_KEY %>" name='<%= randomNamespace + "postReplyBody" + index %>' onChangeMethod='<%= randomNamespace + index + "OnChange" %>' placeholder="type-your-comment-here" />
 
 					<aui:input name='<%= "postReplyBody" + index %>' type="hidden" />
 
@@ -277,39 +298,6 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 					</aui:script>
 				</div>
 			</div>
-
-			<c:if test="<%= !hideControls && MBDiscussionPermission.contains(permissionChecker, company.getCompanyId(), scopeGroupId, permissionClassName, permissionClassPK, message.getMessageId(), message.getUserId(), ActionKeys.UPDATE_DISCUSSION) %>">
-				<div class="lfr-discussion-form lfr-discussion-form-edit" id="<%= namespace + randomNamespace %>editForm<%= index %>" style='<%= "display: none; max-width: " + ModelHintsConstants.TEXTAREA_DISPLAY_WIDTH + "px;" %>'>
-					<liferay-ui:input-editor autoCreate="<%= false %>" contents="<%= message.getBody() %>" data="<%= dataTextEditor %>" editorImpl="<%= EDITOR_TEXT_IMPL_KEY %>" name='<%= randomNamespace + "editReplyBody" + index %>' />
-
-					<aui:input name='<%= "editReplyBody" + index %>' type="hidden" value="<%= message.getBody() %>" />
-
-					<%
-					boolean pending = message.isPending();
-
-					String publishButtonLabel = LanguageUtil.get(request, "publish");
-
-					if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, MBDiscussion.class.getName())) {
-						if (pending) {
-							publishButtonLabel = "save";
-						}
-						else {
-							publishButtonLabel = LanguageUtil.get(request, "submit-for-publication");
-						}
-					}
-					%>
-
-					<aui:button-row>
-						<aui:button name='<%= randomNamespace + "editReplyButton" + index %>' onClick='<%= randomNamespace + "updateMessage(" + index + ");" %>' value="<%= publishButtonLabel %>" />
-
-						<%
-						String taglibCancel = randomNamespace + "hideEditor('" + namespace + randomNamespace + "editReplyBody" + index + "','" + namespace + randomNamespace + "editForm" + index + "');";
-						%>
-
-						<aui:button onClick="<%= taglibCancel %>" type="cancel" />
-					</aui:button-row>
-				</div>
-			</c:if>
 		</div>
 
 		<%

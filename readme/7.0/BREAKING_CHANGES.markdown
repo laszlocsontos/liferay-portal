@@ -20,7 +20,7 @@ feature or API will be dropped in an upcoming version.
 replaces an old API, in spite of the old API being kept in Liferay Portal for
 backwards compatibility.
 
-*This document has been reviewed through commit `7763533`.*
+*This document has been reviewed through commit `68d6f19`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -272,7 +272,7 @@ protected Summary doGetSummary(Document document, Locale locale, String snippet,
 
 With:
 ```
-protected Summary doGetSummary(Document document, Locale locale, String snippet, PortletURL portletURL, PortletRequest portletRequest, PortletResponse portletResponse)
+protected Summary doGetSummary(Document document, Locale locale, String snippet, PortletRequest portletRequest, PortletResponse portletResponse)
 ```
 
 and replace:
@@ -1032,31 +1032,141 @@ This change has been made due to the deprecation of the `Fields` class.
 
 ---------------------------------------
 
-### DLProcessor needs to implement a new method getType()
+### Created a New `getType()` Method That is Implemented in `DLProcessor`
 - **Date:** 2015-Feb-17
 - **JIRA Ticket:** LPS-53574
 
 #### What changed?
 
-DLProcessor has a new method getType()
+The `DLProcessor` interface has a new method `getType()`.
 
 #### Who is affected?
 
-All developers who have created DLProcessor
+This affects developers who have created a `DLProcessor`.
 
 #### How should I update my code?
 
-You need to implement the method in the DLProcessor and return the type of
-Processor. You can check the class DLProcessorConstants to see the types.
-class.
+You should implement the new method and return the type of processor. You can
+check the class `DLProcessorConstants` to see processor types.
 
 #### Why was this change made?
 
-Before we were forcing developers to extend one of the existing DLProcessors and
-we were checking the instance of the class to determine what type of processor
-was.
+Previous to Liferay 7, developers were forced to extend one of the existing
+`DLProcessor` classes and developers using the extended class had to check the
+instance of that class to determine its processor type.
 
-With the new change developers don't need to extend any particular class to
-create their own DLProcessor.
+With this change, developers no longer need to extend any particular class to
+create their own `DLProcessor` and their processor's type can be clearly
+specified by a constant from the class `DLProcessorConstants`.
+
+---------------------------------------
+
+### Added Required Parameter `resourceClassNameId` for DDM Template Search Operations
+- **Date:** 2015-Mar-03
+- **JIRA Ticket:** LPS-52990
+
+#### What changed?
+
+The DDM template `search` and `searchCount` operations have a new parameter
+called `resourceClassNameId`.
+
+#### Who is affected?
+
+This affects developers who have direct calls to the `DDMTemplateService` or 
+`DDMTemplateLocalService`.
+
+#### How should I update my code?
+
+You should add the `resourceClassNameId` parameter to your calls. This parameter
+represents the resource that owns the permission for the DDM template. For
+example, if the template is a WCM template, the `resourceClassNameId` points to
+the `JournalArticle`'s `classNameId`. If the template is a DDL template, the
+`resourceClassNameId` points to the `DDLRecordSet`'s `classNameId`. If the
+template is an ADT template, the `resourceClassNameId` points to the
+`PortletDisplayTemplate`'s `classNameId`.
+
+#### Why was this change made?
+
+This change was made in order to implement model resource permissions for
+DDM templates, such as `VIEW`, `DELETE`, `PERMISSIONS`, and `UPDATE`.
+
+---------------------------------------
+
+### Taglib <liferay-ui:restore-entry /> has changed its usage
+- **Date:** 2015-Mar-1
+- **JIRA Ticket:** LPS-54106
+
+#### What changed?
+
+The usage of this taglib serves a different purpose now. Now it renders the UI
+to restore elements from the Recycle Bin.
+
+#### Who is affected?
+
+Anyone using the taglib liferay-ui:restore-entry.
+
+#### How should I update my code?
+
+You need to replace the call to your taglib with this code. The CheckEntryURL
+should be an ActionURL of your portlet which checks if the current entry can
+be restored form the Recycle Bin. The duplicateEntryURL should be a RenderURL of
+your portlet that renders the UI to restore the entry resolving the conflicts
+(if they exist). In order to generate that URL you can use the taglib
+<liferay-ui:restore-entry /> which has been refactored for this usage.
+
+```
+<aui:script use="liferay-restore-entry">
+	new Liferay.RestoreEntry(
+	{
+			checkEntryURL: '<%= checkEntryURL.toString() %>',
+			duplicateEntryURL: '<%= duplicateEntryURL.toString() %>',
+			namespace: '<portlet:namespace />'
+		}
+	);
+</aui:script>
+```
+
+#### Why was this change made?
+
+This change allows the Trash Portlet to be an independent module. Its actions
+and views are not used anymore by the taglib and they are now responsability of
+each plugin.
+
+---------------------------------------
+
+### Display Styles for the Breadcrumb Portlet have been replaced by ADT
+- **Date:** 2015-Mar-12
+- **JIRA Ticket:** LPS-54106
+
+#### What changed?
+
+The custom display styles of the breadcrumb tag added using JSPs won't work
+anymore. They have been replaced by Application Display Templates.
+
+
+#### Who is affected?
+
+Anyone using the properties.
+
+```
+breadcrumb.display.style.default=horizontal
+
+
+breadcrumb.display.style.options=horizontal,vertical
+```
+
+
+#### How should I update my code?
+
+You need to convert your jsps with custom styles for the breadcrumb with
+Application Display Templates (ADT) for the breadcrumb and use those. ADT can be
+created from the UI of the portal in Site Settings >>
+Application Display Tempaltes or also programatically.
+
+
+#### Why was this change made?
+
+Application Display Templates provide more flexibility that JSPs since coding
+is not needed to change the look and feel of your application.
 
 ---------------------------------------

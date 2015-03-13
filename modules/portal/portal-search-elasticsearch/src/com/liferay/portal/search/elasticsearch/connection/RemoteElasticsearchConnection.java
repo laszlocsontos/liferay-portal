@@ -20,8 +20,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.elasticsearch.spi.connection.ElasticsearchConnection;
-import com.liferay.portal.search.elasticsearch.spi.index.IndexFactory;
+import com.liferay.portal.search.elasticsearch.index.IndexFactory;
 import com.liferay.registry.util.StringPlus;
 
 import java.net.InetAddress;
@@ -39,6 +38,7 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -127,6 +127,11 @@ public class RemoteElasticsearchConnection extends BaseElasticsearchConnection {
 		}
 
 		return transportClient;
+	}
+
+	@Deactivate
+	protected void deactivate(Map<String, Object> properties) {
+		close();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

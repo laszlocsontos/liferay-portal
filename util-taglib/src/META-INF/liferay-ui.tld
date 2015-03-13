@@ -501,6 +501,11 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
+		<attribute>
+			<name>ignoreRequestValue</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 	</tag>
 	<tag>
 		<name>asset-categories-summary</name>
@@ -741,6 +746,11 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
+		<attribute>
+			<name>ignoreRequestValue</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 	</tag>
 	<tag>
 		<name>asset-tags-summary</name>
@@ -782,7 +792,12 @@
 		<tag-class>com.liferay.taglib.ui.BreadcrumbTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
-			<name>displayStyle</name>
+			<name>ddmTemplate</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>ddmTemplateKey</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -3134,6 +3149,11 @@
 		<tag-class>com.liferay.taglib.ui.MapTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
+			<name>apiKey</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>geolocation</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -3625,11 +3645,6 @@
 		<tag-class>com.liferay.taglib.ui.RestoreEntryTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
-			<name>duplicateEntryAction</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
 			<name>overrideMessage</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -3640,8 +3655,8 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<name>restoreEntryAction</name>
-			<required>false</required>
+			<name>restoreURL</name>
+			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
@@ -4961,7 +4976,7 @@
 		<body-content>empty</body-content>
 		<attribute>
 			<name>portletURL</name>
-			<required>false</required>
+			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
