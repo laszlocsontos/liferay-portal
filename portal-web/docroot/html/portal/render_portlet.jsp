@@ -741,7 +741,9 @@ Boolean portletVisibility = null;
 
 if (portlet.isActive() && portlet.isReady() && supportsMimeType && (invokerPortlet != null)) {
 	try {
-		invokerPortlet.render(renderRequestImpl, renderResponseImpl);
+		if (!(group.isLayoutPrototype() && layoutTypePortlet.hasPortletId(portletDisplay.getId()) && !portletDisplay.getPortletName().equals(PortletKeys.NESTED_PORTLETS) && portletDisplay.isModeView() && !portlet.isSystem() && !runtimePortlet)) {
+			invokerPortlet.render(renderRequestImpl, renderResponseImpl);	
+		}
 
 		portletVisibility = (Boolean)renderRequestImpl.getAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY);
 
