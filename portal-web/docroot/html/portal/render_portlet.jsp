@@ -741,7 +741,14 @@ Boolean portletVisibility = null;
 
 if (portlet.isActive() && portlet.isReady() && supportsMimeType && (invokerPortlet != null)) {
 	try {
-		if (!(group.isLayoutPrototype() && layoutTypePortlet.hasPortletId(portletDisplay.getId()) && !portletDisplay.getPortletName().equals(PortletKeys.NESTED_PORTLETS) && portletDisplay.isModeView() && !portlet.isSystem() && !runtimePortlet)) {
+
+		boolean isOnLayoutPrototype = false;
+
+		if (group.isLayoutPrototype() && layoutTypePortlet.hasPortletId(portletDisplay.getId()) && !portletDisplay.getPortletName().equals(PortletKeys.NESTED_PORTLETS) && portletDisplay.isModeView()) {
+			isOnLayoutPrototype = true;
+		}
+
+		if (!(isOnLayoutPrototype && !portlet.isSystem() && !runtimePortlet)) {
 			invokerPortlet.render(renderRequestImpl, renderResponseImpl);	
 		}
 
