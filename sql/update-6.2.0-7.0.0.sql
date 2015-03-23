@@ -7,6 +7,7 @@ update AssetEntry set listable = TRUE;
 drop table AssetTagProperty;
 
 alter table BlogsEntry add subtitle STRING null;
+alter table BlogsEntry add coverImageCaption String null;
 alter table BlogsEntry add coverImageFileEntryId LONG;
 alter table BlogsEntry add coverImageURL STRING null;
 alter table BlogsEntry add smallImageFileEntryId LONG;
@@ -44,7 +45,7 @@ create table DDMStructureVersion (
 	type_ INTEGER
 );
 
-alter table DDMTemplate add sourceClassNameId LONG;
+alter table DDMTemplate add resourceClassNameId LONG;
 alter table DDMTemplate add version VARCHAR(75) null;
 
 update DDMTemplate set version = '1.0';
@@ -79,7 +80,7 @@ create table ExportImportConfiguration (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
-	name VARCHAR(75) null,
+	name VARCHAR(200) null,
 	description STRING null,
 	type_ INTEGER,
 	settings_ TEXT null,

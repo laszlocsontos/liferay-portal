@@ -140,6 +140,10 @@ public class RubyExecutor extends BaseScriptingExecutor {
 		_scriptingContainer.setCurrentDirectory(_basePath);
 	}
 
+	public void destroy() {
+		_scriptingContainer.terminate();
+	}
+
 	@Override
 	public Map<String, Object> eval(
 			Set<String> allowedClasses, Map<String, Object> inputObjects,
@@ -271,8 +275,8 @@ public class RubyExecutor extends BaseScriptingExecutor {
 			allowedClasses, inputObjects, outputNames, scriptFile, script,
 			classLoaders);
 
-		FutureTask<Map<String, Object>> futureTask =
-			new FutureTask<Map<String, Object>>(evalCallable);
+		FutureTask<Map<String, Object>> futureTask = new FutureTask<>(
+			evalCallable);
 
 		Thread oneTimeExecutorThread = _threadFactory.newThread(futureTask);
 
@@ -298,10 +302,9 @@ public class RubyExecutor extends BaseScriptingExecutor {
 	private static final Log _log = LogFactoryUtil.getLog(RubyExecutor.class);
 
 	private static final Field _globalRuntimeField;
-	private static final ThreadFactory _threadFactory =
-		new NamedThreadFactory(
-			RubyExecutor.class.getName(), Thread.NORM_PRIORITY,
-			RubyExecutor.class.getClassLoader());
+	private static final ThreadFactory _threadFactory = new NamedThreadFactory(
+		RubyExecutor.class.getName(), Thread.NORM_PRIORITY,
+		RubyExecutor.class.getClassLoader());
 
 	static {
 		try {

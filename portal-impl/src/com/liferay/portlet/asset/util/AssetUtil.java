@@ -477,11 +477,10 @@ public class AssetUtil {
 			ClassTypeReader classTypeReader =
 				assetRendererFactory.getClassTypeReader();
 
-			List<ClassType> classTypes =
-				classTypeReader.getAvailableClassTypes(
-					PortalUtil.getCurrentAndAncestorSiteGroupIds(
-						themeDisplay.getScopeGroupId()),
-					themeDisplay.getLocale());
+			List<ClassType> classTypes = classTypeReader.getAvailableClassTypes(
+				PortalUtil.getCurrentAndAncestorSiteGroupIds(
+					themeDisplay.getScopeGroupId()),
+				themeDisplay.getLocale());
 
 			if ((classTypeIds.length == 0) || classTypes.isEmpty()) {
 				PortletURL addPortletURL = getAddPortletURL(
@@ -869,8 +868,7 @@ public class AssetUtil {
 		if (sortField.equals(Field.CREATE_DATE) ||
 			sortField.equals(Field.EXPIRATION_DATE) ||
 			sortField.equals(Field.PUBLISH_DATE) ||
-			sortField.equals("ddm-date") ||
-			sortField.equals("modifiedDate")) {
+			sortField.equals("ddm-date") || sortField.equals("modifiedDate")) {
 
 			sortType = Sort.LONG_TYPE;
 		}

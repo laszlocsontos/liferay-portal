@@ -19,7 +19,7 @@
 <%
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 
-JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_ARTICLE);
+JournalArticle article = ActionUtil.getArticle(request);
 
 long classNameId = BeanParamUtil.getLong(article, request, "classNameId");
 %>
@@ -30,12 +30,12 @@ long classNameId = BeanParamUtil.getLong(article, request, "classNameId");
 			<aui:button data-title='<%= LanguageUtil.get(request, "in-order-to-preview-your-changes,-the-web-content-is-saved-as-a-draft") %>' icon="icon-search" name="basicPreviewButton" value="basic-preview" />
 		</c:if>
 
-		<c:if test="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.PERMISSIONS) %>">
+		<c:if test="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.PERMISSIONS) && (classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT) %>">
 			<aui:button icon="icon-lock" name="articlePermissionsButton" value="permissions" />
 		</c:if>
 
 		<portlet:renderURL var="viewHistoryURL">
-			<portlet:param name="struts_action" value="/journal/view_article_history" />
+			<portlet:param name="mvcPath" value="/html/portlet/journal/view_article_history.jsp" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="referringPortletResource" value="<%= referringPortletResource %>" />
 			<portlet:param name="groupId" value="<%= String.valueOf(article.getGroupId()) %>" />

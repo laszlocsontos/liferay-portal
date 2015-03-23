@@ -249,7 +249,7 @@ public class InputTag extends BaseInputTag {
 
 		String forLabel = id;
 
-		if (Validator.equals(type,"assetTags")) {
+		if (Validator.equals(type, "assetTags")) {
 			forLabel = forLabel.concat("assetTagNames");
 		}
 
@@ -267,8 +267,8 @@ public class InputTag extends BaseInputTag {
 
 		String title = getTitle();
 
-		if ((title == null) && (Validator.isNull(label) ||
-			 Validator.equals(type, "image"))) {
+		if ((title == null) &&
+			(Validator.isNull(label) || Validator.equals(type, "image"))) {
 
 			title = TextFormatter.format(name, TextFormatter.P);
 		}

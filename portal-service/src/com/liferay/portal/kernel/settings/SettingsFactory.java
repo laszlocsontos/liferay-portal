@@ -15,7 +15,7 @@
 package com.liferay.portal.kernel.settings;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.resource.manager.ResourceManager;
+import com.liferay.portal.kernel.settings.definition.SettingsDefinition;
 import com.liferay.portal.model.Layout;
 
 import java.util.List;
@@ -34,8 +34,6 @@ public interface SettingsFactory {
 	public Settings getGroupServiceSettings(long groupId, String serviceName)
 		throws PortalException;
 
-	public List<String> getMultiValuedKeys(String settingsId);
-
 	public ArchivedSettings getPortletInstanceArchivedSettings(
 			long groupId, String portletId, String name)
 		throws PortalException;
@@ -48,9 +46,16 @@ public interface SettingsFactory {
 
 	public Settings getServerSettings(String settingsId);
 
+	public SettingsDescriptor getSettingsDescriptor(String settingsId);
+
+	public void registerSettingsDefinition(
+		SettingsDefinition<?, ?> settingsDefinition, Object configurationBean);
+
 	public void registerSettingsMetadata(
-		String settingsId, FallbackKeys fallbackKeys,
-		String[] multiValuedKeysArray, Object serviceConfigurationBean,
-		ResourceManager resourceManager);
+		Class<?> settingsClass, Object configurationBean,
+		FallbackKeys fallbackKeys);
+
+	public void unregisterSettingsDefinition(
+		SettingsDefinition<?, ?> settingsDefinition);
 
 }
