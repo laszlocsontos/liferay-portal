@@ -748,8 +748,8 @@ if (portlet.isActive() && portlet.isReady() && supportsMimeType && (invokerPortl
 			isOnLayoutPrototype = true;
 		}
 
-		if (!(isOnLayoutPrototype && !portlet.isSystem() && !runtimePortlet)) {
-			invokerPortlet.render(renderRequestImpl, renderResponseImpl);	
+		if (!isOnLayoutPrototype || portlet.isSystem() || runtimePortlet) {
+			invokerPortlet.render(renderRequestImpl, renderResponseImpl);
 		}
 
 		portletVisibility = (Boolean)renderRequestImpl.getAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY);
