@@ -50,7 +50,6 @@ import com.liferay.portal.lar.LayoutExporter;
 import com.liferay.portal.lar.LayoutImporter;
 import com.liferay.portal.lar.PortletExporter;
 import com.liferay.portal.lar.PortletImporter;
-import com.liferay.portal.lar.backgroundtask.BackgroundTaskContextMapFactory;
 import com.liferay.portal.lar.backgroundtask.LayoutExportBackgroundTaskExecutor;
 import com.liferay.portal.lar.backgroundtask.LayoutImportBackgroundTaskExecutor;
 import com.liferay.portal.lar.backgroundtask.PortletExportBackgroundTaskExecutor;
@@ -414,8 +413,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		boolean addGuestPermissions = false;
 
-		if (!privateLayout ||
-			type.equals(LayoutConstants.TYPE_CONTROL_PANEL) ||
+		if (!privateLayout || type.equals(LayoutConstants.TYPE_CONTROL_PANEL) ||
 			type.equals(LayoutConstants.TYPE_USER_PERSONAL_PANEL) ||
 			group.isLayoutSetPrototype()) {
 
@@ -953,7 +951,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Map<String, Serializable> settingsMap =
 			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
 				userId, groupId, privateLayout, layoutIds, parameterMap,
-				startDate, endDate, user.getLocale(), user.getTimeZone());
+				user.getLocale(), user.getTimeZone());
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -1103,23 +1101,68 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 	@Override
 	public long exportPortletInfoAsFileInBackground(
+			long userId, ExportImportConfiguration exportImportConfiguration)
+		throws PortalException {
+
+		if (!DLValidatorUtil.isValidName(exportImportConfiguration.getName())) {
+			throw new LARFileNameException(exportImportConfiguration.getName());
+		}
+
+		Map<String, Serializable> taskContextMap = new HashMap<>();
+
+		taskContextMap.put(Constants.CMD, Constants.EXPORT);
+		taskContextMap.put(
+			"exportImportConfigurationId",
+			exportImportConfiguration.getExportImportConfigurationId());
+
+		BackgroundTask backgroundTask =
+			backgroundTaskLocalService.addBackgroundTask(
+				userId, exportImportConfiguration.getGroupId(),
+				exportImportConfiguration.getName(), null,
+				PortletExportBackgroundTaskExecutor.class, taskContextMap,
+				new ServiceContext());
+
+		return backgroundTask.getBackgroundTaskId();
+	}
+
+	@Override
+	public long exportPortletInfoAsFileInBackground(
+			long userId, long exportImportConfigurationId)
+		throws PortalException {
+
+		ExportImportConfiguration exportImportConfiguration =
+			exportImportConfigurationLocalService.getExportImportConfiguration(
+				exportImportConfigurationId);
+
+		return exportPortletInfoAsFileInBackground(
+			userId, exportImportConfiguration);
+	}
+
+	@Override
+	public long exportPortletInfoAsFileInBackground(
 			long userId, String taskName, long plid, long groupId,
 			String portletId, Map<String, String[]> parameterMap,
 			Date startDate, Date endDate, String fileName)
 		throws PortalException {
 
-		Map<String, Serializable> taskContextMap =
-			BackgroundTaskContextMapFactory.buildTaskContextMap(
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		Map<String, Serializable> settingsMap =
+			ExportImportConfigurationSettingsMapFactory.buildExportSettingsMap(
 				userId, plid, groupId, portletId, parameterMap,
-				Constants.EXPORT, startDate, endDate, fileName);
+				Constants.EXPORT, user.getLocale(), user.getTimeZone(),
+				fileName);
 
-		BackgroundTask backgroundTask =
-			backgroundTaskLocalService.addBackgroundTask(
-				userId, groupId, taskName, null,
-				PortletExportBackgroundTaskExecutor.class, taskContextMap,
-				new ServiceContext());
+		ServiceContext serviceContext = new ServiceContext();
 
-		return backgroundTask.getBackgroundTaskId();
+		ExportImportConfiguration exportImportConfiguration =
+			exportImportConfigurationLocalService.addExportImportConfiguration(
+				userId, groupId, taskName, StringPool.BLANK,
+				ExportImportConfigurationConstants.TYPE_EXPORT_PORTLET,
+				settingsMap, WorkflowConstants.STATUS_DRAFT, serviceContext);
+
+		return exportPortletInfoAsFileInBackground(
+			userId, exportImportConfiguration);
 	}
 
 	@Override
@@ -1295,8 +1338,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 				layoutFriendlyURL.getPlid());
 		}
 
-		if ((layout == null) &&
-			friendlyURL.startsWith(StringPool.SLASH) &&
+		if ((layout == null) && friendlyURL.startsWith(StringPool.SLASH) &&
 			Validator.isNumber(friendlyURL.substring(1))) {
 
 			long layoutId = GetterUtil.getLong(friendlyURL.substring(1));
@@ -1878,18 +1920,21 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 	@Override
 	public long importLayoutsInBackground(
-			long userId, String taskName, long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, File file)
+			long userId, ExportImportConfiguration exportImportConfiguration,
+			File file)
 		throws PortalException {
 
-		Map<String, Serializable> taskContextMap =
-			BackgroundTaskContextMapFactory.buildTaskContextMap(
-				userId, groupId, privateLayout, null, parameterMap,
-				Constants.IMPORT, null, null, file.getName());
+		Map<String, Serializable> taskContextMap = new HashMap<>();
+
+		taskContextMap.put(Constants.CMD, Constants.IMPORT);
+		taskContextMap.put(
+			"exportImportConfigurationId",
+			exportImportConfiguration.getExportImportConfigurationId());
 
 		BackgroundTask backgroundTask =
 			backgroundTaskLocalService.addBackgroundTask(
-				userId, groupId, taskName, null,
+				userId, exportImportConfiguration.getGroupId(),
+				exportImportConfiguration.getName(), null,
 				LayoutImportBackgroundTaskExecutor.class, taskContextMap,
 				new ServiceContext());
 
@@ -1897,6 +1942,45 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			userId, backgroundTask.getBackgroundTaskId(), file.getName(), file);
 
 		return backgroundTask.getBackgroundTaskId();
+	}
+
+	@Override
+	public long importLayoutsInBackground(
+			long userId, long exportImportConfigurationId, File file)
+		throws PortalException {
+
+		ExportImportConfiguration exportImportConfiguration =
+			exportImportConfigurationLocalService.getExportImportConfiguration(
+				exportImportConfigurationId);
+
+		return importPortletInfoInBackground(
+			userId, exportImportConfiguration, file);
+	}
+
+	@Override
+	public long importLayoutsInBackground(
+			long userId, String taskName, long groupId, boolean privateLayout,
+			Map<String, String[]> parameterMap, File file)
+		throws PortalException {
+
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		Map<String, Serializable> settingsMap =
+			ExportImportConfigurationSettingsMapFactory.buildImportSettingsMap(
+				userId, groupId, privateLayout, null, parameterMap,
+				Constants.IMPORT, user.getLocale(), user.getTimeZone(),
+				file.getName());
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		ExportImportConfiguration exportImportConfiguration =
+			exportImportConfigurationLocalService.addExportImportConfiguration(
+				userId, groupId, taskName, StringPool.BLANK,
+				ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
+				settingsMap, WorkflowConstants.STATUS_DRAFT, serviceContext);
+
+		return importLayoutsInBackground(
+			userId, exportImportConfiguration, file);
 	}
 
 	@Override
@@ -2074,18 +2158,21 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 	@Override
 	public long importPortletInfoInBackground(
-			long userId, String taskName, long plid, long groupId,
-			String portletId, Map<String, String[]> parameterMap, File file)
+			long userId, ExportImportConfiguration exportImportConfiguration,
+			File file)
 		throws PortalException {
 
-		Map<String, Serializable> taskContextMap =
-			BackgroundTaskContextMapFactory.buildTaskContextMap(
-				userId, plid, groupId, portletId, parameterMap,
-				Constants.IMPORT, null, null, file.getName());
+		Map<String, Serializable> taskContextMap = new HashMap<>();
+
+		taskContextMap.put(Constants.CMD, Constants.IMPORT);
+		taskContextMap.put(
+			"exportImportConfigurationId",
+			exportImportConfiguration.getExportImportConfigurationId());
 
 		BackgroundTask backgroundTask =
 			backgroundTaskLocalService.addBackgroundTask(
-				userId, groupId, taskName, null,
+				userId, exportImportConfiguration.getGroupId(),
+				exportImportConfiguration.getName(), null,
 				PortletImportBackgroundTaskExecutor.class, taskContextMap,
 				new ServiceContext());
 
@@ -2093,6 +2180,45 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			userId, backgroundTask.getBackgroundTaskId(), file.getName(), file);
 
 		return backgroundTask.getBackgroundTaskId();
+	}
+
+	@Override
+	public long importPortletInfoInBackground(
+			long userId, long exportImportConfigurationId, File file)
+		throws PortalException {
+
+		ExportImportConfiguration exportImportConfiguration =
+			exportImportConfigurationLocalService.getExportImportConfiguration(
+				exportImportConfigurationId);
+
+		return importPortletInfoInBackground(
+			userId, exportImportConfiguration, file);
+	}
+
+	@Override
+	public long importPortletInfoInBackground(
+			long userId, String taskName, long plid, long groupId,
+			String portletId, Map<String, String[]> parameterMap, File file)
+		throws PortalException {
+
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		Map<String, Serializable> settingsMap =
+			ExportImportConfigurationSettingsMapFactory.buildImportSettingsMap(
+				userId, plid, groupId, portletId, parameterMap,
+				Constants.IMPORT, user.getLocale(), user.getTimeZone(),
+				file.getName());
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		ExportImportConfiguration exportImportConfiguration =
+			exportImportConfigurationLocalService.addExportImportConfiguration(
+				userId, groupId, taskName, StringPool.BLANK,
+				ExportImportConfigurationConstants.TYPE_IMPORT_PORTLET,
+				settingsMap, WorkflowConstants.STATUS_DRAFT, serviceContext);
+
+		return importPortletInfoInBackground(
+			userId, exportImportConfiguration, file);
 	}
 
 	@Override

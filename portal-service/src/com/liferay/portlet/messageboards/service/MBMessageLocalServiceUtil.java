@@ -313,6 +313,11 @@ public class MBMessageLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
+	public static void emptyMessageAttachments(long messageId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().emptyMessageAttachments(messageId);
+	}
+
 	public static com.liferay.portlet.messageboards.model.MBMessage fetchMBMessage(
 		long messageId) {
 		return getService().fetchMBMessage(messageId);
@@ -384,6 +389,16 @@ public class MBMessageLocalServiceUtil {
 		return getService()
 				   .getDiscussionMessageDisplay(userId, groupId, className,
 			classPK, status);
+	}
+
+	public static com.liferay.portlet.messageboards.model.MBMessageDisplay getDiscussionMessageDisplay(
+		long userId, long groupId, java.lang.String className, long classPK,
+		int status,
+		java.util.Comparator<com.liferay.portlet.messageboards.model.MBMessage> comparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getDiscussionMessageDisplay(userId, groupId, className,
+			classPK, status, comparator);
 	}
 
 	/**
@@ -549,6 +564,16 @@ public class MBMessageLocalServiceUtil {
 		return getService()
 				   .getMessageDisplay(userId, message, status, threadView,
 			includePrevAndNext);
+	}
+
+	public static com.liferay.portlet.messageboards.model.MBMessageDisplay getMessageDisplay(
+		long userId, com.liferay.portlet.messageboards.model.MBMessage message,
+		int status, java.lang.String threadView, boolean includePrevAndNext,
+		java.util.Comparator<com.liferay.portlet.messageboards.model.MBMessage> comparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getMessageDisplay(userId, message, status, threadView,
+			includePrevAndNext, comparator);
 	}
 
 	public static com.liferay.portlet.messageboards.model.MBMessageDisplay getMessageDisplay(

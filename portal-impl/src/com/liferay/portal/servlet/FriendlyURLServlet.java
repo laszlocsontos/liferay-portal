@@ -24,11 +24,14 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.struts.LastPath;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutFriendlyURL;
@@ -98,7 +101,8 @@ public class FriendlyURLServlet extends HttpServlet {
 
 		// Do not set the entire full main path. See LEP-456.
 
-		//String mainPath = (String)ctx.getAttribute(WebKeys.MAIN_PATH);
+		// String mainPath = (String)ctx.getAttribute(WebKeys.MAIN_PATH);
+
 		String mainPath = Portal.PATH_MAIN;
 
 		String redirect = mainPath;
@@ -180,6 +184,45 @@ public class FriendlyURLServlet extends HttpServlet {
 		return friendlyURL;
 	}
 
+	protected String getLoginRedirect(HttpServletRequest request)
+		throws IOException, ServletException {
+
+		String redirect = PortalUtil.getPathMain().concat("/portal/login");
+
+		String currentURL = PortalUtil.getCurrentURL(request);
+
+		redirect = HttpUtil.addParameter(redirect, "redirect", currentURL);
+
+		long plid = ParamUtil.getLong(request, "p_l_id");
+
+		if (plid > 0) {
+			try {
+				redirect = HttpUtil.addParameter(redirect, "refererPlid", plid);
+
+				Layout layout = LayoutLocalServiceUtil.getLayout(plid);
+
+				Group group = layout.getGroup();
+
+				plid = group.getDefaultPublicPlid();
+
+				if ((plid == LayoutConstants.DEFAULT_PLID) ||
+					group.isStagingGroup()) {
+
+					Group guestGroup = GroupLocalServiceUtil.getGroup(
+						layout.getCompanyId(), GroupConstants.GUEST);
+
+					plid = guestGroup.getDefaultPublicPlid();
+				}
+
+				redirect = HttpUtil.addParameter(redirect, "p_l_id", plid);
+			}
+			catch (Exception e) {
+			}
+		}
+
+		return redirect;
+	}
+
 	protected String getPathInfo(HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
 
@@ -202,7 +245,9 @@ public class FriendlyURLServlet extends HttpServlet {
 		throws Exception {
 
 		if (Validator.isNull(path) || (path.charAt(0) != CharPool.SLASH)) {
-			return new Object[] {mainPath, false};
+			return new Object[] {
+				mainPath, false
+			};
 		}
 
 		// Group friendly URL
@@ -219,7 +264,9 @@ public class FriendlyURLServlet extends HttpServlet {
 		}
 
 		if (Validator.isNull(friendlyURL)) {
-			return new Object[] {mainPath, Boolean.FALSE};
+			return new Object[] {
+				mainPath, Boolean.FALSE
+			};
 		}
 
 		long companyId = PortalInstances.getCompanyId(request);
@@ -248,9 +295,8 @@ public class FriendlyURLServlet extends HttpServlet {
 
 				if (group == null) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(
-							"No group exists with friendly URL " + groupId +
-								". Try fetching by screen name instead.");
+						_log.debug("No group exists with friendly URL " +
+							groupId + ". Try fetching by screen name instead.");
 					}
 
 					User user = UserLocalServiceUtil.fetchUserByScreenName(
@@ -260,9 +306,8 @@ public class FriendlyURLServlet extends HttpServlet {
 						group = user.getGroup();
 					}
 					else if (_log.isWarnEnabled()) {
-						_log.warn(
-							"No user or group exists with friendly URL " +
-								groupId);
+						_log.warn("No user or group exists with friendly URL " +
+							groupId);
 					}
 				}
 			}
@@ -315,6 +360,14 @@ public class FriendlyURLServlet extends HttpServlet {
 
 				Layout layout = layoutFriendlyURLComposite.getLayout();
 
+				if (_private && layout.isTypeURL() &&
+					PortalUtil.getUserId(request) == 0) {
+
+					return new Object[] {
+						getLoginRedirect(request), Boolean.FALSE
+					};
+				}
+
 				String layoutFriendlyURLCompositeFriendlyURL =
 					layoutFriendlyURLComposite.getFriendlyURL();
 
@@ -343,7 +396,9 @@ public class FriendlyURLServlet extends HttpServlet {
 						String redirect = PortalUtil.getLocalizedFriendlyURL(
 							request, layout, locale, originalLocale);
 
-						return new Object[] {redirect, Boolean.TRUE};
+						return new Object[] {
+							redirect, Boolean.TRUE
+						};
 					}
 				}
 			}
@@ -357,7 +412,9 @@ public class FriendlyURLServlet extends HttpServlet {
 						String redirect = PortalUtil.getLayoutActualURL(
 							layout, mainPath);
 
-						return new Object[] {redirect, Boolean.FALSE};
+						return new Object[] {
+							redirect, Boolean.FALSE
+						};
 					}
 				}
 
@@ -369,7 +426,9 @@ public class FriendlyURLServlet extends HttpServlet {
 			group.getGroupId(), _private, mainPath, friendlyURL, params,
 			requestContext);
 
-		return new Object[] {actualURL, Boolean.FALSE};
+		return new Object[] {
+			actualURL, Boolean.FALSE
+		};
 	}
 
 	protected Locale setAlternativeLayoutFriendlyURL(

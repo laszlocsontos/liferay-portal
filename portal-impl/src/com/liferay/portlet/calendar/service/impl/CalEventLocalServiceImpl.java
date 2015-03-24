@@ -518,10 +518,9 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 
 		// Time zone sensitive
 
-		List<CalEvent> timeZoneSensitiveEvents =
-			calEventFinder.findByG_SD_T(
-				groupId, CalendarUtil.getGTDate(cal),
-				CalendarUtil.getLTDate(cal), true, types);
+		List<CalEvent> timeZoneSensitiveEvents = calEventFinder.findByG_SD_T(
+			groupId, CalendarUtil.getGTDate(cal), CalendarUtil.getLTDate(cal),
+			true, types);
 
 		// Time zone insensitive
 
@@ -532,10 +531,9 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 			cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
 			cal.get(Calendar.DATE));
 
-		List<CalEvent> timeZoneInsensitiveEvents =
-			calEventFinder.findByG_SD_T(
-				groupId, CalendarUtil.getGTDate(tzICal),
-				CalendarUtil.getLTDate(tzICal), false, types);
+		List<CalEvent> timeZoneInsensitiveEvents = calEventFinder.findByG_SD_T(
+			groupId, CalendarUtil.getGTDate(tzICal),
+			CalendarUtil.getLTDate(tzICal), false, types);
 
 		// Create new list
 
@@ -1257,7 +1255,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					dateFormatDateTime.format(startDate.getTime()),
 					event.getTitle(), fromAddress, fromName,
 					company.getPortalURL(event.getGroupId()), portletName,
-					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
+					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName)
 				});
 
 			body = StringUtil.replace(
@@ -1273,7 +1271,7 @@ public class CalEventLocalServiceImpl extends CalEventLocalServiceBaseImpl {
 					dateFormatDateTime.format(startDate.getTime()),
 					event.getTitle(), fromAddress, fromName,
 					company.getPortalURL(event.getGroupId()), portletName,
-					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName),
+					HtmlUtil.escape(toAddress), HtmlUtil.escape(toName)
 				});
 
 			if ((remindBy == CalEventConstants.REMIND_BY_EMAIL) ||

@@ -17,6 +17,9 @@
 <%@ include file="/html/portlet/journal/init.jsp" %>
 
 <%
+String currentFolder = ParamUtil.getString(request, "curFolder");
+String deltaFolder = ParamUtil.getString(request, "deltaFolder");
+
 long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
 
 long ddmStructureId = 0;
@@ -25,7 +28,8 @@ String ddmStructureName = LanguageUtil.get(request, "basic-web-content");
 
 PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
-portletURL.setParameter("struts_action", "/journal/view");
+portletURL.setParameter("curFolder", currentFolder);
+portletURL.setParameter("deltaFolder", deltaFolder);
 portletURL.setParameter("folderId", String.valueOf(folderId));
 
 ArticleSearch articleSearchContainer = new ArticleSearch(liferayPortletRequest, portletURL);
@@ -208,9 +212,7 @@ request.setAttribute("view_entries.jsp-entryEnd", String.valueOf(articleSearchCo
 			<c:when test="<%= subscribed %>">
 				<c:choose>
 					<c:when test="<%= unsubscribable %>">
-						<portlet:actionURL var="unsubscribeURL">
-							<portlet:param name="struts_action" value='<%= Validator.isNull(displayTerms.getDDMStructureKey()) ? "/journal/edit_folder" : "/journal/edit_article" %>' />
-							<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.UNSUBSCRIBE %>" />
+						<portlet:actionURL name='<%= Validator.isNull(displayTerms.getDDMStructureKey()) ? "unsubscribeFolder" : "unsubscribeStructure" %>' var="unsubscribeURL">
 							<portlet:param name="redirect" value="<%= currentURL %>" />
 
 							<c:choose>
@@ -240,9 +242,7 @@ request.setAttribute("view_entries.jsp-entryEnd", String.valueOf(articleSearchCo
 				</c:choose>
 			</c:when>
 			<c:otherwise>
-				<portlet:actionURL var="subscribeURL">
-					<portlet:param name="struts_action" value='<%= Validator.isNull(displayTerms.getDDMStructureKey()) ? "/journal/edit_folder" : "/journal/edit_article" %>' />
-					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.SUBSCRIBE %>" />
+				<portlet:actionURL name='<%= Validator.isNull(displayTerms.getDDMStructureKey()) ? "subscribeFolder" : "subscribeStructure" %>' var="subscribeURL">
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 
 					<c:choose>
@@ -303,7 +303,7 @@ String displayStyle = journalDisplayContext.getDisplayStyle();
 					<%
 					PortletURL tempRowURL = liferayPortletResponse.createRenderURL();
 
-					tempRowURL.setParameter("struts_action", "/journal/edit_article");
+					tempRowURL.setParameter("mvcPath", "/html/portlet/journal/edit_article.jsp");
 					tempRowURL.setParameter("redirect", currentURL);
 					tempRowURL.setParameter("groupId", String.valueOf(curArticle.getGroupId()));
 					tempRowURL.setParameter("folderId", String.valueOf(curArticle.getFolderId()));
@@ -336,7 +336,6 @@ String displayStyle = journalDisplayContext.getDisplayStyle();
 
 					PortletURL tempRowURL = liferayPortletResponse.createRenderURL();
 
-					tempRowURL.setParameter("struts_action", "/journal/view");
 					tempRowURL.setParameter("redirect", currentURL);
 					tempRowURL.setParameter("groupId", String.valueOf(curFolder.getGroupId()));
 					tempRowURL.setParameter("folderId", String.valueOf(curFolder.getFolderId()));

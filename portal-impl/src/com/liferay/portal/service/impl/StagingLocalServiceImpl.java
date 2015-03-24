@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.ExportImportDateUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.lar.MissingReferences;
+import com.liferay.portal.kernel.lar.exportimportconfiguration.ExportImportConfigurationParameterMapFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -287,12 +288,13 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			Group stagingGroup = liveGroup.getStagingGroup();
 
 			Map<String, String[]> parameterMap =
-				StagingUtil.getStagingParameters();
+				ExportImportConfigurationParameterMapFactory.
+					buildParameterMap();
 
 			if (liveGroup.hasPrivateLayouts()) {
 				StagingUtil.publishLayouts(
 					userId, liveGroup.getGroupId(), stagingGroup.getGroupId(),
-					true, parameterMap, null, null);
+					true, parameterMap);
 			}
 
 			if (liveGroup.hasPublicLayouts() ||
@@ -300,7 +302,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 				StagingUtil.publishLayouts(
 					userId, liveGroup.getGroupId(), stagingGroup.getGroupId(),
-					false, parameterMap, null, null);
+					false, parameterMap);
 			}
 		}
 	}

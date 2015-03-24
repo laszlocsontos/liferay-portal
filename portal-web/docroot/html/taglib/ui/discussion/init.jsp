@@ -16,11 +16,13 @@
 
 <%@ include file="/html/taglib/init.jsp" %>
 
-<%@ page import="com.liferay.portlet.messageboards.model.MBDiscussion" %><%@
+<%@ page import="com.liferay.portlet.comments.display.context.CommentsEditorDisplayContext" %><%@
+page import="com.liferay.portlet.messageboards.model.MBDiscussion" %><%@
 page import="com.liferay.portlet.messageboards.model.MBMessageDisplay" %><%@
 page import="com.liferay.portlet.messageboards.model.MBThread" %><%@
 page import="com.liferay.portlet.messageboards.model.MBTreeWalker" %><%@
 page import="com.liferay.portlet.messageboards.service.permission.MBDiscussionPermission" %><%@
+page import="com.liferay.portlet.messageboards.util.comparator.MessageThreadComparator" %><%@
 page import="com.liferay.portlet.ratings.model.RatingsEntry" %><%@
 page import="com.liferay.portlet.ratings.model.RatingsStats" %><%@
 page import="com.liferay.portlet.ratings.service.RatingsEntryLocalServiceUtil" %><%@
