@@ -103,6 +103,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.portlet.PortletConfig;
@@ -638,6 +639,13 @@ public class MainServlet extends ActionServlet {
 	protected void destroyPortlets(List<Portlet> portlets) throws Exception {
 		for (Portlet portlet : portlets) {
 			PortletInstanceFactoryUtil.destroy(portlet);
+
+			Map<String, PortletFilter> portletFilters =
+				portlet.getPortletFilters();
+
+			for (PortletFilter portletFilter : portletFilters.values()) {
+				PortletFilterFactory.destroy(portletFilter);
+			}
 		}
 	}
 
@@ -982,7 +990,10 @@ public class MainServlet extends ActionServlet {
 
 		User user = UserLocalServiceUtil.getUserById(userId);
 
-		if (PropsValues.USERS_UPDATE_LAST_LOGIN && !user.isDefaultUser()) {
+		if (!user.isDefaultUser() &&
+			(PropsValues.USERS_UPDATE_LAST_LOGIN ||
+			 (user.getLastLoginDate() == null))) {
+
 			user = UserLocalServiceUtil.updateLastLogin(
 				userId, request.getRemoteAddr());
 		}

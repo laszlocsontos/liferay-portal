@@ -172,7 +172,7 @@ contextObjects.put("formattedContent", formattedContent);
 contextObjects.put("wikiPortletInstanceSettings", wikiPortletInstanceSettings);
 %>
 
-<liferay-ui:ddm-template-renderer contextObjects="<%= contextObjects %>" displayStyle="<%= wikiPortletInstanceSettings.getDisplayStyle() %>" displayStyleGroupId="<%= wikiPortletInstanceSettings.getDisplayStyleGroupId(themeDisplay.getScopeGroupId()) %>" entries="<%= entries %>">
+<liferay-ui:ddm-template-renderer className="<%= WikiPage.class.getName() %>" contextObjects="<%= contextObjects %>" displayStyle="<%= wikiPortletInstanceSettings.getDisplayStyle() %>" displayStyleGroupId="<%= wikiPortletInstanceSettings.getDisplayStyleGroupId(themeDisplay.getScopeGroupId()) %>" entries="<%= entries %>">
 	<liferay-ui:header
 		backLabel="<%= parentTitle %>"
 		backURL="<%= (viewParentPageURL != null) ? viewParentPageURL.toString() : null %>"
@@ -395,7 +395,7 @@ contextObjects.put("wikiPortletInstanceSettings", wikiPortletInstanceSettings);
 </aui:script>
 
 <%
-if ((wikiPage != null) && !wikiPage.getTitle().equals(wikiConfiguration.frontPageName())) {
+if ((wikiPage != null) && !wikiPage.getTitle().equals(wikiGroupServiceConfiguration.frontPageName())) {
 	if (!portletName.equals(WikiPortletKeys.WIKI_DISPLAY)) {
 		PortalUtil.setPageSubtitle(wikiPage.getTitle(), request);
 
