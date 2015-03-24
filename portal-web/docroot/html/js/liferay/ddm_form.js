@@ -878,7 +878,7 @@ AUI.add(
 						portletURL.setParameter('eventName', portletNamespace + 'selectDocumentLibrary');
 						portletURL.setParameter('groupId', themeDisplay.getScopeGroupId());
 						portletURL.setParameter('refererPortletName', '');
-						portletURL.setParameter('struts_action', '/document_selector/view');
+						portletURL.setParameter('mvcPath', '/view.jsp');
 						portletURL.setParameter('tabs1Names', 'documents');
 						portletURL.setPortletId(Liferay.PortletKeys.DOCUMENT_SELECTOR);
 						portletURL.setWindowState('pop_up');
@@ -914,9 +914,9 @@ AUI.add(
 
 						portletURL.setParameter('cmd', 'add_temp');
 						portletURL.setParameter('p_auth', Liferay.authToken);
-						portletURL.setParameter('struts_action', '/journal/upload_file_entry');
+						portletURL.setParameter('struts_action', '/document_library/upload_file_entry');
 
-						portletURL.setPortletId(Liferay.PortletKeys.JOURNAL);
+						portletURL.setPortletId(Liferay.PortletKeys.DOCUMENT_LIBRARY);
 
 						return portletURL.toString();
 					},

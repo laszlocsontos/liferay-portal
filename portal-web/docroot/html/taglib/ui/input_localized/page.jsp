@@ -132,11 +132,10 @@ if ((exception != null) && fieldName.equals(focusField)) {
 				function <portlet:namespace /><%= randomNamespace %>OnFocusEditor() {
 					Liferay.component('<portlet:namespace /><%= fieldName %>').focus();
 				}
-			</aui:script>
 
-			<aui:script use="aui-base">
-				A.all('#<portlet:namespace /><%= id %>ContentBox .palette-item-inner').on(
+				$('#<portlet:namespace /><%= id %>ContentBox').on(
 					'click',
+					'.palette-item-inner',
 					function() {
 						window['<portlet:namespace /><%= fieldName %>'].focus();
 					}
@@ -197,6 +196,10 @@ if ((exception != null) && fieldName.equals(focusField)) {
 
 			if (!ignoreRequestValue) {
 				languageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + curLanguageId, languageValue);
+			}
+
+			if (curLanguageId.equals(defaultLanguageId) && Validator.isNull(languageValue)) {
+				languageValue = LocalizationUtil.getLocalization(xml, defaultLanguageId, true);
 			}
 		%>
 

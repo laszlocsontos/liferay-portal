@@ -409,7 +409,9 @@ public class LayoutExporter {
 		for (Portlet portlet : getDataSiteLevelPortlets(companyId)) {
 			String portletId = portlet.getRootPortletId();
 
-			if (!group.isStagedPortlet(portletId)) {
+			if (ExportImportThreadLocal.isStagingInProcess() &&
+				!group.isStagedPortlet(portletId)) {
+
 				continue;
 			}
 
@@ -588,7 +590,6 @@ public class LayoutExporter {
 		portletDataContext.setScopeGroupId(previousScopeGroupId);
 
 		_portletExporter.exportAssetLinks(portletDataContext);
-		_portletExporter.exportAssetTags(portletDataContext);
 		_portletExporter.exportExpandoTables(portletDataContext);
 		_portletExporter.exportLocks(portletDataContext);
 

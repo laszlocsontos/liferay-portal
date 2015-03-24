@@ -489,7 +489,7 @@ public class LayoutImporter {
 				"layout", ArrayUtil.toStringArray(portletIds), manifestSummary);
 		}
 
-		// Read asset tags, expando tables, locks, and permissions to make them
+		// Read expando tables, locks, and permissions to make them
 		// available to the data handlers through the portlet data context
 
 		if (importPermissions) {
@@ -507,7 +507,6 @@ public class LayoutImporter {
 			_permissionImporter.readPortletDataPermissions(portletDataContext);
 		}
 
-		_portletImporter.readAssetTags(portletDataContext);
 		_portletImporter.readExpandoTables(portletDataContext);
 		_portletImporter.readLocks(portletDataContext);
 
@@ -919,13 +918,10 @@ public class LayoutImporter {
 					portletDataContext.getCompanyId());
 			}
 			else if (Validator.isNotNull(scopeLayoutUuid)) {
-				boolean privateLayout = GetterUtil.getBoolean(
-					portletElement.attributeValue("private-layout"));
-
 				Layout scopeLayout =
 					LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
 						scopeLayoutUuid, portletDataContext.getGroupId(),
-						privateLayout);
+						portletDataContext.isPrivateLayout());
 
 				if (scopeLayout.hasScopeGroup()) {
 					scopeGroup = scopeLayout.getScopeGroup();
@@ -950,6 +946,9 @@ public class LayoutImporter {
 
 				if (group.isStaged() && !group.isStagedRemotely()) {
 					try {
+						boolean privateLayout = GetterUtil.getBoolean(
+							portletElement.attributeValue("private-layout"));
+
 						Layout oldLayout =
 							LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
 								scopeLayoutUuid,

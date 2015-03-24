@@ -14,26 +14,25 @@
 
 package com.liferay.sync.engine.util;
 
-import ch.securityvision.xattrj.Xattrj;
-
+import com.liferay.sync.engine.documentlibrary.util.FileEventUtil;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncFileService;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -65,6 +64,117 @@ public class FileUtil {
 		return checksum1.equals(checksum2);
 	}
 
+	public static void deleteFile(Path filePath) {
+		try {
+			deleteFile(filePath, true);
+		}
+		catch (Exception e) {
+		}
+	}
+
+	public static void deleteFile(final Path filePath, boolean retry)
+		throws IOException {
+
+		try {
+			Files.deleteIfExists(filePath);
+		}
+		catch (Exception e) {
+			if (!retry) {
+				throw e;
+			}
+
+			PathCallable pathCallable = new PathCallable(filePath) {
+
+				@Override
+				public Object call() throws Exception {
+					FileTime fileTime = Files.getLastModifiedTime(filePath);
+
+					if (fileTime.toMillis() <= getStartTime()) {
+						Files.deleteIfExists(filePath);
+					}
+
+					return null;
+				}
+
+			};
+
+			FileLockRetryUtil.registerPathCallable(pathCallable);
+		}
+	}
+
+	public static void fireDeleteEvents(Path filePath) throws IOException {
+		long startTime = System.currentTimeMillis();
+
+		Files.walkFileTree(
+			filePath,
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult preVisitDirectory(
+					Path filePath, BasicFileAttributes basicFileAttributes) {
+
+					SyncFile syncFile = SyncFileService.fetchSyncFile(
+						filePath.toString());
+
+					if (syncFile == null) {
+						syncFile = SyncFileService.fetchSyncFile(
+							FileKeyUtil.getFileKey(filePath));
+					}
+
+					if (syncFile != null) {
+						syncFile.setLocalSyncTime(System.currentTimeMillis());
+
+						SyncFileService.update(syncFile);
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFile(
+					Path filePath, BasicFileAttributes basicFileAttributes) {
+
+					SyncFile syncFile = SyncFileService.fetchSyncFile(
+						filePath.toString());
+
+					if (syncFile == null) {
+						syncFile = SyncFileService.fetchSyncFile(
+							FileKeyUtil.getFileKey(filePath));
+					}
+
+					if (syncFile != null) {
+						syncFile.setLocalSyncTime(System.currentTimeMillis());
+
+						SyncFileService.update(syncFile);
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			}
+		);
+
+		List<SyncFile> deletedSyncFiles = SyncFileService.findSyncFiles(
+			filePath.toString(), startTime);
+
+		for (SyncFile deletedSyncFile : deletedSyncFiles) {
+			if (deletedSyncFile.getTypePK() == 0) {
+				SyncFileService.deleteSyncFile(deletedSyncFile, false);
+
+				continue;
+			}
+
+			if (deletedSyncFile.isFolder()) {
+				FileEventUtil.deleteFolder(
+					deletedSyncFile.getSyncAccountId(), deletedSyncFile);
+			}
+			else {
+				FileEventUtil.deleteFile(
+					deletedSyncFile.getSyncAccountId(), deletedSyncFile);
+			}
+		}
+	}
+
 	public static String getChecksum(Path filePath) throws IOException {
 		if (!isValidChecksum(filePath)) {
 			return "";
@@ -84,54 +194,14 @@ public class FileUtil {
 		}
 	}
 
-	public static long getFileKey(Path filePath) {
-		if (!Files.exists(filePath)) {
-			return -1;
-		}
-
+	public static FileLock getFileLock(FileChannel fileChannel) {
 		try {
-			if (OSDetector.isApple()) {
-				Xattrj xattrj = getXattrj();
-
-				if (xattrj == null) {
-					return -1;
-				}
-
-				String fileKey = xattrj.readAttribute(
-					filePath.toFile(), "fileKey");
-
-				if (fileKey == null) {
-					return -1;
-				}
-
-				return Long.parseLong(fileKey);
-			}
-			else {
-				UserDefinedFileAttributeView userDefinedFileAttributeView =
-					Files.getFileAttributeView(
-						filePath, UserDefinedFileAttributeView.class);
-
-				List<String> list = userDefinedFileAttributeView.list();
-
-				if (!list.contains("fileKey")) {
-					return -1;
-				}
-
-				ByteBuffer byteBuffer = ByteBuffer.allocate(
-					userDefinedFileAttributeView.size("fileKey"));
-
-				userDefinedFileAttributeView.read("fileKey", byteBuffer);
-
-				CharBuffer charBuffer = _CHARSET.decode(
-					(ByteBuffer)byteBuffer.flip());
-
-				return Long.parseLong(charBuffer.toString());
-			}
+			return fileChannel.tryLock();
 		}
 		catch (Exception e) {
 			_logger.error(e.getMessage(), e);
 
-			return -1;
+			return null;
 		}
 	}
 
@@ -245,7 +315,7 @@ public class FileUtil {
 		String fileName = String.valueOf(filePath.getFileName());
 
 		if (_syncFileIgnoreNames.contains(fileName) ||
-			isOfficeTempFile(fileName, filePath) ||
+			MSOfficeFileUtil.isTempCreatedFile(filePath) ||
 			(PropsValues.SYNC_FILE_IGNORE_HIDDEN && isHidden(filePath)) ||
 			Files.isSymbolicLink(filePath) || fileName.endsWith(".lnk")) {
 
@@ -283,10 +353,18 @@ public class FileUtil {
 		}
 
 		try {
-			if ((syncFile.getSize() > 0) &&
-				(syncFile.getSize() != Files.size(filePath))) {
+			FileTime fileTime = Files.getLastModifiedTime(filePath);
 
-				return true;
+			long modifiedTime = syncFile.getModifiedTime();
+
+			if (OSDetector.isUnix()) {
+				modifiedTime = modifiedTime / 1000 * 1000;
+			}
+
+			if ((fileTime.toMillis() <= modifiedTime) &&
+				FileKeyUtil.hasFileKey(filePath, syncFile.getSyncFileId())) {
+
+				return false;
 			}
 		}
 		catch (IOException ioe) {
@@ -296,18 +374,10 @@ public class FileUtil {
 		}
 
 		try {
-			FileTime fileTime = Files.getLastModifiedTime(filePath);
+			if ((syncFile.getSize() > 0) &&
+				(syncFile.getSize() != Files.size(filePath))) {
 
-			long modifiedTime = syncFile.getModifiedTime();
-
-			if (OSDetector.isUnix()) {
-				modifiedTime = modifiedTime / 1000 * 1000;
-			}
-
-			if ((fileTime.toMillis() == modifiedTime) &&
-				(getFileKey(filePath) == syncFile.getSyncFileId())) {
-
-				return false;
+				return true;
 			}
 		}
 		catch (IOException ioe) {
@@ -377,15 +447,64 @@ public class FileUtil {
 	}
 
 	public static void moveFile(Path sourceFilePath, Path targetFilePath) {
-		checkFilePath(sourceFilePath);
+		try {
+			moveFile(sourceFilePath, targetFilePath, true);
+		}
+		catch (Exception e) {
+		}
+	}
+
+	public static void moveFile(
+			final Path sourceFilePath, final Path targetFilePath, boolean retry)
+		throws IOException {
 
 		try {
+			checkFilePath(sourceFilePath);
+
 			Files.move(
 				sourceFilePath, targetFilePath,
 				StandardCopyOption.REPLACE_EXISTING);
 		}
 		catch (Exception e) {
-			_logger.error(e.getMessage(), e);
+			if (!retry) {
+				throw e;
+			}
+
+			PathCallable pathCallable = new PathCallable(sourceFilePath) {
+
+				@Override
+				public Object call() throws Exception {
+					FileTime fileTime = Files.getLastModifiedTime(
+						targetFilePath);
+
+					if (fileTime.toMillis() <= getStartTime()) {
+						Files.move(
+							sourceFilePath, targetFilePath,
+							StandardCopyOption.REPLACE_EXISTING);
+					}
+					else {
+						Files.deleteIfExists(sourceFilePath);
+					}
+
+					return null;
+				}
+
+			};
+
+			FileLockRetryUtil.registerPathCallable(pathCallable);
+		}
+	}
+
+	public static void releaseFileLock(FileLock fileLock) {
+		try {
+			if (fileLock != null) {
+				fileLock.release();
+			}
+		}
+		catch (Exception e) {
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -399,43 +518,6 @@ public class FileUtil {
 		FileTime fileTime = FileTime.fromMillis(modifiedTime);
 
 		Files.setLastModifiedTime(filePath, fileTime);
-	}
-
-	public static void writeFileKey(Path filePath, String fileKey) {
-		if (OSDetector.isApple()) {
-			Xattrj xattrj = getXattrj();
-
-			if (xattrj == null) {
-				return;
-			}
-
-			File file = filePath.toFile();
-
-			if (!file.canWrite()) {
-				file.setWritable(true);
-			}
-
-			xattrj.writeAttribute(file, "fileKey", fileKey);
-		}
-		else {
-			File file = filePath.toFile();
-
-			if (!file.canWrite()) {
-				file.setWritable(true);
-			}
-
-			UserDefinedFileAttributeView userDefinedFileAttributeView =
-				Files.getFileAttributeView(
-					filePath, UserDefinedFileAttributeView.class);
-
-			try {
-				userDefinedFileAttributeView.write(
-					"fileKey", _CHARSET.encode(CharBuffer.wrap(fileKey)));
-			}
-			catch (Exception e) {
-				_logger.error(e.getMessage(), e);
-			}
-		}
 	}
 
 	protected static void checkFilePath(Path filePath) {
@@ -462,44 +544,10 @@ public class FileUtil {
 		}
 	}
 
-	protected static Xattrj getXattrj() {
-		if (_xattrj != null) {
-			return _xattrj;
-		}
-
-		try {
-			_xattrj = new Xattrj();
-
-			return _xattrj;
-		}
-		catch (IOException ioe) {
-			_logger.error(ioe.getMessage(), ioe);
-
-			return null;
-		}
-	}
-
-	protected static boolean isOfficeTempFile(String fileName, Path filePath) {
-		if (Files.isDirectory(filePath)) {
-			return false;
-		}
-
-		if (fileName.startsWith("~$") ||
-			(fileName.startsWith("~") && fileName.endsWith(".tmp"))) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private static final Charset _CHARSET = Charset.forName("UTF-8");
-
 	private static final Logger _logger = LoggerFactory.getLogger(
 		FileUtil.class);
 
 	private static final Set<String> _syncFileIgnoreNames = new HashSet<>(
 		Arrays.asList(PropsValues.SYNC_FILE_IGNORE_NAMES));
-	private static Xattrj _xattrj;
 
 }

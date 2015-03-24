@@ -26,8 +26,10 @@ import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.service.SyncSiteService;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.IODeltaUtil;
+import com.liferay.sync.engine.util.SyncEngineUtil;
 
 import java.io.IOException;
 
@@ -58,20 +60,47 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 	@Override
 	public void processResponse(String response) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
+		if (_syncDLObjectUpdate == null) {
+			ObjectMapper objectMapper = new ObjectMapper();
 
-		SyncDLObjectUpdate syncDLObjectUpdate = objectMapper.readValue(
-			response, new TypeReference<SyncDLObjectUpdate>() {});
+			_syncDLObjectUpdate = objectMapper.readValue(
+				response, new TypeReference<SyncDLObjectUpdate>() {});
+		}
 
-		for (SyncFile targetSyncFile : syncDLObjectUpdate.getSyncDLObjects()) {
+		boolean firedProcessingState = false;
+		long start = System.currentTimeMillis();
+
+		for (SyncFile targetSyncFile : _syncDLObjectUpdate.getSyncDLObjects()) {
 			processSyncFile(targetSyncFile);
+
+			if (!firedProcessingState &&
+				((System.currentTimeMillis() - start) > 1000)) {
+
+				SyncEngineUtil.fireSyncEngineStateChanged(
+					getSyncAccountId(),
+					SyncEngineUtil.SYNC_ENGINE_STATE_PROCESSING);
+
+				firedProcessingState = true;
+			}
+		}
+
+		if (firedProcessingState) {
+			SyncEngineUtil.fireSyncEngineStateChanged(
+				getSyncAccountId(), SyncEngineUtil.SYNC_ENGINE_STATE_PROCESSED);
 		}
 
 		if (getParameterValue("parentFolderId") == null) {
 			SyncSite syncSite = SyncSiteService.fetchSyncSite(
 				(Long)getParameterValue("repositoryId"), getSyncAccountId());
 
-			syncSite.setRemoteSyncTime(syncDLObjectUpdate.getLastAccessTime());
+			if ((syncSite == null) ||
+				((Long)getParameterValue("lastAccessTime") !=
+					syncSite.getRemoteSyncTime())) {
+
+				return;
+			}
+
+			syncSite.setRemoteSyncTime(_syncDLObjectUpdate.getLastAccessTime());
 
 			SyncSiteService.update(syncSite);
 		}
@@ -83,8 +112,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		Path filePath = Paths.get(filePathName);
 
 		if (Files.exists(filePath) &&
-			(syncFile.isFolder() ||
-			 !FileUtil.isModified(syncFile, filePath))) {
+			(syncFile.isFolder() || !FileUtil.isModified(syncFile, filePath))) {
 
 			return;
 		}
@@ -100,13 +128,13 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 			SyncFileService.update(syncFile);
 
-			FileUtil.writeFileKey(
+			FileKeyUtil.writeFileKey(
 				filePath, String.valueOf(syncFile.getSyncFileId()));
 		}
 		else {
 			SyncFileService.update(syncFile);
 
-			downloadFile(syncFile, null, false);
+			downloadFile(syncFile, null, 0, false);
 		}
 	}
 
@@ -128,6 +156,12 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			return;
 		}
 
+		if (sourceSyncFile.isFile()) {
+			FileUtil.deleteFile(sourceFilePath);
+
+			return;
+		}
+
 		final Watcher watcher = WatcherRegistry.getWatcher(getSyncAccountId());
 
 		Files.walkFileTree(
@@ -139,7 +173,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 						Path filePath, IOException ioe)
 					throws IOException {
 
-					Files.deleteIfExists(filePath);
+					FileUtil.deleteFile(filePath);
 
 					return FileVisitResult.CONTINUE;
 				}
@@ -160,7 +194,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 						Path filePath, BasicFileAttributes basicFileAttributes)
 					throws IOException {
 
-					Files.deleteIfExists(filePath);
+					FileUtil.deleteFile(filePath);
 
 					return FileVisitResult.CONTINUE;
 				}
@@ -169,7 +203,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 	}
 
 	protected void downloadFile(
-		SyncFile syncFile, String sourceVersion, boolean patch) {
+		SyncFile syncFile, String sourceVersion, long sourceVersionId,
+		boolean patch) {
 
 		String targetVersion = syncFile.getVersion();
 
@@ -178,7 +213,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			(Double.valueOf(sourceVersion) < Double.valueOf(targetVersion))) {
 
 			FileEventUtil.downloadPatch(
-				sourceVersion, getSyncAccountId(), syncFile, targetVersion);
+				sourceVersionId, getSyncAccountId(), syncFile,
+				syncFile.getVersionId());
 		}
 		else {
 			FileEventUtil.downloadFile(getSyncAccountId(), syncFile);
@@ -195,6 +231,28 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		return FileUtil.isIgnoredFilePath(FileUtil.getFilePath(filePathName));
 	}
 
+	@Override
+	protected void logResponse(String response) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			_syncDLObjectUpdate = objectMapper.readValue(
+				response, new TypeReference<SyncDLObjectUpdate>() {});
+
+			List<SyncFile> syncFiles = _syncDLObjectUpdate.getSyncDLObjects();
+
+			if (!syncFiles.isEmpty()) {
+				super.logResponse(response);
+			}
+			else {
+				super.logResponse("");
+			}
+		}
+		catch (Exception e) {
+			_logger.error(e.getMessage(), e);
+		}
+	}
+
 	protected void moveFile(
 			SyncFile sourceSyncFile, SyncFile targetSyncFile,
 			String targetFilePathName)
@@ -207,7 +265,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			targetFilePath, targetSyncFile.getParentFolderId(), sourceSyncFile);
 
 		if (Files.exists(sourceFilePath)) {
-			Files.move(sourceFilePath, targetFilePath);
+			FileUtil.moveFile(sourceFilePath, targetFilePath);
 
 			sourceSyncFile.setState(SyncFile.STATE_SYNCED);
 		}
@@ -216,11 +274,11 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 			sourceSyncFile.setState(SyncFile.STATE_SYNCED);
 
-			FileUtil.writeFileKey(
+			FileKeyUtil.writeFileKey(
 				targetFilePath, String.valueOf(sourceSyncFile.getSyncFileId()));
 		}
 		else {
-			downloadFile(sourceSyncFile, null, false);
+			downloadFile(sourceSyncFile, null, 0, false);
 		}
 
 		sourceSyncFile.setModifiedTime(targetSyncFile.getModifiedTime());
@@ -268,7 +326,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 			if (isIgnoredFilePath(sourceSyncFile, filePathName) ||
 				((sourceSyncFile != null) &&
 				 (sourceSyncFile.getModifiedTime() ==
-					targetSyncFile.getModifiedTime()))) {
+					 targetSyncFile.getModifiedTime()))) {
 
 				return;
 			}
@@ -370,6 +428,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		throws Exception {
 
 		String sourceVersion = sourceSyncFile.getVersion();
+		long sourceVersionId = sourceSyncFile.getVersionId();
 
 		boolean filePathChanged = processFilePathChange(
 			sourceSyncFile, targetSyncFile);
@@ -387,6 +446,7 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 		sourceSyncFile.setSize(targetSyncFile.getSize());
 		sourceSyncFile.setUiEvent(SyncFile.UI_EVENT_UPDATED_REMOTE);
 		sourceSyncFile.setVersion(targetSyncFile.getVersion());
+		sourceSyncFile.setVersionId(targetSyncFile.getVersionId());
 
 		SyncFileService.update(sourceSyncFile);
 
@@ -402,19 +462,19 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 				SyncFileService.update(sourceSyncFile);
 
-				FileUtil.writeFileKey(
+				FileKeyUtil.writeFileKey(
 					targetFilePath,
 					String.valueOf(sourceSyncFile.getSyncFileId()));
 			}
 			else {
-				downloadFile(sourceSyncFile, null, false);
+				downloadFile(sourceSyncFile, null, 0, false);
 			}
 		}
 		else if (targetSyncFile.isFile() &&
 				 FileUtil.isModified(targetSyncFile, filePath)) {
 
 			downloadFile(
-				sourceSyncFile, sourceVersion,
+				sourceSyncFile, sourceVersion, sourceVersionId,
 				!IODeltaUtil.isIgnoredFilePatchingExtension(targetSyncFile));
 		}
 		else {
@@ -426,6 +486,8 @@ public class GetSyncDLObjectUpdateHandler extends BaseSyncDLObjectHandler {
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		GetSyncDLObjectUpdateHandler.class);
+
+	private static SyncDLObjectUpdate _syncDLObjectUpdate;
 
 	private final Map<Long, List<SyncFile>> _dependentSyncFilesMap =
 		new HashMap<>();

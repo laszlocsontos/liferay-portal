@@ -39,8 +39,6 @@ import java.util.Locale;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
 /**
@@ -165,7 +163,8 @@ public class JournalFolderAssetRenderer
 			getControlPanelPlid(liferayPortletRequest), PortletKeys.JOURNAL,
 			PortletRequest.RENDER_PHASE);
 
-		portletURL.setParameter("struts_action", "/journal/edit_folder");
+		portletURL.setParameter(
+			"mvcPath", "/html/portlet/journal/edit_folder.jsp");
 		portletURL.setParameter(
 			"folderId", String.valueOf(_folder.getFolderId()));
 
@@ -183,7 +182,8 @@ public class JournalFolderAssetRenderer
 		PortletURL portletURL = assetRendererFactory.getURLView(
 			liferayPortletResponse, windowState);
 
-		portletURL.setParameter("struts_action", "/journal/view");
+		portletURL.setParameter(
+			"mvcPath", "/html/portlet/journal/asset/folder_full_content.jsp");
 		portletURL.setParameter(
 			"folderId", String.valueOf(_folder.getFolderId()));
 		portletURL.setWindowState(windowState);
@@ -197,9 +197,15 @@ public class JournalFolderAssetRenderer
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		return getURLViewInContext(
-			liferayPortletRequest, noSuchEntryRedirect, "/journal/find_folder",
-			"folderId", _folder.getFolderId());
+		try {
+			PortletURL viewInContextURL = getURLView(
+				liferayPortletResponse, WindowState.MAXIMIZED);
+
+			return viewInContextURL.toString();
+		}
+		catch (Exception e) {
+			return noSuchEntryRedirect;
+		}
 	}
 
 	@Override
@@ -235,13 +241,11 @@ public class JournalFolderAssetRenderer
 
 	@Override
 	public String render(
-			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			String template)
 		throws Exception {
 
 		if (template.equals(TEMPLATE_FULL_CONTENT)) {
-			renderRequest.setAttribute(WebKeys.JOURNAL_FOLDER, _folder);
-
 			return "/html/portlet/journal/asset/folder_" + template + ".jsp";
 		}
 		else {

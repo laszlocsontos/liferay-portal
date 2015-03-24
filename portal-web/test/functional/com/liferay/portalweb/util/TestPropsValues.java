@@ -82,12 +82,6 @@ public class TestPropsValues
 	public static final boolean MOBILE_DEVICE_ENABLED = GetterUtil.getBoolean(
 		TestPropsUtil.get("mobile.device.enabled"));
 
-	public static final String MOBILE_DEVICE_RESOLUTION = TestPropsUtil.get(
-		"mobile.device.resolution");
-
-	public static final String MOBILE_DEVICE_USER_AGENT = TestPropsUtil.get(
-		"mobile.device.user.agent");
-
 	public static final String OUTPUT_DIR_NAME = TestPropsUtil.get(
 		"output.dir");
 
@@ -132,6 +126,9 @@ public class TestPropsValues
 
 	public static final String TEST_BASE_DIR_NAME = TestPropsUtil.get(
 		"test.basedir");
+
+	public static final String TEST_CLASS_COMMAND_NAME = TestPropsUtil.get(
+		"test.class.command.name");
 
 	public static final boolean TEST_DATABASE_MINIMAL = GetterUtil.getBoolean(
 		TestPropsUtil.get("test.database.minimal"));
