@@ -48,6 +48,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
+
 import org.jets3t.service.Jets3tProperties;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
@@ -673,7 +675,7 @@ public class S3Store extends BaseStore {
 		try {
 			File parentFile = tempFile.getParentFile();
 
-			parentFile.mkdirs();
+			FileUtils.forceMkdir(parentFile);
 
 			outputStream = new FileOutputStream(tempFile);
 

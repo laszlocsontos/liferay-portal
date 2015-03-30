@@ -51,6 +51,7 @@ import com.liferay.util.log4j.Log4JUtil;
 import java.awt.image.RenderedImage;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.List;
@@ -73,7 +74,7 @@ public class VideoProcessorImpl
 	extends DLPreviewableProcessor implements VideoProcessor {
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws IOException {
 		boolean valid = true;
 
 		if ((_PREVIEW_TYPES.length == 0) || (_PREVIEW_TYPES.length > 2)) {

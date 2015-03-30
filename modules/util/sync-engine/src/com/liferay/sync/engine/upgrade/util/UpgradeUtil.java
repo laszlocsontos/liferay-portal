@@ -27,7 +27,7 @@ import com.liferay.sync.engine.service.persistence.SyncSitePersistence;
 import com.liferay.sync.engine.service.persistence.SyncUserPersistence;
 import com.liferay.sync.engine.service.persistence.SyncWatchEventPersistence;
 import com.liferay.sync.engine.upgrade.UpgradeProcess;
-import com.liferay.sync.engine.upgrade.v2_0_6.UpgradeProcess_2_0_6;
+import com.liferay.sync.engine.upgrade.v3_0_4.UpgradeProcess_3_0_4;
 import com.liferay.sync.engine.util.LoggerUtil;
 import com.liferay.sync.engine.util.PropsValues;
 import com.liferay.sync.engine.util.ReleaseInfo;
@@ -78,7 +78,7 @@ public class UpgradeUtil {
 			return;
 		}
 
-		UpgradeProcess upgradeProcess = new UpgradeProcess_2_0_6();
+		UpgradeProcess upgradeProcess = new UpgradeProcess_3_0_4();
 
 		if (buildNumber < upgradeProcess.getThreshold()) {
 			_logger.info("Upgrading to {}", upgradeProcess.getThreshold());

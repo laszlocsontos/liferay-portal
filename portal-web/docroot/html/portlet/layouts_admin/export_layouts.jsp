@@ -79,15 +79,7 @@ if (!cmd.equals(Constants.UPDATE)) {
 	String openNodes = SessionTreeJSClicks.getOpenNodes(request, treeId + "SelectedNode");
 
 	if (openNodes == null) {
-		List<Layout> liveGroupLayouts = LayoutLocalServiceUtil.getLayouts(liveGroupId, privateLayout);
-
-		selectedLayoutIds = new long[liveGroupLayouts.size()];
-
-		for (int i = 0; i < liveGroupLayouts.size(); i++) {
-			Layout liveGroupLayout = liveGroupLayouts.get(i);
-
-			selectedLayoutIds[i] = liveGroupLayout.getLayoutId();
-		}
+		selectedLayoutIds = ExportImportHelperUtil.getAllLayoutIds(liveGroupId, privateLayout);
 	}
 	else {
 		selectedLayoutIds = GetterUtil.getLongValues(StringUtil.split(openNodes, ','));
@@ -119,7 +111,14 @@ if (!cmd.equals(Constants.ADD)) {
 }
 %>
 
-<liferay-ui:trash-undo />
+<portlet:actionURL var="restoreTrashEntriesURL">
+	<portlet:param name="struts_action" value="/layouts_admin/edit_export_configuration" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo
+	portletURL="<%= restoreTrashEntriesURL %>"
+/>
 
 <portlet:renderURL var="backURL">
 	<portlet:param name="struts_action" value="/layouts_admin/edit_layout_set" />

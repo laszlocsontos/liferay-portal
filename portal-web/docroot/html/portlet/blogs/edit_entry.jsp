@@ -40,6 +40,7 @@ if (!customAbstract) {
 
 boolean allowPingbacks = PropsValues.BLOGS_PINGBACK_ENABLED && BeanParamUtil.getBoolean(entry, request, "allowPingbacks", true);
 boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.getBoolean(entry, request, "allowTrackbacks", true);
+String coverImageCaption = BeanParamUtil.getString(entry, request, "coverImageCaption");
 long coverImageFileEntryId = BeanParamUtil.getLong(entry, request, "coverImageFileEntryId");
 long smallImageFileEntryId = BeanParamUtil.getLong(entry, request, "smallImageFileEntryId");
 
@@ -110,23 +111,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 			type="pills"
 		>
 			<div class="<%= (entry != null) ? "entry-status " + WorkflowConstants.getStatusLabel(entry.getStatus()) : StringPool.BLANK %>">
-
-				<%
-				Map<String, Object> dataTextEditor = new HashMap<String, Object>();
-
-				JSONObject editorConfig = JSONFactoryUtil.createJSONObject();
-				editorConfig.put("allowedContent", "p");
-				editorConfig.put("disallowedContent", "br");
-				editorConfig.put("toolbars", JSONFactoryUtil.createJSONObject());
-
-				JSONObject editorOptions = JSONFactoryUtil.createJSONObject();
-				editorOptions.put("textMode", Boolean.TRUE);
-				editorOptions.put("showSource", Boolean.FALSE);
-
-				dataTextEditor.put("editorConfig", editorConfig);
-				dataTextEditor.put("editorOptions", editorOptions);
-				%>
-
 				<liferay-ui:section>
 					<c:if test="<%= entry != null %>">
 						<aui:workflow-status showIcon="<%= false %>" showLabel="<%= false %>" status="<%= entry.getStatus() %>" />
@@ -140,30 +124,26 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 						<liferay-ui:image-selector draggableImage="vertical" fileEntryId="<%= coverImageFileEntryId %>" maxFileSize="<%= PrefsPropsUtil.getLong(PropsKeys.BLOGS_IMAGE_COVER_MAX_SIZE) %>" paramName="coverImageFileEntry" uploadURL="<%= coverImageSelectorURL %>" validExtensions='<%= StringUtil.merge(imageExtensions, ", ") %>' />
 					</div>
 
+					<aui:input name="coverImageCaption" type="hidden" />
+
+					<div class="entry-cover-image-caption <%= (coverImageFileEntryId == 0) ? "invisible" : "" %>">
+						<liferay-ui:input-editor contents="<%= coverImageCaption %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="coverImageCaptionEditor" placeholder="caption" showSource="<%= false %>" />
+					</div>
+
 					<div class="entry-title">
-						<h2><liferay-ui:input-editor contents="<%= title %>" data="<%= dataTextEditor %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="titleEditor" placeholder="title" /></h2>
+						<h2><liferay-ui:input-editor contents="<%= title %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="titleEditor" placeholder="title" showSource="<%= false %>" /></h2>
 					</div>
 
 					<aui:input name="title" type="hidden" />
 
 					<div class="entry-subtitle">
-						<liferay-ui:input-editor contents="<%= subtitle %>" data="<%= dataTextEditor %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="subtitleEditor" placeholder="subtitle" />
+						<liferay-ui:input-editor contents="<%= subtitle %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="subtitleEditor" placeholder="subtitle" showSource="<%= false %>" />
 					</div>
 
 					<aui:input name="subtitle" type="hidden" />
 
 					<div class="entry-body">
-						<portlet:actionURL var="uploadEditorImageURL">
-							<portlet:param name="struts_action" value="/blogs/upload_editor_image" />
-						</portlet:actionURL>
-
-						<%
-						Map<String, Object> data = new HashMap<String, Object>();
-
-						data.put("uploadURL", uploadEditorImageURL);
-						%>
-
-						<liferay-ui:input-editor contents="<%= content %>" data="<%= data %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="contentEditor" onChangeMethod="OnChangeEditor" placeholder="content" />
+						<liferay-ui:input-editor contents="<%= content %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="contentEditor" onChangeMethod="OnChangeEditor" placeholder="content" />
 					</div>
 
 					<aui:input name="content" type="hidden" />
@@ -197,7 +177,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 						</p>
 
 						<div class="entry-abstract-options" id="<portlet:namespace />entryAbstractOptions">
-							<aui:input checked="<%= !customAbstract %>" label='<%= LanguageUtil.format(request, "use-first-x-characters-of-the-content-entry", pageAbstractLength, false) %>' name="customAbstract" type="radio" value="<%= false %>" />
+							<aui:input checked="<%= !customAbstract %>" label='<%= LanguageUtil.format(request, "use-the-first-x-characters-of-the-entry-content", pageAbstractLength, false) %>' name="customAbstract" type="radio" value="<%= false %>" />
 
 							<aui:input checked="<%= customAbstract %>" label="custom-abstract" name="customAbstract" type="radio" value="<%= true %>" />
 						</div>
@@ -212,14 +192,14 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 							</div>
 
 							<div class="entry-description">
-								<liferay-ui:input-editor contents="<%= description %>" cssClass='<%= customAbstract ? StringPool.BLANK : "readonly" %>' data="<%= dataTextEditor %>" editorImpl="<%= EDITOR_IMPL_KEY %>" name="descriptionEditor" onInitMethod="OnDescriptionEditorInit" placeholder="description" />
+								<liferay-ui:input-editor contents="<%= description %>" cssClass='<%= customAbstract ? StringPool.BLANK : "readonly" %>' editorImpl="<%= EDITOR_IMPL_KEY %>" name="descriptionEditor" onInitMethod="OnDescriptionEditorInit" placeholder="description" showSource="<%= false %>" />
 							</div>
 
 							<aui:input name="description" type="hidden" />
 						</aui:fieldset>
 					</div>
 
-					<c:if test="<%= (entry != null) && blogsSettings.isEmailEntryUpdatedEnabled() %>">
+					<c:if test="<%= (entry != null) && blogsGroupServiceSettings.isEmailEntryUpdatedEnabled() %>">
 						<div class="email-entry-updated-wrapper">
 							<h3><liferay-ui:message key="email-notifications" /></h3>
 
@@ -417,7 +397,7 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 		</c:if>
 	}
 
-	<c:if test="<%= (entry != null) && blogsSettings.isEmailEntryUpdatedEnabled() %>">
+	<c:if test="<%= (entry != null) && blogsGroupServiceSettings.isEmailEntryUpdatedEnabled() %>">
 		Liferay.Util.toggleBoxes('<portlet:namespace />sendEmailEntryUpdated', '<portlet:namespace />emailEntryUpdatedCommentWrapper');
 	</c:if>
 </aui:script>

@@ -81,12 +81,6 @@ public class PropsValues {
 	public static final boolean MOBILE_DEVICE_ENABLED = GetterUtil.getBoolean(
 		PropsUtil.get("mobile.device.enabled"));
 
-	public static final String MOBILE_DEVICE_RESOLUTION =
-		PropsUtil.get("mobile.device.resolution");
-
-	public static final String MOBILE_DEVICE_USER_AGENT =
-		PropsUtil.get("mobile.device.user.agent");
-
 	public static final String OUTPUT_DIR_NAME = PropsUtil.get(
 		"output.dir");
 
@@ -136,6 +130,8 @@ public class PropsValues {
 
 	public static final boolean TEST_DATABASE_MINIMAL = GetterUtil.getBoolean(
 		PropsUtil.get("test.database.minimal"));
+
+	public static final String TEST_NAME = PropsUtil.get("test.name");
 
 	public static final boolean TEST_SKIP_TEAR_DOWN = GetterUtil.getBoolean(
 		PropsUtil.get("test.skip.tear.down"));

@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.service.ServiceContext;
@@ -167,7 +168,7 @@ public class WikiTestUtil {
 			RandomTestUtil.randomString(), initialParentPage.getTitle(), true,
 			serviceContext);
 
-		WikiPage finalParentPage =  WikiTestUtil.addPage(
+		WikiPage finalParentPage = WikiTestUtil.addPage(
 			TestPropsValues.getUserId(), groupId, nodeId,
 			RandomTestUtil.randomString(), true);
 
@@ -177,9 +178,9 @@ public class WikiTestUtil {
 
 		childPage = WikiPageLocalServiceUtil.getPage(
 			nodeId, childPage.getTitle());
-		initialParentPage =  WikiPageLocalServiceUtil.getPageByPageId(
+		initialParentPage = WikiPageLocalServiceUtil.getPageByPageId(
 			initialParentPage.getPageId());
-		finalParentPage =  WikiPageLocalServiceUtil.getPageByPageId(
+		finalParentPage = WikiPageLocalServiceUtil.getPageByPageId(
 			finalParentPage.getPageId());
 
 		return new WikiPage[] {childPage, finalParentPage, initialParentPage};
@@ -209,7 +210,7 @@ public class WikiTestUtil {
 		WikiPage redirectPage = WikiPageLocalServiceUtil.getPage(
 			nodeId, "TestPage");
 
-		return new WikiPage[]{page, childPage, redirectPage};
+		return new WikiPage[] {page, childPage, redirectPage};
 	}
 
 	public static WikiPage[] addRenamedParentPageWithChildPageAndGrandchildPage(
@@ -436,6 +437,19 @@ public class WikiTestUtil {
 			copyPage.getNodeId(), copyPage.getTitle());
 
 		return copyPage;
+	}
+
+	public static void populateNotificationsServiceContext(
+			ServiceContext serviceContext, String command)
+		throws Exception {
+
+		serviceContext.setAttribute("entryURL", "http://localhost");
+
+		if (Validator.isNotNull(command)) {
+			serviceContext.setCommand(command);
+		}
+
+		serviceContext.setLayoutFullURL("http://localhost");
 	}
 
 	public static WikiPage updatePage(WikiPage page) throws Exception {

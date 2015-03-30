@@ -28,17 +28,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.FileUtils;
+
 /**
  * @author Jorge Ferrer
  */
 public class FileSystemHook extends BaseHook {
 
-	public FileSystemHook() {
+	public FileSystemHook() throws IOException {
 		_rootDir = new File(PropsValues.IMAGE_HOOK_FILE_SYSTEM_ROOT_DIR);
 
-		if (!_rootDir.exists()) {
-			_rootDir.mkdirs();
-		}
+		FileUtils.forceMkdir(_rootDir);
 	}
 
 	@Override

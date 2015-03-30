@@ -63,6 +63,8 @@ import javax.media.jai.operator.TranslateDescriptor;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.FileUtils;
+
 /**
  * @author Brian Wing Shun Chan
  */
@@ -95,14 +97,14 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 			spriteRootDir = new File(spriteRootDirName);
 		}
 
-		spriteRootDir.mkdirs();
+		FileUtils.forceMkdir(spriteRootDir);
 
 		File spritePropertiesFile = new File(
 			spriteRootDir, spritePropertiesFileName);
 
 		File spritePropertiesParentFile = spritePropertiesFile.getParentFile();
 
-		spritePropertiesParentFile.mkdirs();
+		FileUtils.forceMkdir(spritePropertiesParentFile);
 
 		boolean build = false;
 
@@ -224,7 +226,7 @@ public class SpriteProcessorImpl implements SpriteProcessor {
 
 			File spriteDir = spriteFile.getParentFile();
 
-			spriteDir.mkdirs();
+			FileUtils.forceMkdir(spriteDir);
 
 			ImageIO.write(renderedImage, "png", spriteFile);
 

@@ -173,8 +173,7 @@ public class FinderCacheImpl
 
 		if (!PropsValues.VALUE_OBJECT_FINDER_CACHE_ENABLED ||
 			!finderPath.isFinderCacheEnabled() ||
-			!CacheRegistryUtil.isActive() ||
-			(result == null)) {
+			!CacheRegistryUtil.isActive() || (result == null)) {
 
 			return;
 		}
@@ -363,8 +362,6 @@ public class FinderCacheImpl
 
 	private MultiVMPool _multiVMPool;
 	private final ConcurrentMap<String, PortalCache<Serializable, Serializable>>
-		_portalCaches =
-			new ConcurrentHashMap
-				<String, PortalCache<Serializable, Serializable>>();
+		_portalCaches = new ConcurrentHashMap<>();
 
 }

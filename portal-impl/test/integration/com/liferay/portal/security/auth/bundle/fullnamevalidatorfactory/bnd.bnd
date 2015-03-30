@@ -1,4 +1,5 @@
-Bundle-Description: Test Bundle for FullNameValidatorFactory
-Bundle-Version: 1.0
+Bundle-Description: Test Bundle for FullNameValidatorFactoryTest
+Bundle-Version: 1.0.0
 Private-Package: $(bundle.package).*
+
 -dsannotations: *

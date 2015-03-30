@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.RSSUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -40,7 +41,6 @@ import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFeed;
 import com.liferay.portlet.journal.model.JournalFeedConstants;
 import com.liferay.portlet.journal.service.base.JournalFeedLocalServiceBaseImpl;
-import com.liferay.util.RSSUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -339,11 +339,10 @@ public class JournalFeedLocalServiceImpl
 		}
 
 		try {
-			DDMStructure ddmStructure =
-				ddmStructureLocalService.getStructure(
-					groupId,
-					classNameLocalService.getClassNameId(JournalArticle.class),
-					ddmStructureKey);
+			DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
+				groupId,
+				classNameLocalService.getClassNameId(JournalArticle.class),
+				ddmStructureKey);
 
 			DDMForm ddmForm = ddmStructure.getDDMForm();
 

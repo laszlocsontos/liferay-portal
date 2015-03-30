@@ -32,6 +32,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.jackrabbit.core.TransientRepository;
 
 /**
@@ -106,7 +107,7 @@ public class JCRFactoryImpl implements JCRFactory {
 				return;
 			}
 
-			repositoryRoot.mkdirs();
+			FileUtils.forceMkdir(repositoryRoot);
 
 			File tempFile = new File(
 				SystemProperties.get(SystemProperties.TMP_DIR) +

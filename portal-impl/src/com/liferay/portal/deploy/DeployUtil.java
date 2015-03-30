@@ -285,7 +285,7 @@ public class DeployUtil {
 			File parentFile = file.getParentFile();
 
 			if (parentFile != null) {
-				parentFile.mkdirs();
+				FileUtils.forceMkdir(parentFile);
 			}
 
 			StreamUtil.transfer(inputStream, new FileOutputStream(file));

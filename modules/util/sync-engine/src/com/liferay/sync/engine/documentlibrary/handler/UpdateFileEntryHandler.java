@@ -18,12 +18,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.sync.engine.documentlibrary.event.Event;
-import com.liferay.sync.engine.documentlibrary.event.UpdateFileEntryEvent;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.service.SyncFileService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Shinn Lok
@@ -35,33 +31,13 @@ public class UpdateFileEntryHandler extends BaseSyncDLObjectHandler {
 	}
 
 	@Override
-	public boolean handlePortalException(String exception) throws Exception {
-		if (exception.equals(
-				"com.liferay.sync.SyncDLObjectChecksumException")) {
-
-			if (_logger.isDebugEnabled()) {
-				_logger.debug("Handling exception {}", exception);
-			}
-
-			UpdateFileEntryEvent updateFileEntryEvent =
-				new UpdateFileEntryEvent(getSyncAccountId(), getParameters());
-
-			updateFileEntryEvent.run();
-
-			return true;
-		}
-
-		return super.handlePortalException(exception);
-	}
-
-	@Override
 	public void processResponse(String response) throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		SyncFile remoteSyncFile = objectMapper.readValue(
 			response, new TypeReference<SyncFile>() {});
 
-		SyncFile localSyncFile = (SyncFile)getParameterValue("syncFile");
+		SyncFile localSyncFile = getLocalSyncFile();
 
 		processFilePathChange(localSyncFile, remoteSyncFile);
 
@@ -78,11 +54,9 @@ public class UpdateFileEntryHandler extends BaseSyncDLObjectHandler {
 		}
 
 		localSyncFile.setVersion(remoteSyncFile.getVersion());
+		localSyncFile.setVersionId(remoteSyncFile.getVersionId());
 
 		SyncFileService.update(localSyncFile);
 	}
-
-	private static final Logger _logger = LoggerFactory.getLogger(
-		UpdateFileEntryHandler.class);
 
 }

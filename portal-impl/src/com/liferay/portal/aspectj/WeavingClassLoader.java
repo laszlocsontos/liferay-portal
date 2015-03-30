@@ -31,6 +31,8 @@ import java.security.ProtectionDomain;
 
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
+
 import org.aspectj.bridge.AbortException;
 
 /**
@@ -96,7 +98,7 @@ public class WeavingClassLoader extends URLClassLoader {
 
 				File dumpDir = dumpFile.getParentFile();
 
-				dumpDir.mkdirs();
+				FileUtils.forceMkdir(dumpDir);
 
 				try (FileOutputStream fileOutputStream = new FileOutputStream(
 						dumpFile)) {

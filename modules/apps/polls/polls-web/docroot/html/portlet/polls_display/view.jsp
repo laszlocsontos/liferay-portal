@@ -27,11 +27,20 @@ PollsQuestion question = (PollsQuestion)request.getAttribute(PollsWebKeys.POLLS_
 		renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
 		%>
 
-		<div class="alert alert-info portlet-configuration">
-			<a href="<%= portletDisplay.getURLConfiguration() %>" onClick="<%= portletDisplay.getURLConfigurationJS() %>">
-				<liferay-ui:message key="please-configure-this-portlet-to-make-it-visible-to-all-users" />
-			</a>
-		</div>
+		<c:choose>
+			<c:when test="<%= !layout.isLayoutPrototypeLinkActive() %>">
+				<div class="alert alert-info portlet-configuration">
+					<a href="<%= portletDisplay.getURLConfiguration() %>" onClick="<%= portletDisplay.getURLConfigurationJS() %>">
+						<liferay-ui:message key="please-configure-this-portlet-to-make-it-visible-to-all-users" />
+					</a>
+				</div>
+			</c:when>
+			<c:otherwise>
+				<div class="alert alert-info">
+					<liferay-ui:message key="please-configure-this-portlet-to-make-it-visible-to-all-users" />
+				</div>
+			</c:otherwise>
+		</c:choose>
 	</c:when>
 	<c:otherwise>
 
@@ -106,7 +115,7 @@ if (question != null) {
 
 boolean showAddPollIcon = hasConfigurationPermission && PollsPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_QUESTION);
 boolean showEditPollIcon = (question != null) && PollsQuestionPermission.contains(permissionChecker, question, ActionKeys.UPDATE);
-boolean showIconsActions = themeDisplay.isSignedIn() && (hasConfigurationPermission || showEditPollIcon || showAddPollIcon);
+boolean showIconsActions = themeDisplay.isSignedIn() && !layout.isLayoutPrototypeLinkActive() && (hasConfigurationPermission || showEditPollIcon || showAddPollIcon);
 %>
 
 <c:if test="<%= hasViewPermission && showIconsActions %>">
@@ -120,7 +129,7 @@ boolean showIconsActions = themeDisplay.isSignedIn() && (hasConfigurationPermiss
 	redirectURL.setWindowState(LiferayWindowState.POP_UP);
 	%>
 
-	<div class="lfr-meta-actions icons-container">
+	<div class="icons-container lfr-meta-actions">
 		<div class="lfr-icon-actions">
 			<c:if test="<%= showEditPollIcon %>">
 				<liferay-portlet:renderURL doAsGroupId="<%= scopeGroupId %>" plid="<%= controlPanelPlid %>" portletName="<%= PollsPortletKeys.POLLS %>" refererPlid="<%= plid %>" var="editQuestionURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">

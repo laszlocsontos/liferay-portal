@@ -211,6 +211,11 @@ public abstract class BaseSeleniumImpl
 	}
 
 	@Override
+	public void assertPartialConfirmation(String pattern) throws Exception {
+		LiferaySeleniumHelper.assertPartialConfirmation(this, pattern);
+	}
+
+	@Override
 	public void assertPartialText(String locator, String pattern)
 		throws Exception {
 
@@ -327,13 +332,13 @@ public abstract class BaseSeleniumImpl
 	@Override
 	public String getFirstNumber(String locator) {
 		return _commandProcessor.getString(
-			"getFirstNumber", new String[] {locator,});
+			"getFirstNumber", new String[] {locator});
 	}
 
 	@Override
 	public String getFirstNumberIncrement(String locator) {
 		return _commandProcessor.getString(
-			"getFirstNumberIncrement", new String[] {locator,});
+			"getFirstNumberIncrement", new String[] {locator});
 	}
 
 	@Override
@@ -432,7 +437,7 @@ public abstract class BaseSeleniumImpl
 		value = RuntimeVariables.replace(value);
 
 		return _commandProcessor.getBoolean(
-			"isPartialText", new String[] {locator, value,});
+			"isPartialText", new String[] {locator, value});
 	}
 
 	@Override
@@ -882,28 +887,34 @@ public abstract class BaseSeleniumImpl
 
 		StackTraceElement[] stackTraceElements = currentThread.getStackTrace();
 
-		for (int i = 1; i < stackTraceElements.length; i++) {
-			StackTraceElement stackTraceElement = stackTraceElements[i];
+		try {
+			for (int i = 1; i < stackTraceElements.length; i++) {
+				StackTraceElement stackTraceElement = stackTraceElements[i];
 
-			String className = stackTraceElement.getClassName();
+				String className = stackTraceElement.getClassName();
 
-			if ((className.startsWith("com.liferay.portalweb.plugins") ||
-				 className.startsWith("com.liferay.portalweb.portal") ||
-				 className.startsWith("com.liferay.portalweb.portlet") ||
-				 className.startsWith("com.liferay.portalweb.properties")) &&
-				className.endsWith("Test")) {
+				if ((className.startsWith("com.liferay.portalweb.plugins") ||
+					 className.startsWith("com.liferay.portalweb.portal") ||
+					 className.startsWith("com.liferay.portalweb.portlet") ||
+					 className.startsWith(
+						 "com.liferay.portalweb.properties")) &&
+					className.endsWith("Test")) {
 
-				String dirName = className.substring(22);
+					String dirName = className.substring(22);
 
-				dirName = StringUtil.replace(dirName, ".", "/") + "/";
+					dirName = StringUtil.replace(dirName, ".", "/") + "/";
 
-				String fileName = stackTraceElement.getFileName();
-				int lineNumber = stackTraceElement.getLineNumber();
+					String fileName = stackTraceElement.getFileName();
+					int lineNumber = stackTraceElement.getLineNumber();
 
-				FileUtil.mkdirs(_OUTPUT_SCREENSHOTS_DIR + dirName);
+					FileUtil.mkdirs(_OUTPUT_SCREENSHOTS_DIR + dirName);
 
-				return dirName + fileName + "-" + lineNumber;
+					return dirName + fileName + "-" + lineNumber;
+				}
 			}
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 
 		throw new RuntimeException("Unable to find screenshot file name");
