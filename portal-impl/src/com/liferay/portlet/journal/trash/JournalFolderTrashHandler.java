@@ -15,6 +15,7 @@
 package com.liferay.portlet.journal.trash;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.trash.TrashActionKeys;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.Validator;
@@ -22,8 +23,9 @@ import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.journal.InvalidDDMStructureException;
-import com.liferay.portlet.journal.asset.JournalFolderAssetRenderer;
 import com.liferay.portlet.journal.model.JournalFolder;
 import com.liferay.portlet.journal.model.JournalFolderConstants;
 import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
@@ -40,6 +42,11 @@ import javax.portlet.PortletRequest;
  *
  * @author Eudaldo Alonso
  */
+@OSGiBeanProperties(
+	property = {
+		"model.class.name=com.liferay.portlet.journal.model.JournalFolder"
+	}
+)
 public class JournalFolderTrashHandler extends JournalBaseTrashHandler {
 
 	@Override
@@ -134,9 +141,11 @@ public class JournalFolderTrashHandler extends JournalBaseTrashHandler {
 
 	@Override
 	public TrashRenderer getTrashRenderer(long classPK) throws PortalException {
-		JournalFolder folder = JournalFolderLocalServiceUtil.getFolder(classPK);
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				JournalFolder.class.getName());
 
-		return new JournalFolderAssetRenderer(folder);
+		return (TrashRenderer)assetRendererFactory.getAssetRenderer(classPK);
 	}
 
 	@Override
@@ -274,7 +283,7 @@ public class JournalFolderTrashHandler extends JournalBaseTrashHandler {
 		}
 		catch (InvalidDDMStructureException iddmse) {
 			throw new RestoreEntryException(
-				RestoreEntryException.INVALID_CONTAINER);
+				RestoreEntryException.INVALID_CONTAINER, iddmse);
 		}
 	}
 

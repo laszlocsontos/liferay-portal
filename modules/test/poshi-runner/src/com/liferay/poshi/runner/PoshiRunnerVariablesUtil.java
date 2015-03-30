@@ -28,16 +28,28 @@ import java.util.regex.Pattern;
  */
 public class PoshiRunnerVariablesUtil {
 
-	public static boolean containsKeyInCommandMap(String key) {
+	public static boolean containsKeyInCommandMap(String key)
+		throws PoshiRunnerException {
+
 		return _commandMap.containsKey(replaceCommandVars(key));
 	}
 
-	public static boolean containsKeyInExecuteMap(String key) {
+	public static boolean containsKeyInExecuteMap(String key)
+		throws PoshiRunnerException {
+
 		return _executeMap.containsKey(replaceCommandVars(key));
 	}
 
-	public static String getValueFromCommandMap(String key) {
+	public static String getValueFromCommandMap(String key)
+		throws PoshiRunnerException {
+
 		return _commandMap.get(replaceCommandVars(key));
+	}
+
+	public static String getValueFromExecuteMap(String key)
+		throws PoshiRunnerException {
+
+		return _executeMap.get(replaceCommandVars(key));
 	}
 
 	public static void popCommandMap() {
@@ -54,19 +66,41 @@ public class PoshiRunnerVariablesUtil {
 		_executeMap = new HashMap<>();
 	}
 
-	public static void putIntoCommandMap(String key, String value) {
+	public static void putIntoCommandMap(String key, String value)
+		throws PoshiRunnerException {
+
 		_commandMap.put(replaceCommandVars(key), replaceCommandVars(value));
 	}
 
-	public static void putIntoExecuteMap(String key, String value) {
+	public static void putIntoExecuteMap(String key, String value)
+		throws PoshiRunnerException {
+
 		_executeMap.put(replaceCommandVars(key), replaceCommandVars(value));
 	}
 
-	public static String replaceCommandVars(String token) {
+	public static String replaceCommandVars(String token)
+		throws PoshiRunnerException {
+
 		Matcher matcher = _pattern.matcher(token);
 
-		while (matcher.find()) {
+		while (matcher.find() && _commandMap.containsKey(matcher.group(1))) {
 			String varValue = getValueFromCommandMap(matcher.group(1));
+
+			varValue = Matcher.quoteReplacement(varValue);
+
+			token = StringUtil.replace(token, matcher.group(), varValue);
+		}
+
+		return token;
+	}
+
+	public static String replaceExecuteVars(String token)
+		throws PoshiRunnerException {
+
+		Matcher matcher = _pattern.matcher(token);
+
+		while (matcher.find() && _executeMap.containsKey(matcher.group(1))) {
+			String varValue = getValueFromExecuteMap(matcher.group(1));
 
 			varValue = Matcher.quoteReplacement(varValue);
 

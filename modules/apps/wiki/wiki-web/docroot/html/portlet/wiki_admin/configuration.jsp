@@ -44,9 +44,9 @@ MailTemplatesHelper mailTemplatesHelper = new MailTemplatesHelper(wikiRequestHel
 
 		<liferay-ui:section>
 			<aui:fieldset>
-				<aui:input cssClass="lfr-input-text-container" label="name" name="preferences--emailFromName--" value="<%= wikiSettings.getEmailFromName() %>" />
+				<aui:input cssClass="lfr-input-text-container" label="name" name="preferences--emailFromName--" value="<%= wikiGroupServiceSettings.emailFromName() %>" />
 
-				<aui:input cssClass="lfr-input-text-container" label="address" name="preferences--emailFromAddress--" value="<%= wikiSettings.getEmailFromAddress() %>" />
+				<aui:input cssClass="lfr-input-text-container" label="address" name="preferences--emailFromAddress--" value="<%= wikiGroupServiceSettings.emailFromAddress() %>" />
 			</aui:fieldset>
 
 			<aui:fieldset cssClass="definition-of-terms">
@@ -83,21 +83,21 @@ MailTemplatesHelper mailTemplatesHelper = new MailTemplatesHelper(wikiRequestHel
 
 		<liferay-ui:section>
 			<liferay-ui:email-notification-settings
-				emailBody="<%= wikiSettings.getEmailPageAddedBodyXml() %>"
+				emailBody="<%= wikiGroupServiceSettings.emailPageAddedBodyXml() %>"
 				emailDefinitionTerms="<%= definitionTerms %>"
-				emailEnabled="<%= wikiSettings.isEmailPageAddedEnabled() %>"
+				emailEnabled="<%= wikiGroupServiceSettings.emailPageAddedEnabled() %>"
 				emailParam="emailPageAdded"
-				emailSubject="<%= wikiSettings.getEmailPageAddedSubjectXml() %>"
+				emailSubject="<%= wikiGroupServiceSettings.emailPageAddedSubjectXml() %>"
 			/>
 		</liferay-ui:section>
 
 		<liferay-ui:section>
 			<liferay-ui:email-notification-settings
-				emailBody="<%= wikiSettings.getEmailPageUpdatedBodyXml() %>"
+				emailBody="<%= wikiGroupServiceSettings.emailPageUpdatedBodyXml() %>"
 				emailDefinitionTerms="<%= definitionTerms %>"
-				emailEnabled="<%= wikiSettings.isEmailPageUpdatedEnabled() %>"
+				emailEnabled="<%= wikiGroupServiceSettings.emailPageUpdatedEnabled() %>"
 				emailParam="emailPageUpdated"
-				emailSubject="<%= wikiSettings.getEmailPageUpdatedSubjectXml() %>"
+				emailSubject="<%= wikiGroupServiceSettings.emailPageUpdatedSubjectXml() %>"
 			/>
 		</liferay-ui:section>
 	</liferay-ui:tabs>

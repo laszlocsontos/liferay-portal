@@ -16,9 +16,11 @@ package com.liferay.journal.content.web.portlet;
 
 import com.liferay.journal.content.web.constants.JournalContentPortletKeys;
 import com.liferay.journal.content.web.upgrade.JournalContentWebUpgrade;
+import com.liferay.journal.web.util.ExportArticleUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -28,19 +30,18 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleDisplay;
 import com.liferay.portlet.journal.service.JournalArticleLocalService;
-import com.liferay.portlet.journal.util.ExportArticleUtil;
 import com.liferay.portlet.journal.util.JournalContentUtil;
 import com.liferay.util.log4j.Log4JUtil;
 
 import java.io.IOException;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -151,11 +152,20 @@ public class JournalContentPortlet extends MVCPortlet {
 		super.doView(renderRequest, renderResponse);
 	}
 
-	public void exportArticle(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
+	@Override
+	public void serveResource(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws IOException, PortletException {
 
-		ExportArticleUtil.sendFile(actionRequest, actionResponse);
+		String resourceID = GetterUtil.getString(
+			resourceRequest.getResourceID());
+
+		if (resourceID.equals("exportArticle")) {
+			ExportArticleUtil.sendFile(resourceRequest, resourceResponse);
+		}
+		else {
+			super.serveResource(resourceRequest, resourceResponse);
+		}
 	}
 
 	@Activate
@@ -167,7 +177,7 @@ public class JournalContentPortlet extends MVCPortlet {
 
 	protected void initLogger(ClassLoader classLoader) {
 		Log4JUtil.configureLog4J(
-			classLoader.getResource("META-INF/portlet-log4j.xml"));
+			classLoader.getResource("META-INF/portal-log4j.xml"));
 	}
 
 	@Reference

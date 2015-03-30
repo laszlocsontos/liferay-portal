@@ -147,6 +147,30 @@ import org.xml.sax.XMLReader;
  */
 public class ExportImportHelperImpl implements ExportImportHelper {
 
+	@Override
+	public long[] getAllLayoutIds(long groupId, boolean privateLayout) {
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			groupId, privateLayout);
+
+		return getLayoutIds(layouts);
+	}
+
+	@Override
+	public Map<Long, Boolean> getAllLayoutIdsMap(
+		long groupId, boolean privateLayout) {
+
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			groupId, privateLayout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+
+		Map<Long, Boolean> layoutIdMap = new HashMap<>();
+
+		for (Layout layout : layouts) {
+			layoutIdMap.put(layout.getPlid(), true);
+		}
+
+		return layoutIdMap;
+	}
+
 	/**
 	 * @deprecated As of 7.0.0, moved to {@link
 	 *             ExportImportDateUtil#getCalendar(PortletRequest, String,
@@ -256,7 +280,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			exportPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_DATA),
 			exportPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_SETUP),
 			exportPortletControlsMap.get(
-				PortletDataHandlerKeys.PORTLET_USER_PREFERENCES),
+				PortletDataHandlerKeys.PORTLET_USER_PREFERENCES)
 		};
 	}
 
@@ -331,7 +355,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			importPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_DATA),
 			importPortletControlsMap.get(PortletDataHandlerKeys.PORTLET_SETUP),
 			importPortletControlsMap.get(
-				PortletDataHandlerKeys.PORTLET_USER_PREFERENCES),
+				PortletDataHandlerKeys.PORTLET_USER_PREFERENCES)
 		};
 	}
 
@@ -1008,7 +1032,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 					else if (urlSBString.contains(
 								DATA_HANDLER_PRIVATE_LAYOUT_SET_SECURE_URL) ||
 							 urlSBString.contains(
-								DATA_HANDLER_PRIVATE_LAYOUT_SET_URL)) {
+								 DATA_HANDLER_PRIVATE_LAYOUT_SET_URL)) {
 
 						layoutSet = group.getPrivateLayoutSet();
 					}
@@ -1281,12 +1305,24 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				continue;
 			}
 
-			String url = DLUtil.getPreviewURL(
-				importedFileEntry, importedFileEntry.getFileVersion(), null,
-				StringPool.BLANK, false, false);
+			String reference = StringPool.BLANK;
+
+			if (entityStagedModel instanceof JournalArticle) {
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+				jsonObject.put("groupId", importedFileEntry.getGroupId());
+				jsonObject.put("uuid", importedFileEntry.getUuid());
+
+				reference = jsonObject.toString();
+			}
+			else {
+				reference = DLUtil.getPreviewURL(
+					importedFileEntry, importedFileEntry.getFileVersion(), null,
+					StringPool.BLANK, false, false);
+			}
 
 			content = StringUtil.replace(
-				content, "[$dl-reference=" + path + "$]", url);
+				content, "[$dl-reference=" + path + "$]", reference);
 		}
 
 		return content;
@@ -2012,16 +2048,14 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 			exportCurPortletConfiguration = true;
 
-			exportCurPortletArchivedSetups =
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL);
+			exportCurPortletArchivedSetups = MapUtil.getBoolean(
+				parameterMap,
+				PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL);
 			exportCurPortletSetup = MapUtil.getBoolean(
 				parameterMap, PortletDataHandlerKeys.PORTLET_SETUP_ALL);
-			exportCurPortletUserPreferences =
-				MapUtil.getBoolean(
-					parameterMap,
-					PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL);
+			exportCurPortletUserPreferences = MapUtil.getBoolean(
+				parameterMap,
+				PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL);
 		}
 		else if (rootPortletId != null) {
 			exportCurPortletConfiguration =

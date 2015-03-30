@@ -371,6 +371,26 @@ public class SearchEngineUtil {
 			new String[assetEntryClassNames.size()]);
 	}
 
+	public static String getQueryString(
+		SearchContext searchContext, Query query) {
+
+		SearchEngine searchEngine = getSearchEngine(
+			searchContext.getSearchEngineId());
+
+		IndexSearcher indexSearcher = searchEngine.getIndexSearcher();
+
+		try {
+			return indexSearcher.getQueryString(searchContext, query);
+		}
+		catch (ParseException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to parse query " + query, pe);
+			}
+		}
+
+		return StringPool.BLANK;
+	}
+
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link #getSearchEngine(String)}
 	 */
@@ -786,7 +806,7 @@ public class SearchEngineUtil {
 		throws SearchException {
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Search query " + query.toString());
+			_log.debug("Search query " + getQueryString(searchContext, query));
 		}
 
 		SearchEngine searchEngine = getSearchEngine(

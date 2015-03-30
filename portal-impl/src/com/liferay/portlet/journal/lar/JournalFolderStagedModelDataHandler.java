@@ -21,8 +21,8 @@ import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.ServiceContext;
@@ -36,6 +36,7 @@ import java.util.Map;
 /**
  * @author Daniel Kocsis
  */
+@OSGiBeanProperties
 public class JournalFolderStagedModelDataHandler
 	extends BaseStagedModelDataHandler<JournalFolder> {
 
@@ -54,27 +55,21 @@ public class JournalFolderStagedModelDataHandler
 	}
 
 	@Override
-	public JournalFolder fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<JournalFolder> folders =
-			JournalFolderLocalServiceUtil.getJournalFoldersByUuidAndCompanyId(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<JournalFolder>());
-
-		if (ListUtil.isEmpty(folders)) {
-			return null;
-		}
-
-		return folders.get(0);
-	}
-
-	@Override
 	public JournalFolder fetchStagedModelByUuidAndGroupId(
 		String uuid, long groupId) {
 
 		return JournalFolderLocalServiceUtil.fetchJournalFolderByUuidAndGroupId(
 			uuid, groupId);
+	}
+
+	@Override
+	public List<JournalFolder> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return JournalFolderLocalServiceUtil.
+			getJournalFoldersByUuidAndCompanyId(
+				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new StagedModelModifiedDateComparator<JournalFolder>());
 	}
 
 	@Override

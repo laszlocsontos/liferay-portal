@@ -3,6 +3,8 @@ AUI.add(
 	function(A) {
 		var Lang = A.Lang;
 
+		var CSS_INVISIBLE = 'invisible';
+
 		var STR_BLANK = '';
 
 		var STR_CHANGE = 'change';
@@ -104,7 +106,12 @@ AUI.add(
 					_bindUI: function() {
 						var instance = this;
 
-						var eventHandles = [];
+						instance._captionNode = AUI.$('.entry-cover-image-caption');
+
+						var eventHandles = [
+							Liferay.on('imageDeleted', instance._removeCaption, instance),
+							Liferay.on('imageUploaded', instance._showCaption, instance)
+						];
 
 						var publishButton = instance.one('#publishButton');
 
@@ -119,14 +126,6 @@ AUI.add(
 						if (saveButton) {
 							eventHandles.push(
 								saveButton.on(STR_CLICK, A.bind('_checkImagesBeforeSave', instance, true, false))
-							);
-						}
-
-						var previewButton = instance.one('#previewButton');
-
-						if (previewButton) {
-							eventHandles.push(
-								previewButton.on(STR_CLICK, instance._previewEntry, instance)
 							);
 						}
 
@@ -221,43 +220,14 @@ AUI.add(
 						instance._oldTitle = entry ? entry.title : STR_BLANK;
 					},
 
-					_previewEntry: function() {
+					_removeCaption: function() {
 						var instance = this;
 
-						var constants = instance.get('constants');
+						var captionNode = instance._captionNode;
 
-						var form = instance._getPrincipalForm();
+						captionNode.addClass(CSS_INVISIBLE);
 
-						instance.one('#' + constants.CMD).val(instance.get('entry') ? constants.UPDATE : constants.ADD);
-
-						instance.one('#preview').val('true');
-						instance.one('#workflowAction').val(constants.ACTION_SAVE_DRAFT);
-
-						var contentEditor = window[instance.ns('contentEditor')];
-
-						if (contentEditor) {
-							instance.one('#content').val(contentEditor.getHTML());
-						}
-
-						var descriptionEditor = window[instance.ns('descriptionEditor')];
-
-						if (descriptionEditor) {
-							instance.one('#description').val(descriptionEditor.getHTML());
-						}
-
-						var subtitleEditor = window[instance.ns('subtitleEditor')];
-
-						if (subtitleEditor) {
-							instance.one('#subtitle').val(subtitleEditor.getHTML());
-						}
-
-						var titleEditor = window[instance.ns('titleEditor')];
-
-						if (titleEditor) {
-							instance.one('#title').val(titleEditor.getHTML());
-						}
-
-						submitForm(form);
+						window[instance.ns('coverImageCaptionEditor')].setHTML(STR_BLANK);
 					},
 
 					_saveEntry: function(draft, ajax) {
@@ -270,6 +240,7 @@ AUI.add(
 						var subtitle = window[instance.ns('subtitleEditor')].getHTML();
 						var content = window[instance.ns('contentEditor')].getHTML();
 						var description = window[instance.ns('descriptionEditor')].getHTML();
+						var coverImageCaption = window[instance.ns('coverImageCaptionEditor')].getHTML();
 
 						var form = instance._getPrincipalForm();
 
@@ -293,6 +264,7 @@ AUI.add(
 										'assetTagNames': instance.one('#assetTagNames').val(),
 										'cmd': constants.ADD,
 										'content': content,
+										'coverImageCaption': coverImageCaption,
 										'displayDateAmPm': instance.one('#displayDateAmPm').val(),
 										'displayDateDay': instance.one('#displayDateDay').val(),
 										'displayDateHour': instance.one('#displayDateHour').val(),
@@ -383,11 +355,11 @@ AUI.add(
 						else {
 							instance.one('#' + constants.CMD).val(instance.get('entry') ? constants.UPDATE : constants.ADD);
 
-							instance.one('#title').val(title);
-							instance.one('#subtitle').val(subtitle);
 							instance.one('#content').val(content);
+							instance.one('#coverImageCaption').val(coverImageCaption);
 							instance.one('#description').val(description);
-
+							instance.one('#subtitle').val(subtitle);
+							instance.one('#title').val(title);
 							instance.one('#workflowAction').val(draft ? constants.ACTION_SAVE_DRAFT : constants.ACTION_PUBLISH);
 
 							submitForm(form);
@@ -419,6 +391,12 @@ AUI.add(
 						}
 
 						return text;
+					},
+
+					_showCaption: function() {
+						var instance = this;
+
+						instance._captionNode.removeClass(CSS_INVISIBLE);
 					},
 
 					_updateImages: function(persistentImages) {

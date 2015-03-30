@@ -18,8 +18,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.sync.engine.documentlibrary.event.Event;
+import com.liferay.sync.engine.util.FileUtil;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import java.util.Iterator;
@@ -73,13 +73,15 @@ public class UpdateFileEntriesHandler extends BaseJSONHandler {
 				handler.processResponse(fieldValue.toString());
 			}
 			catch (Exception e) {
-				_logger.debug(e.getMessage(), e);
+				if (_logger.isDebugEnabled()) {
+					_logger.debug(e.getMessage(), e);
+				}
 			}
 		}
 
 		Path filePath = (Path)getParameterValue("zipFilePath");
 
-		Files.deleteIfExists(filePath);
+		FileUtil.deleteFile(filePath);
 	}
 
 	private static final Logger _logger = LoggerFactory.getLogger(
