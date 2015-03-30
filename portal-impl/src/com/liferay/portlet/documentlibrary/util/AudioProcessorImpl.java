@@ -46,6 +46,7 @@ import com.liferay.portlet.documentlibrary.model.DLProcessorConstants;
 import com.liferay.util.log4j.Log4JUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.List;
@@ -68,7 +69,7 @@ public class AudioProcessorImpl
 	extends DLPreviewableProcessor implements AudioProcessor {
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws IOException {
 		boolean valid = true;
 
 		if ((_PREVIEW_TYPES.length == 0) || (_PREVIEW_TYPES.length > 2)) {

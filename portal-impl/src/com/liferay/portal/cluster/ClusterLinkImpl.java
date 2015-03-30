@@ -15,37 +15,45 @@
 package com.liferay.portal.cluster;
 
 import com.liferay.portal.kernel.cluster.Address;
+import com.liferay.portal.kernel.cluster.ClusterChannel;
+import com.liferay.portal.kernel.cluster.ClusterChannelFactory;
+import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterLink;
+import com.liferay.portal.kernel.cluster.ClusterReceiver;
 import com.liferay.portal.kernel.cluster.Priority;
+import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-
-import org.jgroups.JChannel;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author Shuyang Zhou
  */
 @DoPrivileged
-public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
+public class ClusterLinkImpl implements ClusterLink {
 
-	@Override
 	public void destroy() {
 		if (!isEnabled()) {
 			return;
 		}
 
-		for (JChannel jChannel : _transportJChannels) {
-			jChannel.close();
+		for (ClusterChannel clusterChannel : _transportChannels) {
+			clusterChannel.close();
 		}
+
+		_executorService.shutdownNow();
 	}
 
 	@Override
@@ -53,6 +61,9 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 		if (!isEnabled()) {
 			return;
 		}
+
+		_executorService = PortalExecutorManagerUtil.getPortalExecutor(
+			ClusterLinkImpl.class.getName());
 
 		try {
 			initChannels();
@@ -65,11 +76,14 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 			throw new IllegalStateException(e);
 		}
 
-		for (JChannel jChannel : _transportJChannels) {
-			BaseReceiver baseReceiver = (BaseReceiver)jChannel.getReceiver();
-
-			baseReceiver.openLatch();
+		for (ClusterReceiver clusterReceiver : _clusterReceivers) {
+			clusterReceiver.openLatch();
 		}
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return PropsValues.CLUSTER_LINK_ENABLED;
 	}
 
 	@Override
@@ -78,14 +92,9 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 			return;
 		}
 
-		JChannel jChannel = getChannel(priority);
+		ClusterChannel clusterChannel = getChannel(priority);
 
-		try {
-			jChannel.send(null, message);
-		}
-		catch (Exception e) {
-			_log.error("Unable to send multicast message " + message, e);
-		}
+		clusterChannel.sendMulticastMessage(message);
 	}
 
 	@Override
@@ -96,20 +105,24 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 			return;
 		}
 
-		org.jgroups.Address jGroupsAddress =
-			(org.jgroups.Address)address.getRealAddress();
+		if (_localTransportAddresses.contains(address)) {
+			sendLocalMessage(message);
 
-		JChannel jChannel = getChannel(priority);
+			return;
+		}
 
-		try {
-			jChannel.send(jGroupsAddress, message);
-		}
-		catch (Exception e) {
-			_log.error("Unable to send unicast message " + message, e);
-		}
+		ClusterChannel clusterChannel = getChannel(priority);
+
+		clusterChannel.sendUnicastMessage(message, address);
 	}
 
-	protected JChannel getChannel(Priority priority) {
+	public void setClusterChannelFactory(
+		ClusterChannelFactory clusterChannelFactory) {
+
+		_clusterChannelFactory = clusterChannelFactory;
+	}
+
+	protected ClusterChannel getChannel(Priority priority) {
 		int channelIndex =
 			priority.ordinal() * _channelCount / MAX_CHANNEL_COUNT;
 
@@ -119,7 +132,15 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 					priority);
 		}
 
-		return _transportJChannels.get(channelIndex);
+		return _transportChannels.get(channelIndex);
+	}
+
+	protected ExecutorService getExecutorService() {
+		return _executorService;
+	}
+
+	protected List<Address> getLocalTransportAddresses() {
+		return _localTransportAddresses;
 	}
 
 	protected void initChannels() throws Exception {
@@ -134,7 +155,8 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 		}
 
 		_localTransportAddresses = new ArrayList<>(_channelCount);
-		_transportJChannels = new ArrayList<>(_channelCount);
+		_transportChannels = new ArrayList<>(_channelCount);
+		_clusterReceivers = new ArrayList<>(_channelCount);
 
 		List<String> keys = new ArrayList<>(_channelCount);
 
@@ -149,23 +171,55 @@ public class ClusterLinkImpl extends ClusterBase implements ClusterLink {
 
 			String value = transportProperties.getProperty(customName);
 
-			JChannel jChannel = createJChannel(
-				value, new ClusterForwardReceiver(_localTransportAddresses),
-				_LIFERAY_TRANSPORT_CHANNEL + i);
+			ClusterReceiver clusterReceiver = new ClusterForwardReceiver(this);
 
-			_localTransportAddresses.add(jChannel.getAddress());
-			_transportJChannels.add(jChannel);
+			ClusterChannel clusterChannel =
+				_clusterChannelFactory.createClusterChannel(
+					value, _LIFERAY_TRANSPORT_CHANNEL_NAME + i,
+					clusterReceiver);
+
+			_clusterReceivers.add(clusterReceiver);
+			_localTransportAddresses.add(clusterChannel.getLocalAddress());
+			_transportChannels.add(clusterChannel);
 		}
 	}
 
-	private static final String _LIFERAY_TRANSPORT_CHANNEL =
-		"LIFERAY-TRANSPORT-CHANNEL-";
+	protected void sendLocalMessage(Message message) {
+		String destinationName = message.getDestinationName();
+
+		if (Validator.isNotNull(destinationName)) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Sending local cluster link message " + message + " to " +
+						destinationName);
+			}
+
+			ClusterInvokeThreadLocal.setEnabled(false);
+
+			try {
+				MessageBusUtil.sendMessage(destinationName, message);
+			}
+			finally {
+				ClusterInvokeThreadLocal.setEnabled(true);
+			}
+		}
+		else {
+			_log.error(
+				"Local cluster link message has no destination " + message);
+		}
+	}
+
+	private static final String _LIFERAY_TRANSPORT_CHANNEL_NAME =
+		PropsValues.CLUSTER_LINK_CHANNEL_NAME_PREFIX + "transport-";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ClusterLinkImpl.class);
 
 	private int _channelCount;
-	private List<org.jgroups.Address> _localTransportAddresses;
-	private List<JChannel> _transportJChannels;
+	private ClusterChannelFactory _clusterChannelFactory;
+	private List<ClusterReceiver> _clusterReceivers;
+	private ExecutorService _executorService;
+	private List<Address> _localTransportAddresses;
+	private List<ClusterChannel> _transportChannels;
 
 }

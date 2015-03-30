@@ -11,6 +11,7 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+
 package com.liferay.asset.categories.admin.web.portlet.route;
 
 import com.liferay.asset.categories.admin.web.constants.AssetCategoriesAdminPortletKeys;
@@ -24,10 +25,19 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 	property = {
+		"com.liferay.portlet.friendly-url-routes=META-INF/friendly-url-routes/routes.xml",
 		"javax.portlet.name=" + AssetCategoriesAdminPortletKeys.ASSET_CATEGORIES_ADMIN
 	},
 	service = FriendlyURLMapper.class
 )
 public class AssetCategoryAdminFriendlyURLMapper
 	extends DefaultFriendlyURLMapper {
+
+	@Override
+	public String getMapping() {
+		return _MAPPING;
+	}
+
+	private static final String _MAPPING = "categories_admin";
+
 }

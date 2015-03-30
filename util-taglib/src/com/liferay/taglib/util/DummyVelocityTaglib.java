@@ -132,9 +132,9 @@ public class DummyVelocityTaglib implements VelocityTaglib {
 
 	@Override
 	public void breadcrumb(
-			String displayStyle, boolean showGuestGroup,
-			boolean showParentGroups, boolean showLayout,
-			boolean showPortletBreadcrumb)
+			long ddmTemplateGroupId, String ddmTemplateKey,
+			boolean showGuestGroup, boolean showParentGroups,
+			boolean showLayout, boolean showPortletBreadcrumb)
 		throws Exception {
 	}
 
@@ -171,7 +171,7 @@ public class DummyVelocityTaglib implements VelocityTaglib {
 	}
 
 	@Override
-	public AssetCategoriesSummaryTag getAssetCategoriesSummaryTag()
+	public AssetCategoriesSummaryTag<?> getAssetCategoriesSummaryTag()
 		throws Exception {
 
 		return null;
@@ -183,7 +183,7 @@ public class DummyVelocityTaglib implements VelocityTaglib {
 	}
 
 	@Override
-	public AssetTagsSummaryTag getAssetTagsSummaryTag() throws Exception {
+	public AssetTagsSummaryTag<?> getAssetTagsSummaryTag() throws Exception {
 		return null;
 	}
 
@@ -426,8 +426,7 @@ public class DummyVelocityTaglib implements VelocityTaglib {
 	}
 
 	@Override
-	public void journalContentSearch(
-			boolean showListed, String targetPortletId, String type)
+	public void journalContentSearch(boolean showListed, String targetPortletId)
 		throws Exception {
 	}
 

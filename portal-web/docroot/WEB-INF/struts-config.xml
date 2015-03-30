@@ -83,8 +83,6 @@
 
 		<action path="/portal/status" forward="portal.status" />
 
-		<action path="/portal/tck" type="com.liferay.portal.action.TCKAction" />
-
 		<action path="/portal/terms_of_use" forward="portal.terms_of_use" />
 
 		<!--<action path="/portal/test" type="com.liferay.portal.action.TestAction">
@@ -428,6 +426,8 @@
 
 		<action path="/document_library/select_restricted_file_entry_type" forward="portlet.document_library.select_restricted_file_entry_type" />
 
+		<action path="/document_library/upload_file_entry" type="com.liferay.portlet.documentlibrary.action.EditFileEntryAction" />
+
 		<action path="/document_library/upload_multiple_file_entries" type="com.liferay.portlet.documentlibrary.action.EditFileEntryAction">
 			<forward name="portlet.document_library.edit_file_entry" path="portlet.document_library.upload_multiple_file_entries" />
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
@@ -716,102 +716,6 @@
 			<forward name="portlet.invitation.view" path="portlet.invitation.view" />
 		</action>
 
-		<!-- Journal -->
-
-		<action path="/journal/compare_versions" type="com.liferay.portlet.journal.action.CompareVersionsAction">
-			<forward name="portlet.journal.compare_versions" path="portlet.journal.compare_versions" />
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/copy_article" type="com.liferay.portlet.journal.action.CopyArticleAction">
-			<forward name="portlet.journal.copy_article" path="portlet.journal.copy_article" />
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/edit_article" type="com.liferay.portlet.journal.action.EditArticleAction">
-			<forward name="portlet.journal.edit_article" path="portlet.journal.edit_article" />
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/edit_article_discussion" type="com.liferay.portlet.messageboards.action.EditDiscussionAction">
-			<forward name="portlet.message_boards.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/edit_entry" type="com.liferay.portlet.journal.action.EditEntryAction">
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/edit_feed" type="com.liferay.portlet.journal.action.EditFeedAction">
-			<forward name="portlet.journal.edit_feed" path="portlet.journal.edit_feed" />
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/edit_folder" type="com.liferay.portlet.journal.action.EditFolderAction">
-			<forward name="portlet.journal.edit_folder" path="portlet.journal.edit_folder" />
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/export_article" type="com.liferay.portlet.journal.action.ExportArticleAction" />
-
-		<action path="/journal/find_folder" type="com.liferay.portlet.journal.action.FindFolderAction" />
-
-		<action path="/journal/get_article" type="com.liferay.portlet.journal.action.GetArticleAction" />
-
-		<action path="/journal/get_article_content" type="com.liferay.portlet.journal.action.GetArticleContentAction" />
-
-		<action path="/journal/get_articles" type="com.liferay.portlet.journal.action.GetArticlesAction" />
-
-		<action path="/journal/get_latest_article_content" type="com.liferay.portlet.journal.action.GetLatestArticleContentAction" />
-
-		<action path="/journal/move_entry" type="com.liferay.portlet.journal.action.EditEntryAction">
-			<forward name="portlet.journal.edit_entry" path="portlet.journal.move_entries" />
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/preview_article_content" type="com.liferay.portlet.journal.action.PreviewArticleContentAction">
-			<forward name="portlet.journal.preview_article_content" path="portlet.journal.preview_article_content" />
-		</action>
-
-		<action path="/journal/rss" type="com.liferay.portlet.journal.action.RSSAction" />
-
-		<action path="/journal/select_folder" type="com.liferay.portlet.journal.action.EditFolderAction">
-			<forward name="portlet.journal.edit_folder" path="portlet.journal.select_folder" />
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/select_version" forward="portlet.journal.select_version" />
-
-		<action path="/journal/upload_file_entry" type="com.liferay.portlet.documentlibrary.action.EditFileEntryAction" />
-
-		<action path="/journal/view" type="com.liferay.portlet.journal.action.ViewAction">
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-			<forward name="portlet.journal.view" path="portlet.journal.view" />
-		</action>
-
-		<action path="/journal/view_article" type="com.liferay.portlet.journal.action.EditArticleAction">
-			<forward name="portlet.journal.edit_article" path="portlet.journal.view_article" />
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-		</action>
-
-		<action path="/journal/view_article_content" type="com.liferay.portlet.journal.action.ViewArticleContentAction">
-			<forward name="portlet.journal.preview_article_content" path="portlet.journal.preview_article_content" />
-		</action>
-
-		<action path="/journal/view_article_history" type="com.liferay.portlet.journal.action.EditArticleAction">
-			<forward name="portlet.journal.error" path="portlet.journal.error" />
-			<forward name="portlet.journal.edit_article" path="portlet.journal.view_article_history" />
-		</action>
-
-		<action path="/journal/view_feeds" forward="portlet.journal.view_feeds" />
-
-		<!-- Journal Content Search -->
-
-		<action path="/journal_content_search/search" type="com.liferay.portlet.journalcontentsearch.action.SearchAction">
-			<forward name="portlet.journal_content_search.search" path="portlet.journal_content_search.search" />
-		</action>
-
-		<action path="/journal_content_search/view" forward="portlet.journal_content_search.view" />
-
 		<!-- Layout Prototypes -->
 
 		<action path="/layout_prototypes/delete_background_task" type="com.liferay.portlet.backgroundtask.action.DeleteBackgroundTaskAction" />
@@ -968,11 +872,6 @@
 			<forward name="portlet.login.login" path="portlet.login.login" />
 		</action>
 
-		<action path="/login/facebook_connect_oauth" type="com.liferay.portlet.login.action.FacebookConnectAction">
-			<forward name="portlet.login.login" path="portlet.login.login" />
-			<forward name="portlet.login.update_account" path="portlet.login.update_account" />
-		</action>
-
 		<action path="/login/forgot_password" type="com.liferay.portlet.login.action.ForgotPasswordAction">
 			<forward name="portlet.login.forgot_password" path="portlet.login.forgot_password" />
 			<forward name="portlet.login.login" path="portlet.login.login" />
@@ -984,11 +883,6 @@
 		</action>
 
 		<action path="/login/login_redirect" forward="portlet.login.login_redirect" />
-
-		<action path="/login/open_id" type="com.liferay.portlet.login.action.OpenIdAction">
-			<forward name="portlet.login.open_id" path="portlet.login.open_id" />
-			<forward name="portlet.login.login" path="portlet.login.login" />
-		</action>
 
 		<action path="/login/update_account" forward="portlet.login.update_account" />
 
@@ -1044,11 +938,7 @@
 			<forward name="portlet.message_boards.move_thread" path="portlet.message_boards.move_thread" />
 		</action>
 
-		<action path="/message_boards/restore_entry" forward="portlet.trash.restore_entry" />
-
-		<action path="/message_boards/restore_message_attachment" type="com.liferay.portlet.trash.action.EditEntryAction">
-			<forward name="portlet.trash.view" path="portlet.message_boards.view_message" />
-		</action>
+		<action path="/message_boards/restore_entry" forward="/portlet/message_boards/restore_entry.jsp" />
 
 		<action path="/message_boards/rss" type="com.liferay.portlet.messageboards.action.RSSAction" />
 
@@ -1127,11 +1017,7 @@
 			<forward name="portlet.message_boards.move_thread" path="portlet.message_boards.move_thread" />
 		</action>
 
-		<action path="/message_boards_admin/restore_entry" forward="portlet.trash.restore_entry" />
-
-		<action path="/message_boards_admin/restore_message_attachment" type="com.liferay.portlet.trash.action.EditEntryAction">
-			<forward name="portlet.trash.view" path="portlet.message_boards.view_message" />
-		</action>
+		<action path="/message_boards_admin/restore_entry" forward="/portlet/message_boards/restore_entry.jsp" />
 
 		<action path="/message_boards_admin/search" forward="portlet.message_boards.search" />
 
@@ -1449,8 +1335,6 @@
 
 		<!-- Recent Documents -->
 
-		<action path="/recent_documents/get_file" type="com.liferay.portlet.documentlibrary.action.GetFileAction" />
-
 		<action path="/recent_documents/view" forward="portlet.recent_documents.view" />
 
 		<!-- Requests -->
@@ -1498,20 +1382,6 @@
 		<action path="/roles_admin/view" forward="portlet.roles_admin.view" />
 
 		<action path="/roles_admin/view_users" forward="portlet.users_admin.view" />
-
-		<!-- Search -->
-
-		<action path="/search/edit_content_redirect" forward="portlet.search.edit_content_redirect" />
-
-		<action path="/search/open_search" type="com.liferay.portlet.search.action.OpenSearchAction" />
-
-		<action path="/search/open_search_description.xml" forward="/portlet/search/open_search_description.jsp" />
-
-		<action path="/search/search" forward="portlet.search.search" />
-
-		<action path="/search/view" forward="portlet.search.view" />
-
-		<action path="/search/view_content" forward="portlet.search.view_content" />
 
 		<!-- Shopping -->
 
@@ -1747,27 +1617,6 @@
 		<action path="/staging_bar/view_layout_revisions" forward="portlet.staging_bar.view_layout_revisions" />
 
 		<action path="/staging_bar/view_layout_set_branches" forward="portlet.staging_bar.view_layout_set_branches" />
-
-		<!-- Trash -->
-
-		<action path="/trash/edit_discussion" type="com.liferay.portlet.messageboards.action.EditDiscussionAction">
-			<forward name="portlet.message_boards.error" path="portlet.trash.error" />
-		</action>
-
-		<action path="/trash/edit_entry" type="com.liferay.portlet.trash.action.EditEntryAction">
-			<forward name="portlet.trash.view" path="portlet.trash.view" />
-		</action>
-
-		<action path="/trash/restore_entry" forward="portlet.trash.restore_entry" />
-
-		<action path="/trash/view" forward="portlet.trash.view" />
-
-		<action path="/trash/view_container_model" type="com.liferay.portlet.trash.action.ContainerModelAction">
-			<forward name="portlet.trash.error" path="portlet.trash.error" />
-			<forward name="portlet.trash.view_container_model" path="portlet.trash.view_container_model" />
-		</action>
-
-		<action path="/trash/view_content" forward="portlet.trash.view_content" />
 
 		<!-- User Groups Admin -->
 

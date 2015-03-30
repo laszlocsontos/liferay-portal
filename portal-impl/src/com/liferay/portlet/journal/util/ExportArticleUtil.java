@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
@@ -36,6 +35,7 @@ import com.liferay.portlet.journal.model.JournalArticleDisplay;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.portlet.PortletPreferences;
@@ -48,11 +48,11 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Eudaldo Alonso
  */
-public class ExportArticleUtil extends PortletAction {
+public class ExportArticleUtil {
 
 	public static void sendFile(
 			PortletRequest portletRequest, PortletResponse portletResponse)
-		throws Exception {
+		throws IOException {
 
 		long groupId = ParamUtil.getLong(portletRequest, "groupId");
 		String articleId = ParamUtil.getString(portletRequest, "articleId");
@@ -75,10 +75,9 @@ public class ExportArticleUtil extends PortletAction {
 		HttpServletResponse response = PortalUtil.getHttpServletResponse(
 			portletResponse);
 
-		JournalArticleDisplay articleDisplay =
-			JournalContentUtil.getDisplay(
-				groupId, articleId, null, "export", languageId, 1,
-				portletRequestModel, themeDisplay);
+		JournalArticleDisplay articleDisplay = JournalContentUtil.getDisplay(
+			groupId, articleId, null, "export", languageId, 1,
+			portletRequestModel, themeDisplay);
 
 		int pages = articleDisplay.getNumberOfPages();
 

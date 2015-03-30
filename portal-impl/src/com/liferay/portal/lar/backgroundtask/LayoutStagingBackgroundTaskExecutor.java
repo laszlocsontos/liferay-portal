@@ -32,13 +32,13 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.BackgroundTask;
 import com.liferay.portal.model.ExportImportConfiguration;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.service.ExportImportConfigurationLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetBranchLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.StagingLocalServiceUtil;
 import com.liferay.portal.spring.transaction.TransactionHandlerUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.Serializable;
@@ -61,15 +61,8 @@ public class LayoutStagingBackgroundTaskExecutor
 	public BackgroundTaskResult execute(BackgroundTask backgroundTask)
 		throws PortalException {
 
-		Map<String, Serializable> taskContextMap =
-			backgroundTask.getTaskContextMap();
-
-		long exportImportConfigurationId = MapUtil.getLong(
-			taskContextMap, "exportImportConfigurationId");
-
 		ExportImportConfiguration exportImportConfiguration =
-			ExportImportConfigurationLocalServiceUtil.
-				getExportImportConfiguration(exportImportConfigurationId);
+			getExportImportConfiguration(backgroundTask);
 
 		Map<String, Serializable> settingsMap =
 			exportImportConfiguration.getSettingsMap();
@@ -225,8 +218,23 @@ public class LayoutStagingBackgroundTaskExecutor
 
 				initLayoutSetBranches(_userId, _sourceGroupId, _targetGroupId);
 			}
-			finally {
+			catch (Exception e) {
+				if (PropsValues.STAGING_DELETE_TEMP_LAR_ON_FAILURE) {
+					FileUtil.delete(file);
+				}
+				else if ((file != null) && _log.isErrorEnabled()) {
+					_log.error(
+						"Kept temporary LAR file " + file.getAbsolutePath());
+				}
+
+				throw e;
+			}
+
+			if (PropsValues.STAGING_DELETE_TEMP_LAR_ON_SUCCESS) {
 				FileUtil.delete(file);
+			}
+			else if ((file != null) && _log.isDebugEnabled()) {
+				_log.debug("Kept temporary LAR file " + file.getAbsolutePath());
 			}
 
 			return missingReferences;

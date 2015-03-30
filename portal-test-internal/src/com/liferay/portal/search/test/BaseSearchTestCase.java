@@ -41,6 +41,7 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.test.randomizerbumpers.BBCodeRandomizerBumper;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 
@@ -489,7 +490,8 @@ public abstract class BaseSearchTestCase {
 			searchBaseModelsCount(
 				getBaseModelClass(), group.getGroupId(), searchContext));
 
-		String updatedKeywords = RandomTestUtil.randomString();
+		String updatedKeywords = RandomTestUtil.randomString(
+			BBCodeRandomizerBumper.INSTANCE);
 
 		baseModel = updateBaseModel(baseModel, updatedKeywords, serviceContext);
 
@@ -967,7 +969,7 @@ public abstract class BaseSearchTestCase {
 			group, serviceContext);
 
 		baseModel = addBaseModelWithDDMStructure(
-			parentBaseModel,  getSearchKeywords(), serviceContext);
+			parentBaseModel, getSearchKeywords(), serviceContext);
 
 		Assert.assertEquals(
 			initialBaseModelsSearchCount + 1,
@@ -1016,7 +1018,7 @@ public abstract class BaseSearchTestCase {
 
 			searchContext.setUserId(user.getUserId());
 
-			int baseModelsCount =  initialBaseModelsSearchCount;
+			int baseModelsCount = initialBaseModelsSearchCount;
 
 			if (addBaseModelPermission && !isCheckBaseModelPermission()) {
 				baseModelsCount++;

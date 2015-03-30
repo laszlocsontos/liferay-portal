@@ -14,11 +14,10 @@
 
 package com.liferay.wiki.web.upgrade.v1_0_0;
 
+import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.wiki.constants.WikiConstants;
 import com.liferay.wiki.constants.WikiPortletKeys;
-import com.liferay.wiki.settings.WikiSettings;
-import com.liferay.wiki.web.settings.WikiPortletInstanceSettings;
 
 /**
  * @author Iván Zaera
@@ -26,12 +25,15 @@ import com.liferay.wiki.web.settings.WikiPortletInstanceSettings;
 public class UpgradePortletSettings
 	extends com.liferay.portal.upgrade.v7_0_0.UpgradePortletSettings {
 
+	public UpgradePortletSettings(SettingsFactory settingsFactory) {
+		super(settingsFactory);
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
 		upgradeMainPortlet(
 			WikiPortletKeys.WIKI, WikiConstants.SERVICE_NAME,
-			PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-			WikiPortletInstanceSettings.ALL_KEYS, WikiSettings.ALL_KEYS);
+			PortletKeys.PREFS_OWNER_TYPE_LAYOUT, true);
 	}
 
 }
