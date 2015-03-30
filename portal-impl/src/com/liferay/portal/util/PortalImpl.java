@@ -3384,6 +3384,8 @@ public class PortalImpl implements Portal {
 
 		long groupId = 0;
 
+		Group group = null;
+
 		Layout layout = (Layout)request.getAttribute(WebKeys.LAYOUT);
 
 		if ((layout != null) && !layout.isTypeControlPanel()) {
@@ -3391,6 +3393,8 @@ public class PortalImpl implements Portal {
 				long scopeGroupId = getScopeGroupId(request);
 
 				groupId = getSiteGroupId(scopeGroupId);
+
+				group = GroupLocalServiceUtil.getGroup(groupId);
 			}
 			catch (Exception e) {
 			}
@@ -3404,6 +3408,27 @@ public class PortalImpl implements Portal {
 
 			if (LanguageUtil.isAvailableLocale(groupId, locale)) {
 				return locale;
+			}
+			else if (group != null) {
+				UnicodeProperties typeSettingsProperties =
+					group.getTypeSettingsProperties();
+
+				if (!Boolean.valueOf(
+						typeSettingsProperties.getProperty(
+							PropsKeys.INHERIT_LOCALES))) {
+
+					String i18nPath = (String)request.getAttribute(
+						WebKeys.I18N_PATH);
+					int pos = i18nPath.lastIndexOf(CharPool.SLASH);
+
+					i18nLanguageId = i18nPath.substring(pos + 1);
+
+					locale = LanguageUtil.getLocale(groupId, i18nLanguageId);
+
+					if (LanguageUtil.isAvailableLocale(groupId, locale)) {
+						return locale;
+					}
+				}
 			}
 		}
 
