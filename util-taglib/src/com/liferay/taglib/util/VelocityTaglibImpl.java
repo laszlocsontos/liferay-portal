@@ -15,6 +15,7 @@
 package com.liferay.taglib.util;
 
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.provider.PortletProvider;
 import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
 import com.liferay.portal.kernel.servlet.JSPSupportServlet;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
@@ -214,8 +215,8 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 			PortletURL portletURL)
 		throws Exception {
 
-		AssetCategoriesSummaryTag assetCategorySummaryTag =
-			new AssetCategoriesSummaryTag();
+		AssetCategoriesSummaryTag<?> assetCategorySummaryTag =
+			new AssetCategoriesSummaryTag<>();
 
 		setUp(assetCategorySummaryTag);
 
@@ -248,7 +249,8 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 			String assetTagNames, PortletURL portletURL)
 		throws Exception {
 
-		AssetTagsSummaryTag assetTagsSummaryTag = new AssetTagsSummaryTag();
+		AssetTagsSummaryTag<?> assetTagsSummaryTag =
+			new AssetTagsSummaryTag<>();
 
 		setUp(assetTagsSummaryTag);
 
@@ -272,16 +274,17 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 
 	@Override
 	public void breadcrumb(
-			String displayStyle, boolean showGuestGroup,
-			boolean showParentGroups, boolean showLayout,
-			boolean showPortletBreadcrumb)
+			long ddmTemplateGroupId, String ddmTemplateKey,
+			boolean showGuestGroup, boolean showParentGroups,
+			boolean showLayout, boolean showPortletBreadcrumb)
 		throws Exception {
 
 		BreadcrumbTag breadcrumbTag = new BreadcrumbTag();
 
 		setUp(breadcrumbTag);
 
-		breadcrumbTag.setDisplayStyle(displayStyle);
+		breadcrumbTag.setDdmTemplateGroupId(ddmTemplateGroupId);
+		breadcrumbTag.setDdmTemplateKey(ddmTemplateKey);
 		breadcrumbTag.setShowGuestGroup(showGuestGroup);
 		breadcrumbTag.setShowLayout(showLayout);
 		breadcrumbTag.setShowParentGroups(showParentGroups);
@@ -356,11 +359,11 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 	}
 
 	@Override
-	public AssetCategoriesSummaryTag getAssetCategoriesSummaryTag()
+	public AssetCategoriesSummaryTag<?> getAssetCategoriesSummaryTag()
 		throws Exception {
 
-		AssetCategoriesSummaryTag assetCategoriesSummaryTag =
-			new AssetCategoriesSummaryTag();
+		AssetCategoriesSummaryTag<?> assetCategoriesSummaryTag =
+			new AssetCategoriesSummaryTag<>();
 
 		setUp(assetCategoriesSummaryTag);
 
@@ -377,8 +380,9 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 	}
 
 	@Override
-	public AssetTagsSummaryTag getAssetTagsSummaryTag() throws Exception {
-		AssetTagsSummaryTag assetTagsSummaryTag = new AssetTagsSummaryTag();
+	public AssetTagsSummaryTag<?> getAssetTagsSummaryTag() throws Exception {
+		AssetTagsSummaryTag<?> assetTagsSummaryTag =
+			new AssetTagsSummaryTag<>();
 
 		setUp(assetTagsSummaryTag);
 
@@ -712,12 +716,11 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 
 	@Override
 	public void journalContentSearch() throws Exception {
-		journalContentSearch(true, null, null);
+		journalContentSearch(true, null);
 	}
 
 	@Override
-	public void journalContentSearch(
-			boolean showListed, String targetPortletId, String type)
+	public void journalContentSearch(boolean showListed, String targetPortletId)
 		throws Exception {
 
 		JournalContentSearchTag journalContentSearchTag =
@@ -727,7 +730,6 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 
 		journalContentSearchTag.setShowListed(showListed);
 		journalContentSearchTag.setTargetPortletId(targetPortletId);
-		journalContentSearchTag.setType(type);
 
 		journalContentSearchTag.runTag();
 	}
@@ -1144,14 +1146,26 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 
 	@Override
 	public void runtime(String portletName) throws Exception {
-		runtime(portletName, null);
+		runtime(portletName, (String)null);
+	}
+
+	@Override
+	public void runtime(
+			String portletProviderClassName,
+			PortletProvider.Action portletProviderAction)
+		throws Exception {
+
+		RuntimeTag.doTag(
+			portletProviderClassName, portletProviderAction, null, null,
+			_pageContext, _request, _response);
 	}
 
 	@Override
 	public void runtime(String portletName, String queryString)
 		throws Exception {
 
-		RuntimeTag.doTag(portletName, queryString, null, _request, _response);
+		RuntimeTag.doTag(
+			portletName, queryString, _pageContext, _request, _response);
 	}
 
 	@Override
@@ -1160,8 +1174,8 @@ public class VelocityTaglibImpl implements VelocityTaglib {
 		throws Exception {
 
 		RuntimeTag.doTag(
-			portletName, queryString, defaultPreferences, null, _request,
-			_response);
+			portletName, queryString, defaultPreferences, _pageContext,
+			_request, _response);
 	}
 
 	@Override

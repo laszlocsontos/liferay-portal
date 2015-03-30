@@ -51,6 +51,11 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<name>actionJspServletContext</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>assetCategoryClassName</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -291,6 +296,11 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<name>actionJspServletContext</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>containerIcon</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -501,6 +511,11 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
+		<attribute>
+			<name>ignoreRequestValue</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 	</tag>
 	<tag>
 		<name>asset-categories-summary</name>
@@ -702,6 +717,16 @@
 		<tag-class>com.liferay.taglib.ui.AssetTagsSelectorTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
+			<name>addCallback</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>allowAddEntry</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>autoFocus</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -738,6 +763,16 @@
 		</attribute>
 		<attribute>
 			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>ignoreRequestValue</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>removeCallback</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -782,7 +817,12 @@
 		<tag-class>com.liferay.taglib.ui.BreadcrumbTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
-			<name>displayStyle</name>
+			<name>ddmTemplateGroupId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>ddmTemplateKey</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -986,6 +1026,11 @@
 		<tag-class>com.liferay.taglib.ui.DDMTemplateRendererTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
+			<name>className</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<name>contextObjects</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -1011,7 +1056,7 @@
 		<tag-class>com.liferay.taglib.ui.DDMTemplateSelectorTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
-			<name>classNameId</name>
+			<name>className</name>
 			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -2158,6 +2203,11 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<name>configKey</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<description>Sets configuration parameters using a map. The map holds key value pairs of type <![CDATA[<code>&lt;String, String&gt;</code>]]>.</description>
 			<name>configParams</name>
 			<required>false</required>
@@ -2963,11 +3013,6 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
-		<attribute>
-			<name>type</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
 	</tag>
 	<tag>
 		<name>language</name>
@@ -3133,6 +3178,11 @@
 		<name>map</name>
 		<tag-class>com.liferay.taglib.ui.MapTag</tag-class>
 		<body-content>JSP</body-content>
+		<attribute>
+			<name>apiKey</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 		<attribute>
 			<name>geolocation</name>
 			<required>false</required>
@@ -3625,11 +3675,6 @@
 		<tag-class>com.liferay.taglib.ui.RestoreEntryTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
-			<name>duplicateEntryAction</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
 			<name>overrideMessage</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -3640,8 +3685,8 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<name>restoreEntryAction</name>
-			<required>false</required>
+			<name>restoreURL</name>
+			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
@@ -4961,7 +5006,7 @@
 		<body-content>empty</body-content>
 		<attribute>
 			<name>portletURL</name>
-			<required>false</required>
+			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>

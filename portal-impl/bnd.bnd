@@ -59,14 +59,13 @@ Export-Package:\
 	com.liferay.portlet.documentlibrary,\
 	com.liferay.portlet.documentlibrary.action,\
 	com.liferay.portlet.documentlibrary.service.permission,\
+	com.liferay.portlet.documentlibrary.util,\
+	com.liferay.portlet.dynamicdatamapping.util,\
 	com.liferay.portlet.expando.model,\
 	com.liferay.portlet.expando.service,\
 	com.liferay.portlet.expando.service.persistence,\
 	com.liferay.portlet.expando.util,\
-	com.liferay.portlet.journal.asset,\
-	com.liferay.portlet.journal.ddm,\
 	com.liferay.portlet.journal.lar,\
-	com.liferay.portlet.journal.search,\
 	com.liferay.portlet.journal.service.permission,\
 	com.liferay.portlet.layoutsadmin.context,\
 	com.liferay.portlet.messageboards.model,\

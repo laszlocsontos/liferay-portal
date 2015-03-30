@@ -52,7 +52,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "details
 	<liferay-util:param name="tabs1" value="details" />
 </liferay-util:include>
 
-<table class="table table-bordered table-hover table-striped page-info">
+<table class="page-info table table-bordered table-hover table-striped">
 <tr>
 	<th class="table-header">
 		<liferay-ui:message key="title" />
@@ -150,23 +150,23 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "details
 	</tr>
 </c:if>
 
-<c:if test="<%= wikiPortletInstanceSettings.isEnableRSS() %>">
+<c:if test="<%= wikiPortletInstanceSettings.enableRss() %>">
 	<tr>
 		<th class="table-header">
 			<liferay-ui:message key="rss-subscription" />
 		</th>
 		<td class="table-cell">
 			<liferay-ui:rss
-				delta="<%= wikiPortletInstanceSettings.getRssDelta() %>"
-				displayStyle="<%= wikiPortletInstanceSettings.getRssDisplayStyle() %>"
-				feedType="<%= wikiPortletInstanceSettings.getRssFeedType() %>"
+				delta="<%= GetterUtil.getInteger(wikiPortletInstanceSettings.rssDelta()) %>"
+				displayStyle="<%= wikiPortletInstanceSettings.rssDisplayStyle() %>"
+				feedType="<%= wikiPortletInstanceSettings.rssFeedType() %>"
 				url='<%= themeDisplay.getPathMain() + "/wiki/rss?p_l_id=" + plid + "&companyId=" + company.getCompanyId() + "&nodeId=" + wikiPage.getNodeId() + "&title=" + wikiPage.getTitle() %>'
 			/>
 		</td>
 	</tr>
 </c:if>
 
-<c:if test="<%= (WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.SUBSCRIBE) || WikiNodePermission.contains(permissionChecker, node, ActionKeys.SUBSCRIBE)) && (wikiSettings.isEmailPageAddedEnabled() || wikiSettings.isEmailPageUpdatedEnabled()) %>">
+<c:if test="<%= (WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.SUBSCRIBE) || WikiNodePermission.contains(permissionChecker, node, ActionKeys.SUBSCRIBE)) && (wikiGroupServiceSettings.emailPageAddedEnabled() || wikiGroupServiceSettings.emailPageUpdatedEnabled()) %>">
 	<tr>
 		<th class="table-header">
 			<liferay-ui:message key="email-subscription" />
@@ -345,7 +345,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "details
 					<%
 					PortletURL frontPageURL = PortletURLUtil.clone(viewPageURL, renderResponse);
 
-					frontPageURL.setParameter("title", wikiConfiguration.frontPageName());
+					frontPageURL.setParameter("title", wikiGroupServiceConfiguration.frontPageName());
 
 					PortletURL deletePageURL = PortletURLUtil.clone(editPageURL, PortletRequest.ACTION_PHASE, renderResponse);
 

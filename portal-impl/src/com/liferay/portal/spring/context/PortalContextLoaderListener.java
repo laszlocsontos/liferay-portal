@@ -15,7 +15,6 @@
 package com.liferay.portal.spring.context;
 
 import com.liferay.portal.bean.BeanLocatorImpl;
-import com.liferay.portal.cache.ehcache.ClearEhcacheThreadUtil;
 import com.liferay.portal.dao.orm.hibernate.FieldInterceptionHelperUtil;
 import com.liferay.portal.deploy.hot.IndexerPostProcessorRegistry;
 import com.liferay.portal.deploy.hot.SchedulerEntryRegistry;
@@ -118,13 +117,6 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		try {
 			ClearTimerThreadUtil.clearTimerThread();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		try {
-			ClearEhcacheThreadUtil.clearEhcacheReplicationThread();
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -268,7 +260,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			ContextLoader.getCurrentWebApplicationContext();
 
 		try {
-			BeanReferenceRefreshUtil.refresh(applicationContext);
+			BeanReferenceRefreshUtil.refresh(
+				applicationContext.getAutowireCapableBeanFactory());
 		}
 		catch (Exception e) {
 			_log.error(e, e);

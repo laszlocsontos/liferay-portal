@@ -531,11 +531,26 @@
 		</attribute>
 		<attribute>
 			<name>portletName</name>
-			<required>true</required>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>portletProviderClassName</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>portletProviderAction</name>
+			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
 			<name>queryString</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>settingsScope</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

@@ -42,9 +42,9 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.messageboards.NoSuchDiscussionException;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
+import com.liferay.portlet.messageboards.model.MBDiscussion;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBCategoryServiceUtil;
@@ -57,7 +57,6 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 
 /**
  * @author Brian Wing Shun Chan
@@ -72,9 +71,10 @@ public class MBMessageIndexer extends BaseIndexer {
 
 	public MBMessageIndexer() {
 		setDefaultSelectedFieldNames(
-			Field.CLASS_NAME_ID, Field.CLASS_PK, Field.COMPANY_ID,
-			Field.CONTENT, Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK,
-			Field.TITLE, Field.UID);
+			Field.ASSET_TAG_NAMES, Field.CLASS_NAME_ID, Field.CLASS_PK,
+			Field.COMPANY_ID, Field.CONTENT, Field.ENTRY_CLASS_NAME,
+			Field.ENTRY_CLASS_PK, Field.GROUP_ID, Field.MODIFIED_DATE,
+			Field.SCOPE_GROUP_ID, Field.TITLE, Field.UID);
 		setFilterSearch(true);
 		setPermissionAware(true);
 	}
@@ -85,13 +85,10 @@ public class MBMessageIndexer extends BaseIndexer {
 
 		DLFileEntry dlFileEntry = (DLFileEntry)obj;
 
-		MBMessage message = null;
+		MBMessage message = MBMessageAttachmentsUtil.fetchMessage(
+			dlFileEntry.getFileEntryId());
 
-		try {
-			message = MBMessageAttachmentsUtil.getMessage(
-				dlFileEntry.getFileEntryId());
-		}
-		catch (Exception e) {
+		if (message == null) {
 			return;
 		}
 
@@ -229,14 +226,15 @@ public class MBMessageIndexer extends BaseIndexer {
 			document.remove(Field.USER_NAME);
 		}
 
-		try {
-			MBDiscussionLocalServiceUtil.getThreadDiscussion(
+		MBDiscussion discussion =
+			MBDiscussionLocalServiceUtil.fetchThreadDiscussion(
 				message.getThreadId());
 
-			document.addKeyword("discussion", true);
-		}
-		catch (NoSuchDiscussionException nsde) {
+		if (discussion == null) {
 			document.addKeyword("discussion", false);
+		}
+		else {
+			document.addKeyword("discussion", true);
 		}
 
 		document.addKeyword("threadId", message.getThreadId());
@@ -257,19 +255,12 @@ public class MBMessageIndexer extends BaseIndexer {
 
 	@Override
 	protected Summary doGetSummary(
-		Document document, Locale locale, String snippet, PortletURL portletURL,
+		Document document, Locale locale, String snippet,
 		PortletRequest portletRequest, PortletResponse portletResponse) {
-
-		String messageId = document.get(Field.ENTRY_CLASS_PK);
-
-		portletURL.setParameter(
-			"struts_action", "/message_boards/view_message");
-		portletURL.setParameter("messageId", messageId);
 
 		Summary summary = createSummary(document, Field.TITLE, Field.CONTENT);
 
 		summary.setMaxContentLength(200);
-		summary.setPortletURL(portletURL);
 
 		return summary;
 	}

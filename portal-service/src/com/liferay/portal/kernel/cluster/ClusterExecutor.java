@@ -24,21 +24,13 @@ public interface ClusterExecutor {
 	public void addClusterEventListener(
 		ClusterEventListener clusterEventListener);
 
-	public void destroy();
-
 	public FutureClusterResponses execute(ClusterRequest clusterRequest);
-
-	public FutureClusterResponses execute(
-		ClusterRequest clusterRequest,
-		ClusterResponseCallback clusterResponseCallback);
 
 	public List<ClusterEventListener> getClusterEventListeners();
 
 	public List<ClusterNode> getClusterNodes();
 
 	public ClusterNode getLocalClusterNode();
-
-	public void initialize();
 
 	public boolean isClusterNodeAlive(String clusterNodeId);
 

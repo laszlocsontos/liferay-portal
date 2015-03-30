@@ -533,6 +533,11 @@ public class LanguageImpl implements Language, Serializable {
 	}
 
 	@Override
+	public Locale getLocale(long groupId, String languageCode) {
+		return _getInstance()._getLocale(groupId, languageCode);
+	}
+
+	@Override
 	public Locale getLocale(String languageCode) {
 		return _getInstance()._getLocale(languageCode);
 	}
@@ -714,10 +719,8 @@ public class LanguageImpl implements Language, Serializable {
 	public boolean isInheritLocales(long groupId) throws PortalException {
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		Group liveGroup = group;
-
 		if (group.isStagingGroup()) {
-			liveGroup = group.getLiveGroup();
+			group = group.getLiveGroup();
 		}
 
 		if (!group.isSite() || group.isCompany()) {
@@ -725,7 +728,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 
 		return GetterUtil.getBoolean(
-			liveGroup.getTypeSettingsProperty("inheritLocales"), true);
+			group.getTypeSettingsProperty("inheritLocales"), true);
 	}
 
 	@Override
@@ -921,6 +924,19 @@ public class LanguageImpl implements Language, Serializable {
 		return locale;
 	}
 
+	private Locale _getLocale(long groupId, String languageCode) {
+		Map<String, Locale> localesMap = _groupLocalesByLanguageMap.get(
+			groupId);
+
+		if (localesMap != null) {
+			return localesMap.get(languageCode);
+		}
+
+		_initGroupLocales(groupId);
+
+		return _groupLocalesByLanguageMap.get(groupId).get(languageCode);
+	}
+
 	private Locale _getLocale(String languageCode) {
 		return _localesMap.get(languageCode);
 	}
@@ -967,11 +983,13 @@ public class LanguageImpl implements Language, Serializable {
 			localesSet.add(locale);
 		}
 
+		_groupLocalesByLanguageMap.put(groupId, localesMap);
 		_groupLocalesMap.put(groupId, locales);
 		_groupLocalesSet.put(groupId, localesSet);
 	}
 
 	private void _resetAvailableGroupLocales(long groupId) {
+		_groupLocalesByLanguageMap.remove(groupId);
 		_groupLocalesMap.remove(groupId);
 		_groupLocalesSet.remove(groupId);
 	}
@@ -1007,6 +1025,8 @@ public class LanguageImpl implements Language, Serializable {
 
 	private final Map<String, String> _charEncodings;
 	private final Set<String> _duplicateLanguageCodes;
+	private final Map<Long, Map<String, Locale>> _groupLocalesByLanguageMap =
+		new HashMap<>();
 	private final Map<Long, Locale[]> _groupLocalesMap = new HashMap<>();
 	private final Map<Long, Set<Locale>> _groupLocalesSet = new HashMap<>();
 	private final Locale[] _locales;

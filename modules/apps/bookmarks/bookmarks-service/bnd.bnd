@@ -15,14 +15,10 @@ Export-Package:\
 	com.liferay.bookmarks.social,\
 	com.liferay.bookmarks.trash,\
 	com.liferay.bookmarks.util
-Import-Package:\
-	!aQute.bnd.ant,\
-	!aQute.bnd.differ,\
-	!org.incava.util.diff,\
-	*
 Include-Resource:\
 	classes,\
 	custom-sql/default.xml=classes/META-INF/custom-sql/default.xml,\
+	META-INF/=../../../../portal-impl/src/META-INF/log4j.dtd,\
 	@${app.server.lib.portal.dir}/util-java.jar!/com/liferay/util/dao/orm/CustomSQL.class,\
 	@${app.server.lib.portal.dir}/util-java.jar!/com/liferay/util/dao/orm/CustomSQLUtil.class
 Liferay-Service: true

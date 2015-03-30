@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.journal.social;
 
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
@@ -23,9 +24,16 @@ import com.liferay.portlet.social.model.BaseSocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 
+import javax.portlet.PortletURL;
+
 /**
  * @author Zsolt Berentey
  */
+@OSGiBeanProperties(
+	property = {
+		"model.class.name=com.liferay.portlet.journal.model.JournalFolder"
+	}
+)
 public class JournalFolderActivityInterpreter
 	extends BaseSocialActivityInterpreter {
 
@@ -35,10 +43,28 @@ public class JournalFolderActivityInterpreter
 	}
 
 	@Override
-	protected String getPath(
-		SocialActivity activity, ServiceContext serviceContext) {
+	protected String getLink(
+			SocialActivity activity, ServiceContext serviceContext)
+		throws Exception {
 
-		return "/journal/find_folder?folderId=" + activity.getClassPK();
+		String className = activity.getClassName();
+		long classPK = activity.getClassPK();
+
+		String viewEntryInTrashURL = getViewEntryInTrashURL(
+			className, classPK, serviceContext);
+
+		if (viewEntryInTrashURL != null) {
+			return viewEntryInTrashURL;
+		}
+
+		PortletURL viewEntryPortletURL = getViewEntryPortletURL(
+			className, classPK, serviceContext);
+
+		if (viewEntryPortletURL != null) {
+			return viewEntryPortletURL.toString();
+		}
+
+		return null;
 	}
 
 	@Override
