@@ -3405,6 +3405,27 @@ public class PortalImpl implements Portal {
 			if (LanguageUtil.isAvailableLocale(groupId, locale)) {
 				return locale;
 			}
+			else if (groupId > 0) {
+				try {
+					if (!LanguageUtil.isInheritLocales(groupId)) {
+						String i18nPath = (String)request.getAttribute(
+							WebKeys.I18N_PATH);
+						int pos = i18nPath.lastIndexOf(CharPool.SLASH);
+
+						i18nLanguageId = i18nPath.substring(pos + 1);
+
+						locale = LanguageUtil.getLocale(
+							groupId, i18nLanguageId);
+
+						if (LanguageUtil.isAvailableLocale(groupId, locale)) {
+							return locale;
+						}
+					}
+				}
+				catch (PortalException e) {
+					_log.error(e);
+				}
+			}
 		}
 
 		String doAsUserLanguageId = ParamUtil.getString(
