@@ -21,13 +21,14 @@ import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.provider.PortletProvider;
+import com.liferay.portal.kernel.provider.PortletProviderUtil;
 import com.liferay.portal.kernel.repository.RepositoryException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
-import com.liferay.portal.kernel.servlet.Range;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -75,7 +76,6 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
@@ -94,6 +94,7 @@ import com.liferay.portlet.documentlibrary.util.PDFProcessor;
 import com.liferay.portlet.documentlibrary.util.PDFProcessorUtil;
 import com.liferay.portlet.documentlibrary.util.VideoProcessor;
 import com.liferay.portlet.documentlibrary.util.VideoProcessorUtil;
+import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.awt.image.RenderedImage;
@@ -871,9 +872,11 @@ public class WebServerServlet extends HttpServlet {
 			PermissionChecker permissionChecker =
 				PermissionThreadLocal.getPermissionChecker();
 
+			String portletId = PortletProviderUtil.getPortletId(
+				TrashEntry.class.getName(), PortletProvider.Action.VIEW);
+
 			if (!PortletPermissionUtil.hasControlPanelAccessPermission(
-					permissionChecker, fileEntry.getGroupId(),
-					PortletKeys.TRASH)) {
+					permissionChecker, fileEntry.getGroupId(), portletId)) {
 
 				throw new PrincipalException();
 			}
@@ -1020,11 +1023,11 @@ public class WebServerServlet extends HttpServlet {
 		FlashMagicBytesUtil.Result flashMagicBytesUtilResult =
 			FlashMagicBytesUtil.check(inputStream);
 
-		inputStream = flashMagicBytesUtilResult.getInputStream();
-
 		if (flashMagicBytesUtilResult.isFlash()) {
 			fileName = FileUtil.stripExtension(fileName) + ".swf";
 		}
+
+		inputStream = flashMagicBytesUtilResult.getInputStream();
 
 		// Determine proper content type
 
@@ -1044,7 +1047,7 @@ public class WebServerServlet extends HttpServlet {
 		// Send file
 
 		if (isSupportsRangeHeader(contentType)) {
-			sendFileWithRangeHeader(
+			ServletResponseUtil.sendFileWithRangeHeader(
 				request, response, fileName, inputStream, contentLength,
 				contentType);
 		}
@@ -1079,57 +1082,6 @@ public class WebServerServlet extends HttpServlet {
 		InputStream inputStream = fileEntry.getContentStream();
 
 		ServletResponseUtil.write(response, inputStream, fileEntry.getSize());
-	}
-
-	protected void sendFileWithRangeHeader(
-			HttpServletRequest request, HttpServletResponse response,
-			String fileName, InputStream inputStream, long contentLength,
-			String contentType)
-		throws IOException {
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Accepting ranges for the file " + fileName);
-		}
-
-		response.setHeader(
-			HttpHeaders.ACCEPT_RANGES, HttpHeaders.ACCEPT_RANGES_BYTES_VALUE);
-
-		List<Range> ranges = null;
-
-		try {
-			ranges = ServletResponseUtil.getRanges(
-				request, response, contentLength);
-		}
-		catch (IOException ioe) {
-			if (_log.isErrorEnabled()) {
-				_log.error(ioe);
-			}
-
-			response.setHeader(
-				HttpHeaders.CONTENT_RANGE, "bytes */" + contentLength);
-
-			response.sendError(
-				HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-
-			return;
-		}
-
-		if ((ranges == null) || ranges.isEmpty()) {
-			ServletResponseUtil.sendFile(
-				request, response, fileName, inputStream, contentLength,
-				contentType);
-		}
-		else {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Request has range header " +
-						request.getHeader(HttpHeaders.RANGE));
-			}
-
-			ServletResponseUtil.write(
-				request, response, fileName, ranges, inputStream, contentLength,
-				contentType);
-		}
 	}
 
 	protected void sendGroups(
@@ -1213,9 +1165,20 @@ public class WebServerServlet extends HttpServlet {
 				HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
 		}
 		else {
+			InputStream is = fileEntry.getContentStream();
+
+			FlashMagicBytesUtil.Result flashMagicBytesUtilResult =
+				FlashMagicBytesUtil.check(is);
+
+			is = flashMagicBytesUtilResult.getInputStream();
+
+			if (flashMagicBytesUtilResult.isFlash()) {
+				fileName = FileUtil.stripExtension(fileName) + ".swf";
+			}
+
 			ServletResponseUtil.sendFile(
-				request, response, fileName, fileEntry.getContentStream(),
-				fileEntry.getSize(), fileEntry.getMimeType());
+				request, response, fileName, is, fileEntry.getSize(),
+				fileEntry.getMimeType());
 		}
 	}
 

@@ -66,6 +66,7 @@ import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.service.BlogsEntryServiceUtil;
 import com.liferay.portlet.documentlibrary.FileSizeException;
+import com.liferay.portlet.trash.service.TrashEntryServiceUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.ArrayList;
@@ -148,6 +149,9 @@ public class EditEntryAction extends PortletAction {
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteEntries(actionRequest, true);
+			}
+			else if (cmd.equals(Constants.RESTORE)) {
+				restoreTrashEntries(actionRequest);
 			}
 			else if (cmd.equals(Constants.SUBSCRIBE)) {
 				subscribe(actionRequest);
@@ -410,8 +414,6 @@ public class EditEntryAction extends PortletAction {
 
 		String backURL = ParamUtil.getString(actionRequest, "backURL");
 
-		boolean preview = ParamUtil.getBoolean(actionRequest, "preview");
-
 		PortletURLImpl portletURL = new PortletURLImpl(
 			actionRequest, portletConfig.getPortletName(),
 			themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
@@ -432,10 +434,20 @@ public class EditEntryAction extends PortletAction {
 			"groupId", String.valueOf(entry.getGroupId()), false);
 		portletURL.setParameter(
 			"entryId", String.valueOf(entry.getEntryId()), false);
-		portletURL.setParameter("preview", String.valueOf(preview), false);
 		portletURL.setWindowState(actionRequest.getWindowState());
 
 		return portletURL.toString();
+	}
+
+	protected void restoreTrashEntries(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] restoreTrashEntryIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "restoreTrashEntryIds"), 0L);
+
+		for (long restoreTrashEntryId : restoreTrashEntryIds) {
+			TrashEntryServiceUtil.restoreEntry(restoreTrashEntryId);
+		}
 	}
 
 	protected void subscribe(ActionRequest actionRequest) throws Exception {
@@ -491,7 +503,8 @@ public class EditEntryAction extends PortletAction {
 				entry.getDescription(), content, displayDateMonth,
 				displayDateDay, displayDateYear, displayDateHour,
 				displayDateMinute, entry.getAllowPingbacks(),
-				entry.getAllowTrackbacks(), null, null, null, serviceContext);
+				entry.getAllowTrackbacks(), null, StringPool.BLANK, null, null,
+				serviceContext);
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -567,6 +580,9 @@ public class EditEntryAction extends PortletAction {
 		String coverImageFileEntryCropRegion = ParamUtil.getString(
 			actionRequest, "coverImageFileEntryCropRegion");
 
+		String coverImageCaption = ParamUtil.getString(
+			actionRequest, "coverImageCaption");
+
 		ImageSelector coverImageImageSelector = new ImageSelector(
 			coverImageFileEntryId, coverImageURL,
 			coverImageFileEntryCropRegion);
@@ -595,8 +611,8 @@ public class EditEntryAction extends PortletAction {
 				title, subtitle, description, content, displayDateMonth,
 				displayDateDay, displayDateYear, displayDateHour,
 				displayDateMinute, allowPingbacks, allowTrackbacks, trackbacks,
-				coverImageImageSelector, smallImageImageSelector,
-				serviceContext);
+				coverImageCaption, coverImageImageSelector,
+				smallImageImageSelector, serviceContext);
 
 			BlogsEntryAttachmentFileEntryHelper
 				blogsEntryAttachmentFileEntryHelper =
@@ -671,8 +687,9 @@ public class EditEntryAction extends PortletAction {
 				entryId, title, subtitle, description, content,
 				displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, allowPingbacks,
-				allowTrackbacks, trackbacks, coverImageImageSelector,
-				smallImageImageSelector, serviceContext);
+				allowTrackbacks, trackbacks, coverImageCaption,
+				coverImageImageSelector, smallImageImageSelector,
+				serviceContext);
 
 			for (FileEntry tempBlogsEntryAttachmentFileEntry :
 					tempBlogsEntryAttachmentFileEntries) {

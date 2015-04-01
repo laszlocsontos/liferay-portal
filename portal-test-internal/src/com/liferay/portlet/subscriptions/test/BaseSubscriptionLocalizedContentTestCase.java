@@ -19,13 +19,13 @@ import com.dumbster.smtp.MailMessage;
 import com.liferay.portal.kernel.settings.ModifiableSettings;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
-import com.liferay.portal.kernel.test.util.MailServiceTestUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.util.test.LayoutTestUtil;
+import com.liferay.portal.util.test.MailServiceTestUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,11 +70,11 @@ public abstract class BaseSubscriptionLocalizedContentTestCase
 		setBaseModelSubscriptionBodyPreferences(
 			getSubscriptionAddedBodyPreferenceName());
 
-		addSubscriptionContainerModel(PARENT_CONTAINER_MODEL_ID_DEFAULT);
+		addSubscriptionContainerModel(getDefaultContainerModelId());
 
 		LocaleThreadLocal.setDefaultLocale(LocaleUtil.GERMANY);
 
-		addBaseModel(PARENT_CONTAINER_MODEL_ID_DEFAULT);
+		addBaseModel(creatorUser.getUserId(), getDefaultContainerModelId());
 
 		List<MailMessage> messages = MailServiceTestUtil.getMailMessages(
 			"Body", GERMAN_BODY);
@@ -99,11 +99,12 @@ public abstract class BaseSubscriptionLocalizedContentTestCase
 
 		LocaleThreadLocal.setDefaultLocale(LocaleUtil.SPAIN);
 
-		long baseModelId = addBaseModel(PARENT_CONTAINER_MODEL_ID_DEFAULT);
+		long baseModelId = addBaseModel(
+			creatorUser.getUserId(), getDefaultContainerModelId());
 
-		addSubscriptionContainerModel(PARENT_CONTAINER_MODEL_ID_DEFAULT);
+		addSubscriptionContainerModel(getDefaultContainerModelId());
 
-		updateBaseModel(baseModelId);
+		updateBaseModel(creatorUser.getUserId(), baseModelId);
 
 		List<MailMessage> messages = MailServiceTestUtil.getMailMessages(
 			"Body", SPANISH_BODY);
@@ -115,6 +116,10 @@ public abstract class BaseSubscriptionLocalizedContentTestCase
 
 	protected abstract void addSubscriptionContainerModel(long containerModelId)
 		throws Exception;
+
+	protected long getDefaultContainerModelId() {
+		return PARENT_CONTAINER_MODEL_ID_DEFAULT;
+	}
 
 	protected abstract String getPortletId();
 

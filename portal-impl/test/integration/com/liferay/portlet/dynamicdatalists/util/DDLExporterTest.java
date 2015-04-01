@@ -22,21 +22,25 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
 import com.liferay.portlet.dynamicdatalists.util.test.DDLRecordSetTestHelper;
 import com.liferay.portlet.dynamicdatalists.util.test.DDLRecordTestHelper;
-import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDSerializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormField;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormFieldOptions;
@@ -161,13 +165,11 @@ public class DDLExporterTest {
 	}
 
 	protected DDLRecordSet addRecordSet(DDMForm ddmForm) throws Exception {
-		String definition = DDMFormXSDSerializerUtil.serialize(ddmForm);
-
 		DDMStructureTestHelper ddmStructureTestHelper =
 			new DDMStructureTestHelper(_group);
 
 		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
-			definition, StorageType.JSON.toString());
+			ddmForm, StorageType.JSON.toString());
 
 		DDLRecordSetTestHelper recordSetTestHelper = new DDLRecordSetTestHelper(
 			_group);
@@ -220,9 +222,15 @@ public class DDLExporterTest {
 	}
 
 	protected String createDocumentLibraryDDMFormFieldValue() throws Exception {
-		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			"file.txt");
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "file.txt",
+			ContentTypes.TEXT_PLAIN, RandomTestUtil.randomBytes(),
+			serviceContext);
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -327,7 +335,7 @@ public class DDLExporterTest {
 		_fieldValues.put(DDMFormFieldType.NUMBER, "3");
 		_fieldValues.put(DDMFormFieldType.RADIO, createListDDMFormFieldValue());
 		_fieldValues.put(
-			DDMFormFieldType.SELECT,  createListDDMFormFieldValue());
+			DDMFormFieldType.SELECT, createListDDMFormFieldValue());
 		_fieldValues.put(DDMFormFieldType.TEXT, "Text content");
 		_fieldValues.put(DDMFormFieldType.TEXT_AREA, "Text Area content");
 		_fieldValues.put(DDMFormFieldType.TEXT_HTML, "Text HTML content");

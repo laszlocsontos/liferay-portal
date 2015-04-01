@@ -14,7 +14,7 @@
 
 package com.liferay.polls.lar.test;
 
-import com.liferay.arquillian.bridge.junit.Arquillian;
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.polls.model.PollsChoice;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.model.PollsVote;
@@ -86,7 +86,7 @@ public class PollsVoteStagedModelDataHandlerTest
 		PollsQuestion question =
 			(PollsQuestion)questionDependentStagedModels.get(0);
 
-		List<StagedModel>  choiceDependentStagedModels =
+		List<StagedModel> choiceDependentStagedModels =
 			dependentStagedModelsMap.get(PollsChoice.class.getSimpleName());
 
 		PollsChoice choice = (PollsChoice)choiceDependentStagedModels.get(0);

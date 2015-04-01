@@ -55,8 +55,8 @@ AUI.add(
 		var TPL_LOADING = '<div class="loading-animation" />';
 
 		var TPL_SEARCH_FORM = '<form action="javascript:;" class="form-search lfr-tag-selector-search row">' +
-			'<input class="col-md-12 lfr-tag-selector-input search-query" placeholder="{0}" type="text" />' +
-		'</form>';
+				'<input class="col-md-12 lfr-tag-selector-input search-query" placeholder="{0}" type="text" />' +
+			'</form>';
 
 		var TPL_SUGGESTIONS_QUERY = 'select * from search.termextract where context="{0}"';
 
@@ -93,6 +93,10 @@ AUI.add(
 		var AssetTagsSelector = A.Component.create(
 			{
 				ATTRS: {
+					allowAddEntry: {
+						value: true
+					},
+
 					allowAnyEntry: {
 						value: true
 					},
@@ -440,14 +444,6 @@ AUI.add(
 
 						var buttonGroup = [
 							{
-								icon: 'icon-plus',
-								label: Liferay.Language.get('add'),
-								on: {
-									click: A.bind('_onAddEntryClick', instance)
-								},
-								title: Liferay.Language.get('add-tags')
-							},
-							{
 								icon: 'icon-search',
 								label: Liferay.Language.get('select'),
 								on: {
@@ -456,6 +452,19 @@ AUI.add(
 								title: Liferay.Language.get('select-tags')
 							}
 						];
+
+						if (instance.get('allowAddEntry')) {
+							buttonGroup.unshift(
+								{
+									icon: 'icon-plus',
+									label: Liferay.Language.get('add'),
+									on: {
+										click: A.bind('_onAddEntryClick', instance)
+									},
+									title: Liferay.Language.get('add-tags')
+								}
+							);
+						}
 
 						if (instance.get('contentCallback')) {
 							buttonGroup.push(

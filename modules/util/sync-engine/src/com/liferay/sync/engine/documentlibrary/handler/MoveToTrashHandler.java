@@ -29,9 +29,9 @@ public class MoveToTrashHandler extends BaseJSONHandler {
 
 	@Override
 	public void processResponse(String response) throws Exception {
-		SyncFile syncFile = (SyncFile)getParameterValue("syncFile");
+		SyncFile syncFile = getLocalSyncFile();
 
-		SyncFileService.deleteSyncFile(syncFile, false);
+		SyncFileService.deleteSyncFile(syncFile, true);
 	}
 
 }

@@ -1,3 +1,4 @@
+Bundle-SymbolicName: system.packages.extra
 Bundle-Version: 7.0.0
 Bundle-Vendor: Liferay, Inc.
 Export-Package:\
@@ -8,6 +9,8 @@ Export-Package:\
 	!FTL_liferay.ftl,\
 	!VM_global_library.vm,\
 	!VM_liferay.vm,\
+	!aQute.bnd.osgi.eclipse,\
+	!aQute.bnd.osgi.resource,\
 	!aQute.lib.filter,\
 	!com.liferay.portal.asm,\
 	!com.liferay.portal.aspectj,\
@@ -88,6 +91,7 @@ Export-Package:\
 	javax.xml.stream.*;version='1.0',\
 	javax.xml.transform.*;version='1.4',\
 	javax.xml.validation.*;version='1.4',\
+	javax.xml.ws.*;version='2.2.11',\
 	javax.xml.xpath.*;version='1.4',\
 	org.aopalliance.*;version='1.0',\
 	org.apache.bcel.*;version='2.7.1',\
@@ -184,6 +188,7 @@ Export-Package:\
 	*
 Include-Resource:\
 	@lib/com.liferay.registry.api.jar,\
+	@lib/jaxws-api.jar,\
 	@../../../lib/development/jms.jar,\
 	@../../../lib/development/mail.jar,\
 	@../../../lib/development/servlet-api.jar,\
@@ -191,6 +196,10 @@ Include-Resource:\
 	@../../../lib/portal/ant.jar,\
 	@../../../lib/portal/asm-debug-all.jar,\
 	@../../../lib/portal/aopalliance.jar,\
+	@../../../lib/portal/bnd.jar!/aQute/bnd/annotation/metatype/*,\
+	@../../../lib/portal/bnd.jar!/aQute/bnd/header/*,\
+	@../../../lib/portal/bnd.jar!/aQute/bnd/osgi/*,\
+	@../../../lib/portal/bnd.jar!/aQute/bnd/version/*,\
 	@../../../lib/portal/commons-beanutils.jar,\
 	@../../../lib/portal/commons-codec.jar,\
 	@../../../lib/portal/commons-collections.jar,\

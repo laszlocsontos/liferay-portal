@@ -18,11 +18,9 @@ import com.liferay.portal.kernel.cluster.ClusterEvent;
 import com.liferay.portal.kernel.cluster.ClusterEventListener;
 import com.liferay.portal.kernel.cluster.ClusterExecutor;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
-import com.liferay.portal.kernel.cluster.ClusterMessageType;
 import com.liferay.portal.kernel.cluster.ClusterNode;
 import com.liferay.portal.kernel.cluster.ClusterNodeResponse;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
-import com.liferay.portal.kernel.cluster.ClusterResponseCallback;
 import com.liferay.portal.kernel.cluster.FutureClusterResponses;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
@@ -68,8 +66,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -107,13 +103,9 @@ public class LuceneHelperImplTest {
 
 		PortalInstances.addCompanyId(_COMPANY_ID);
 
-		_localhostInetAddress = InetAddress.getLocalHost();
+		_localhostInetAddress = InetAddress.getLoopbackAddress();
 
 		_mockClusterExecutor = new MockClusterExecutor();
-
-		ClusterExecutorUtil clusterExecutorUtil = new ClusterExecutorUtil();
-
-		clusterExecutorUtil.setClusterExecutor(_mockClusterExecutor);
 
 		Class<LuceneHelperImpl> luceneHelperImplClass = LuceneHelperImpl.class;
 
@@ -152,7 +144,8 @@ public class LuceneHelperImplTest {
 
 	@AdviseWith(
 		adviceClasses = {
-			DisableIndexOnStartUpAdvice.class, EnableClusterLinkAdvice.class,
+			ClusterExecutorUtilAdvice.class, DisableIndexOnStartUpAdvice.class,
+			EnableClusterLinkAdvice.class,
 			EnableLuceneReplicateWriteAdvice.class
 		}
 	)
@@ -184,7 +177,8 @@ public class LuceneHelperImplTest {
 
 	@AdviseWith(
 		adviceClasses = {
-			DisableIndexOnStartUpAdvice.class, EnableClusterLinkAdvice.class,
+			ClusterExecutorUtilAdvice.class, DisableIndexOnStartUpAdvice.class,
+			EnableClusterLinkAdvice.class,
 			EnableLuceneReplicateWriteAdvice.class,
 			SkipGetBootupClusterNodeObjectValuePairAdvice.class
 		}
@@ -225,7 +219,8 @@ public class LuceneHelperImplTest {
 
 	@AdviseWith(
 		adviceClasses = {
-			DisableIndexOnStartUpAdvice.class, EnableClusterLinkAdvice.class,
+			ClusterExecutorUtilAdvice.class, DisableIndexOnStartUpAdvice.class,
+			EnableClusterLinkAdvice.class,
 			EnableLuceneReplicateWriteAdvice.class,
 			LuceneClusterUtilAdvice.class
 		}
@@ -288,7 +283,8 @@ public class LuceneHelperImplTest {
 
 	@AdviseWith(
 		adviceClasses = {
-			DisableIndexOnStartUpAdvice.class, EnableClusterLinkAdvice.class,
+			ClusterExecutorUtilAdvice.class, DisableIndexOnStartUpAdvice.class,
+			EnableClusterLinkAdvice.class,
 			EnableLuceneReplicateWriteAdvice.class,
 			LuceneClusterUtilAdvice.class
 		}
@@ -326,7 +322,8 @@ public class LuceneHelperImplTest {
 
 	@AdviseWith(
 		adviceClasses = {
-			DisableIndexOnStartUpAdvice.class, EnableClusterLinkAdvice.class,
+			ClusterExecutorUtilAdvice.class, DisableIndexOnStartUpAdvice.class,
+			EnableClusterLinkAdvice.class,
 			EnableLuceneReplicateWriteAdvice.class,
 			SkipGetLoadIndexesInputStreamFromClusterAdvice.class
 		}
@@ -366,7 +363,8 @@ public class LuceneHelperImplTest {
 
 	@AdviseWith(
 		adviceClasses = {
-			DisableIndexOnStartUpAdvice.class, DisableClusterLinkAdvice.class,
+			ClusterExecutorUtilAdvice.class, DisableIndexOnStartUpAdvice.class,
+			DisableClusterLinkAdvice.class,
 			EnableLuceneReplicateWriteAdvice.class
 		}
 	)
@@ -384,8 +382,8 @@ public class LuceneHelperImplTest {
 
 	@AdviseWith(
 		adviceClasses = {
-			DisableIndexOnStartUpAdvice.class, EnableClusterLinkAdvice.class,
-			EnableLuceneReplicateWriteAdvice.class
+			ClusterExecutorUtilAdvice.class, DisableIndexOnStartUpAdvice.class,
+			EnableClusterLinkAdvice.class, EnableLuceneReplicateWriteAdvice.class
 		}
 	)
 	@Test
@@ -531,6 +529,26 @@ public class LuceneHelperImplTest {
 	@Rule
 	public final AspectJNewEnvTestRule aspectJNewEnvTestRule =
 		AspectJNewEnvTestRule.INSTANCE;
+
+	@Aspect
+	public static class ClusterExecutorUtilAdvice {
+
+		@Around(
+			"execution(private com.liferay.portal.kernel.cluster." +
+				"ClusterExecutorUtil.new())"
+		)
+		public void ClusterExecutorUtil() {
+		}
+
+		@Around(
+			"execution(* com.liferay.portal.kernel.cluster." +
+				"ClusterExecutorUtil.getClusterExecutor(..))"
+		)
+		public ClusterExecutor getClusterExecutor() {
+			return _mockClusterExecutor;
+		}
+
+	}
 
 	@Aspect
 	public static class DisableClusterLinkAdvice {
@@ -705,70 +723,20 @@ public class LuceneHelperImplTest {
 	private static final byte[] _RESPONSE_MESSAGE =
 		"Response Message".getBytes();
 
+	private static InetAddress _localhostInetAddress;
+	private static MockClusterExecutor _mockClusterExecutor;
+
 	private CaptureHandler _captureHandler;
-	private InetAddress _localhostInetAddress;
 	private LuceneHelperImpl _luceneHelperImpl;
-	private MockClusterExecutor _mockClusterExecutor;
 	private MockIndexAccessor _mockIndexAccessor;
 
-	private static class MockURLConnection extends URLConnection {
-
-		public MockURLConnection(URL url) {
-			super(url);
-		}
-
-		public void assertOutputContent(String outputContent) {
-			Assert.assertEquals(
-				outputContent, _unsyncByteArrayOutputStream.toString());
-		}
-
-		@Override
-		public void connect() {
-		}
-
-		@Override
-		public InputStream getInputStream() {
-			return new UnsyncByteArrayInputStream(_RESPONSE_MESSAGE);
-		}
-
-		@Override
-		public OutputStream getOutputStream() {
-			return _unsyncByteArrayOutputStream;
-		}
-
-		private final UnsyncByteArrayOutputStream _unsyncByteArrayOutputStream =
-			new UnsyncByteArrayOutputStream();
-
-	}
-
-	private class MockBlockingQueue<E> extends LinkedBlockingQueue<E> {
-
-		public MockBlockingQueue(BlockingQueue<E> blockingQueue) {
-			_blockingQueue = blockingQueue;
-		}
-
-		@Override
-		public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-			return _blockingQueue.poll(1000, TimeUnit.MILLISECONDS);
-		}
-
-		private final BlockingQueue<E> _blockingQueue;
-
-	}
-
-	private class MockClusterExecutor implements ClusterExecutor {
+	private static class MockClusterExecutor implements ClusterExecutor {
 
 		@Override
 		public void addClusterEventListener(
 			ClusterEventListener clusterEventListener) {
 
 			_clusterEventListeners.add(clusterEventListener);
-		}
-
-		@Override
-		public void destroy() {
-			_clusterNodes.clear();
-			_clusterEventListeners.clear();
 		}
 
 		@Override
@@ -784,14 +752,6 @@ public class LuceneHelperImplTest {
 				new FutureClusterResponses(clusterNodeIds);
 
 			for (ClusterNode clusterNode : _clusterNodes.values()) {
-				ClusterNodeResponse clusterNodeResponse =
-					new ClusterNodeResponse();
-
-				clusterNodeResponse.setClusterMessageType(
-					ClusterMessageType.EXECUTE);
-				clusterNodeResponse.setMulticast(clusterRequest.isMulticast());
-				clusterNodeResponse.setUuid(clusterRequest.getUuid());
-
 				try {
 					clusterNode.setPortalInetSocketAddress(
 						new InetSocketAddress(_portalInetAddress, _port));
@@ -801,42 +761,18 @@ public class LuceneHelperImplTest {
 				catch (IllegalArgumentException iae) {
 				}
 
-				clusterNodeResponse.setClusterNode(clusterNode);
-
 				try {
-					clusterNodeResponse.setResult(
-						_invoke(clusterRequest.getMethodHandler()));
+					futureClusterResponses.addClusterNodeResponse(
+						ClusterNodeResponse.createResultClusterNodeResponse(
+							clusterNode, clusterRequest.getUuid(),
+							_invoke(
+								(MethodHandler)clusterRequest.getPayload())));
 				}
 				catch (Exception e) {
-					clusterNodeResponse.setException(e);
+					futureClusterResponses.addClusterNodeResponse(
+						ClusterNodeResponse.createExceptionClusterNodeResponse(
+							clusterNode, clusterRequest.getUuid(), e));
 				}
-
-				futureClusterResponses.addClusterNodeResponse(
-					clusterNodeResponse);
-			}
-
-			return futureClusterResponses;
-		}
-
-		@Override
-		public FutureClusterResponses execute(
-			ClusterRequest clusterRequest,
-			ClusterResponseCallback clusterResponseCallback) {
-
-			FutureClusterResponses futureClusterResponses = execute(
-				clusterRequest);
-
-			try {
-				BlockingQueue<ClusterNodeResponse> blockingQueue =
-					futureClusterResponses.get().getClusterResponses();
-
-				MockBlockingQueue<ClusterNodeResponse> mockBlockingQueue =
-					new MockBlockingQueue<>(blockingQueue);
-
-				clusterResponseCallback.callback(mockBlockingQueue);
-			}
-			catch (InterruptedException ie) {
-				throw new RuntimeException(ie);
 			}
 
 			return futureClusterResponses;
@@ -863,10 +799,6 @@ public class LuceneHelperImplTest {
 
 		public String getLocalClusterNodeId() {
 			return _CLUSTER_NODE_ID_PREFIX + 0;
-		}
-
-		@Override
-		public void initialize() {
 		}
 
 		@Override
@@ -956,6 +888,36 @@ public class LuceneHelperImplTest {
 		private boolean _invokeMethodThrowException = false;
 		private int _port = -1;
 		private InetAddress _portalInetAddress;
+
+	}
+
+	private static class MockURLConnection extends URLConnection {
+
+		public MockURLConnection(URL url) {
+			super(url);
+		}
+
+		public void assertOutputContent(String outputContent) {
+			Assert.assertEquals(
+				outputContent, _unsyncByteArrayOutputStream.toString());
+		}
+
+		@Override
+		public void connect() {
+		}
+
+		@Override
+		public InputStream getInputStream() {
+			return new UnsyncByteArrayInputStream(_RESPONSE_MESSAGE);
+		}
+
+		@Override
+		public OutputStream getOutputStream() {
+			return _unsyncByteArrayOutputStream;
+		}
+
+		private final UnsyncByteArrayOutputStream _unsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
 
 	}
 

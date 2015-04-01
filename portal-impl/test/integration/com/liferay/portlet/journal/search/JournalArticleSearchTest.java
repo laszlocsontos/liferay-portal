@@ -37,7 +37,6 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.dynamicdatamapping.io.DDMFormXSDDeserializerUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
 import com.liferay.portlet.dynamicdatamapping.model.DDMFormLayout;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
@@ -47,8 +46,8 @@ import com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMTemplateTestUtil;
-import com.liferay.portlet.journal.asset.JournalArticleAssetRenderer;
 import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.model.JournalArticleConstants;
 import com.liferay.portlet.journal.model.JournalFolder;
 import com.liferay.portlet.journal.model.JournalFolderConstants;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
@@ -156,12 +155,11 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		String definition = DDMStructureTestUtil.getSampleStructureDefinition(
-			"name");
+		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm("name");
 
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
 			serviceContext.getScopeGroupId(), JournalArticle.class.getName(),
-			definition);
+			ddmForm);
 
 		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
 			serviceContext.getScopeGroupId(), ddmStructure.getStructureId());
@@ -254,8 +252,15 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 
 	@Override
 	protected Long getBaseModelClassPK(ClassedModel classedModel) {
-		return JournalArticleAssetRenderer.getClassPK(
-			(JournalArticle)classedModel);
+		JournalArticle article = (JournalArticle)classedModel;
+
+		if ((article.isDraft() || article.isPending()) &&
+			(article.getVersion() != JournalArticleConstants.VERSION_DEFAULT)) {
+
+			return article.getPrimaryKey();
+		}
+
+		return article.getResourcePrimKey();
 	}
 
 	@Override
@@ -325,7 +330,7 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	protected long searchGroupEntriesCount(long groupId, long creatorUserId)
 		throws Exception {
 
-		Hits hits =  JournalArticleServiceUtil.search(
+		Hits hits = JournalArticleServiceUtil.search(
 			groupId, creatorUserId, WorkflowConstants.STATUS_APPROVED,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
@@ -349,10 +354,7 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	protected void updateDDMStructure(ServiceContext serviceContext)
 		throws Exception {
 
-		String definition = DDMStructureTestUtil.getSampleStructureDefinition(
-			"title");
-
-		DDMForm ddmForm = DDMFormXSDDeserializerUtil.deserialize(definition);
+		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm("title");
 
 		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
 
