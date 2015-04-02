@@ -69,7 +69,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
-import com.liferay.portlet.messageboards.MBSettings;
+import com.liferay.portlet.messageboards.MBGroupServiceSettings;
 import com.liferay.portlet.messageboards.model.MBBan;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
@@ -347,6 +347,12 @@ public class MBUtil {
 		return categoryId;
 	}
 
+	public static long getCategoryId(String messageIdString) {
+		String[] parts = _getMessageIdStringParts(messageIdString);
+
+		return GetterUtil.getLong(parts[0]);
+	}
+
 	public static Set<Long> getCategorySubscriptionClassPKs(long userId) {
 		List<Subscription> subscriptions =
 			SubscriptionLocalServiceUtil.getUserSubscriptions(
@@ -583,39 +589,34 @@ public class MBUtil {
 		return entries;
 	}
 
-	public static long getMessageId(String mailId) {
-		int x = mailId.indexOf(CharPool.LESS_THAN) + 1;
-		int y = mailId.indexOf(CharPool.AT);
+	public static long getMessageId(String messageIdString) {
+		String[] parts = _getMessageIdStringParts(messageIdString);
 
-		long messageId = 0;
+		return GetterUtil.getLong(parts[1]);
+	}
 
-		if ((x > 0 ) && (y != -1)) {
-			String temp = mailId.substring(x, y);
-
-			int z = temp.lastIndexOf(CharPool.PERIOD);
-
-			if (z != -1) {
-				messageId = GetterUtil.getLong(temp.substring(z + 1));
-			}
+	public static int getMessageIdStringOffset() {
+		if (PropsValues.POP_SERVER_SUBDOMAIN.length() == 0) {
+			return 1;
 		}
 
-		return messageId;
+		return 0;
 	}
 
 	public static long getParentMessageId(Message message) throws Exception {
 		long parentMessageId = -1;
 
-		String parentHeader = getParentMessageIdString(message);
+		String parentMessageIdString = getParentMessageIdString(message);
 
-		if (parentHeader != null) {
+		if (parentMessageIdString != null) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Parent header " + parentHeader);
+				_log.debug("Parent header " + parentMessageIdString);
 			}
 
-			parentMessageId = getMessageId(parentHeader);
+			parentMessageId = getMessageId(parentMessageIdString);
 
 			if (_log.isDebugEnabled()) {
-				_log.debug("Previous message id " + parentMessageId);
+				_log.debug("Parent message id " + parentMessageId);
 			}
 		}
 
@@ -637,12 +638,13 @@ public class MBUtil {
 		if (ArrayUtil.isNotEmpty(references)) {
 			String reference = references[0];
 
-			int x = reference.lastIndexOf("<mb.");
+			int x = reference.lastIndexOf(
+				StringPool.LESS_THAN + MESSAGE_POP_PORTLET_PREFIX);
 
 			if (x > -1) {
-				int y = reference.indexOf(">", x);
+				int y = reference.indexOf(StringPool.GREATER_THAN, x);
 
-				parentHeader = reference.substring(x, y);
+				parentHeader = reference.substring(x, y + 1);
 			}
 		}
 
@@ -720,11 +722,11 @@ public class MBUtil {
 	}
 
 	public static String[] getThreadPriority(
-			MBSettings mbSettings, String languageId, double value,
-			ThemeDisplay themeDisplay)
+			MBGroupServiceSettings mbGroupServiceSettings, String languageId,
+			double value, ThemeDisplay themeDisplay)
 		throws Exception {
 
-		String[] priorities = mbSettings.getPriorities(languageId);
+		String[] priorities = mbGroupServiceSettings.getPriorities(languageId);
 
 		String[] priorityPair = _findThreadPriority(
 			value, themeDisplay, priorities);
@@ -733,7 +735,8 @@ public class MBUtil {
 			String defaultLanguageId = LocaleUtil.toLanguageId(
 				LocaleUtil.getSiteDefault());
 
-			priorities = mbSettings.getPriorities(defaultLanguageId);
+			priorities = mbGroupServiceSettings.getPriorities(
+				defaultLanguageId);
 
 			priorityPair = _findThreadPriority(value, themeDisplay, priorities);
 		}
@@ -768,12 +771,13 @@ public class MBUtil {
 	}
 
 	public static String getUserRank(
-			MBSettings mbSettings, String languageId, int posts)
+			MBGroupServiceSettings mbGroupServiceSettings, String languageId,
+			int posts)
 		throws Exception {
 
 		String rank = StringPool.BLANK;
 
-		String[] ranks = mbSettings.getRanks(languageId);
+		String[] ranks = mbGroupServiceSettings.getRanks(languageId);
 
 		for (int i = 0; i < ranks.length; i++) {
 			String[] kvp = StringUtil.split(ranks[i], CharPool.EQUAL);
@@ -793,7 +797,8 @@ public class MBUtil {
 	}
 
 	public static String[] getUserRank(
-			MBSettings mbSettings, String languageId, MBStatsUser statsUser)
+			MBGroupServiceSettings mbGroupServiceSettings, String languageId,
+			MBStatsUser statsUser)
 		throws Exception {
 
 		String[] rank = {StringPool.BLANK, StringPool.BLANK};
@@ -804,7 +809,7 @@ public class MBUtil {
 
 		long companyId = group.getCompanyId();
 
-		String[] ranks = mbSettings.getRanks(languageId);
+		String[] ranks = mbGroupServiceSettings.getRanks(languageId);
 
 		for (int i = 0; i < ranks.length; i++) {
 			String[] kvp = StringUtil.split(ranks[i], CharPool.EQUAL);
@@ -945,7 +950,7 @@ public class MBUtil {
 			defaultGroupRole.getRoleId());
 
 		if (defaultGroupActionIds == null) {
-			serviceContext.setGroupPermissions(new String[]{});
+			serviceContext.setGroupPermissions(new String[] {});
 		}
 		else {
 			serviceContext.setGroupPermissions(
@@ -957,7 +962,7 @@ public class MBUtil {
 			guestRole.getRoleId());
 
 		if (guestActionIds == null) {
-			serviceContext.setGuestPermissions(new String[]{});
+			serviceContext.setGuestPermissions(new String[] {});
 		}
 		else {
 			serviceContext.setGuestPermissions(
@@ -1136,6 +1141,17 @@ public class MBUtil {
 		return MBMessageLocalServiceUtil.getCategoryMessagesCount(
 			category.getGroupId(), category.getCategoryId(),
 			WorkflowConstants.STATUS_APPROVED);
+	}
+
+	private static String[] _getMessageIdStringParts(String messageIdString) {
+		int pos = messageIdString.indexOf(CharPool.AT);
+
+		return StringUtil.split(
+			messageIdString.substring(
+				MBUtil.MESSAGE_POP_PORTLET_PREFIX.length() +
+					getMessageIdStringOffset(),
+				pos),
+			CharPool.PERIOD);
 	}
 
 	private static String _getParentMessageIdFromSubject(Message message)

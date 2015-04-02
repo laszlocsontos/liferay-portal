@@ -18,12 +18,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.wiki.configuration.WikiConfiguration;
+import com.liferay.wiki.configuration.WikiGroupServiceConfiguration;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.service.WikiNodeLocalServiceUtil;
 import com.liferay.wiki.service.settings.WikiServiceSettingsProvider;
@@ -31,9 +31,12 @@ import com.liferay.wiki.service.settings.WikiServiceSettingsProvider;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Zsolt Berentey
  */
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class WikiNodeStagedModelDataHandler
 	extends BaseStagedModelDataHandler<WikiNode> {
 
@@ -52,26 +55,19 @@ public class WikiNodeStagedModelDataHandler
 	}
 
 	@Override
-	public WikiNode fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<WikiNode> wikiNodes =
-			WikiNodeLocalServiceUtil.getWikiNodesByUuidAndCompanyId(
-				uuid, companyId);
-
-		if (ListUtil.isEmpty(wikiNodes)) {
-			return null;
-		}
-
-		return wikiNodes.get(0);
-	}
-
-	@Override
 	public WikiNode fetchStagedModelByUuidAndGroupId(
 		String uuid, long groupId) {
 
 		return WikiNodeLocalServiceUtil.fetchWikiNodeByUuidAndGroupId(
 			uuid, groupId);
+	}
+
+	@Override
+	public List<WikiNode> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return WikiNodeLocalServiceUtil.getWikiNodesByUuidAndCompanyId(
+			uuid, companyId);
 	}
 
 	@Override
@@ -120,14 +116,15 @@ public class WikiNodeStagedModelDataHandler
 		WikiServiceSettingsProvider wikiServiceSettingsProvider =
 			WikiServiceSettingsProvider.getWikiServiceSettingsProvider();
 
-		WikiConfiguration wikiConfiguration =
-			wikiServiceSettingsProvider.getWikiConfiguration();
+		WikiGroupServiceConfiguration wikiGroupServiceConfiguration =
+			wikiServiceSettingsProvider.getWikiGroupServiceConfiguration();
 
 		if (portletDataContext.isDataStrategyMirror()) {
 			WikiNode existingNode = fetchStagedModelByUuidAndGroupId(
 				node.getUuid(), portletDataContext.getScopeGroupId());
 
-			String initialNodeName = wikiConfiguration.initialNodeName();
+			String initialNodeName =
+				wikiGroupServiceConfiguration.initialNodeName();
 
 			if ((existingNode == null) &&
 				initialNodeName.equals(node.getName())) {
@@ -154,7 +151,8 @@ public class WikiNodeStagedModelDataHandler
 			}
 		}
 		else {
-			String initialNodeName = wikiConfiguration.initialNodeName();
+			String initialNodeName =
+				wikiGroupServiceConfiguration.initialNodeName();
 
 			if (initialNodeName.equals(node.getName())) {
 				WikiNode initialNode = WikiNodeLocalServiceUtil.fetchNode(

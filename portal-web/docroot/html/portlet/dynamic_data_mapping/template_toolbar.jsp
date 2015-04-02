@@ -26,7 +26,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 long groupId = ParamUtil.getLong(request, "groupId", scopeGroupId);
 long classNameId = ParamUtil.getLong(request, "classNameId");
 long classPK = ParamUtil.getLong(request, "classPK");
-long sourceClassNameId = ParamUtil.getLong(request, "sourceClassNameId");
+long resourceClassNameId = ParamUtil.getLong(request, "resourceClassNameId");
 %>
 
 <aui:nav-bar>
@@ -38,7 +38,7 @@ long sourceClassNameId = ParamUtil.getLong(request, "sourceClassNameId");
 
 		<c:choose>
 			<c:when test="<%= classNameId == PortalUtil.getClassNameId(DDMStructure.class) %>">
-				<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmDisplay.getResourceName(), ddmDisplay.getAddTemplateActionId()) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_FORM)) %>">
+				<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmPermissionHandler.getResourceName(scopeClassNameId), ddmPermissionHandler.getAddTemplateActionId()) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_FORM)) %>">
 
 					<%
 					if (Validator.isNull(templateTypeValue)) {
@@ -52,14 +52,14 @@ long sourceClassNameId = ParamUtil.getLong(request, "sourceClassNameId");
 						<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 						<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
 						<portlet:param name="classPK" value="<%= String.valueOf(classPK) %>" />
-						<portlet:param name="sourceClassNameId" value="<%= String.valueOf(sourceClassNameId) %>" />
+						<portlet:param name="resourceClassNameId" value="<%= String.valueOf(resourceClassNameId) %>" />
 						<portlet:param name="structureAvailableFields" value='<%= renderResponse.getNamespace() + "getAvailableFields" %>' />
 					</portlet:renderURL>
 
 					<aui:nav-item href="<%= addTemplateURL %>" iconCssClass="icon-plus" label="<%= message %>" selected='<%= toolbarItem.equals("add-form-template") %>' />
 				</c:if>
 
-				<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmDisplay.getResourceName(), ddmDisplay.getAddTemplateActionId()) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY)) %>">
+				<c:if test="<%= DDMPermission.contains(permissionChecker, scopeGroupId, ddmPermissionHandler.getResourceName(scopeClassNameId), ddmPermissionHandler.getAddTemplateActionId()) && (Validator.isNull(templateTypeValue) || templateTypeValue.equals(DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY)) %>">
 
 					<%
 					if (Validator.isNull(templateTypeValue)) {
@@ -73,7 +73,7 @@ long sourceClassNameId = ParamUtil.getLong(request, "sourceClassNameId");
 						<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 						<portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" />
 						<portlet:param name="classPK" value="<%= String.valueOf(classPK) %>" />
-						<portlet:param name="sourceClassNameId" value="<%= String.valueOf(sourceClassNameId) %>" />
+						<portlet:param name="resourceClassNameId" value="<%= String.valueOf(resourceClassNameId) %>" />
 						<portlet:param name="type" value="<%= DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY %>" />
 					</portlet:renderURL>
 
@@ -122,7 +122,7 @@ long sourceClassNameId = ParamUtil.getLong(request, "sourceClassNameId");
 						for (TemplateHandler templateHandler : templateHandlers) {
 							addPortletDisplayTemplateURL.setParameter("classNameId", String.valueOf(PortalUtil.getClassNameId(templateHandler.getClassName())));
 							addPortletDisplayTemplateURL.setParameter("classPK", String.valueOf(0));
-							addPortletDisplayTemplateURL.setParameter("sourceClassNameId", String.valueOf(PortalUtil.getClassNameId(templateHandler.getClassName())));
+							addPortletDisplayTemplateURL.setParameter("resourceClassNameId", String.valueOf(resourceClassNameId));
 						%>
 
 							<aui:nav-item

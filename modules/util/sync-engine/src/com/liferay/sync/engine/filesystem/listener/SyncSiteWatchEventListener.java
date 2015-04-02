@@ -24,6 +24,8 @@ import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.service.SyncSiteService;
 import com.liferay.sync.engine.service.SyncWatchEventService;
+import com.liferay.sync.engine.util.FileUtil;
+import com.liferay.sync.engine.util.MSOfficeFileUtil;
 
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -49,7 +51,9 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 		addSyncWatchEvent(eventType, filePath);
 	}
 
-	protected void addSyncWatchEvent(String eventType, Path filePath) {
+	protected synchronized void addSyncWatchEvent(
+		String eventType, Path filePath) {
+
 		try {
 			String filePathName = filePath.toString();
 
@@ -88,44 +92,112 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 				return;
 			}
 
-			if (eventType.equals(SyncWatchEvent.EVENT_TYPE_RENAME_FROM)) {
-				_previousFilePath = filePath;
+			if (!eventType.equals(SyncWatchEvent.EVENT_TYPE_RENAME_TO)) {
+				SyncWatchEventService.addSyncWatchEvent(
+					eventType, filePathName, getFileType(eventType, filePath),
+					null, getSyncAccountId());
 
 				return;
 			}
 
-			String previousFilePathName = null;
+			String previousEventType = null;
+			Path previousFilePath = null;
+			long previousRepositoryId = 0;
 
-			if (eventType.equals(SyncWatchEvent.EVENT_TYPE_RENAME_TO)) {
-				if (_previousFilePath == null) {
+			SyncWatchEvent lastSyncWatchEvent =
+				SyncWatchEventService.getLastSyncWatchEvent(getSyncAccountId());
+
+			if (lastSyncWatchEvent != null) {
+				previousEventType = lastSyncWatchEvent.getEventType();
+				previousFilePath = Paths.get(
+					lastSyncWatchEvent.getFilePathName());
+				previousRepositoryId = getRepositoryId(previousFilePath);
+			}
+
+			String fileType = getFileType(eventType, filePath);
+
+			if ((lastSyncWatchEvent == null) ||
+				!previousEventType.equals(
+					SyncWatchEvent.EVENT_TYPE_RENAME_FROM) ||
+				(previousRepositoryId != repositoryId)) {
+
+				eventType = SyncWatchEvent.EVENT_TYPE_CREATE;
+
+				SyncWatchEventService.addSyncWatchEvent(
+					eventType, filePathName, getFileType(eventType, filePath),
+					null, getSyncAccountId());
+
+				if (fileType.equals(SyncFile.TYPE_FOLDER)) {
+					SyncFile syncFile = SyncFileService.fetchSyncFile(
+						filePathName);
+
+					if (syncFile != null) {
+						FileUtil.fireDeleteEvents(Paths.get(filePathName));
+					}
+
+					Watcher watcher = WatcherRegistry.getWatcher(
+						getSyncAccountId());
+
+					watcher.walkFileTree(Paths.get(filePathName));
+				}
+			}
+			else if (parentFilePath.equals(previousFilePath.getParent())) {
+				if (MSOfficeFileUtil.isTempRenamedFile(filePath) &&
+					MSOfficeFileUtil.isExcelFile(previousFilePath)) {
+
+					SyncWatchEventService.deleteSyncWatchEvent(
+						lastSyncWatchEvent.getSyncWatchEventId());
+
+					return;
+				}
+
+				lastSyncWatchEvent.setEventType(
+					SyncWatchEvent.EVENT_TYPE_RENAME);
+				lastSyncWatchEvent.setFilePathName(filePathName);
+				lastSyncWatchEvent.setPreviousFilePathName(
+					previousFilePath.toString());
+
+				SyncWatchEventService.update(lastSyncWatchEvent);
+
+				if (fileType.equals(SyncFile.TYPE_FOLDER)) {
+					Watcher watcher = WatcherRegistry.getWatcher(
+						getSyncAccountId());
+
+					watcher.walkFileTree(Paths.get(filePathName));
+				}
+			}
+			else {
+				SyncFile syncFile = SyncFileService.fetchSyncFile(filePathName);
+
+				if ((syncFile != null) &&
+					fileType.equals(SyncFile.TYPE_FOLDER)) {
+
+					FileUtil.fireDeleteEvents(Paths.get(filePathName));
+
 					Watcher watcher = WatcherRegistry.getWatcher(
 						getSyncAccountId());
 
 					watcher.walkFileTree(Paths.get(filePathName));
 
-					eventType = SyncWatchEvent.EVENT_TYPE_CREATE;
+					watchEvent(SyncWatchEvent.EVENT_TYPE_DELETE, filePath);
 				}
 				else {
-					if (parentFilePath.equals(_previousFilePath.getParent())) {
-						eventType = SyncWatchEvent.EVENT_TYPE_RENAME;
-					}
-					else {
-						eventType = SyncWatchEvent.EVENT_TYPE_MOVE;
-					}
+					lastSyncWatchEvent.setEventType(
+						SyncWatchEvent.EVENT_TYPE_MOVE);
+					lastSyncWatchEvent.setFilePathName(filePathName);
+					lastSyncWatchEvent.setPreviousFilePathName(
+						previousFilePath.toString());
 
-					previousFilePathName = _previousFilePath.toString();
+					SyncWatchEventService.update(lastSyncWatchEvent);
+
+					if (fileType.equals(SyncFile.TYPE_FOLDER)) {
+						Watcher watcher = WatcherRegistry.getWatcher(
+							getSyncAccountId());
+
+						watcher.walkFileTree(Paths.get(filePathName));
+					}
 				}
 			}
-			else if (_previousFilePath != null) {
-				eventType = SyncWatchEvent.EVENT_TYPE_DELETE;
-				filePathName = _previousFilePath.toString();
-			}
-
-			SyncWatchEventService.addSyncWatchEvent(
-				eventType, filePathName, getFileType(eventType, filePath),
-				previousFilePathName, getSyncAccountId());
-
-			_previousFilePath = null;
 		}
 		catch (Exception e) {
 			_logger.error(e.getMessage(), e);
@@ -170,7 +242,7 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 		String eventType, String filePathName, long syncAccountId) {
 
 		SyncWatchEvent lastSyncWatchEvent =
-			SyncWatchEventService.fetchLastSyncWatchEvent(syncAccountId);
+			SyncWatchEventService.getLastSyncWatchEvent(syncAccountId);
 
 		if ((lastSyncWatchEvent == null) ||
 			!filePathName.equals(lastSyncWatchEvent.getFilePathName()) ||
@@ -184,7 +256,5 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 
 	private static final Logger _logger = LoggerFactory.getLogger(
 		SyncWatchEventService.class);
-
-	private Path _previousFilePath;
 
 }

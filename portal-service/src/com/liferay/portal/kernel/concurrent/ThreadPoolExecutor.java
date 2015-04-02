@@ -239,6 +239,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 		return _maxPoolSize;
 	}
 
+	public String getName() {
+		return _name;
+	}
+
 	public int getPendingTaskCount() {
 		return _taskQueue.size();
 	}
@@ -327,6 +331,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 		}
 
 		_keepAliveTime = timeUnit.toNanos(keepAliveTime);
+	}
+
+	public void setName(String name) {
+		_name = name;
 	}
 
 	public void setRejectedExecutionHandler(
@@ -436,6 +444,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 		execute(defaultNoticeableFuture);
 
 		return defaultNoticeableFuture;
+	}
+
+	public NoticeableFuture<Void> terminationNoticeableFuture() {
+		return _terminationDefaultNoticeableFuture;
 	}
 
 	@Override
@@ -583,7 +595,10 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 				_runState = _TERMINATED;
 
 				_terminationCondition.signalAll();
+
 				_threadPoolHandler.terminated();
+
+				_terminationDefaultNoticeableFuture.run();
 
 				return;
 			}
@@ -609,11 +624,24 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 	private volatile int _largestPoolSize;
 	private final ReentrantLock _mainLock = new ReentrantLock();
 	private volatile int _maxPoolSize;
+	private String _name;
 	private volatile int _poolSize;
 	private volatile RejectedExecutionHandler _rejectedExecutionHandler;
 	private volatile int _runState;
 	private final TaskQueue<Runnable> _taskQueue;
 	private final Condition _terminationCondition = _mainLock.newCondition();
+
+	private final DefaultNoticeableFuture<Void>
+		_terminationDefaultNoticeableFuture =
+			new DefaultNoticeableFuture<Void>() {
+
+				@Override
+				public boolean cancel(boolean mayInterruptIfRunning) {
+					return false;
+				}
+
+			};
+
 	private volatile ThreadFactory _threadFactory;
 	private volatile ThreadPoolHandler _threadPoolHandler;
 	private final Set<WorkerTask> _workerTasks;

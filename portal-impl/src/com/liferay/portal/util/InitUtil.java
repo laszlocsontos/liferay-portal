@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.log.SanitizerLogWrapper;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.JavaDetector;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -114,10 +113,6 @@ public class InitUtil {
 
 		SanitizerLogWrapper.init();
 
-		// Java properties
-
-		JavaDetector.isJDK5();
-
 		// Security manager
 
 		SecurityManagerUtil.init();
@@ -192,6 +187,8 @@ public class InitUtil {
 			if (initModuleFramework) {
 				PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR =
 					System.getProperty(SystemProperties.TMP_DIR);
+
+				ModuleFrameworkUtilAdapter.initFramework();
 
 				ModuleFrameworkUtilAdapter.startFramework();
 			}

@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -50,6 +50,7 @@ import java.util.Map;
 /**
  * @author Daniel Kocsis
  */
+@OSGiBeanProperties
 public class JournalFeedStagedModelDataHandler
 	extends BaseStagedModelDataHandler<JournalFeed> {
 
@@ -68,27 +69,20 @@ public class JournalFeedStagedModelDataHandler
 	}
 
 	@Override
-	public JournalFeed fetchStagedModelByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		List<JournalFeed> feeds =
-			JournalFeedLocalServiceUtil.getJournalFeedsByUuidAndCompanyId(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<JournalFeed>());
-
-		if (ListUtil.isEmpty(feeds)) {
-			return null;
-		}
-
-		return feeds.get(0);
-	}
-
-	@Override
 	public JournalFeed fetchStagedModelByUuidAndGroupId(
 		String uuid, long groupId) {
 
 		return JournalFeedLocalServiceUtil.fetchJournalFeedByUuidAndGroupId(
 			uuid, groupId);
+	}
+
+	@Override
+	public List<JournalFeed> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return JournalFeedLocalServiceUtil.getJournalFeedsByUuidAndCompanyId(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			new StagedModelModifiedDateComparator<JournalFeed>());
 	}
 
 	@Override
@@ -330,14 +324,15 @@ public class JournalFeedStagedModelDataHandler
 		}
 		catch (FeedTargetLayoutFriendlyUrlException ftlfurle) {
 			if (_log.isWarnEnabled()) {
-				StringBundler sb = new StringBundler(6);
+				StringBundler sb = new StringBundler(7);
 
 				sb.append("A feed with the ID ");
 				sb.append(feedId);
 				sb.append(" cannot be imported because layout with friendly ");
 				sb.append("URL ");
 				sb.append(feed.getTargetLayoutFriendlyUrl());
-				sb.append(" does not exist");
+				sb.append(" does not exist: ");
+				sb.append(ftlfurle.getMessage());
 
 				_log.warn(sb.toString());
 			}

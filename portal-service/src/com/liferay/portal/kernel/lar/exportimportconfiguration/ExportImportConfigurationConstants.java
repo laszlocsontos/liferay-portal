@@ -18,12 +18,25 @@ import com.liferay.portal.kernel.util.StringPool;
 
 /**
  * @author Daniel Kocsis
+ * @author Akos Thurzo
  */
 public class ExportImportConfigurationConstants {
 
 	public static final int TYPE_EXPORT_LAYOUT = 0;
 
 	public static final String TYPE_EXPORT_LAYOUT_LABEL = "export-layout";
+
+	public static final int TYPE_EXPORT_PORTLET = 5;
+
+	public static final String TYPE_EXPORT_PORTLET_LABEL = "export-portlet";
+
+	public static final int TYPE_IMPORT_LAYOUT = 6;
+
+	public static final String TYPE_IMPORT_LAYOUT_LABEL = "import-layout";
+
+	public static final int TYPE_IMPORT_PORTLET = 7;
+
+	public static final String TYPE_IMPORT_PORTLET_LABEL = "import-portlet";
 
 	public static final int TYPE_PUBLISH_LAYOUT_LOCAL = 1;
 
@@ -34,6 +47,10 @@ public class ExportImportConfigurationConstants {
 
 	public static final String TYPE_PUBLISH_LAYOUT_REMOTE_LABEL =
 		"publish-layout-remote";
+
+	public static final int TYPE_PUBLISH_PORTLET = 8;
+
+	public static final String TYPE_PUBLISH_PORTLET_LABEL = "publish-portlet";
 
 	public static final int TYPE_SCHEDULED_PUBLISH_LAYOUT_LOCAL = 3;
 
@@ -49,11 +66,23 @@ public class ExportImportConfigurationConstants {
 		if (type == TYPE_EXPORT_LAYOUT) {
 			return TYPE_EXPORT_LAYOUT_LABEL;
 		}
+		else if (type == TYPE_EXPORT_PORTLET) {
+			return TYPE_EXPORT_PORTLET_LABEL;
+		}
+		else if (type == TYPE_IMPORT_LAYOUT) {
+			return TYPE_IMPORT_LAYOUT_LABEL;
+		}
+		else if (type == TYPE_IMPORT_PORTLET) {
+			return TYPE_IMPORT_PORTLET_LABEL;
+		}
 		else if (type == TYPE_PUBLISH_LAYOUT_LOCAL) {
 			return TYPE_PUBLISH_LAYOUT_LOCAL_LABEL;
 		}
 		else if (type == TYPE_PUBLISH_LAYOUT_REMOTE) {
 			return TYPE_PUBLISH_LAYOUT_REMOTE_LABEL;
+		}
+		else if (type == TYPE_PUBLISH_PORTLET) {
+			return TYPE_PUBLISH_PORTLET_LABEL;
 		}
 		else if (type == TYPE_SCHEDULED_PUBLISH_LAYOUT_LOCAL) {
 			return TYPE_SCHEDULED_PUBLISH_LAYOUT_LOCAL_LABEL;

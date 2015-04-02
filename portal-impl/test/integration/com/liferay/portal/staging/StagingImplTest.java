@@ -16,6 +16,7 @@ package com.liferay.portal.staging;
 
 import com.liferay.portal.kernel.lar.ExportImportDateUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
+import com.liferay.portal.kernel.lar.exportimportconfiguration.ExportImportConfigurationParameterMapFactory;
 import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -173,11 +174,11 @@ public class StagingImplTest {
 
 		AssetVocabulary assetVocabulary =
 			AssetVocabularyLocalServiceUtil.addVocabulary(
-				TestPropsValues.getUserId(), "TestVocabulary", titleMap,
-				descriptionMap, null, serviceContext);
+				TestPropsValues.getUserId(), groupId, "TestVocabulary",
+				titleMap, descriptionMap, null, serviceContext);
 
 		return AssetCategoryLocalServiceUtil.addCategory(
-			TestPropsValues.getUserId(), 0, titleMap, descriptionMap,
+			TestPropsValues.getUserId(), groupId, 0, titleMap, descriptionMap,
 			assetVocabulary.getVocabularyId(), new String[0], serviceContext);
 	}
 
@@ -186,7 +187,7 @@ public class StagingImplTest {
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		Map<String, String[]> stagingParameters =
-			StagingUtil.getStagingParameters();
+			ExportImportConfigurationParameterMapFactory.buildParameterMap();
 
 		for (String stagingParameterName : stagingParameters.keySet()) {
 			serviceContext.setAttribute(
@@ -271,7 +272,8 @@ public class StagingImplTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		Map<String, String[]> parameters = StagingUtil.getStagingParameters();
+		Map<String, String[]> parameters =
+			ExportImportConfigurationParameterMapFactory.buildParameterMap();
 
 		parameters.put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION +
@@ -318,7 +320,7 @@ public class StagingImplTest {
 
 		StagingUtil.publishLayouts(
 			TestPropsValues.getUserId(), stagingGroup.getGroupId(),
-			_group.getGroupId(), false, parameters, null, null);
+			_group.getGroupId(), false, parameters);
 
 		// Retrieve content from live after publishing
 

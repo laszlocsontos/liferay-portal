@@ -15,11 +15,13 @@
 package com.liferay.portal.kernel.concurrent;
 
 import com.liferay.portal.kernel.concurrent.test.TestUtil;
+import com.liferay.portal.kernel.test.SyncThrowableThread;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
@@ -47,7 +49,7 @@ public class TaskQueueTest {
 		catch (IllegalArgumentException iae) {
 		}
 
-		TaskQueue<Object> taskQueue = new TaskQueue<Object>(10);
+		TaskQueue<Object> taskQueue = new TaskQueue<>(10);
 
 		Assert.assertEquals(10, taskQueue.remainingCapacity());
 
@@ -144,7 +146,7 @@ public class TaskQueueTest {
 
 	@Test
 	public void testOffer() {
-		TaskQueue<Object> taskQueue = new TaskQueue<Object>(10);
+		TaskQueue<Object> taskQueue = new TaskQueue<>(10);
 
 		try {
 			taskQueue.offer(null, new boolean[1]);
@@ -154,7 +156,7 @@ public class TaskQueueTest {
 		catch (NullPointerException npe) {
 		}
 
-		taskQueue = new TaskQueue<Object>(10);
+		taskQueue = new TaskQueue<>(10);
 
 		try {
 			taskQueue.offer(new Object(), null);
@@ -164,7 +166,7 @@ public class TaskQueueTest {
 		catch (NullPointerException npe) {
 		}
 
-		taskQueue = new TaskQueue<Object>(10);
+		taskQueue = new TaskQueue<>(10);
 
 		try {
 			taskQueue.offer(new Object(), new boolean[0]);
@@ -174,7 +176,7 @@ public class TaskQueueTest {
 		catch (IllegalArgumentException iae) {
 		}
 
-		taskQueue = new TaskQueue<Object>(10);
+		taskQueue = new TaskQueue<>(10);
 
 		boolean[] hasWaiterMarker = new boolean[1];
 
@@ -237,7 +239,7 @@ public class TaskQueueTest {
 
 	@Test
 	public void testRemainingCapacity() {
-		TaskQueue<Object> taskQueue = new TaskQueue<Object>(10);
+		TaskQueue<Object> taskQueue = new TaskQueue<>(10);
 
 		Assert.assertEquals(10, taskQueue.remainingCapacity());
 
@@ -249,7 +251,7 @@ public class TaskQueueTest {
 
 	@Test
 	public void testRemove() {
-		TaskQueue<Object> taskQueue = new TaskQueue<Object>(10);
+		TaskQueue<Object> taskQueue = new TaskQueue<>(10);
 
 		Assert.assertFalse(taskQueue.remove(null));
 		Assert.assertFalse(taskQueue.remove(new Object()));
@@ -272,7 +274,7 @@ public class TaskQueueTest {
 
 	@Test
 	public void testSize() {
-		TaskQueue<Object> taskQueue = new TaskQueue<Object>(10);
+		TaskQueue<Object> taskQueue = new TaskQueue<>(10);
 
 		Assert.assertEquals(0, taskQueue.size());
 
@@ -290,30 +292,30 @@ public class TaskQueueTest {
 		Assert.assertTrue(taskQueue.offer(object, new boolean[1]));
 		Assert.assertSame(object, taskQueue.take());
 
-		Thread thread = new Thread() {
+		SyncThrowableThread<Void> syncThrowableThread =
+			new SyncThrowableThread<>(
+				new Callable<Void>() {
 
-			@Override
-			public void run() {
-				try {
-					for (int i = 0; i < 10; i++) {
-						Assert.assertEquals(i, taskQueue.take());
+					@Override
+					public Void call() throws Exception {
+						for (int i = 0; i < 10; i++) {
+							Assert.assertEquals(i, taskQueue.take());
+						}
+
+						try {
+							taskQueue.take();
+
+							Assert.fail();
+						}
+						catch (InterruptedException ie) {
+						}
+
+						return null;
 					}
-				}
-				catch (InterruptedException ie) {
-					Assert.fail();
-				}
 
-				try {
-					taskQueue.take();
-					Assert.fail();
-				}
-				catch (InterruptedException ie) {
-				}
-			}
+				});
 
-		};
-
-		thread.start();
+		syncThrowableThread.start();
 
 		for (int i = 0; i < 10; i++) {
 			Assert.assertTrue(taskQueue.offer(i, new boolean[1]));
@@ -321,8 +323,9 @@ public class TaskQueueTest {
 
 		Thread.sleep(TestUtil.SHORT_WAIT);
 
-		thread.interrupt();
-		thread.join();
+		syncThrowableThread.interrupt();
+
+		syncThrowableThread.sync();
 	}
 
 }

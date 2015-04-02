@@ -83,7 +83,7 @@ public class BatchEvent {
 			parameters.put("urlPath", event.getURLPath());
 			parameters.put("zipFileId", zipFileId);
 
-			parameters = new HashMap<String, Object>(parameters);
+			parameters = new HashMap<>(parameters);
 
 			parameters.remove("deltaFilePath");
 			parameters.remove("filePath");
@@ -106,7 +106,9 @@ public class BatchEvent {
 			return true;
 		}
 		catch (IOException ioe) {
-			_logger.debug(ioe.getMessage(), ioe);
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(ioe.getMessage(), ioe);
+			}
 
 			return false;
 		}
@@ -143,7 +145,9 @@ public class BatchEvent {
 			_closed = true;
 		}
 		catch (Exception e) {
-			_logger.debug(e.getMessage(), e);
+			if (_logger.isDebugEnabled()) {
+				_logger.debug(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -203,7 +207,9 @@ public class BatchEvent {
 			}
 		}
 		finally {
-			_zipOutputStream.closeEntry();
+			if (_zipOutputStream != null) {
+				_zipOutputStream.closeEntry();
+			}
 
 			StreamUtil.cleanUp(inputStream);
 		}
