@@ -113,42 +113,13 @@ else if (group != null) {
 <liferay-ui:error exception="<%= DuplicateGroupException.class %>" message="please-enter-a-unique-name" />
 <liferay-ui:error exception="<%= GroupInheritContentException.class %>" message="this-site-cannot-inherit-content-from-its-parent-site" />
 <liferay-ui:error exception="<%= GroupKeyException.class %>" message="please-enter-a-valid-name" />
-
-<liferay-ui:error exception="<%= GroupParentException.class %>">
-
-	<%
-	GroupParentException gpe = (GroupParentException)errorException;
-	%>
-
-	<c:if test="<%= gpe.getType() == GroupParentException.CHILD_DESCENDANT %>">
-		<liferay-ui:message key="the-site-cannot-have-a-child-as-its-parent-site" />
-	</c:if>
-
-	<c:if test="<%= gpe.getType() == GroupParentException.SELF_DESCENDANT %>">
-		<liferay-ui:message key="the-site-cannot-be-its-own-parent-site" />
-	</c:if>
-</liferay-ui:error>
-
+<liferay-ui:error exception="<%= GroupParentException.MustNotBeOwnParent.class %>" message="the-site-cannot-be-its-own-parent-site" />
+<liferay-ui:error exception="<%= GroupParentException.MustNotHaveChildParent.class %>" message="the-site-cannot-have-a-child-as-its-parent-site" />
+<liferay-ui:error exception="<%= GroupParentException.MustNotHaveStagingParent.class %>" message="the-site-cannot-have-a-staging-site-as-its-parent-site" />
 <liferay-ui:error exception="<%= PendingBackgroundTaskException.class %>" message="the-site-cannot-be-deleted-because-it-has-background-tasks-in-progress" />
-
-<liferay-ui:error exception="<%= RequiredGroupException.class %>">
-
-	<%
-	RequiredGroupException rge = (RequiredGroupException)errorException;
-	%>
-
-	<c:if test="<%= rge.getType() == RequiredGroupException.CURRENT_GROUP %>">
-		<liferay-ui:message key="the-site-cannot-be-deleted-or-deactivated-because-you-are-accessing-the-site" />
-	</c:if>
-
-	<c:if test="<%= rge.getType() == RequiredGroupException.PARENT_GROUP %>">
-		<liferay-ui:message key="you-cannot-delete-sites-that-have-subsites" />
-	</c:if>
-
-	<c:if test="<%= rge.getType() == RequiredGroupException.SYSTEM_GROUP %>">
-		<liferay-ui:message key="the-site-cannot-be-deleted-or-deactivated-because-it-is-a-required-system-site" />
-	</c:if>
-</liferay-ui:error>
+<liferay-ui:error exception="<%= RequiredGroupException.MustNotDeleteCurrentGroup.class %>" message="the-site-cannot-be-deleted-or-deactivated-because-you-are-accessing-the-site" />
+<liferay-ui:error exception="<%= RequiredGroupException.MustNotDeleteGroupThatHasChild.class %>" message="you-cannot-delete-sites-that-have-subsites" />
+<liferay-ui:error exception="<%= RequiredGroupException.MustNotDeleteSystemGroup.class %>" message="the-site-cannot-be-deleted-or-deactivated-because-it-is-a-required-system-site" />
 
 <liferay-ui:error key="resetMergeFailCountAndMerge" message="unable-to-reset-the-failure-counter-and-propagate-the-changes" />
 
@@ -276,19 +247,13 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 									<c:when test="<%= group != null %>">
 										<c:choose>
 											<c:when test="<%= group.getPublicLayoutsPageCount() > 0 %>">
-												<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="publicPagesURL">
-													<portlet:param name="struts_action" value="/my_sites/view" />
-													<portlet:param name="groupId" value="<%= String.valueOf(group.getGroupId()) %>" />
-													<portlet:param name="privateLayout" value="<%= Boolean.FALSE.toString() %>" />
-												</liferay-portlet:actionURL>
-
 												<liferay-ui:icon
 													iconCssClass="icon-search"
 													label="<%= true %>"
 													message="open-public-pages"
 													method="get"
 													target="_blank"
-													url="<%= publicPagesURL.toString() %>"
+													url="<%= group.getDisplayURL(themeDisplay, false) %>"
 												/>
 											</c:when>
 											<c:otherwise>
@@ -382,19 +347,13 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 									<c:when test="<%= group != null %>">
 										<c:choose>
 											<c:when test="<%= group.getPrivateLayoutsPageCount() > 0 %>">
-												<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="privatePagesURL">
-													<portlet:param name="struts_action" value="/my_sites/view" />
-													<portlet:param name="groupId" value="<%= String.valueOf(group.getGroupId()) %>" />
-													<portlet:param name="privateLayout" value="<%= Boolean.TRUE.toString() %>" />
-												</liferay-portlet:actionURL>
-
 												<liferay-ui:icon
 													iconCssClass="icon-search"
 													label="<%= true %>"
 													message="open-private-pages"
 													method="get"
 													target="_blank"
-													url="<%= privatePagesURL.toString() %>"
+													url="<%= group.getDisplayURL(themeDisplay, true) %>"
 												/>
 											</c:when>
 											<c:otherwise>
@@ -574,7 +533,7 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 		<aui:input label="limit-membership-to-members-of-the-parent-site" name="membershipRestriction" type="checkbox" value="<%= membershipRestriction %>" />
 
 		<%
-		boolean breadcrumbShowParentGroups = PropsValues.BREADCRUMB_SHOW_PARENT_GROUPS;
+		boolean breadcrumbShowParentGroups = true;
 
 		if (typeSettingsProperties != null) {
 			breadcrumbShowParentGroups = PropertiesParamUtil.getBoolean(typeSettingsProperties, request, "breadcrumbShowParentGroups", breadcrumbShowParentGroups);

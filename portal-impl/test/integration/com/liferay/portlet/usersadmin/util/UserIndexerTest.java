@@ -14,11 +14,13 @@
 
 package com.liferay.portlet.usersadmin.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
+import com.liferay.portal.kernel.test.IdempotentRetryAssert;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -26,6 +28,8 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
@@ -38,6 +42,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -66,22 +72,136 @@ public class UserIndexerTest {
 	}
 
 	@Test
-	public void testNameFields() throws Exception {
+	public void testEmailAddress() throws Exception {
+		addUserEmailAddress("Em.Ail@liferay.com");
+
+		User user = assertSearchOneUser("Em.Ail@liferay.com");
+
+		Assert.assertEquals("em.ail@liferay.com", user.getEmailAddress());
+	}
+
+	@Test
+	public void testEmailAddressField() throws Exception {
+		addUserEmailAddress("Em.Ail@liferay.com");
+
+		User user = assertSearchOneUser("emailAddress", "em.ail@liferay.com");
+
+		Assert.assertEquals("em.ail@liferay.com", user.getEmailAddress());
+	}
+
+	@Test
+	public void testEmailAddressPrefix() throws Exception {
+		addUserEmailAddress("Em.Ail@liferay.com");
+
+		User user = assertSearchOneUser("EM.AIL");
+
+		Assert.assertEquals("em.ail@liferay.com", user.getEmailAddress());
+	}
+
+	@Test
+	public void testEmailAddressSubstring() throws Exception {
 		Assume.assumeTrue(
-			isCaseInsensitiveWildcardsImplementedForSearchEngine());
+			isTwoEndedSubstringSearchImplementedForSearchEngine());
+
+		addUserEmailAddress("Em.Ail@liferay.com");
+
+		User user = assertSearchOneUser("ail@life");
+
+		Assert.assertEquals("em.ail@liferay.com", user.getEmailAddress());
+	}
+
+	@Test
+	public void testEmptyQuery() throws Exception {
+		Assume.assumeTrue(isEmptyQueryImplementedForSearchEngine());
+
+		addUser();
+
+		assertHits("", 1);
+	}
+
+	@Test
+	public void testLikeCharacter() throws Exception {
+		Assume.assumeTrue(isEmptyQueryImplementedForSearchEngine());
+
+		addUser();
+
+		assertHits("%", 1);
+		assertHits("%" + RandomTestUtil.randomString(), 0);
+	}
+
+	@Test
+	public void testLuceneQueryParserUnfriendlyCharacters() throws Exception {
+		Assume.assumeTrue(isAPIWithoutQueryParserImplementedForSearchEngine());
+
+		User user1 = addUser();
+		User user2 = assertSearchOneUser("@");
+
+		Assert.assertEquals(user1.getEmailAddress(), user2.getEmailAddress());
+
+		assertHits("@" + RandomTestUtil.randomString(), 0);
+		assertHits("!", 0);
+		assertHits("!" + RandomTestUtil.randomString(), 0);
+	}
+
+	@Test
+	public void testNameFieldsNotTokenized() throws Exception {
+		Assume.assumeTrue(
+			isCaseInsensitiveNameFieldsImplementedForSearchEngine());
+
+		String firstName = "Liferay7";
+		String lastName = "dell'Apostrophe";
+		String middleName = "ALLOY_4";
+
+		testNameFields(firstName, lastName, middleName);
+	}
+
+	@Test
+	public void testNameFieldsNotTokenizedLowercase() throws Exception {
+		String firstName = "liferay7";
+		String lastName = "dell'apostrophe";
+		String middleName = "alloy_4";
+
+		testNameFields(firstName, lastName, middleName);
+	}
+
+	@Test
+	public void testNamesPrefix() throws Exception {
+		Assume.assumeTrue(
+			isCaseInsensitiveNameFieldsImplementedForSearchEngine());
 
 		String firstName = "First";
 		String lastName = "Last";
 		String middleName = "Middle";
-		String screenName = "Screen";
 
-		addUser(firstName, lastName, middleName, screenName);
+		addUserNameFields(firstName, lastName, middleName);
+
+		User user = assertSearchOneUser("Fir");
+
+		Assert.assertEquals("First", user.getFirstName());
+
+		user = assertSearchOneUser("LasT");
+
+		Assert.assertEquals("Last", user.getLastName());
+
+		user = assertSearchOneUser("midd");
+
+		Assert.assertEquals("Middle", user.getMiddleName());
+	}
+
+	@Test
+	public void testNamesSubstring() throws Exception {
+		Assume.assumeTrue(
+			isCaseInsensitiveNameFieldsImplementedForSearchEngine());
+		Assume.assumeTrue(
+			isTwoEndedSubstringSearchImplementedForSearchEngine());
+
+		String firstName = "First";
+		String lastName = "Last";
+		String middleName = "Middle";
+
+		addUserNameFields(firstName, lastName, middleName);
 
 		User user;
-
-		user = assertSearchOneUser("");
-
-		Assert.assertEquals("First Middle Last", user.getFullName());
 
 		user = assertSearchOneUser("Fir");
 
@@ -94,15 +214,58 @@ public class UserIndexerTest {
 		user = assertSearchOneUser("idd");
 
 		Assert.assertEquals("Middle", user.getMiddleName());
+	}
 
-		user = assertSearchOneUser("SCREE");
+	@Test
+	public void testScreenName() throws Exception {
+		addUserScreenName("Open4Life");
 
-		Assert.assertEquals("screen", user.getScreenName());
+		User user = assertSearchOneUser("Open4Life");
+
+		Assert.assertEquals("open4life", user.getScreenName());
+	}
+
+	@Test
+	public void testScreenNameField() throws Exception {
+		addUserScreenName("Open4Life");
+
+		User user = assertSearchOneUser("screenName", "open4life");
+
+		Assert.assertEquals("open4life", user.getScreenName());
+	}
+
+	@Test
+	public void testScreenNamePrefix() throws Exception {
+		addUserScreenName("Open4Life");
+
+		User user = assertSearchOneUser("OPE");
+
+		Assert.assertEquals("open4life", user.getScreenName());
+	}
+
+	@Test
+	public void testScreenNameSubstring() throws Exception {
+		Assume.assumeTrue(
+			isTwoEndedSubstringSearchImplementedForSearchEngine());
+
+		addUserScreenName("Open4Life");
+
+		User user = assertSearchOneUser("4lif");
+
+		Assert.assertEquals("open4life", user.getScreenName());
+	}
+
+	protected User addUser() throws Exception {
+		User user = UserTestUtil.addUser();
+
+		_users.add(user);
+
+		return user;
 	}
 
 	protected void addUser(
 			String firstName, String lastName, String middleName,
-			String screenName)
+			String screenName, String emailAddress)
 		throws Exception {
 
 		long companyId = TestPropsValues.getCompanyId();
@@ -110,7 +273,6 @@ public class UserIndexerTest {
 		String password1 = null;
 		String password2 = null;
 		boolean autoScreenName = false;
-		String emailAddress = RandomTestUtil.randomString() + "@liferay.com";
 		long facebookId = 0;
 		String openId = null;
 		Locale locale = LocaleUtil.getDefault();
@@ -137,31 +299,132 @@ public class UserIndexerTest {
 		_users.add(user);
 	}
 
-	protected User assertSearchOneUser(String keywords) throws Exception {
+	protected void addUserEmailAddress(String emailAddress) throws Exception {
+		String firstName = RandomTestUtil.randomString();
+		String lastName = RandomTestUtil.randomString();
+		String middleName = RandomTestUtil.randomString();
+		String screenName = RandomTestUtil.randomString();
+
+		addUser(firstName, lastName, middleName, screenName, emailAddress);
+	}
+
+	protected void addUserNameFields(
+			String firstName, String lastName, String middleName)
+		throws Exception {
+
+		String screenName = RandomTestUtil.randomString();
+		String emailAddress = RandomTestUtil.randomString() + "@liferay.com";
+
+		addUser(firstName, lastName, middleName, screenName, emailAddress);
+	}
+
+	protected void addUserScreenName(String screenName) throws Exception {
+		String firstName = RandomTestUtil.randomString();
+		String lastName = RandomTestUtil.randomString();
+		String middleName = RandomTestUtil.randomString();
+		String emailAddress = RandomTestUtil.randomString() + "@liferay.com";
+
+		addUser(firstName, lastName, middleName, screenName, emailAddress);
+	}
+
+	protected Hits assertHits(
+			final SearchContext searchContext, final int length)
+		throws Exception {
+
+		return IdempotentRetryAssert.retryAssert(
+			3, TimeUnit.SECONDS,
+			new Callable<Hits>() {
+
+				@Override
+				public Hits call() throws Exception {
+					Hits hits = _indexer.search(searchContext);
+
+					Assert.assertEquals(length, hits.getLength());
+
+					return hits;
+				}
+
+			});
+	}
+
+	protected Hits assertHits(String keywords, int length) throws Exception {
 		SearchContext searchContext = SearchContextTestUtil.getSearchContext();
 
 		searchContext.setKeywords(keywords);
 
-		Hits hits = _indexer.search(searchContext);
+		return assertHits(searchContext, length);
+	}
 
-		Assert.assertEquals(1, hits.getLength());
+	protected Hits assertHits(String field, String value, int length)
+		throws Exception {
 
+		SearchContext searchContext = SearchContextTestUtil.getSearchContext();
+
+		searchContext.setAttribute(field, value);
+
+		return assertHits(searchContext, length);
+	}
+
+	protected User assertSearchOneUser(String keywords) throws Exception {
+		Hits hits = assertHits(keywords, 1);
+
+		return getUser(hits);
+	}
+
+	protected User assertSearchOneUser(String field, String value)
+		throws Exception {
+
+		Hits hits = assertHits(field, value, 1);
+
+		return getUser(hits);
+	}
+
+	protected User getUser(Hits hits) throws PortalException {
 		long userId = UserIndexer.getUserId(hits.doc(0));
 
 		return UserLocalServiceUtil.getUser(userId);
 	}
 
-	protected boolean isCaseInsensitiveWildcardsImplementedForSearchEngine() {
+	protected boolean isAPIWithoutQueryParserImplementedForSearchEngine() {
+		return !isSearchEngineVendor("Lucene", "Solr");
+	}
+
+	protected boolean isCaseInsensitiveNameFieldsImplementedForSearchEngine() {
+		return !isSearchEngineVendor("Lucene");
+	}
+
+	protected boolean isEmptyQueryImplementedForSearchEngine() {
+		return !isSearchEngineVendor("Solr");
+	}
+
+	protected boolean isSearchEngineVendor(String... vendors) {
 		SearchEngine searchEngine = SearchEngineUtil.getSearchEngine(
 			SearchEngineUtil.getDefaultSearchEngineId());
 
-		String vendor = searchEngine.getVendor();
+		return ArrayUtil.contains(vendors, searchEngine.getVendor(), true);
+	}
 
-		if (vendor.equals("Elasticsearch")) {
-			return true;
-		}
+	protected boolean isTwoEndedSubstringSearchImplementedForSearchEngine() {
+		return !isSearchEngineVendor("Solr");
+	}
 
-		return false;
+	protected void testNameFields(
+			String firstName, String lastName, String middleName)
+		throws Exception {
+
+		addUserNameFields(firstName, lastName, middleName);
+
+		User user = assertSearchOneUser("firstName", firstName);
+
+		Assert.assertEquals(firstName, user.getFirstName());
+
+		user = assertSearchOneUser("lastName", lastName);
+
+		Assert.assertEquals(lastName, user.getLastName());
+
+		user = assertSearchOneUser("middleName", middleName);
+
+		Assert.assertEquals(middleName, user.getMiddleName());
 	}
 
 	private Indexer _indexer;

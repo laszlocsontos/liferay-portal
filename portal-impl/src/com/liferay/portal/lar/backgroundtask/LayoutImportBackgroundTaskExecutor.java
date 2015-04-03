@@ -16,24 +16,31 @@ package com.liferay.portal.lar.backgroundtask;
 
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
-import com.liferay.portal.kernel.backgroundtask.BaseBackgroundTaskExecutor;
-import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.staging.StagingUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.model.BackgroundTask;
+import com.liferay.portal.model.ExportImportConfiguration;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.spring.transaction.TransactionHandlerUtil;
 
+import java.io.File;
 import java.io.Serializable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * @author Daniel Kocsis
+ * @author Akos Thurzo
  */
 public class LayoutImportBackgroundTaskExecutor
-	extends BaseBackgroundTaskExecutor {
+	extends BaseExportImportBackgroundTaskExecutor {
 
 	public LayoutImportBackgroundTaskExecutor() {
 		setBackgroundTaskStatusMessageTranslator(
@@ -42,41 +49,93 @@ public class LayoutImportBackgroundTaskExecutor
 		// Isolation level guarantees this will be serial in a group
 
 		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_GROUP);
-		setSerial(true);
 	}
 
 	@Override
 	public BackgroundTaskResult execute(BackgroundTask backgroundTask)
 		throws Exception {
 
-		Map<String, Serializable> taskContextMap =
-			backgroundTask.getTaskContextMap();
+		ExportImportConfiguration exportImportConfiguration =
+			getExportImportConfiguration(backgroundTask);
 
-		long userId = MapUtil.getLong(taskContextMap, "userId");
-		long groupId = MapUtil.getLong(taskContextMap, "groupId");
+		Map<String, Serializable> settingsMap =
+			exportImportConfiguration.getSettingsMap();
+
+		long userId = MapUtil.getLong(settingsMap, "userId");
+		long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
 		boolean privateLayout = MapUtil.getBoolean(
-			taskContextMap, "privateLayout");
+			settingsMap, "privateLayout");
 		Map<String, String[]> parameterMap =
-			(Map<String, String[]>)taskContextMap.get("parameterMap");
+			(Map<String, String[]>)settingsMap.get("parameterMap");
 
 		List<FileEntry> attachmentsFileEntries =
 			backgroundTask.getAttachmentsFileEntries();
 
+		File file = null;
+
 		for (FileEntry attachmentsFileEntry : attachmentsFileEntries) {
-			LayoutLocalServiceUtil.importLayouts(
-				userId, groupId, privateLayout, parameterMap,
-				attachmentsFileEntry.getContentStream());
+			try {
+				file = FileUtil.createTempFile("lar");
+
+				FileUtil.write(file, attachmentsFileEntry.getContentStream());
+
+				TransactionHandlerUtil.invoke(
+					transactionAttribute,
+					new LayoutImportCallable(
+						file, parameterMap, privateLayout, targetGroupId,
+						userId));
+			}
+			catch (Throwable t) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(t, t);
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn("Unable to import layouts: " + t.getMessage());
+				}
+
+				throw new SystemException(t);
+			}
+			finally {
+				FileUtil.delete(file);
+			}
 		}
 
 		return BackgroundTaskResult.SUCCESS;
 	}
 
-	@Override
-	public String handleException(BackgroundTask backgroundTask, Exception e) {
-		JSONObject jsonObject = StagingUtil.getExceptionMessagesJSONObject(
-			getLocale(backgroundTask), e, backgroundTask.getTaskContextMap());
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutImportBackgroundTaskExecutor.class);
 
-		return jsonObject.toString();
+	private class LayoutImportCallable implements Callable<Void> {
+
+		public LayoutImportCallable(
+			File file, Map<String, String[]> parameterMap,
+			boolean privateLayout, long targetGroupId, long userId) {
+
+			_file = file;
+			_parameterMap = parameterMap;
+			_privateLayout = privateLayout;
+			_targetGroupId = targetGroupId;
+			_userId = userId;
+		}
+
+		@Override
+		public Void call() throws PortalException {
+			LayoutLocalServiceUtil.importLayoutsDataDeletions(
+				_userId, _targetGroupId, _privateLayout, _parameterMap, _file);
+
+			LayoutLocalServiceUtil.importLayouts(
+				_userId, _targetGroupId, _privateLayout, _parameterMap, _file);
+
+			return null;
+		}
+
+		private final File _file;
+		private final Map<String, String[]> _parameterMap;
+		private final boolean _privateLayout;
+		private final long _targetGroupId;
+		private final long _userId;
+
 	}
 
 }

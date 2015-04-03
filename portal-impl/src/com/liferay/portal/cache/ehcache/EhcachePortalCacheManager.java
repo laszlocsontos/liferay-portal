@@ -25,6 +25,11 @@ import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
+import com.liferay.registry.ServiceTracker;
+import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.io.Serializable;
 
@@ -59,32 +64,17 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 	}
 
 	@Override
-	public String getName() {
-		return _name;
-	}
-
-	@Override
 	public void reconfigureCaches(URL configurationURL) {
 		_configurationPair = EhcacheConfigurationHelperUtil.getConfiguration(
 			configurationURL, clusterAware, _usingDefault);
 
-		Configuration ehcacheConfiguration = _configurationPair.getKey();
-
-		if (!_name.equals(ehcacheConfiguration.getName())) {
-			return;
-		}
-
-		reconfigEhcache(ehcacheConfiguration);
+		reconfigEhcache(_configurationPair.getKey());
 
 		reconfigPortalCache(_configurationPair.getValue());
 	}
 
 	public void setConfigPropertyKey(String configPropertyKey) {
 		_configPropertyKey = configPropertyKey;
-	}
-
-	public void setMBeanServer(MBeanServer mBeanServer) {
-		_mBeanServer = mBeanServer;
 	}
 
 	public void setRegisterCacheConfigurations(
@@ -125,14 +115,11 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 
 	@Override
 	protected void doDestroy() {
-		try {
-			_cacheManager.shutdown();
+		if (_serviceTracker != null) {
+			_serviceTracker.close();
 		}
-		finally {
-			if (_managementService != null) {
-				_managementService.dispose();
-			}
-		}
+
+		_cacheManager.shutdown();
 	}
 
 	@Override
@@ -161,10 +148,9 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 		_configurationPair = EhcacheConfigurationHelperUtil.getConfiguration(
 			configurationPath, clusterAware, _usingDefault);
 
-		_cacheManager = CacheManagerUtil.createCacheManager(
-			_configurationPair.getKey());
+		_cacheManager = new CacheManager(_configurationPair.getKey());
 
-		_name = _cacheManager.getName();
+		_cacheManager.setName(name);
 
 		FailSafeTimer failSafeTimer = _cacheManager.getTimer();
 
@@ -180,21 +166,21 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 			throw new RuntimeException(e);
 		}
 
-		if (PropsValues.EHCACHE_PORTAL_CACHE_MANAGER_JMX_ENABLED) {
-			_managementService = new ManagementService(
-				_cacheManager, _mBeanServer, _registerCacheManager,
-				_registerCaches, _registerCacheConfigurations,
-				_registerCacheStatistics);
-
-			_managementService.init();
-		}
-
 		CacheManagerEventListenerRegistry cacheManagerEventListenerRegistry =
 			_cacheManager.getCacheManagerEventListenerRegistry();
 
 		cacheManagerEventListenerRegistry.registerListener(
 			new PortalCacheManagerEventListener(
 				aggregatedCacheManagerListener));
+
+		if (PropsValues.EHCACHE_PORTAL_CACHE_MANAGER_JMX_ENABLED) {
+			Registry registry = RegistryUtil.getRegistry();
+
+			_serviceTracker = registry.trackServices(
+				MBeanServer.class, new MBeanServerServiceTrackerCustomizer());
+
+			_serviceTracker.open();
+		}
 	}
 
 	protected void reconfigEhcache(Configuration configuration) {
@@ -267,13 +253,52 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 	private String _configPropertyKey;
 	private ObjectValuePair<Configuration, PortalCacheManagerConfiguration>
 		_configurationPair;
-	private ManagementService _managementService;
-	private MBeanServer _mBeanServer;
-	private String _name;
 	private boolean _registerCacheConfigurations = true;
 	private boolean _registerCacheManager = true;
 	private boolean _registerCaches = true;
 	private boolean _registerCacheStatistics = true;
+	private ServiceTracker <MBeanServer, ManagementService> _serviceTracker;
 	private boolean _usingDefault;
+
+	private class MBeanServerServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<MBeanServer, ManagementService> {
+
+		@Override
+		public ManagementService addingService(
+			ServiceReference<MBeanServer> serviceReference) {
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			MBeanServer mBeanServer = registry.getService(serviceReference);
+
+			ManagementService managementService = new ManagementService(
+				_cacheManager, mBeanServer, _registerCacheManager,
+				_registerCaches, _registerCacheConfigurations,
+				_registerCacheStatistics);
+
+			managementService.init();
+
+			return managementService;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<MBeanServer> serviceReference,
+			ManagementService managementService) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<MBeanServer> serviceReference,
+			ManagementService managementService) {
+
+			Registry registry = RegistryUtil.getRegistry();
+
+			registry.ungetService(serviceReference);
+
+			managementService.dispose();
+		}
+
+	}
 
 }

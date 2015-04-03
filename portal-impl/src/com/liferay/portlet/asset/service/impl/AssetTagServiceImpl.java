@@ -54,14 +54,15 @@ import java.util.TreeSet;
 public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 
 	@Override
-	public AssetTag addTag(String name, ServiceContext serviceContext)
+	public AssetTag addTag(
+			long groupId, String name, ServiceContext serviceContext)
 		throws PortalException {
 
 		AssetPermission.check(
-			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			ActionKeys.ADD_TAG);
+			getPermissionChecker(), groupId, ActionKeys.ADD_TAG);
 
-		return assetTagLocalService.addTag(getUserId(), name, serviceContext);
+		return assetTagLocalService.addTag(
+			getUserId(), groupId, name, serviceContext);
 	}
 
 	@Override
@@ -211,7 +212,8 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 		long[] groupIds, String name, int start, int end) {
 
 		if (Validator.isNull(name)) {
-			return assetTagPersistence.filterFindByGroupId(groupIds);
+			return assetTagPersistence.filterFindByGroupId(
+				groupIds, start, end, new AssetTagNameComparator());
 		}
 
 		return assetTagPersistence.filterFindByG_LikeN(

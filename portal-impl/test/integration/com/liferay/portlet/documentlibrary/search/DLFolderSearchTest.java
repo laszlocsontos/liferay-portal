@@ -28,8 +28,8 @@ import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -59,6 +59,24 @@ public class DLFolderSearchTest extends BaseSearchTestCase {
 	@Override
 	@Test
 	public void testSearchAttachments() throws Exception {
+	}
+
+	@Override
+	@Test
+	public void testSearchBaseModel() throws Exception {
+		searchBaseModel(1);
+	}
+
+	@Override
+	@Test
+	public void testSearchBaseModelWithDelete() throws Exception {
+		searchBaseModelWithDelete(1);
+	}
+
+	@Override
+	@Test
+	public void testSearchBaseModelWithTrash() throws Exception {
+		searchBaseModelWithTrash(1);
 	}
 
 	@Ignore()
@@ -129,8 +147,9 @@ public class DLFolderSearchTest extends BaseSearchTestCase {
 			folderId = parentDLFolder.getFolderId();
 		}
 
-		Folder folder = DLAppTestUtil.addFolder(
-			folderId, keywords, serviceContext);
+		Folder folder = DLAppServiceUtil.addFolder(
+			serviceContext.getScopeGroupId(), folderId, keywords,
+			RandomTestUtil.randomString(), serviceContext);
 
 		return (DLFolder)folder.getModel();
 	}
@@ -150,10 +169,11 @@ public class DLFolderSearchTest extends BaseSearchTestCase {
 			BaseModel<?> parentBaseModel, ServiceContext serviceContext)
 		throws Exception {
 
-		Folder folder = DLAppTestUtil.addFolder(
+		Folder folder = DLAppServiceUtil.addFolder(
+			serviceContext.getScopeGroupId(),
 			(Long)parentBaseModel.getPrimaryKeyObj(),
 			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH),
-			serviceContext);
+			RandomTestUtil.randomString(), serviceContext);
 
 		return (DLFolder)folder.getModel();
 	}
@@ -163,10 +183,11 @@ public class DLFolderSearchTest extends BaseSearchTestCase {
 			Group group, ServiceContext serviceContext)
 		throws Exception {
 
-		Folder folder = DLAppTestUtil.addFolder(
+		Folder folder = DLAppServiceUtil.addFolder(
+			serviceContext.getScopeGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH),
-			serviceContext);
+			RandomTestUtil.randomString(), serviceContext);
 
 		return (DLFolder)folder.getModel();
 	}

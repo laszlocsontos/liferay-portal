@@ -168,7 +168,7 @@
 
 		.publish-link-container {
 			padding-left: 5px;
-			width: 100%;
+			width: auto;
 
 			&.branching-enabled {
 				bottom: 5px;
@@ -188,11 +188,7 @@
 			.publish-link {
 				@include ellipsis;
 
-				padding: 5px 0;
-
-				a {
-					padding: 6px 10px;
-				}
+				padding: 5px;
 
 				em {
 					display: inline-block;

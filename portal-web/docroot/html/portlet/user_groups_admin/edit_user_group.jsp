@@ -24,6 +24,12 @@ String backURL = ParamUtil.getString(request, "backURL", redirect);
 UserGroup userGroup = (UserGroup)request.getAttribute(WebKeys.USER_GROUP);
 
 long userGroupId = BeanParamUtil.getLong(userGroup, request, "userGroupId");
+
+boolean hasUserGroupUpdatePermission = true;
+
+if (userGroup != null) {
+	hasUserGroupUpdatePermission = UserGroupPermissionUtil.contains(permissionChecker, userGroup.getUserGroupId(), ActionKeys.UPDATE);
+}
 %>
 
 <aui:form method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveUserGroup();" %>'>
@@ -44,9 +50,9 @@ long userGroupId = BeanParamUtil.getLong(userGroup, request, "userGroupId");
 	<aui:model-context bean="<%= userGroup %>" model="<%= UserGroup.class %>" />
 
 	<aui:fieldset>
-		<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" label='<%= (userGroup != null) ? "new-name" : "name" %>' name="name" />
+		<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" disabled="<%= !hasUserGroupUpdatePermission %>" label='<%= (userGroup != null) ? "new-name" : "name" %>' name="name" />
 
-		<aui:input name="description" />
+		<aui:input disabled="<%= !hasUserGroupUpdatePermission %>" name="description" />
 
 		<liferay-ui:custom-attributes-available className="<%= UserGroup.class.getName() %>">
 			<liferay-ui:custom-attribute-list
@@ -116,11 +122,24 @@ long userGroupId = BeanParamUtil.getLong(userGroup, request, "userGroupId");
 
 			<%
 			boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(permissionChecker, ActionKeys.UNLINK_LAYOUT_SET_PROTOTYPE);
+
+			boolean hasUpdateSitePermission = false;
+
+			if (userGroupGroup != null) {
+				hasUpdateSitePermission = GroupPermissionUtil.contains(permissionChecker, userGroupGroup, ActionKeys.UPDATE);
+			}
+			else {
+				for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
+					if (GroupPermissionUtil.contains(permissionChecker, layoutSetPrototype.getGroup(), ActionKeys.UPDATE)) {
+						hasUpdateSitePermission = true;
+					}
+				}
+			}
 			%>
 
 			<c:choose>
 				<c:when test="<%= ((userGroupGroup == null) || ((publicLayoutSetPrototype == null) && (userGroupGroup.getPublicLayoutsPageCount() == 0))) && !layoutSetPrototypes.isEmpty() %>">
-					<aui:select label="public-pages" name="publicLayoutSetPrototypeId">
+					<aui:select disabled="<%= !hasUpdateSitePermission || !hasUserGroupUpdatePermission %>" label="public-pages" name="publicLayoutSetPrototypeId">
 						<aui:option label="none" selected="<%= true %>" value="" />
 
 						<%
@@ -152,19 +171,13 @@ long userGroupId = BeanParamUtil.getLong(userGroup, request, "userGroupId");
 							<c:when test="<%= userGroupGroup != null %>">
 								<c:choose>
 									<c:when test="<%= userGroupGroup.getPublicLayoutsPageCount() > 0 %>">
-										<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="publicPagesURL">
-											<portlet:param name="struts_action" value="/MY_SITES/view" />
-											<portlet:param name="groupId" value="<%= String.valueOf(userGroupGroup.getGroupId()) %>" />
-											<portlet:param name="publicLayout" value="<%= Boolean.TRUE.toString() %>" />
-										</liferay-portlet:actionURL>
-
 										<liferay-ui:icon
 											iconCssClass="icon-search"
 											label="<%= true %>"
 											message="open-pages"
 											method="get"
 											target="_blank"
-											url="<%= publicPagesURL.toString() %>"
+											url="<%= userGroupGroup.getDisplayURL(themeDisplay, false) %>"
 										/>
 									</c:when>
 									<c:otherwise>
@@ -190,7 +203,7 @@ long userGroupId = BeanParamUtil.getLong(userGroup, request, "userGroupId");
 
 			<c:choose>
 				<c:when test="<%= ((userGroup == null) || ((privateLayoutSetPrototype == null) && (userGroupGroup.getPrivateLayoutsPageCount() == 0))) && !layoutSetPrototypes.isEmpty() %>">
-					<aui:select label="private-pages" name="privateLayoutSetPrototypeId">
+					<aui:select disabled="<%= !hasUpdateSitePermission || !hasUserGroupUpdatePermission %>" label="private-pages" name="privateLayoutSetPrototypeId">
 						<aui:option label="none" selected="<%= true %>" value="" />
 
 						<%
@@ -222,19 +235,13 @@ long userGroupId = BeanParamUtil.getLong(userGroup, request, "userGroupId");
 							<c:when test="<%= userGroupGroup != null %>">
 								<c:choose>
 									<c:when test="<%= userGroupGroup.getPrivateLayoutsPageCount() > 0 %>">
-										<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="privatePagesURL">
-											<portlet:param name="struts_action" value="/MY_SITES/view" />
-											<portlet:param name="groupId" value="<%= String.valueOf(userGroupGroup.getGroupId()) %>" />
-											<portlet:param name="privateLayout" value="<%= Boolean.TRUE.toString() %>" />
-										</liferay-portlet:actionURL>
-
 										<liferay-ui:icon
 											iconCssClass="icon-search"
 											label="<%= true %>"
 											message="open-pages"
 											method="get"
 											target="_blank"
-											url="<%= privatePagesURL.toString() %>"
+											url="<%= userGroupGroup.getDisplayURL(themeDisplay, true) %>"
 										/>
 									</c:when>
 									<c:otherwise>
@@ -261,9 +268,9 @@ long userGroupId = BeanParamUtil.getLong(userGroup, request, "userGroupId");
 	</c:if>
 
 	<aui:button-row>
-		<aui:button type="submit" />
+		<aui:button disabled="<%= !hasUserGroupUpdatePermission %>" type="submit" />
 
-		<aui:button href="<%= redirect %>" type="cancel" />
+		<aui:button disabled="<%= !hasUserGroupUpdatePermission %>" href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
 </aui:form>
 

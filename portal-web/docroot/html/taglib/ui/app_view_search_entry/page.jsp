@@ -18,6 +18,7 @@
 
 <%
 String actionJsp = (String)request.getAttribute("liferay-ui:app-view-search-entry:actionJsp");
+ServletContext actionJspServletContext = (ServletContext)request.getAttribute("liferay-ui:app-view-entry:actionJspServletContext");
 String containerName = (String)request.getAttribute("liferay-ui:app-view-search-entry:containerName");
 String containerType = GetterUtil.getString(request.getAttribute("liferay-ui:app-view-search-entry:containerType"), LanguageUtil.get(locale, "folder"));
 String cssClass = GetterUtil.getString((String)request.getAttribute("liferay-ui:app-view-search-entry:cssClass"));
@@ -36,7 +37,7 @@ String title = (String)request.getAttribute("liferay-ui:app-view-search-entry:ti
 String url = (String)request.getAttribute("liferay-ui:app-view-search-entry:url");
 List<String> versions = (List<String>)request.getAttribute("liferay-ui:app-view-search-entry:versions");
 
-Summary summary = new Summary(title, description, null);
+Summary summary = new Summary(title, description);
 
 summary.setHighlight(highlightEnabled);
 summary.setQueryTerms(queryTerms);
@@ -149,7 +150,7 @@ summary.setQueryTerms(queryTerms);
 		for (MBMessage mbMessage : mbMessages) {
 			User userDisplay = UserLocalServiceUtil.getUser(mbMessage.getUserId());
 
-			summary = new Summary(null, mbMessage.getBody(), null);
+			summary = new Summary(null, mbMessage.getBody());
 
 			summary.setHighlight(highlightEnabled);
 			summary.setQueryTerms(queryTerms);
@@ -186,7 +187,7 @@ summary.setQueryTerms(queryTerms);
 	</c:if>
 
 	<c:if test="<%= Validator.isNotNull(actionJsp) %>">
-		<liferay-util:include page="<%= actionJsp %>">
+		<liferay-util:include page="<%= actionJsp %>" servletContext="<%= actionJspServletContext %>">
 			<liferay-util:param name="showMinimalActionButtons" value="<%= String.valueOf(Boolean.TRUE) %>" />
 		</liferay-util:include>
 	</c:if>

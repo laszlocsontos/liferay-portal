@@ -60,7 +60,6 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +75,7 @@ import javax.portlet.WindowState;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletContextListener;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -184,6 +183,11 @@ public class PortletTracker
 		if (serviceRegistrations == null) {
 			return;
 		}
+
+		BundlePortletApp bundlePortletApp =
+			serviceRegistrations.getBundlePortletApp();
+
+		bundlePortletApp.removePortlet(portletModel);
 
 		serviceRegistrations.removeServiceReference(serviceReference);
 
@@ -305,10 +309,11 @@ public class PortletTracker
 		com.liferay.portal.model.Portlet portletModel =
 			_portletLocalService.createPortlet(0);
 
+		portletModel.setPortletId(portletId);
+
 		portletModel.setCompanyId(CompanyConstants.SYSTEM);
 		portletModel.setPluginPackage(bundlePortletApp.getPluginPackage());
 		portletModel.setPortletApp(bundlePortletApp);
-		portletModel.setPortletId(portletId);
 		portletModel.setRoleMappers(bundlePortletApp.getRoleMappers());
 		portletModel.setStrutsPath(portletId);
 
@@ -926,10 +931,13 @@ public class PortletTracker
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
 			bundlePortletApp.getServletContextName());
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_LISTENER,
+			Boolean.TRUE.toString());
 
 		serviceRegistrations.addServiceRegistration(
 			bundleContext.registerService(
-				EventListener.class, bundlePortletApp, properties));
+				ServletContextListener.class, bundlePortletApp, properties));
 
 		return bundlePortletApp;
 	}
@@ -958,7 +966,7 @@ public class PortletTracker
 				ServletContextHelper.class, servletContextHelper, properties));
 	}
 
-	protected ServiceRegistration<Servlet> createDefaultServlet(
+	protected ServiceRegistration<?> createDefaultServlet(
 		BundleContext bundleContext, String contextName) {
 
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
@@ -970,10 +978,10 @@ public class PortletTracker
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_RESOURCE_PREFIX,
 			"/META-INF/resources");
 		properties.put(
-			HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/*");
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_RESOURCE_PATTERN, "/*");
 
 		return bundleContext.registerService(
-			Servlet.class, new HttpServlet() {}, properties);
+			Object.class, new Object(), properties);
 	}
 
 	protected ServiceRegistration<Servlet> createJspServlet(
@@ -1122,7 +1130,9 @@ public class PortletTracker
 			properties.get(
 				HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT_ATTRIBUTE));
 
-		_httpServiceEndpoint = httpServiceEndpoints.get(0);
+		if (!httpServiceEndpoints.isEmpty()) {
+			_httpServiceEndpoint = httpServiceEndpoints.get(0);
+		}
 	}
 
 	@Reference(unbind = "-")
@@ -1198,7 +1208,7 @@ public class PortletTracker
 
 	private CompanyLocalService _companyLocalService;
 	private ComponentContext _componentContext;
-	private String _httpServiceEndpoint;
+	private String _httpServiceEndpoint = StringPool.BLANK;
 	private PortletInstanceFactory _portletInstanceFactory;
 	private PortletLocalService _portletLocalService;
 	private final PortletPropertyValidator _portletPropertyValidator =

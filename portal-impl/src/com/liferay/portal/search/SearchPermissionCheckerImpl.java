@@ -44,10 +44,8 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerBag;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
-import com.liferay.portal.security.permission.ResourceBlockIdsBag;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ResourceBlockLocalServiceUtil;
-import com.liferay.portal.service.ResourceBlockPermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
@@ -203,28 +201,10 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 		boolean[] hasResourcePermissions = null;
 
 		if (ResourceBlockLocalServiceUtil.isSupported(className)) {
-			ResourceBlockIdsBag resourceBlockIdsBag =
-				ResourceBlockLocalServiceUtil.getResourceBlockIdsBag(
-					companyId, groupId, className, roleIdsArray);
-
-			long actionId = ResourceBlockLocalServiceUtil.getActionId(
-				className, ActionKeys.VIEW);
-
-			List<Long> resourceBlockIds =
-				resourceBlockIdsBag.getResourceBlockIds(actionId);
-
-			hasResourcePermissions = new boolean[roleIdsArray.length];
-
-			for (long resourceBlockId : resourceBlockIds) {
-				for (int i = 0; i < roleIdsArray.length; i++) {
-					int count =
-						ResourceBlockPermissionLocalServiceUtil.
-							getResourceBlockPermissionsCount(
-								resourceBlockId, roleIdsArray[i]);
-
-					hasResourcePermissions[i] = (count > 0);
-				}
-			}
+			hasResourcePermissions =
+				ResourceBlockLocalServiceUtil.hasIndividualPermissions(
+					className, Long.valueOf(classPK), roleIdsArray,
+					ActionKeys.VIEW);
 		}
 		else {
 			hasResourcePermissions =
@@ -335,7 +315,7 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 			PermissionCheckerBag userBag = advancedPermissionChecker.getUserBag(
 				userId, group.getGroupId());
 
-			List<Role> groupRoles = userBag.getRoles();
+			List<Role> groupRoles = ListUtil.fromCollection(userBag.getRoles());
 
 			groupIdsToRoles.put(group.getGroupId(), groupRoles);
 
@@ -428,13 +408,17 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 				}
 			}
 
-			for (long groupId : groupIds) {
-				if (ResourcePermissionLocalServiceUtil.hasResourcePermission(
-						companyId, className, ResourceConstants.SCOPE_GROUP,
-						String.valueOf(groupId), role.getRoleId(),
-						ActionKeys.VIEW)) {
+			if (ArrayUtil.isNotEmpty(groupIds)) {
+				for (long groupId : groupIds) {
+					if (ResourcePermissionLocalServiceUtil.
+							hasResourcePermission(
+								companyId, className,
+								ResourceConstants.SCOPE_GROUP,
+								String.valueOf(groupId), role.getRoleId(),
+								ActionKeys.VIEW)) {
 
-					groupsQuery.addTerm(Field.GROUP_ID, groupId);
+						groupsQuery.addTerm(Field.GROUP_ID, groupId);
+					}
 				}
 			}
 

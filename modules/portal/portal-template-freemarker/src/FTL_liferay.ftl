@@ -35,14 +35,8 @@ LPS-30525.
 	</#if>
 </#function>
 
-<#macro breadcrumbs
-	control_panel = ""
->
-	<#if control_panel = "control_panel">
-		${theme.breadcrumb(0, false, false, true, true)}
-	<#else>
-		${theme.breadcrumb()}
-	</#if>
+<#macro breadcrumbs>
+	${theme.runtime("com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry", portletProviderAction.VIEW)}
 </#macro>
 
 <#macro css
@@ -62,52 +56,6 @@ ${dateUtil.getCurrentDate(format, locale)}</#macro>
 
 <#macro dockbar>
 	${theme.runtime("145")}
-</#macro>
-
-<#macro ie6_png_fix>
-<#if browserSniffer.isIe(request) && browserSniffer.getMajorVersion(request) < 7>
-/* ---------- IE6 PNG image fix ---------- */
-img, .png {
-	position: relative;
-	behavior: expression(
-		(this.runtimeStyle.behavior = "none") &&
-		(
-			this.pngSet || (this.src && this.src.toLowerCase().indexOf('spacer.png') > -1) ?
-				this.pngSet = true :
-					(
-						this.nodeName == "IMG" &&
-						(
-							(
-								(this.src.toLowerCase().indexOf('.png') > -1) ||
-								(this.className && ([''].concat(this.className.split(' ')).concat(['']).join('|').indexOf('|png|')) > -1)
-							) &&
-							(this.className.indexOf('no-png-fix') == -1)
-						) ?
-							(
-								this.runtimeStyle.backgroundImage = "none",
-								this.runtimeStyle.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.src + "', sizingMethod='image')",
-								this.src = "${images_folder}/spacer.png"
-							) :
-								(
-									(
-										(this.currentStyle.backgroundImage.toLowerCase().indexOf('.png') > -1) ||
-										(this.className && ([''].concat(this.className.split(' ')).concat(['']).join('|').indexOf('|png|')) > -1)
-									) ?
-										(
-												this.origBg = this.origBg ?
-													this.origBg :
-													this.currentStyle.backgroundImage.toString().replace('url("','').replace('")',''),
-													this.runtimeStyle.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.origBg + "', sizingMethod='crop')",
-													this.runtimeStyle.backgroundImage = "none"
-										) :
-											''
-								)
-					),
-					this.pngSet = true
-		)
-	);
-}
-</#if>
 </#macro>
 
 <#macro js
@@ -130,6 +78,10 @@ ${languageUtil.get(locale, key)}</#macro>
 	key
 >
 ${languageUtil.format(locale, key, arguments)}</#macro>
+
+<#macro languages>
+	${theme.runtime("com.liferay.portal.kernel.servlet.taglib.ui.LanguageEntry", portletProviderAction.VIEW)}
+</#macro>
 
 <#macro quick_access
 	content_id

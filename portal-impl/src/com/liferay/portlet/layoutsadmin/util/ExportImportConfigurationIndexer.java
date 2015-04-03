@@ -41,7 +41,6 @@ import java.util.TimeZone;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 
 /**
  * @author Mate Thurzo
@@ -66,6 +65,8 @@ public class ExportImportConfigurationIndexer extends BaseIndexer {
 	public void postProcessContextQuery(
 			BooleanQuery contextQuery, SearchContext searchContext)
 		throws Exception {
+
+		addStatus(contextQuery, searchContext);
 
 		contextQuery.addRequiredTerm(
 			Field.COMPANY_ID, searchContext.getCompanyId());
@@ -138,21 +139,11 @@ public class ExportImportConfigurationIndexer extends BaseIndexer {
 	@Override
 	protected Summary doGetSummary(
 			Document document, Locale locale, String snippet,
-			PortletURL portletURL, PortletRequest portletRequest,
-			PortletResponse portletResponse)
+			PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception {
-
-		String exportImportConfigurationId = document.get(Field.ENTRY_CLASS_PK);
 
 		Summary summary = createSummary(
 			document, Field.TITLE, Field.DESCRIPTION);
-
-		portletURL.setParameter(
-			"struts_action", "/layouts_admin/edit_export_configuration");
-		portletURL.setParameter(
-			"exportImportConfigurationId", exportImportConfigurationId);
-
-		summary.setPortletURL(portletURL);
 
 		return summary;
 	}

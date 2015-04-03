@@ -235,12 +235,6 @@
 		<column name="clusterNodeIds" type="String" />
 		<column name="wholeCluster" type="boolean" />
 	</entity>
-	<entity name="CMISRepository" local-service="true" remote-service="false">
-
-		<!-- References -->
-
-		<reference package-path="com.liferay.portal" entity="Repository" />
-	</entity>
 	<entity name="Company" local-service="true" remote-service="true">
 
 		<!-- PK fields -->
@@ -676,6 +670,7 @@
 		<reference package-path="com.liferay.portlet.social" entity="SocialRequest" />
 		<reference package-path="com.liferay.portlet.softwarecatalog" entity="SCFrameworkVersion" />
 		<reference package-path="com.liferay.portlet.softwarecatalog" entity="SCProductEntry" />
+		<reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
 	<entity name="Image" local-service="true" remote-service="true">
 
