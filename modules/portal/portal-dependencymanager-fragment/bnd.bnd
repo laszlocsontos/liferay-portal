@@ -1,7 +1,9 @@
 Bundle-Name: Liferay Dependency Manager TCCL Fragment
 Bundle-SymbolicName: com.liferay.dm.tccl.fragment
 Bundle-Version: 1.0.0
-Export-Package: com.liferay.portal.dm.tccl
+Export-Package:\
+	com.liferay.portal.dm.tccl,\
+	com.liferay.portal.dm.util
 Fragment-Host: org.apache.felix.dependencymanager
 Import-Package: org.osgi.framework.*
 Include-Resource:\

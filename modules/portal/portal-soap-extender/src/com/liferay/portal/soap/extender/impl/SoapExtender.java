@@ -17,6 +17,7 @@ package com.liferay.portal.soap.extender.impl;
 import aQute.bnd.annotation.metatype.Configurable;
 
 import com.liferay.portal.dm.tccl.TCCLDependencyManager;
+import com.liferay.portal.dm.util.ComponentUtil;
 import com.liferay.portal.soap.extender.api.SoapDescriptorBuilder;
 import com.liferay.portal.soap.extender.configuration.SoapExtenderConfiguration;
 
@@ -57,6 +58,8 @@ public class SoapExtender {
 		_dependencyManager = new TCCLDependencyManager(bundleContext);
 
 		_component = _dependencyManager.createComponent();
+
+		_componentHelper = ComponentUtil.createHelper(_component);
 
 		CXFJaxWSServiceRegistrator jaxwsServiceRegistrator =
 			new CXFJaxWSServiceRegistrator();
@@ -118,7 +121,7 @@ public class SoapExtender {
 				String contextPathFilterString =
 					"(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH +
 						"=" + contextPath + ")";
-				addTCCLDependency(
+				_componentHelper.addTCCLDependency(
 					true, Bus.class, contextPathFilterString, "addBus",
 					"removeBus");
 			}
@@ -133,7 +136,7 @@ public class SoapExtender {
 
 		if (handlersFilters != null) {
 			for (String handlerFilter : handlersFilters) {
-				addTCCLDependency(
+				_componentHelper.addTCCLDependency(
 					false, Handler.class, handlerFilter, "addHandler",
 					"removeHandler");
 			}
@@ -148,7 +151,7 @@ public class SoapExtender {
 
 		if (serviceFilters != null) {
 			for (String serviceFilter : serviceFilters) {
-				addTCCLDependency(
+				_componentHelper.addTCCLDependency(
 					false, null, serviceFilter, "addService", "removeService");
 			}
 		}
@@ -172,30 +175,8 @@ public class SoapExtender {
 		_component.add(serviceDependency);
 	}
 
-	protected ServiceDependency addTCCLDependency(
-		boolean required, Class<?> clazz, String filter, String addName,
-		String removeName) {
-
-		ServiceDependency serviceDependency =
-			_dependencyManager.createTCCLServiceDependency();
-
-		serviceDependency.setRequired(required);
-
-		if (clazz == null) {
-			serviceDependency.setService(filter);
-		}
-		else {
-			serviceDependency.setService(clazz, filter);
-		}
-
-		serviceDependency.setCallbacks(addName, removeName);
-
-		_component.add(serviceDependency);
-
-		return serviceDependency;
-	}
-
 	private org.apache.felix.dm.Component _component;
+	private ComponentUtil.TCCLComponentHelper _componentHelper;
 	private TCCLDependencyManager _dependencyManager;
 	private SoapDescriptorBuilder _soapDescriptorBuilder;
 	private SoapExtenderConfiguration _soapExtenderConfiguration;
