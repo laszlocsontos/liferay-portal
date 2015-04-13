@@ -32,8 +32,7 @@ public class EditorUtil {
 		if (langType.equals("css")) {
 			editorMode = "css";
 		}
-		else if (langType.equals("xml") ||
-				 langType.equals("xsl") ||
+		else if (langType.equals("xml") || langType.equals("xsl") ||
 				 langType.equals("xsd")) {
 
 			editorMode = "xml";
@@ -42,6 +41,10 @@ public class EditorUtil {
 		return editorMode;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public static String getEditorValue(
 		HttpServletRequest request, String editorImpl) {
 

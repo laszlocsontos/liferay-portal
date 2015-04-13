@@ -822,6 +822,9 @@ public class DLFileEntryLocalServiceImpl
 
 			expandoRowLocalService.deleteRows(dlFileVersion.getFileVersionId());
 
+			dlFileEntryMetadataLocalService.deleteFileVersionFileEntryMetadata(
+				dlFileVersion.getFileVersionId());
+
 			workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
 				dlFileVersion.getCompanyId(), dlFileVersion.getGroupId(),
 				DLFileEntryConstants.getClassName(),
@@ -1162,13 +1165,16 @@ public class DLFileEntryLocalServiceImpl
 		return dlFileEntryPersistence.countAll();
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public int getFileEntriesCount(
 		long groupId, DateRange dateRange, long repositoryId,
 		QueryDefinition<DLFileEntry> queryDefinition) {
 
-		return dlFileEntryFinder.countByG_M_R(
-			groupId, dateRange, repositoryId, queryDefinition);
+		return 0;
 	}
 
 	@Override

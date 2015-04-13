@@ -31,6 +31,8 @@ String closeRedirect = ParamUtil.getString(request, "closeRedirect");
 
 String publishConfigurationButtons = ParamUtil.getString(request, "publishConfigurationButtons", "custom");
 
+boolean quickPublish = ParamUtil.getBoolean(request, "quickPublish");
+
 long exportImportConfigurationId = 0;
 
 ExportImportConfiguration exportImportConfiguration = null;
@@ -70,8 +72,6 @@ boolean localPublishing = true;
 if ((liveGroup.isStaged() && liveGroup.isStagedRemotely()) || cmd.equals(Constants.PUBLISH_TO_REMOTE)) {
 	localPublishing = false;
 }
-
-boolean quickPublish = ParamUtil.getBoolean(request, "quickPublish");
 
 String treeId = "liveLayoutsTree";
 
@@ -113,15 +113,7 @@ long[] selectedLayoutIds = null;
 String openNodes = SessionTreeJSClicks.getOpenNodes(request, treeId + "SelectedNode");
 
 if (openNodes == null) {
-	List<Layout> stagingGroupLayouts = LayoutLocalServiceUtil.getLayouts(stagingGroupId, privateLayout);
-
-	selectedLayoutIds = new long[stagingGroupLayouts.size()];
-
-	for (int i = 0; i < stagingGroupLayouts.size(); i++) {
-		Layout stagingGroupLayout = stagingGroupLayouts.get(i);
-
-		selectedLayoutIds[i] = stagingGroupLayout.getLayoutId();
-	}
+	selectedLayoutIds = ExportImportHelperUtil.getAllLayoutIds(stagingGroupId, privateLayout);
 }
 else {
 	selectedLayoutIds = GetterUtil.getLongValues(StringUtil.split(openNodes, ','));
@@ -186,7 +178,14 @@ else if (!quickPublish) {
 }
 %>
 
-<liferay-ui:trash-undo />
+<portlet:actionURL var="restoreTrashEntriesURL">
+	<portlet:param name="struts_action" value="/layouts_admin/edit_export_configuration" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo
+	portletURL="<%= restoreTrashEntriesURL %>"
+/>
 
 <liferay-ui:tabs
 	names="<%= tabs2Names %>"
@@ -346,7 +345,11 @@ else if (!quickPublish) {
 								</aui:fieldset>
 							</c:if>
 
-							<liferay-staging:content parameterMap="<%= parameterMap %>" type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>" />
+							<liferay-staging:content cmd="<%= cmd %>" parameterMap="<%= parameterMap %>" type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>" />
+
+							<c:if test="<%= !quickPublish %>">
+								<liferay-staging:deletions cmd="<%= Constants.PUBLISH %>" />
+							</c:if>
 
 							<aui:fieldset cssClass="options-group" label="permissions">
 								<%@ include file="/html/portlet/layouts_admin/export_configuration/permissions.jspf" %>
@@ -394,6 +397,7 @@ else if (!quickPublish) {
 				<liferay-util:param name="groupId" value="<%= String.valueOf(stagingGroupId) %>" />
 				<liferay-util:param name="liveGroupId" value="<%= String.valueOf(liveGroupId) %>" />
 				<liferay-util:param name="localPublishing" value="<%= String.valueOf(localPublishing) %>" />
+				<liferay-util:param name="quickPublish" value="<%= String.valueOf(quickPublish) %>" />
 			</liferay-util:include>
 		</div>
 	</liferay-ui:section>
@@ -452,13 +456,13 @@ else if (!quickPublish) {
 		<portlet:param name="liveGroupId" value="<%= String.valueOf(liveGroupId) %>" />
 		<portlet:param name="localPublishing" value="<%= String.valueOf(localPublishing) %>" />
 		<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
+		<portlet:param name="quickPublish" value="<%= String.valueOf(quickPublish) %>" />
 	</liferay-portlet:resourceURL>
 
 	new Liferay.ExportImport(
 		{
 			commentsNode: '#<%= PortletDataHandlerKeys.COMMENTS %>',
 			deleteMissingLayoutsNode: '#<%= PortletDataHandlerKeys.DELETE_MISSING_LAYOUTS %>',
-			deletePortletDataNode: '#<%= PortletDataHandlerKeys.DELETE_PORTLET_DATA %>',
 			deletionsNode: '#<%= PortletDataHandlerKeys.DELETIONS %>',
 			form: document.<portlet:namespace />exportPagesFm,
 			incompleteProcessMessageNode: '#<portlet:namespace />incompleteProcessMessage',
@@ -474,7 +478,6 @@ else if (!quickPublish) {
 			rangeLastPublishNode: '#rangeLastPublish',
 			ratingsNode: '#<%= PortletDataHandlerKeys.RATINGS %>',
 			remoteAddressNode: '#<portlet:namespace />remoteAddress',
-			remoteDeletePortletDataNode: '#remoteDeletePortletData',
 			remoteGroupIdNode: '#<portlet:namespace />remoteGroupId',
 			remotePathContextNode: '#<portlet:namespace />remotePathContext',
 			remotePortNode: '#<portlet:namespace />remotePort',

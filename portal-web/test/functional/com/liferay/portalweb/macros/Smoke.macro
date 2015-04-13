@@ -1,0 +1,64 @@
+<definition>
+	<command name="runSmoke" summary-ignore="true">
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Test Page1" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Test Page2" />
+		</execute>
+
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Test Page3" />
+		</execute>
+
+		<var name="pageName" value="Test Page1" />
+		<var name="portletBody" value="Welcome to Liferay Portal" />
+		<var name="portletName" value="Hello World" />
+
+		<task summary="Add a '${portletName}' portlet to the page named '${pageName}'">
+			<execute macro="Page#gotoPG">
+				<var name="pageName" value="${pageName}" />
+			</execute>
+
+			<execute macro="Portlet#addPG">
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="Portlet#viewTitle">
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="Portlet#viewBody">
+				<var name="portletBody" value="${portletBody}" />
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="Page#gotoPG">
+				<var name="pageName" value="${pageName}" />
+			</execute>
+
+			<execute macro="Portlet#viewTitle">
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="Portlet#viewBody">
+				<var name="portletBody" value="${portletBody}" />
+				<var name="portletName" value="${portletName}" />
+			</execute>
+		</task>
+
+		<var name="portletName" value="Blogs" />
+		<var name="portletTitle" value="Blogs" />
+
+		<task macro-summary="Page#gotoContentCP">
+			<execute macro="Page#gotoContentCP">
+				<var name="portletName" value="${portletName}" />
+			</execute>
+
+			<execute macro="SiteAdmin#viewPortletTitle">
+				<var name="portletTitle" value="${portletTitle}" />
+			</execute>
+		</task>
+	</command>
+</definition>

@@ -72,6 +72,7 @@ import com.liferay.portlet.asset.service.permission.AssetTagPermission;
 import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
@@ -396,15 +397,6 @@ public class AssetUtil {
 					"recordSetId", String.valueOf(classTypeId));
 			}
 
-			if (className.equals(DLFileEntry.class.getName())) {
-				addPortletURL.setParameter(Constants.CMD, Constants.ADD);
-				addPortletURL.setParameter(
-					"folderId",
-					String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID));
-				addPortletURL.setParameter(
-					"fileEntryTypeId", String.valueOf(classTypeId));
-			}
-
 			if (className.equals(JournalArticle.class.getName())) {
 				DDMStructure ddmStructure =
 					DDMStructureLocalServiceUtil.getStructure(classTypeId);
@@ -412,6 +404,23 @@ public class AssetUtil {
 				addPortletURL.setParameter(
 					"ddmStructureKey", ddmStructure.getStructureKey());
 			}
+		}
+
+		if (className.equals(DLFileEntry.class.getName())) {
+			addPortletURL.setParameter(Constants.CMD, Constants.ADD);
+			addPortletURL.setParameter(
+				"folderId",
+				String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID));
+
+			long fileEntryTypeId =
+				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT;
+
+			if (classTypeId >= 0) {
+				fileEntryTypeId = classTypeId;
+			}
+
+			addPortletURL.setParameter(
+				"fileEntryTypeId", String.valueOf(fileEntryTypeId));
 		}
 
 		addPortletURL.setPortletMode(PortletMode.VIEW);
@@ -477,11 +486,10 @@ public class AssetUtil {
 			ClassTypeReader classTypeReader =
 				assetRendererFactory.getClassTypeReader();
 
-			List<ClassType> classTypes =
-				classTypeReader.getAvailableClassTypes(
-					PortalUtil.getCurrentAndAncestorSiteGroupIds(
-						themeDisplay.getScopeGroupId()),
-					themeDisplay.getLocale());
+			List<ClassType> classTypes = classTypeReader.getAvailableClassTypes(
+				PortalUtil.getCurrentAndAncestorSiteGroupIds(
+					themeDisplay.getScopeGroupId()),
+				themeDisplay.getLocale());
 
 			if ((classTypeIds.length == 0) || classTypes.isEmpty()) {
 				PortletURL addPortletURL = getAddPortletURL(
@@ -810,32 +818,25 @@ public class AssetUtil {
 		return assetSearcher;
 	}
 
-	protected static Sort getSort(
-			String orderByType, String sortField, Locale locale)
-		throws Exception {
+	protected static String getDDMFormFieldType(String sortField)
+		throws PortalException {
 
-		if (Validator.isNull(orderByType)) {
-			orderByType = "asc";
-		}
+		String[] sortFields = sortField.split(DDMIndexer.DDM_FIELD_SEPARATOR);
 
-		int sortType = getSortType(sortField);
+		long ddmStructureId = GetterUtil.getLong(sortFields[1]);
+		String fieldName = sortFields[2];
 
+		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.getStructure(
+			ddmStructureId);
+
+		return ddmStructure.getFieldType(fieldName);
+	}
+
+	protected static String getOrderByCol(String sortField, Locale locale) {
 		if (sortField.startsWith(DDMIndexer.DDM_FIELD_PREFIX)) {
-			String[] sortFields = sortField.split(
-				DDMIndexer.DDM_FIELD_SEPARATOR);
-
-			long ddmStructureId = GetterUtil.getLong(sortFields[1]);
-			String fieldName = sortFields[2];
-
-			DDMStructure ddmStructure =
-				DDMStructureLocalServiceUtil.getStructure(ddmStructureId);
-
-			String fieldType = ddmStructure.getFieldType(fieldName);
-
-			sortType = getSortType(fieldType);
-
-			sortField = sortField.concat(StringPool.UNDERLINE).concat(
-				LocaleUtil.toLanguageId(locale));
+			sortField = DocumentImpl.getSortableFieldName(
+				sortField.concat(StringPool.UNDERLINE).concat(
+					LocaleUtil.toLanguageId(locale)));
 		}
 		else if (sortField.equals("modifiedDate")) {
 			sortField = Field.MODIFIED_DATE;
@@ -845,8 +846,23 @@ public class AssetUtil {
 				"localized_title_".concat(LocaleUtil.toLanguageId(locale)));
 		}
 
+		return sortField;
+	}
+
+	protected static Sort getSort(
+			String orderByType, String sortField, Locale locale)
+		throws Exception {
+
+		String ddmFormFieldType = sortField;
+
+		if (ddmFormFieldType.startsWith(DDMIndexer.DDM_FIELD_PREFIX)) {
+			ddmFormFieldType = getDDMFormFieldType(ddmFormFieldType);
+		}
+
 		return SortFactoryUtil.getSort(
-			AssetEntry.class, sortType, sortField, orderByType);
+			AssetEntry.class, getSortType(ddmFormFieldType),
+			getOrderByCol(sortField, locale),
+			!sortField.startsWith(DDMIndexer.DDM_FIELD_PREFIX), orderByType);
 	}
 
 	protected static Sort[] getSorts(
@@ -869,8 +885,7 @@ public class AssetUtil {
 		if (sortField.equals(Field.CREATE_DATE) ||
 			sortField.equals(Field.EXPIRATION_DATE) ||
 			sortField.equals(Field.PUBLISH_DATE) ||
-			sortField.equals("ddm-date") ||
-			sortField.equals("modifiedDate")) {
+			sortField.equals("ddm-date") || sortField.equals("modifiedDate")) {
 
 			sortType = Sort.LONG_TYPE;
 		}

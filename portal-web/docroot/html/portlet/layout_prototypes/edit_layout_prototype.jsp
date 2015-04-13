@@ -21,7 +21,9 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 String backURL = ParamUtil.getString(request, "backURL", redirect);
 
-LayoutPrototype layoutPrototype = (LayoutPrototype)request.getAttribute(WebKeys.LAYOUT_PROTOTYPE);
+long layoutPrototypeId = ParamUtil.getLong(request, "layoutPrototypeId");
+
+LayoutPrototype layoutPrototype = LayoutPrototypeServiceUtil.fetchLayoutPrototype(layoutPrototypeId);
 
 if (layoutPrototype == null) {
 	layoutPrototype = new LayoutPrototypeImpl();
@@ -29,8 +31,6 @@ if (layoutPrototype == null) {
 	layoutPrototype.setNew(true);
 	layoutPrototype.setActive(true);
 }
-
-long layoutPrototypeId = BeanParamUtil.getLong(layoutPrototype, request, "layoutPrototypeId");
 %>
 
 <liferay-util:include page="/html/portlet/layout_prototypes/toolbar.jsp">
@@ -50,8 +50,9 @@ request.setAttribute("edit_layout_prototype.jsp-redirect", redirect);
 
 <liferay-util:include page="/html/portlet/layout_prototypes/merge_alert.jsp" />
 
-<aui:form method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveLayoutPrototype();" %>'>
-	<aui:input name="<%= Constants.CMD %>" type="hidden" />
+<portlet:actionURL name="editLayoutPrototype" var="editLayoutPrototypeURL" />
+
+<aui:form action="<%= editLayoutPrototypeURL %>" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="layoutPrototypeId" type="hidden" value="<%= layoutPrototypeId %>" />
 
@@ -66,11 +67,10 @@ request.setAttribute("edit_layout_prototype.jsp-redirect", redirect);
 
 		<c:if test="<%= !layoutPrototype.isNew() %>">
 			<aui:field-wrapper label="configuration">
-				<liferay-portlet:actionURL portletName="<%= PortletKeys.SITE_REDIRECTOR %>" var="viewURL">
-					<portlet:param name="struts_action" value="/my_sites/view" />
-					<portlet:param name="groupId" value="<%= String.valueOf(layoutPrototype.getGroupId()) %>" />
-					<portlet:param name="privateLayout" value="<%= Boolean.TRUE.toString() %>" />
-				</liferay-portlet:actionURL>
+
+				<%
+				Group layoutPrototypeGroup = layoutPrototype.getGroup();
+				%>
 
 				<liferay-ui:icon
 					iconCssClass="icon-search"
@@ -78,7 +78,7 @@ request.setAttribute("edit_layout_prototype.jsp-redirect", redirect);
 					message="open-page-template"
 					method="get"
 					target="_blank"
-					url="<%= viewURL %>"
+					url="<%= layoutPrototypeGroup.getDisplayURL(themeDisplay, true) %>"
 				/>
 			</aui:field-wrapper>
 		</c:if>
@@ -90,14 +90,6 @@ request.setAttribute("edit_layout_prototype.jsp-redirect", redirect);
 		<aui:button href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
 </aui:form>
-
-<aui:script>
-	function <portlet:namespace />saveLayoutPrototype() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (layoutPrototype == null) ? Constants.ADD : Constants.UPDATE %>';
-
-		submitForm(document.<portlet:namespace />fm, '<portlet:actionURL><portlet:param name="struts_action" value="/layout_prototypes/edit_layout_prototype" /></portlet:actionURL>');
-	}
-</aui:script>
 
 <%
 if (!layoutPrototype.isNew()) {

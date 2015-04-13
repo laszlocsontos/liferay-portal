@@ -65,7 +65,14 @@ if (folder != null) {
 }
 %>
 
-<liferay-ui:trash-undo />
+<portlet:actionURL var="restoreTrashEntriesURL">
+	<portlet:param name="struts_action" value="/bookmarks/edit_entry" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo
+	portletURL="<%= restoreTrashEntriesURL %>"
+/>
 
 <liferay-util:include page="/html/portlet/bookmarks/top_links.jsp" servletContext="<%= application %>" />
 
@@ -131,7 +138,7 @@ if (folder != null) {
 						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="bookmarksEntriesFoldersListingPanel" persistState="<%= true %>" title='<%= (folder != null) ? "subfolders" : "folders" %>'>
 							<liferay-ui:search-container
 								curParam="cur1"
-								delta="<%= bookmarksSettings.getFoldersPerPage() %>"
+								delta="<%= bookmarksGroupServiceSettings.getFoldersPerPage() %>"
 								deltaConfigurable="<%= false %>"
 								headerNames="<%= StringUtil.merge(folderColumns) %>"
 								iteratorURL="<%= portletURL %>"
@@ -211,7 +218,7 @@ if (folder != null) {
 			%>
 
 			<liferay-ui:search-container
-				delta="<%= bookmarksSettings.getEntriesPerPage() %>"
+				delta="<%= bookmarksGroupServiceSettings.getEntriesPerPage() %>"
 				deltaConfigurable="<%= false %>"
 				emptyResultsMessage="there-are-no-entries"
 				iteratorURL="<%= portletURL %>"
@@ -231,7 +238,7 @@ if (folder != null) {
 					<%
 					String rowHREF = null;
 
-					if (BookmarksEntryPermission.contains(permissionChecker, entry, ActionKeys.VIEW)) {
+					if (BookmarksEntryPermissionChecker.contains(permissionChecker, entry, ActionKeys.VIEW)) {
 						PortletURL tempRowURL = renderResponse.createRenderURL();
 
 						tempRowURL.setParameter("struts_action", "/bookmarks/view_entry");

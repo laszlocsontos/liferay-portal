@@ -18,6 +18,7 @@ import com.liferay.poshi.runner.selenium.LiferaySelenium;
 import com.liferay.poshi.runner.selenium.SeleniumUtil;
 import com.liferay.poshi.runner.util.FileUtil;
 import com.liferay.poshi.runner.util.MathUtil;
+import com.liferay.poshi.runner.util.OSDetector;
 import com.liferay.poshi.runner.util.StringPool;
 import com.liferay.poshi.runner.util.StringUtil;
 
@@ -71,6 +72,10 @@ public class PoshiRunnerGetterUtil {
 		int x = filePath.lastIndexOf("/");
 		int y = filePath.lastIndexOf(".");
 
+		if (OSDetector.isWindows()) {
+			x = filePath.lastIndexOf("\\");
+		}
+
 		return filePath.substring(x + 1, y);
 	}
 
@@ -93,6 +98,16 @@ public class PoshiRunnerGetterUtil {
 		return classCommandName.substring(x + 1);
 	}
 
+	public static String getFileNameFromClassKey(String classKey) {
+		int x = classKey.indexOf("#");
+		int y = classKey.length();
+
+		String classType = classKey.substring(0, x);
+		String className = classKey.substring(x + 1, y);
+
+		return className + "." + classType;
+	}
+
 	public static String getProjectDir() {
 		File file = new File(StringPool.PERIOD);
 
@@ -104,9 +119,9 @@ public class PoshiRunnerGetterUtil {
 	public static Element getRootElementFromFilePath(String filePath)
 		throws Exception {
 
-		StringBuilder sb = new StringBuilder();
-
+		boolean cdata = false;
 		int lineNumber = 1;
+		StringBuilder sb = new StringBuilder();
 
 		BufferedReader bufferedReader = new BufferedReader(
 			new StringReader(FileUtil.read(filePath)));
@@ -116,16 +131,60 @@ public class PoshiRunnerGetterUtil {
 		while ((line = bufferedReader.readLine()) != null) {
 			Matcher matcher = _tagPattern.matcher(line);
 
-			if (matcher.find()) {
+			if (line.contains("<![CDATA[") || cdata) {
+				if (line.contains("]]>")) {
+					cdata = false;
+				}
+				else {
+					cdata = true;
+				}
+
+				if (line.contains("<![CDATA[") && matcher.find()) {
+					for (String reservedTag : _reservedTags) {
+						if (line.contains("<" + reservedTag)) {
+							line = StringUtil.replace(
+								line, matcher.group(),
+								matcher.group() + " line-number=\"" +
+								lineNumber + "\"");
+
+							break;
+						}
+					}
+				}
+			}
+			else if (matcher.find()) {
+				boolean tagIsReservedTag = false;
+
 				for (String reservedTag : _reservedTags) {
 					if (line.contains("<" + reservedTag)) {
 						line = StringUtil.replace(
 							line, matcher.group(),
-							matcher.group() + " line-number=\"" + lineNumber +
-								"\"");
+							matcher.group() + " line-number=\"" +
+							lineNumber + "\"");
+
+						tagIsReservedTag = true;
 
 						break;
 					}
+				}
+
+				if (!tagIsReservedTag) {
+					int x = line.indexOf("<");
+					int y = line.indexOf(" ", x);
+
+					if (y == -1) {
+						y = line.indexOf(">");
+
+						if (y == -1) {
+							y = line.indexOf(">");
+						}
+					}
+
+					String tagName = line.substring(x + 1, y);
+
+					throw new PoshiRunnerException(
+						"Invaild \"" + tagName + "\" tag\n" + filePath + ":" +
+							lineNumber);
 				}
 			}
 
@@ -136,29 +195,40 @@ public class PoshiRunnerGetterUtil {
 
 		String content = sb.toString();
 
-		InputStream inputStream = new ByteArrayInputStream(content.getBytes());
+		InputStream inputStream = new ByteArrayInputStream(
+			content.getBytes("UTF-8"));
 
 		SAXReader saxReader = new SAXReader();
 
 		Document document = saxReader.read(inputStream);
 
-		return document.getRootElement();
+		Element rootElement = document.getRootElement();
+
+		PoshiRunnerValidation.validate(rootElement, filePath);
+
+		return rootElement;
 	}
 
-	public static String getVarMethodValue(Element element) throws Exception {
-		String classCommandName = PoshiRunnerVariablesUtil.replaceCommandVars(
-			element.attributeValue("method"));
+	public static String getVarMethodValue(String classCommandName)
+		throws PoshiRunnerException {
 
-		Matcher matcher = _parameterPattern.matcher(classCommandName);
+		int x = classCommandName.indexOf("(");
+		int y = classCommandName.lastIndexOf(")");
 
 		String[] parameters = null;
 
-		while (matcher.find()) {
-			String parameterString = matcher.group(1);
+		if (y > (x + 1)) {
+			String parameterString = classCommandName.substring(x + 1, y);
 
 			parameterString = parameterString.replaceAll("\"", "");
 
-			parameters = parameterString.split(",");
+			if (parameterString.contains("#")) {
+				parameters = new String[] {
+					PoshiRunnerContext.getPathLocator(parameterString)};
+			}
+			else {
+				parameters = parameterString.split(",");
+			}
 		}
 
 		String className = getClassNameFromClassCommandName(classCommandName);
@@ -177,21 +247,26 @@ public class PoshiRunnerGetterUtil {
 			for (Method method : methods) {
 				String methodName = method.getName();
 
-				if (methodName.equals(commandName)) {
-					Class<?>[] parameterTypes = method.getParameterTypes();
+				try {
+					if (methodName.equals(commandName)) {
+						Class<?>[] parameterTypes = method.getParameterTypes();
 
-					if (parameterTypes.length > 1 ) {
-						Object returnObject = method.invoke(
-							null, (Object[])integers);
+						if (parameterTypes.length > 1 ) {
+							Object returnObject = method.invoke(
+								null, (Object[])integers);
 
-						return returnObject.toString();
+								return returnObject.toString();
+						}
+						else {
+							Object returnObject = method.invoke(
+								null, new Object[] {integers});
+
+							return returnObject.toString();
+						}
 					}
-					else {
-						Object returnObject = method.invoke(
-							null, new Object[]{integers});
-
-						return returnObject.toString();
-					}
+				}
+				catch (Exception e) {
+					throw new PoshiRunnerException(e);
 				}
 			}
 		}
@@ -200,7 +275,12 @@ public class PoshiRunnerGetterUtil {
 
 			if (parameters != null) {
 				for (int i = 0; i < parameters.length; i++) {
-					parameters[i] = parameters[i].trim();
+					if (parameters[i].length() != 1) {
+						parameters[i] = parameters[i].trim();
+					}
+					else {
+						parameters[i] = parameters[i];
+					}
 
 					parameterClasses.add(String.class);
 				}
@@ -216,31 +296,43 @@ public class PoshiRunnerGetterUtil {
 				object = liferaySelenium;
 			}
 			else {
-				clazz = Class.forName(
-					"com.liferay.poshi.runner.util." + className);
+				try {
+					clazz = Class.forName(
+						"com.liferay.poshi.runner.util." + className);
+				}
+				catch (Exception e) {
+					throw new PoshiRunnerException(
+						"\nBUILD FAILED: No such class " + className, e);
+				}
 			}
 
-			Method method = clazz.getMethod(
-				commandName,
-				parameterClasses.toArray(new Class[parameterClasses.size()]));
+			try {
+				Method method = clazz.getMethod(
+					commandName,
+					parameterClasses.toArray(
+						new Class[parameterClasses.size()]));
 
-			Object returnObject = method.invoke(object, (Object[])parameters);
+				Object returnObject = method.invoke(
+					object, (Object[])parameters);
 
-			return returnObject.toString();
+				return returnObject.toString();
+			}
+			catch (Exception e) {
+				throw new PoshiRunnerException(e);
+			}
 		}
 
 		return null;
 	}
 
-	private static final Pattern _parameterPattern = Pattern.compile(
-		"\\(([^)]+)\\)");
 	private static final List<String> _reservedTags = Arrays.asList(
 		new String[] {
-			"and", "case", "command", "condition", "contains", "default",
-			"definition", "delimiter", "description", "echo", "else", "elseif",
-			"equals", "execute", "fail", "for", "if", "isset", "not", "or",
-			"property", "set-up", "take-screenshot", "td", "tear-down", "then",
-			"tr", "while", "var"
+			"and", "body", "case", "command", "condition", "contains",
+			"default", "definition", "description", "echo", "else", "elseif",
+			"equals", "execute", "fail", "for", "if", "head", "html", "isset",
+			"not", "or", "property", "set-up", "table", "take-screenshot",
+			"task", "tbody", "td", "tear-down", "thead", "then", "title", "tr",
+			"var", "while"
 		});
 	private static final Pattern _tagPattern = Pattern.compile("<[a-z\\-]+");
 

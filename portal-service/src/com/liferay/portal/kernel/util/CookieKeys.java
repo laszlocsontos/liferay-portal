@@ -44,7 +44,7 @@ public class CookieKeys {
 
 	public static final String LOGIN = "LOGIN";
 
-	public static final int MAX_AGE = (int)Time.YEAR;
+	public static final int MAX_AGE = (int)(Time.YEAR / 1000);
 
 	public static final String PASSWORD = "PASSWORD";
 
@@ -67,7 +67,7 @@ public class CookieKeys {
 		HttpServletRequest request, HttpServletResponse response, Cookie cookie,
 		boolean secure) {
 
-		if (!_SESSION_ENABLE_PERSISTENT_COOKIES || _TCK_URL) {
+		if (!_SESSION_ENABLE_PERSISTENT_COOKIES) {
 			return;
 		}
 
@@ -93,9 +93,6 @@ public class CookieKeys {
 		cookie.setValue(encodedValue);
 		cookie.setVersion(0);
 
-		// Setting a cookie will cause the TCK to lose its ability to track
-		// sessions
-
 		response.addCookie(cookie);
 	}
 
@@ -116,6 +113,10 @@ public class CookieKeys {
 
 	public static String getCookie(
 		HttpServletRequest request, String name, boolean toUpperCase) {
+
+		if (!_SESSION_ENABLE_PERSISTENT_COOKIES) {
+			return null;
+		}
 
 		String value = _get(request, name, toUpperCase);
 
@@ -304,9 +305,6 @@ public class CookieKeys {
 	private static final boolean _SESSION_TEST_COOKIE_SUPPORT =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.SESSION_TEST_COOKIE_SUPPORT));
-
-	private static final boolean _TCK_URL = GetterUtil.getBoolean(
-		PropsUtil.get(PropsKeys.TCK_URL));
 
 	private static final Log _log = LogFactoryUtil.getLog(CookieKeys.class);
 

@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelHintsConstants;
-import com.liferay.portal.servlet.filters.dynamiccss.RTLCSSUtil;
 import com.liferay.portal.tools.sass.SassExecutorUtil;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
 import com.liferay.portal.util.FileImpl;
@@ -96,7 +95,12 @@ public class SassToCssBuilder {
 		String docrootDirName = arguments.get("sass.docroot.dir");
 		String portalCommonDirName = arguments.get("sass.portal.common.dir");
 
-		new SassToCssBuilder(dirNames, docrootDirName, portalCommonDirName);
+		try {
+			new SassToCssBuilder(dirNames, docrootDirName, portalCommonDirName);
+		}
+		catch (Exception e) {
+			ArgumentsUtil.processMainException(arguments, e);
+		}
 	}
 
 	public static String parseStaticTokens(String content) {
@@ -191,8 +195,6 @@ public class SassToCssBuilder {
 		PortalClassLoaderUtil.setClassLoader(classLoader);
 
 		PropsUtil.setProps(new PropsImpl());
-
-		RTLCSSUtil.init();
 	}
 
 	private boolean _isModified(String dirName, String[] fileNames)

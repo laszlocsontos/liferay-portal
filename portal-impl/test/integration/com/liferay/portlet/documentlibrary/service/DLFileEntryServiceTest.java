@@ -305,12 +305,12 @@ public class DLFileEntryServiceTest {
 		String sourceFileName = RandomTestUtil.randomString();
 
 		if (appendExtension) {
-			sourceFileName.concat(".pdf");
+			sourceFileName = sourceFileName.concat(".pdf");
 		}
 
 		String fileEntryTitle = RandomTestUtil.randomString();
 
-		return  DLFileEntryLocalServiceUtil.addFileEntry(
+		return DLFileEntryLocalServiceUtil.addFileEntry(
 			TestPropsValues.getUserId(), _group.getGroupId(),
 			_group.getGroupId(), folderId, sourceFileName, null, fileEntryTitle,
 			RandomTestUtil.randomString(), StringPool.BLANK,

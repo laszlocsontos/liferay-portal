@@ -84,14 +84,10 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.PortletPreferencesImpl;
-import com.liferay.portlet.asset.NoSuchTagException;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLink;
-import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetLinkLocalServiceUtil;
-import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
-import com.liferay.portlet.asset.service.persistence.AssetTagUtil;
 import com.liferay.portlet.expando.NoSuchTableException;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.expando.model.ExpandoTable;
@@ -198,6 +194,57 @@ public class PortletImporter {
 		}
 
 		return PortletPreferencesFactoryUtil.toXML(portletPreferencesImpl);
+	}
+
+	public void importPortletDataDeletions(
+			long userId, long plid, long groupId, String portletId,
+			Map<String, String[]> parameterMap, File file)
+		throws Exception {
+
+		ZipReader zipReader = null;
+
+		try {
+			ExportImportThreadLocal.setPortletDataDeletionImportInProcess(true);
+
+			// LAR validation
+
+			Layout layout = LayoutLocalServiceUtil.getLayout(plid);
+
+			zipReader = ZipReaderFactoryUtil.getZipReader(file);
+
+			validateFile(layout.getCompanyId(), groupId, portletId, zipReader);
+
+			PortletDataContext portletDataContext = getPortletDataContext(
+				userId, plid, groupId, portletId, parameterMap, file);
+
+			boolean deletePortletData = MapUtil.getBoolean(
+				parameterMap, PortletDataHandlerKeys.DELETE_PORTLET_DATA);
+
+			// Portlet data deletion
+
+			if (deletePortletData) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Deleting portlet data");
+				}
+
+				deletePortletData(portletDataContext);
+			}
+
+			// Deletion system events
+
+			populateDeletionStagedModelTypes(portletDataContext);
+
+			_deletionSystemEventImporter.importDeletionSystemEvents(
+				portletDataContext);
+		}
+		finally {
+			ExportImportThreadLocal.setPortletDataDeletionImportInProcess(
+				false);
+
+			if (zipReader != null) {
+				zipReader.close();
+			}
+		}
 	}
 
 	public void importPortletInfo(
@@ -396,8 +443,6 @@ public class PortletImporter {
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();
 
-		boolean deletePortletData = MapUtil.getBoolean(
-			parameterMap, PortletDataHandlerKeys.DELETE_PORTLET_DATA);
 		boolean importPermissions = MapUtil.getBoolean(
 			parameterMap, PortletDataHandlerKeys.PERMISSIONS);
 
@@ -447,7 +492,7 @@ public class PortletImporter {
 
 		portletDataContext.setManifestSummary(manifestSummary);
 
-		// Read asset tags, expando tables, locks and permissions to make them
+		// Read expando tables, locks and permissions to make them
 		// available to the data handlers through the portlet data context
 
 		Element rootElement = portletDataContext.getImportDataRootElement();
@@ -477,19 +522,8 @@ public class PortletImporter {
 			_permissionImporter.readPortletDataPermissions(portletDataContext);
 		}
 
-		readAssetTags(portletDataContext);
 		readExpandoTables(portletDataContext);
 		readLocks(portletDataContext);
-
-		// Delete portlet data
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Deleting portlet data");
-		}
-
-		if (deletePortletData) {
-			deletePortletData(portletDataContext);
-		}
 
 		Element portletDataElement = portletElement.element("portlet-data");
 
@@ -660,67 +694,6 @@ public class PortletImporter {
 		}
 
 		return portletPreferences;
-	}
-
-	protected void importAssetTag(
-			PortletDataContext portletDataContext, Map<Long, Long> assetTagPKs,
-			Element assetTagElement, AssetTag assetTag)
-		throws PortalException {
-
-		long userId = portletDataContext.getUserId(assetTag.getUserUuid());
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setAddGroupPermissions(true);
-		serviceContext.setAddGuestPermissions(true);
-		serviceContext.setCreateDate(assetTag.getCreateDate());
-		serviceContext.setModifiedDate(assetTag.getModifiedDate());
-		serviceContext.setScopeGroupId(portletDataContext.getScopeGroupId());
-
-		AssetTag existingAssetTag = null;
-
-		try {
-			existingAssetTag = AssetTagUtil.findByG_N(
-				portletDataContext.getScopeGroupId(), assetTag.getName());
-		}
-		catch (NoSuchTagException nste) {
-			if (_log.isDebugEnabled()) {
-				StringBundler sb = new StringBundler(5);
-
-				sb.append("No AssetTag exists with the key {groupId=");
-				sb.append(portletDataContext.getScopeGroupId());
-				sb.append(", name=");
-				sb.append(assetTag.getName());
-				sb.append("}");
-
-				_log.debug(sb.toString());
-			}
-		}
-
-		AssetTag importedAssetTag = null;
-
-		try {
-			if (existingAssetTag == null) {
-				importedAssetTag = AssetTagLocalServiceUtil.addTag(
-					userId, assetTag.getName(), serviceContext);
-			}
-			else {
-				importedAssetTag = AssetTagLocalServiceUtil.updateTag(
-					userId, existingAssetTag.getTagId(), assetTag.getName(),
-					serviceContext);
-			}
-
-			assetTagPKs.put(assetTag.getTagId(), importedAssetTag.getTagId());
-
-			portletDataContext.importPermissions(
-				AssetTag.class, assetTag.getTagId(),
-				importedAssetTag.getTagId());
-		}
-		catch (NoSuchTagException nste) {
-			_log.error(
-				"Could not find the parent category for category " +
-					assetTag.getTagId());
-		}
 	}
 
 	protected void importPortletData(
@@ -952,6 +925,31 @@ public class PortletImporter {
 			portletPreferences);
 	}
 
+	protected void populateDeletionStagedModelTypes(
+			PortletDataContext portletDataContext)
+		throws Exception {
+
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(
+			portletDataContext.getCompanyId(),
+			portletDataContext.getPortletId());
+
+		if ((portlet == null) || !portlet.isActive() ||
+			portlet.isUndeployedPortlet()) {
+
+			return;
+		}
+
+		PortletDataHandler portletDataHandler =
+			portlet.getPortletDataHandlerInstance();
+
+		if (portletDataHandler == null) {
+			return;
+		}
+
+		portletDataContext.addDeletionSystemEventStagedModelTypes(
+			portletDataHandler.getDeletionSystemEventStagedModelTypes());
+	}
+
 	protected void readAssetLinks(PortletDataContext portletDataContext)
 		throws Exception {
 
@@ -1034,56 +1032,6 @@ public class PortletImporter {
 					targetAssetEntry.getEntryId(), assetLink.getType(),
 					assetLink.getWeight());
 			}
-		}
-	}
-
-	protected void readAssetTags(PortletDataContext portletDataContext)
-		throws Exception {
-
-		String xml = portletDataContext.getZipEntryAsString(
-			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
-				"/tags.xml");
-
-		if (xml == null) {
-			return;
-		}
-
-		Document document = SAXReaderUtil.read(xml);
-
-		Element rootElement = document.getRootElement();
-
-		List<Element> assetTagElements = rootElement.elements("tag");
-
-		for (Element assetTagElement : assetTagElements) {
-			String path = assetTagElement.attributeValue("path");
-
-			if (!portletDataContext.isPathNotProcessed(path)) {
-				continue;
-			}
-
-			AssetTag assetTag =
-				(AssetTag)portletDataContext.getZipEntryAsObject(path);
-
-			Map<Long, Long> assetTagPKs =
-				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-					AssetTag.class);
-
-			importAssetTag(
-				portletDataContext, assetTagPKs, assetTagElement, assetTag);
-		}
-
-		List<Element> assetElements = rootElement.elements("asset");
-
-		for (Element assetElement : assetElements) {
-			String className = GetterUtil.getString(
-				assetElement.attributeValue("class-name"));
-			long classPK = GetterUtil.getLong(
-				assetElement.attributeValue("class-pk"));
-			String assetTagNames = GetterUtil.getString(
-				assetElement.attributeValue("tags"));
-
-			portletDataContext.addAssetTags(
-				className, classPK, StringUtil.split(assetTagNames));
 		}
 	}
 

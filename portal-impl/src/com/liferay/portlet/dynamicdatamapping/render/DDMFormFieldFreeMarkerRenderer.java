@@ -348,8 +348,8 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 			if (Validator.equals(ddmFormField.getType(), "select") ||
 				Validator.equals(ddmFormField.getType(), "radio")) {
 
-				Map<String, Object> optionFreeMarkerContext =
-					new HashMap<String, Object>(freeMarkerContext);
+				Map<String, Object> optionFreeMarkerContext = new HashMap<>(
+					freeMarkerContext);
 
 				optionFreeMarkerContext.put(
 					"parentFieldStructure", fieldStructure);
@@ -562,7 +562,7 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 
 		if ((fieldReadOnly && Validator.isNotNull(mode) &&
 			 StringUtil.equalsIgnoreCase(
-				mode, DDMTemplateConstants.TEMPLATE_MODE_EDIT)) ||
+				 mode, DDMTemplateConstants.TEMPLATE_MODE_EDIT)) ||
 			readOnly) {
 
 			fieldNamespace = _DEFAULT_READ_ONLY_NAMESPACE;

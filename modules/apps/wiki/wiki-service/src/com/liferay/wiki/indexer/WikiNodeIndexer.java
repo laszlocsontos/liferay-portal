@@ -32,13 +32,12 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.service.WikiNodeLocalServiceUtil;
-import com.liferay.wiki.service.permission.WikiNodePermission;
+import com.liferay.wiki.service.permission.WikiNodePermissionChecker;
 
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -73,7 +72,7 @@ public class WikiNodeIndexer extends BaseIndexer {
 
 		WikiNode node = WikiNodeLocalServiceUtil.getNode(entryClassPK);
 
-		return WikiNodePermission.contains(
+		return WikiNodePermissionChecker.contains(
 			permissionChecker, node, ActionKeys.VIEW);
 	}
 
@@ -107,8 +106,7 @@ public class WikiNodeIndexer extends BaseIndexer {
 	@Override
 	protected Summary doGetSummary(
 			Document document, Locale locale, String snippet,
-			PortletURL portletURL, PortletRequest portletRequest,
-			PortletResponse portletResponse)
+			PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception {
 
 		return null;

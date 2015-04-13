@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.lar.lifecycle.ExportImportLifecycleManager;
 import com.liferay.portal.kernel.lar.xstream.XStreamAliasRegistryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.staging.LayoutStagingUtil;
@@ -409,7 +410,9 @@ public class LayoutExporter {
 		for (Portlet portlet : getDataSiteLevelPortlets(companyId)) {
 			String portletId = portlet.getRootPortletId();
 
-			if (!group.isStagedPortlet(portletId)) {
+			if (ExportImportThreadLocal.isStagingInProcess() &&
+				!group.isStagedPortlet(portletId)) {
+
 				continue;
 			}
 
@@ -588,7 +591,6 @@ public class LayoutExporter {
 		portletDataContext.setScopeGroupId(previousScopeGroupId);
 
 		_portletExporter.exportAssetLinks(portletDataContext);
-		_portletExporter.exportAssetTags(portletDataContext);
 		_portletExporter.exportExpandoTables(portletDataContext);
 		_portletExporter.exportLocks(portletDataContext);
 
@@ -686,9 +688,8 @@ public class LayoutExporter {
 		for (Portlet portlet : layoutTypePortlet.getAllPortlets(false)) {
 			String portletId = portlet.getPortletId();
 
-			Settings portletInstanceSettings =
-				SettingsFactoryUtil.getPortletInstanceSettings(
-					layout, portletId);
+			Settings portletInstanceSettings = SettingsFactoryUtil.getSettings(
+				new PortletInstanceSettingsLocator(layout, portletId));
 
 			String scopeType = portletInstanceSettings.getValue(
 				"lfrScopeType", null);
@@ -788,10 +789,6 @@ public class LayoutExporter {
 		@Override
 		public Void call() throws PortalException {
 			Group group = GroupLocalServiceUtil.getGroup(_groupId);
-
-			if (group.isStagedRemotely()) {
-				return null;
-			}
 
 			Date endDate = null;
 

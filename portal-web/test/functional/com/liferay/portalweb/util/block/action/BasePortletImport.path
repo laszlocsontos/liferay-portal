@@ -9,11 +9,6 @@
 </thead>
 <tbody>
 <tr>
-	<td>PAGE_NAME</td>
-	<td></td>
-	<td>BasePortletImport</td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -30,7 +25,7 @@
 </tr>
 <tr>
 	<td>IMPORT_IFRAME</td>
-	<td>//iframe[contains(@id,'configurationIframeDialog')]</td>
+	<td>//iframe[contains(@id,'importDialog')]</td>
 	<td></td>
 </tr>
 <tr>

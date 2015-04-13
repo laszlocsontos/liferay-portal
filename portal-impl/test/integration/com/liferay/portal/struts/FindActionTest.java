@@ -70,7 +70,7 @@ public class FindActionTest {
 	public void testGetPlidAndPortletIdViewInContext() throws Exception {
 		addLayouts(true, false);
 
-		Object[] plidAndPorltetId = FindAction.getPlidAndPortletId(
+		Object[] plidAndPorltetId = BaseFindActionHelper.getPlidAndPortletId(
 			getThemeDisplay(), _blogsEntry.getGroupId(), _assetLayout.getPlid(),
 			_PORTLET_IDS);
 
@@ -85,7 +85,7 @@ public class FindActionTest {
 		addLayouts(false, false);
 
 		try {
-			FindAction.getPlidAndPortletId(
+			BaseFindActionHelper.getPlidAndPortletId(
 				getThemeDisplay(), _blogsEntry.getGroupId(),
 				_assetLayout.getPlid(), _PORTLET_IDS);
 
@@ -101,7 +101,7 @@ public class FindActionTest {
 
 		HttpServletRequest request = getHttpServletRequest();
 
-		FindAction.setTargetLayout(
+		BaseFindActionHelper.setTargetLayout(
 			request, _blogsEntry.getGroupId(), _blogLayout.getPlid());
 
 		Layout layout = (Layout)request.getAttribute(WebKeys.LAYOUT);
@@ -116,7 +116,7 @@ public class FindActionTest {
 
 		HttpServletRequest request = getHttpServletRequest();
 
-		FindAction.setTargetLayout(
+		BaseFindActionHelper.setTargetLayout(
 			request, _blogsEntry.getGroupId(), _blogLayout.getPlid());
 
 		Layout layout = (Layout)request.getAttribute(WebKeys.LAYOUT);
@@ -141,12 +141,13 @@ public class FindActionTest {
 
 		preferenceMap.put("assetLinkBehavior", new String[] {"viewInPortlet"});
 
-		_assetPublisherPortletId =
-			PortletKeys.ASSET_PUBLISHER + PortletConstants.INSTANCE_SEPARATOR +
-				RandomTestUtil.randomString();
+		_testPortletId =
+			com.liferay.portlet.util.test.PortletKeys.TEST +
+				PortletConstants.INSTANCE_SEPARATOR +
+					RandomTestUtil.randomString();
 
 		LayoutTestUtil.addPortletToLayout(
-			TestPropsValues.getUserId(), _assetLayout, _assetPublisherPortletId,
+			TestPropsValues.getUserId(), _assetLayout, _testPortletId,
 			"column-1", preferenceMap);
 
 		Group group = _group;
@@ -192,11 +193,12 @@ public class FindActionTest {
 	};
 
 	private Layout _assetLayout;
-	private String _assetPublisherPortletId;
 	private Layout _blogLayout;
 	private BlogsEntry _blogsEntry;
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	private String _testPortletId;
 
 }

@@ -14,10 +14,7 @@
 
 package com.liferay.portal.kernel.settings;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.resource.manager.ResourceManager;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
-import com.liferay.portal.model.Layout;
 
 import java.util.List;
 
@@ -27,28 +24,9 @@ import java.util.List;
  */
 public class SettingsFactoryUtil {
 
-	public static void clearCache() {
-		getSettingsFactory().clearCache();
-	}
-
-	public static Settings getCompanyServiceSettings(
-		long companyId, String serviceName) {
-
-		return getSettingsFactory().getCompanyServiceSettings(
-			companyId, serviceName);
-	}
-
-	public static Settings getGroupServiceSettings(
-			long groupId, String serviceName)
-		throws PortalException {
-
-		return getSettingsFactory().getGroupServiceSettings(
-			groupId, serviceName);
-	}
-
 	public static ArchivedSettings getPortletInstanceArchivedSettings(
 			long groupId, String portletId, String name)
-		throws PortalException {
+		throws SettingsException {
 
 		return getSettingsFactory().getPortletInstanceArchivedSettings(
 			groupId, portletId, name);
@@ -61,16 +39,18 @@ public class SettingsFactoryUtil {
 			groupId, portletId);
 	}
 
-	public static Settings getPortletInstanceSettings(
-			Layout layout, String portletId)
-		throws PortalException {
-
-		return getSettingsFactory().getPortletInstanceSettings(
-			layout, portletId);
-	}
-
 	public static Settings getServerSettings(String settingsId) {
 		return getSettingsFactory().getServerSettings(settingsId);
+	}
+
+	public static Settings getSettings(SettingsLocator settingsLocator)
+		throws SettingsException {
+
+		return getSettingsFactory().getSettings(settingsLocator);
+	}
+
+	public static SettingsDescriptor getSettingsDescriptor(String settingsId) {
+		return getSettingsFactory().getSettingsDescriptor(settingsId);
 	}
 
 	public static SettingsFactory getSettingsFactory() {
@@ -80,11 +60,11 @@ public class SettingsFactoryUtil {
 	}
 
 	public static void registerSettingsMetadata(
-		String settingsId, FallbackKeys fallbackKeys, String[] multiValuedKeys,
-		ResourceManager resourceManager) {
+		Class<?> settingsClass, Object configurationBean,
+		FallbackKeys fallbackKeys) {
 
 		getSettingsFactory().registerSettingsMetadata(
-			settingsId, fallbackKeys, multiValuedKeys, null, resourceManager);
+			settingsClass, null, fallbackKeys);
 	}
 
 	public void setSettingsFactory(SettingsFactory settingsFactory) {
