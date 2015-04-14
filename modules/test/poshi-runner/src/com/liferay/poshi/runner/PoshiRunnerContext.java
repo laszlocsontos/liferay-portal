@@ -15,7 +15,10 @@
 package com.liferay.poshi.runner;
 
 import com.liferay.poshi.runner.util.FileUtil;
+import com.liferay.poshi.runner.util.OSDetector;
+import com.liferay.poshi.runner.util.PropsValues;
 import com.liferay.poshi.runner.util.StringUtil;
+import com.liferay.poshi.runner.util.Validator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +63,10 @@ public class PoshiRunnerContext {
 		return _commandElements.get("action#" + classCommandName);
 	}
 
+	public static String getActionCommandSummary(String classCommandName) {
+		return _commandSummaries.get("action#" + classCommandName);
+	}
+
 	public static int getActionLocatorCount(String classCommandName) {
 		String commandName =
 			PoshiRunnerGetterUtil.getCommandNameFromClassCommandName(
@@ -73,8 +80,23 @@ public class PoshiRunnerContext {
 		return _rootElements.get("action#" + className);
 	}
 
+	public static String getFilePathFromClassKey(String classKey) {
+		String fileName = PoshiRunnerGetterUtil.getFileNameFromClassKey(
+			classKey);
+
+		return _filePaths.get(fileName);
+	}
+
+	public static String getFilePathFromFileName(String fileName) {
+		return _filePaths.get(fileName);
+	}
+
 	public static Element getFunctionCommandElement(String classCommandName) {
 		return _commandElements.get("function#" + classCommandName);
+	}
+
+	public static String getFunctionCommandSummary(String classCommandName) {
+		return _commandSummaries.get("function#" + classCommandName);
 	}
 
 	public static int getFunctionLocatorCount(String className) {
@@ -89,12 +111,20 @@ public class PoshiRunnerContext {
 		return _commandElements.get("macro#" + classCommandName);
 	}
 
+	public static String getMacroCommandSummary(String classCommandName) {
+		return _commandSummaries.get("macro#" + classCommandName);
+	}
+
 	public static Element getMacroRootElement(String className) {
 		return _rootElements.get("macro#" + className);
 	}
 
 	public static String getPathLocator(String pathLocatorKey) {
 		return _pathLocators.get(pathLocatorKey);
+	}
+
+	public static Map<String, Element> getRootElementsMap() {
+		return _rootElements;
 	}
 
 	public static int getSeleniumParameterCount(String commandName) {
@@ -107,6 +137,30 @@ public class PoshiRunnerContext {
 
 	public static Element getTestcaseRootElement(String className) {
 		return _rootElements.get("testcase#" + className);
+	}
+
+	public static void readFiles() throws Exception {
+		_readPoshiFiles();
+		_readSeleniumFiles();
+	}
+
+	private static String _getCommandSummary(
+		String classCommandName, Element commandElement) {
+
+		String summaryIgnore = commandElement.attributeValue("summary-ignore");
+
+		if (Validator.isNotNull(summaryIgnore) &&
+			summaryIgnore.equals("true")) {
+
+			return null;
+		}
+
+		if (commandElement.attributeValue("summary") != null) {
+			return commandElement.attributeValue("summary");
+		}
+		else {
+			return classCommandName;
+		}
 	}
 
 	private static List<String> _getRelatedActionClassCommandNames(
@@ -162,8 +216,14 @@ public class PoshiRunnerContext {
 			String locator = locatorElement.getText();
 
 			if (locatorKey.equals("EXTEND_ACTION_PATH")) {
-				for (String extendFilePath : _filePaths) {
-					if (extendFilePath.endsWith("/" + locator + ".path")) {
+				for (String extendFilePath : _filePathsArray) {
+					String expectedExtendedPath = "/" + locator + ".path";
+
+					if (OSDetector.isWindows()) {
+						expectedExtendedPath = "\\" + locator + ".path";
+					}
+
+					if (extendFilePath.endsWith(expectedExtendedPath)) {
 						extendFilePath = _BASE_DIR + "/" + extendFilePath;
 
 						_readPathFile(extendFilePath, className);
@@ -191,15 +251,21 @@ public class PoshiRunnerContext {
 
 		directoryScanner.scan();
 
-		_filePaths = directoryScanner.getIncludedFiles();
+		_filePathsArray = directoryScanner.getIncludedFiles();
 
-		for (String filePath : _filePaths) {
+		for (String filePath : _filePathsArray) {
 			filePath = _BASE_DIR + "/" + filePath;
+
+			if (OSDetector.isWindows()) {
+				filePath = filePath.replace("/", "\\");
+			}
 
 			String className = PoshiRunnerGetterUtil.getClassNameFromFilePath(
 				filePath);
 			String classType = PoshiRunnerGetterUtil.getClassTypeFromFilePath(
 				filePath);
+
+			_filePaths.put(className + "." + classType, filePath);
 
 			if (classType.equals("action") || classType.equals("function") ||
 				classType.equals("macro") || classType.equals("testcase")) {
@@ -235,15 +301,26 @@ public class PoshiRunnerContext {
 
 					_commandElements.put(
 						classType + "#" + classCommandName, commandElement);
+
+					_commandSummaries.put(
+						classType + "#" + classCommandName,
+						_getCommandSummary(classCommandName, commandElement));
 				}
 
 				if (classType.equals("function")) {
+					String defaultClassCommandName =
+						className + "#" + rootElement.attributeValue("default");
+
 					Element defaultCommandElement = getFunctionCommandElement(
-						className + "#" +
-							rootElement.attributeValue("default"));
+						defaultClassCommandName);
 
 					_commandElements.put(
 						classType + "#" + className, defaultCommandElement);
+
+					_commandSummaries.put(
+						classType + "#" + className,
+						_getCommandSummary(
+							defaultClassCommandName, defaultCommandElement));
 
 					String xml = rootElement.asXML();
 
@@ -274,30 +351,40 @@ public class PoshiRunnerContext {
 		};
 
 		for (String fileName : fileNames) {
-			String content = FileUtil.read(
-				"src/com/liferay/poshi/runner/selenium/" + fileName);
+			String filePath = "src/com/liferay/poshi/runner/selenium/";
 
-			Matcher matcher = _pattern.matcher(content);
+			if (OSDetector.isWindows()) {
+				filePath = filePath.replace("/", "\\");
+			}
 
-			while (matcher.find()) {
-				String methodSignature = matcher.group();
+			try {
+				String content = FileUtil.read(filePath + fileName);
 
-				int x = methodSignature.indexOf(" ", 7);
-				int y = methodSignature.indexOf("(");
+				Matcher matcher = _pattern.matcher(content);
 
-				String commandName = methodSignature.substring(x + 1, y);
+				while (matcher.find()) {
+					String methodSignature = matcher.group();
 
-				int parameterCount = 0;
+					int x = methodSignature.indexOf(" ", 7);
+					int y = methodSignature.indexOf("(");
 
-				int z = methodSignature.indexOf(")");
+					String commandName = methodSignature.substring(x + 1, y);
 
-				String parameters = methodSignature.substring(y + 1, z);
+					int parameterCount = 0;
 
-				if (!parameters.equals("")) {
-					parameterCount = StringUtil.count(parameters, ",") + 1;
+					int z = methodSignature.indexOf(")");
+
+					String parameters = methodSignature.substring(y + 1, z);
+
+					if (!parameters.equals("")) {
+						parameterCount = StringUtil.count(parameters, ",") + 1;
+					}
+
+					_seleniumParameterCounts.put(commandName, parameterCount);
 				}
-
-				_seleniumParameterCounts.put(commandName, parameterCount);
+			}
+			catch (Exception e) {
+				throw new PoshiRunnerException(e);
 			}
 		}
 
@@ -305,14 +392,16 @@ public class PoshiRunnerContext {
 	}
 
 	private static final String _BASE_DIR =
-		PoshiRunnerGetterUtil.getCanonicalPath(
-			"../../../portal-web/test/functional/com/liferay/portalweb/");
+		PoshiRunnerGetterUtil.getCanonicalPath(PropsValues.TEST_BASE_DIR_NAME);
 
 	private static final Map<String, String> _actionExtendClassName =
 		new HashMap<>();
 	private static final Map<String, Element> _commandElements =
 		new HashMap<>();
-	private static String[] _filePaths;
+	private static final Map<String, String> _commandSummaries =
+		new HashMap<>();
+	private static final Map<String, String> _filePaths = new HashMap<>();
+	private static String[] _filePathsArray;
 	private static final Map<String, Integer> _functionLocatorCounts =
 		new HashMap<>();
 	private static final Map<String, String> _pathLocators = new HashMap<>();
@@ -321,15 +410,5 @@ public class PoshiRunnerContext {
 	private static final Map<String, Element> _rootElements = new HashMap<>();
 	private static final Map<String, Integer> _seleniumParameterCounts =
 		new HashMap<>();
-
-	static {
-		try {
-			_readPoshiFiles();
-			_readSeleniumFiles();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 }

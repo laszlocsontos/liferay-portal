@@ -38,7 +38,14 @@ public class SeleniumBuilder {
 	public static void main(String[] args) throws Exception {
 		ToolDependencies.wireBasic();
 
-		new SeleniumBuilder(args);
+		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
+
+		try {
+			new SeleniumBuilder(args);
+		}
+		catch (Exception e) {
+			ArgumentsUtil.processMainException(arguments, e);
+		}
 	}
 
 	/**
@@ -507,6 +514,18 @@ public class SeleniumBuilder {
 			List<Element> commandElements =
 				_seleniumBuilderFileUtil.getAllChildElements(
 					rootElement, "command");
+
+			String extendsTestCaseName = rootElement.attributeValue("extends");
+
+			if (extendsTestCaseName != null) {
+				Element extendsRootElement =
+					_seleniumBuilderContext.getTestCaseRootElement(
+						extendsTestCaseName);
+
+				commandElements.addAll(
+					_seleniumBuilderFileUtil.getAllChildElements(
+						extendsRootElement, "command"));
+			}
 
 			for (Element commandElement : commandElements) {
 				List<Element> commandPropertyElements =

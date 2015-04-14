@@ -123,14 +123,6 @@ public class PortletPreferencesFactoryImpl
 			themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), layout,
 			portletId, false);
 
-		PortletPreferences portletPreferences =
-			PortletPreferencesLocalServiceUtil.fetchPreferences(
-				portletPreferencesIds);
-
-		if (portletPreferences != null) {
-			return;
-		}
-
 		PortletPreferencesLocalServiceUtil.getPreferences(
 			portletPreferencesIds);
 	}
@@ -146,15 +138,10 @@ public class PortletPreferencesFactoryImpl
 	public PortalPreferencesImpl fromXML(
 		long ownerId, int ownerType, String xml) {
 
-		try {
-			Map<String, Preference> preferencesMap = toPreferencesMap(xml);
+		Map<String, Preference> preferencesMap = toPreferencesMap(xml);
 
-			return new PortalPreferencesImpl(
-				ownerId, ownerType, xml, preferencesMap, false);
-		}
-		catch (SystemException se) {
-			throw se;
-		}
+		return new PortalPreferencesImpl(
+			ownerId, ownerType, xml, preferencesMap, false);
 	}
 
 	@Override
@@ -162,16 +149,11 @@ public class PortletPreferencesFactoryImpl
 		long companyId, long ownerId, int ownerType, long plid,
 		String portletId, String xml) {
 
-		try {
-			Map<String, Preference> preferencesMap = toPreferencesMap(xml);
+		Map<String, Preference> preferencesMap = toPreferencesMap(xml);
 
-			return new PortletPreferencesImpl(
-				companyId, ownerId, ownerType, plid, portletId, xml,
-				preferencesMap);
-		}
-		catch (SystemException se) {
-			throw se;
-		}
+		return new PortletPreferencesImpl(
+			companyId, ownerId, ownerType, plid, portletId, xml,
+			preferencesMap);
 	}
 
 	/**
@@ -189,6 +171,13 @@ public class PortletPreferencesFactoryImpl
 	public PortletPreferences getLayoutPortletSetup(
 		Layout layout, String portletId) {
 
+		return getLayoutPortletSetup(layout, portletId, null);
+	}
+
+	@Override
+	public PortletPreferences getLayoutPortletSetup(
+		Layout layout, String portletId, String defaultPreferences) {
+
 		long ownerId = PortletKeys.PREFS_OWNER_ID_DEFAULT;
 		int ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
 
@@ -199,7 +188,7 @@ public class PortletPreferencesFactoryImpl
 
 		return PortletPreferencesLocalServiceUtil.getPreferences(
 			layout.getCompanyId(), ownerId, ownerType, layout.getPlid(),
-			portletId);
+			portletId, defaultPreferences);
 	}
 
 	@Override
@@ -460,6 +449,45 @@ public class PortletPreferencesFactoryImpl
 	}
 
 	@Override
+	public PortletPreferencesIds getPortletPreferencesIds(
+		long companyId, long siteGroupId, long plid, String portletId,
+		String settingsScope) {
+
+		int ownerType = 0;
+		long ownerId = PortletKeys.PREFS_OWNER_ID_DEFAULT;
+
+		if (settingsScope.equals(
+				PortletPreferencesFactoryConstants.SETTINGS_SCOPE_COMPANY)) {
+
+			ownerId = companyId;
+			ownerType = PortletKeys.PREFS_OWNER_TYPE_COMPANY;
+			plid = PortletKeys.PREFS_PLID_SHARED;
+		}
+		else if (settingsScope.equals(
+					PortletPreferencesFactoryConstants.SETTINGS_SCOPE_GROUP)) {
+
+			ownerId = siteGroupId;
+			ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
+			plid = PortletKeys.PREFS_PLID_SHARED;
+		}
+		else if (settingsScope.equals(
+					PortletPreferencesFactoryConstants.
+						SETTINGS_SCOPE_PORTLET_INSTANCE)) {
+
+			ownerId = PortletKeys.PREFS_OWNER_ID_DEFAULT;
+			ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
+
+			if (PortletConstants.hasUserId(portletId)) {
+				ownerId = PortletConstants.getUserId(portletId);
+				ownerType = PortletKeys.PREFS_OWNER_TYPE_USER;
+			}
+		}
+
+		return new PortletPreferencesIds(
+			companyId, ownerId, ownerType, plid, portletId);
+	}
+
+	@Override
 	public PortletPreferences getPortletSetup(
 		HttpServletRequest request, String portletId) {
 
@@ -620,6 +648,18 @@ public class PortletPreferencesFactoryImpl
 		return getPortletSetup(
 			LayoutConstants.DEFAULT_PLID, layout, portletId, StringPool.BLANK,
 			true);
+	}
+
+	@Override
+	public StrictPortletPreferencesImpl strictFromXML(
+		long companyId, long ownerId, int ownerType, long plid,
+		String portletId, String xml) {
+
+		Map<String, Preference> preferencesMap = toPreferencesMap(xml);
+
+		return new StrictPortletPreferencesImpl(
+			companyId, ownerId, ownerType, plid, portletId, xml,
+			preferencesMap);
 	}
 
 	@Override

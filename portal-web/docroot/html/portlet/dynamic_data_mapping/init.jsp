@@ -34,6 +34,8 @@ page import="com.liferay.portlet.dynamicdatamapping.TemplateNameException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.TemplateScriptException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.TemplateSmallImageNameException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.TemplateSmallImageSizeException" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONDeserializerUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMForm" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.search.StructureDisplayTerms" %><%@
@@ -50,9 +52,10 @@ page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMStruct
 page import="com.liferay.portlet.dynamicdatamapping.storage.StorageType" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMDisplay" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMDisplayRegistryUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.util.DDMPermissionHandler" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMUtil" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %>
+page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplate" %>
 
 <%@ page import="java.util.StringTokenizer" %>
 
@@ -68,9 +71,9 @@ boolean showToolbar = ParamUtil.getBoolean(request, "showToolbar", true);
 
 DDMDisplay ddmDisplay = DDMDisplayRegistryUtil.getDDMDisplay(refererPortletName);
 
-long scopeClassNameId = PortalUtil.getClassNameId(ddmDisplay.getStructureType());
-
+DDMPermissionHandler ddmPermissionHandler = ddmDisplay.getDDMPermissionHandler();
 String scopeAvailableFields = ddmDisplay.getAvailableFields();
+long scopeClassNameId = PortalUtil.getClassNameId(ddmDisplay.getStructureType());
 String scopeStorageType = ddmDisplay.getStorageType();
 String scopeTemplateType = ddmDisplay.getTemplateType();
 

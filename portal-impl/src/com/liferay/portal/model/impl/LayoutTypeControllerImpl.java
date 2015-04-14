@@ -110,9 +110,6 @@ public class LayoutTypeControllerImpl implements LayoutTypeController {
 			else if (_type.equals(LayoutConstants.TYPE_CONTROL_PANEL)) {
 				path += "/portal/layout/view/control_panel.jsp";
 			}
-			else if (_type.equals(LayoutConstants.TYPE_USER_PERSONAL_PANEL)) {
-				path += "/portal/layout/view/user_personal_panel.jsp";
-			}
 			else {
 				path += "/portal/layout/view/portlet.jsp";
 			}
@@ -122,6 +119,28 @@ public class LayoutTypeControllerImpl implements LayoutTypeController {
 		}
 
 		return path;
+	}
+
+	@Override
+	public String includeEditContent(
+			HttpServletRequest request, HttpServletResponse response,
+			Layout layout)
+		throws Exception {
+
+		ServletContext servletContext = (ServletContext)request.getAttribute(
+			WebKeys.CTX);
+
+		RequestDispatcher requestDispatcher =
+			servletContext.getRequestDispatcher(getEditPage());
+
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+
+		PipingServletResponse pipingServletResponse = new PipingServletResponse(
+			response, unsyncStringWriter);
+
+		requestDispatcher.include(request, pipingServletResponse);
+
+		return unsyncStringWriter.toString();
 	}
 
 	@Override

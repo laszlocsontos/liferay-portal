@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ArrayUtil_IW;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ClearThreadLocalUtil;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
@@ -46,7 +45,7 @@ import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.tools.ArgumentsUtil;
 import com.liferay.portal.tools.ToolDependencies;
-import com.liferay.portal.tools.sourceformatter.JavaSourceProcessor;
+import com.liferay.portal.tools.sourceformatter.JavaImportsFormatter;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.util.xml.XMLFormatter;
 
@@ -104,6 +103,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
+
 import org.dom4j.DocumentException;
 
 /**
@@ -118,6 +119,9 @@ import org.dom4j.DocumentException;
  * @author Shuyang Zhou
  * @author James Lefeu
  * @author Miguel Pastor
+ * @author Cody Hoag
+ * @author James Hinkey
+ * @author Hugo Huijser
  */
 public class ServiceBuilder {
 
@@ -220,7 +224,7 @@ public class ServiceBuilder {
 		return false;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
 		ToolDependencies.wireServiceBuilder();
@@ -266,7 +270,7 @@ public class ServiceBuilder {
 				sqlIndexesFileName, sqlSequencesFileName, targetEntityName,
 				testDir, true);
 		}
-		catch (RuntimeException re) {
+		catch (Exception e) {
 			System.out.println(
 				"Please set these arguments. Sample values are:\n" +
 				"\n" +
@@ -340,7 +344,7 @@ public class ServiceBuilder {
 				"\t-Dservice.tpl.spring_xml=" + _TPL_ROOT + "spring_xml.ftl\n"+
 				"\t-Dservice.tpl.spring_xml_session=" + _TPL_ROOT + "spring_xml_session.ftl");
 
-			throw re;
+			ArgumentsUtil.processMainException(arguments, e);
 		}
 
 		try {
@@ -405,12 +409,14 @@ public class ServiceBuilder {
 
 		className = className.substring(0, className.length() - 5);
 
-		content = JavaSourceProcessor.stripJavaImports(
+		content = JavaImportsFormatter.stripJavaImports(
 			content, packagePath, className);
+
+		content = _stripFullyQualifiedClassNames(content);
 
 		File tempFile = new File("ServiceBuilder.temp");
 
-		FileUtil.write(tempFile, content);
+		FileUtils.write(tempFile, content);
 
 		// Beautify
 
@@ -517,23 +523,26 @@ public class ServiceBuilder {
 
 		// Write file if and only if the file has changed
 
-		if (!file.exists() || !FileUtil.isSameContent(file, content)) {
-			FileUtil.write(file, content);
+		if (!file.exists() ||
+			!content.equals(FileUtils.readFileToString(file))) {
+
+			FileUtils.write(file, content);
 
 			System.out.println("Writing " + file);
 		}
 	}
 
 	public ServiceBuilder(
-		String apiDir, boolean autoImportDefaultReferences,
-		boolean autoNamespaceTables, String beanLocatorUtil, long buildNumber,
-		boolean buildNumberIncrement, String hbmFileName, String implDir,
-		String inputFileName, String modelHintsFileName, boolean osgiModule,
-		String pluginName, String propsUtil, String remotingFileName,
-		String resourcesDir, String springFileName, String[] springNamespaces,
-		String sqlDir, String sqlFileName, String sqlIndexesFileName,
-		String sqlSequencesFileName, String targetEntityName, String testDir,
-		boolean build) {
+			String apiDir, boolean autoImportDefaultReferences,
+			boolean autoNamespaceTables, String beanLocatorUtil,
+			long buildNumber, boolean buildNumberIncrement, String hbmFileName,
+			String implDir, String inputFileName, String modelHintsFileName,
+			boolean osgiModule, String pluginName, String propsUtil,
+			String remotingFileName, String resourcesDir, String springFileName,
+			String[] springNamespaces, String sqlDir, String sqlFileName,
+			String sqlIndexesFileName, String sqlSequencesFileName,
+			String targetEntityName, String testDir, boolean build)
+		throws Exception {
 
 		_tplBadAliasNames = _getTplProperty(
 			"bad_alias_names", _tplBadAliasNames);
@@ -898,20 +907,19 @@ public class ServiceBuilder {
 		catch (FileNotFoundException fnfe) {
 			System.out.println(fnfe.getMessage());
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public ServiceBuilder(
-		String apiDir, boolean autoImportDefaultReferences,
-		boolean autoNamespaceTables, String beanLocatorUtil, String hbmFileName,
-		String implDir, String inputFileName, String modelHintsFileName,
-		boolean osgiModule, String pluginName, String propsUtil,
-		String remotingFileName, String resourcesDir, String springFileName,
-		String[] springNamespaces, String sqlDir, String sqlFileName,
-		String sqlIndexesFileName, String sqlSequencesFileName,
-		String targetEntityName, String testDir) {
+			String apiDir, boolean autoImportDefaultReferences,
+			boolean autoNamespaceTables, String beanLocatorUtil,
+			String hbmFileName, String implDir, String inputFileName,
+			String modelHintsFileName, boolean osgiModule, String pluginName,
+			String propsUtil, String remotingFileName, String resourcesDir,
+			String springFileName, String[] springNamespaces, String sqlDir,
+			String sqlFileName, String sqlIndexesFileName,
+			String sqlSequencesFileName, String targetEntityName,
+			String testDir)
+		throws Exception {
 
 		this(
 			apiDir, autoImportDefaultReferences, autoNamespaceTables,
@@ -1052,7 +1060,7 @@ public class ServiceBuilder {
 	}
 
 	public String getCreateMappingTableSQL(EntityMapping entityMapping)
-		throws IOException {
+		throws Exception {
 
 		String createMappingTableSQL = _getCreateMappingTableSQL(entityMapping);
 
@@ -1091,7 +1099,7 @@ public class ServiceBuilder {
 		return getDimensions(GetterUtil.getInteger(dims));
 	}
 
-	public Entity getEntity(String name) throws IOException {
+	public Entity getEntity(String name) throws Exception {
 		Entity entity = _entityPool.get(name);
 
 		if (entity != null) {
@@ -1149,8 +1157,8 @@ public class ServiceBuilder {
 
 			ClassLoader classLoader = getClass().getClassLoader();
 
-			FileUtil.write(
-				refFileName,
+			FileUtils.write(
+				refFile,
 				StringUtil.read(classLoader, refPackageDir + "/service.xml"));
 
 			useTempFile = true;
@@ -1257,7 +1265,7 @@ public class ServiceBuilder {
 	}
 
 	public List<EntityColumn> getMappingEntities(String mappingTable)
-		throws IOException {
+		throws Exception {
 
 		List<EntityColumn> mappingEntitiesPKList = new ArrayList<>();
 
@@ -1346,7 +1354,7 @@ public class ServiceBuilder {
 	}
 
 	public String getReturnType(JavaMethod method) {
-		Type returnType = method.getReturns();
+		Type returnType = method.getReturnType();
 
 		return getTypeGenericsName(returnType);
 	}
@@ -1597,14 +1605,10 @@ public class ServiceBuilder {
 		String methodName = method.getName();
 
 		if (methodName.equals("afterPropertiesSet") ||
-			methodName.equals("destroy") ||
-			methodName.equals("equals") ||
-			methodName.equals("getClass") ||
-			methodName.equals("hashCode") ||
-			methodName.equals("notify") ||
-			methodName.equals("notifyAll") ||
-			methodName.equals("toString") ||
-			methodName.equals("wait")) {
+			methodName.equals("destroy") || methodName.equals("equals") ||
+			methodName.equals("getClass") || methodName.equals("hashCode") ||
+			methodName.equals("notify") || methodName.equals("notifyAll") ||
+			methodName.equals("toString") || methodName.equals("wait")) {
 
 			return false;
 		}
@@ -1691,7 +1695,7 @@ public class ServiceBuilder {
 	}
 
 	public boolean isSoapMethod(JavaMethod method) {
-		Type returnType = method.getReturns();
+		Type returnType = method.getReturnType();
 
 		String returnTypeGenericsName = getTypeGenericsName(returnType);
 		String returnValueName = returnType.getValue();
@@ -1782,7 +1786,7 @@ public class ServiceBuilder {
 	private static Document _getContentDocument(String fileName)
 		throws Exception {
 
-		String content = FileUtil.read(new File(fileName));
+		String content = FileUtils.readFileToString(new File(fileName));
 
 		Document document = SAXReaderUtil.read(content);
 
@@ -1848,6 +1852,61 @@ public class ServiceBuilder {
 			throw new RuntimeException(
 				"Unable to load jalopy.xml from the class loader", e);
 		}
+	}
+
+	private static String _stripFullyQualifiedClassNames(String content)
+		throws IOException {
+
+		String imports = JavaImportsFormatter.getImports(content);
+
+		if (Validator.isNull(imports)) {
+			return content;
+		}
+
+		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
+			new UnsyncStringReader(imports));
+
+		String line = null;
+
+		while ((line = unsyncBufferedReader.readLine()) != null) {
+			int x = line.indexOf("import ");
+
+			if (x == -1) {
+				continue;
+			}
+
+			String importPackageAndClassName = line.substring(
+				x + 7, line.lastIndexOf(StringPool.SEMICOLON));
+
+			for (x = -1;;) {
+				x = content.indexOf(importPackageAndClassName, x + 1);
+
+				if (x == -1) {
+					break;
+				}
+
+				char nextChar = content.charAt(
+					x + importPackageAndClassName.length());
+				char previousChar = content.charAt(x - 1);
+
+				if (Character.isAlphabetic(nextChar) ||
+					(nextChar == CharPool.QUOTE) ||
+					(nextChar == CharPool.SEMICOLON) ||
+					(previousChar == CharPool.QUOTE)) {
+
+					continue;
+				}
+
+				String importClassName = importPackageAndClassName.substring(
+					importPackageAndClassName.lastIndexOf(StringPool.PERIOD) +
+						1);
+
+				content = StringUtil.replaceFirst(
+					content, importPackageAndClassName, importClassName, x);
+			}
+		}
+
+		return content;
 	}
 
 	private void _addIndexMetadata(
@@ -2007,11 +2066,11 @@ public class ServiceBuilder {
 
 				content = StringUtil.replace(content, "\r\n", "\n");
 
-				FileUtil.write(exceptionFile, content);
+				writeFileRaw(exceptionFile, content);
 			}
 
 			if (exception.startsWith("NoSuch")) {
-				String content = FileUtil.read(exceptionFile);
+				String content = FileUtils.readFileToString(exceptionFile);
 
 				if (!content.contains("NoSuchModelException")) {
 					content = StringUtil.replace(
@@ -2020,7 +2079,7 @@ public class ServiceBuilder {
 						content, "kernel.exception.NoSuchModelException",
 						"NoSuchModelException");
 
-					FileUtil.write(exceptionFile, content);
+					writeFileRaw(exceptionFile, content);
 				}
 			}
 		}
@@ -2126,7 +2185,7 @@ public class ServiceBuilder {
 			_outputPath + "/model/impl/" + entity.getName() + "Impl.java");
 
 		if (modelFile.exists()) {
-			content = FileUtil.read(modelFile);
+			content = FileUtils.readFileToString(modelFile);
 
 			content = content.replaceAll(
 				"extends\\s+" + entity.getName() +
@@ -2248,10 +2307,10 @@ public class ServiceBuilder {
 				"<hibernate-mapping default-lazy=\"false\" auto-import=\"false\">\n" +
 				"</hibernate-mapping>";
 
-			FileUtil.write(xmlFile, xml);
+			FileUtils.write(xmlFile, xml);
 		}
 
-		String oldContent = FileUtil.read(xmlFile);
+		String oldContent = FileUtils.readFileToString(xmlFile);
 		String newContent = _fixHbmXml(oldContent);
 
 		int firstImport = newContent.indexOf(
@@ -2306,7 +2365,7 @@ public class ServiceBuilder {
 		newContent = _formatXml(newContent);
 
 		if (!oldContent.equals(newContent)) {
-			FileUtil.write(xmlFile, newContent);
+			writeFileRaw(xmlFile, newContent);
 		}
 	}
 
@@ -2420,10 +2479,10 @@ public class ServiceBuilder {
 				"<model-hints>\n" +
 				"</model-hints>";
 
-			FileUtil.write(xmlFile, xml);
+			FileUtils.write(xmlFile, xml);
 		}
 
-		String oldContent = FileUtil.read(xmlFile);
+		String oldContent = FileUtils.readFileToString(xmlFile);
 		String newContent = oldContent;
 
 		int firstModel = newContent.indexOf(
@@ -2449,7 +2508,7 @@ public class ServiceBuilder {
 		newContent = _formatXml(newContent);
 
 		if (!oldContent.equals(newContent)) {
-			FileUtil.write(xmlFile, newContent);
+			writeFileRaw(xmlFile, newContent);
 		}
 	}
 
@@ -2669,7 +2728,7 @@ public class ServiceBuilder {
 
 		if (propsFile.exists()) {
 			Properties properties = PropertiesUtil.load(
-				FileUtil.read(propsFile));
+				FileUtils.readFileToString(propsFile));
 
 			if (!_buildNumberIncrement) {
 				buildDate = GetterUtil.getLong(
@@ -2697,7 +2756,7 @@ public class ServiceBuilder {
 
 		// Write file
 
-		FileUtil.write(propsFile, content, true);
+		writeFileRaw(propsFile, content);
 	}
 
 	private void _createRemotingXml() throws Exception {
@@ -2751,7 +2810,7 @@ public class ServiceBuilder {
 			return;
 		}
 
-		String content = FileUtil.read(outputFile);
+		String content = FileUtils.readFileToString(outputFile);
 		String newContent = content;
 
 		int x = content.indexOf("<bean ");
@@ -2783,9 +2842,7 @@ public class ServiceBuilder {
 		newContent = _formatXml(newContent);
 
 		if (!content.equals(newContent)) {
-			FileUtil.write(outputFile, newContent);
-
-			System.out.println(outputFile.toString());
+			writeFileRaw(outputFile, newContent);
 		}
 	}
 
@@ -2860,7 +2917,7 @@ public class ServiceBuilder {
 
 		context.put("entity", entity);
 		context.put("methods", methods);
-		context.put("sessionTypeName",_getSessionTypeName(sessionType));
+		context.put("sessionTypeName", _getSessionTypeName(sessionType));
 		context.put("referenceList", _mergeReferenceList(entity));
 
 		context = _putDeprecatedKeys(context, javaClass);
@@ -3235,10 +3292,10 @@ public class ServiceBuilder {
 			"</beans>";
 
 		if (!xmlFile.exists()) {
-			FileUtil.write(xmlFile, xml);
+			FileUtils.write(xmlFile, xml);
 		}
 
-		String oldContent = FileUtil.read(xmlFile);
+		String oldContent = FileUtils.readFileToString(xmlFile);
 
 		if (Validator.isNotNull(_pluginName) &&
 			oldContent.contains("DOCTYPE beans PUBLIC")) {
@@ -3283,12 +3340,14 @@ public class ServiceBuilder {
 		newContent = _formatXml(newContent);
 
 		if (!oldContent.equals(newContent)) {
-			FileUtil.write(xmlFile, newContent);
+			writeFileRaw(xmlFile, newContent);
 		}
 	}
 
-	private void _createSQLIndexes() throws IOException {
-		if (!FileUtil.exists(_sqlDir)) {
+	private void _createSQLIndexes() throws Exception {
+		File sqlDir = new File(_sqlDir);
+
+		if (!sqlDir.exists()) {
 			return;
 		}
 
@@ -3297,7 +3356,7 @@ public class ServiceBuilder {
 		File sqlFile = new File(_sqlDir + "/" + _sqlIndexesFileName);
 
 		if (!sqlFile.exists()) {
-			FileUtil.write(sqlFile, "");
+			FileUtils.touch(sqlFile);
 		}
 
 		Map<String, List<IndexMetadata>> indexMetadataMap = new TreeMap<>();
@@ -3401,11 +3460,13 @@ public class ServiceBuilder {
 			sb.setIndex(sb.index() - 2);
 		}
 
-		FileUtil.write(sqlFile, sb.toString(), true);
+		writeFileRaw(sqlFile, sb.toString());
 
 		// indexes.properties
 
-		FileUtil.delete(_sqlDir + "/indexes.properties");
+		File file = new File(_sqlDir, "indexes.properties");
+
+		file.delete();
 	}
 
 	private void _createSQLMappingTables(
@@ -3414,10 +3475,10 @@ public class ServiceBuilder {
 		throws IOException {
 
 		if (!sqlFile.exists()) {
-			FileUtil.write(sqlFile, StringPool.BLANK);
+			FileUtils.touch(sqlFile);
 		}
 
-		String content = FileUtil.read(sqlFile);
+		String content = FileUtils.readFileToString(sqlFile);
 
 		int x = content.indexOf(
 			_SQL_CREATE_TABLE + entityMapping.getTable() + " (");
@@ -3431,7 +3492,7 @@ public class ServiceBuilder {
 					content.substring(0, x) + newCreateTableString +
 						content.substring(y + 2);
 
-				FileUtil.write(sqlFile, content);
+				writeFileRaw(sqlFile, content);
 			}
 		}
 		else if (addMissingTables) {
@@ -3467,20 +3528,22 @@ public class ServiceBuilder {
 					sb.append(newCreateTableString);
 				}
 
-				FileUtil.write(sqlFile, sb.toString(), true);
+				writeFileRaw(sqlFile, sb.toString());
 			}
 		}
 	}
 
 	private void _createSQLSequences() throws IOException {
-		if (!FileUtil.exists(_sqlDir)) {
+		File sqlDir = new File(_sqlDir);
+
+		if (!sqlDir.exists()) {
 			return;
 		}
 
 		File sqlFile = new File(_sqlDir + "/" + _sqlSequencesFileName);
 
 		if (!sqlFile.exists()) {
-			FileUtil.write(sqlFile, "");
+			FileUtils.touch(sqlFile);
 		}
 
 		Set<String> sequenceSQLs = new TreeSet<>();
@@ -3550,18 +3613,20 @@ public class ServiceBuilder {
 			sb.setIndex(sb.index() - 1);
 		}
 
-		FileUtil.write(sqlFile, sb.toString(), true);
+		writeFileRaw(sqlFile, sb.toString());
 	}
 
-	private void _createSQLTables() throws IOException {
-		if (!FileUtil.exists(_sqlDir)) {
+	private void _createSQLTables() throws Exception {
+		File sqlDir = new File(_sqlDir);
+
+		if (!sqlDir.exists()) {
 			return;
 		}
 
 		File sqlFile = new File(_sqlDir + "/" + _sqlFileName);
 
 		if (!sqlFile.exists()) {
-			FileUtil.write(sqlFile, StringPool.BLANK);
+			FileUtils.touch(sqlFile);
 		}
 
 		for (int i = 0; i < _ejbList.size(); i++) {
@@ -3599,9 +3664,9 @@ public class ServiceBuilder {
 			}
 		}
 
-		String content = FileUtil.read(sqlFile);
+		String content = FileUtils.readFileToString(sqlFile);
 
-		FileUtil.write(sqlFile, content.trim());
+		writeFileRaw(sqlFile, content.trim());
 	}
 
 	private void _createSQLTables(
@@ -3610,10 +3675,10 @@ public class ServiceBuilder {
 		throws IOException {
 
 		if (!sqlFile.exists()) {
-			FileUtil.write(sqlFile, StringPool.BLANK);
+			FileUtils.touch(sqlFile);
 		}
 
-		String content = FileUtil.read(sqlFile);
+		String content = FileUtils.readFileToString(sqlFile);
 
 		int x = content.indexOf(_SQL_CREATE_TABLE + entity.getTable() + " (");
 		int y = content.indexOf(");", x);
@@ -3626,7 +3691,7 @@ public class ServiceBuilder {
 					content.substring(0, x) + newCreateTableString +
 						content.substring(y + 2);
 
-				FileUtil.write(sqlFile, content);
+				FileUtils.write(sqlFile, content);
 			}
 		}
 		else if (addMissingTables) {
@@ -3662,9 +3727,15 @@ public class ServiceBuilder {
 					sb.append(newCreateTableString);
 				}
 
-				FileUtil.write(sqlFile, sb.toString(), true);
+				writeFileRaw(sqlFile, sb.toString());
 			}
 		}
+	}
+
+	private void _deleteFile(String fileName) {
+		File file = new File(fileName);
+
+		file.delete();
 	}
 
 	private void _deleteOrmXml() throws Exception {
@@ -3672,7 +3743,7 @@ public class ServiceBuilder {
 			return;
 		}
 
-		FileUtil.delete("docroot/WEB-INF/src/META-INF/portlet-orm.xml");
+		_deleteFile("docroot/WEB-INF/src/META-INF/portlet-orm.xml");
 	}
 
 	private void _deleteSpringLegacyXml() throws Exception {
@@ -3680,16 +3751,15 @@ public class ServiceBuilder {
 			return;
 		}
 
-		FileUtil.delete("docroot/WEB-INF/src/META-INF/base-spring.xml");
-		FileUtil.delete("docroot/WEB-INF/src/META-INF/cluster-spring.xml");
-		FileUtil.delete("docroot/WEB-INF/src/META-INF/data-source-spring.xml");
-		FileUtil.delete(
+		_deleteFile("docroot/WEB-INF/src/META-INF/base-spring.xml");
+		_deleteFile("docroot/WEB-INF/src/META-INF/cluster-spring.xml");
+		_deleteFile("docroot/WEB-INF/src/META-INF/data-source-spring.xml");
+		_deleteFile(
 			"docroot/WEB-INF/src/META-INF/dynamic-data-source-spring.xml");
-		FileUtil.delete("docroot/WEB-INF/src/META-INF/hibernate-spring.xml");
-		FileUtil.delete(
-			"docroot/WEB-INF/src/META-INF/infrastructure-spring.xml");
-		FileUtil.delete("docroot/WEB-INF/src/META-INF/misc-spring.xml");
-		FileUtil.delete(
+		_deleteFile("docroot/WEB-INF/src/META-INF/hibernate-spring.xml");
+		_deleteFile("docroot/WEB-INF/src/META-INF/infrastructure-spring.xml");
+		_deleteFile("docroot/WEB-INF/src/META-INF/misc-spring.xml");
+		_deleteFile(
 			"docroot/WEB-INF/src/META-INF/shard-data-source-spring.xml");
 	}
 
@@ -3892,7 +3962,7 @@ public class ServiceBuilder {
 	private void _getCreateMappingTableIndex(
 			EntityMapping entityMapping,
 			Map<String, List<IndexMetadata>> indexMetadataMap)
-		throws IOException {
+		throws Exception {
 
 		Entity[] entities = new Entity[2];
 
@@ -3924,7 +3994,7 @@ public class ServiceBuilder {
 	}
 
 	private String _getCreateMappingTableSQL(EntityMapping entityMapping)
-		throws IOException {
+		throws Exception {
 
 		Entity[] entities = new Entity[2];
 
@@ -3977,8 +4047,7 @@ public class ServiceBuilder {
 
 					sb.append("DOUBLE");
 				}
-				else if (colType.equals("int") ||
-						 colType.equals("Integer") ||
+				else if (colType.equals("int") || colType.equals("Integer") ||
 						 StringUtil.equalsIgnoreCase(colType, "short")) {
 
 					sb.append("INTEGER");
@@ -4095,8 +4164,7 @@ public class ServiceBuilder {
 
 				sb.append("DOUBLE");
 			}
-			else if (colType.equals("int") ||
-					 colType.equals("Integer") ||
+			else if (colType.equals("int") || colType.equals("Integer") ||
 					 StringUtil.equalsIgnoreCase(colType, "short")) {
 
 				sb.append("INTEGER");
@@ -4206,20 +4274,16 @@ public class ServiceBuilder {
 	}
 
 	private JavaClass _getJavaClass(String fileName) throws IOException {
-		int pos = fileName.indexOf(_implDir + "/");
+		fileName = StringUtil.replace(
+			fileName, CharPool.BACK_SLASH, CharPool.SLASH);
 
-		if (pos != -1) {
-			pos += _implDir.length();
-		}
-		else {
-			pos = fileName.indexOf(_apiDir + "/") + _apiDir.length();
-		}
+		int pos = fileName.lastIndexOf("/src/") + 5;
 
-		String srcFile = fileName.substring(pos + 1);
-		String className = StringUtil.replace(
-			srcFile.substring(0, srcFile.length() - 5), "/", ".");
+		String fullyQualifiedClassName = StringUtil.replace(
+			fileName.substring(pos, fileName.length() - 5), CharPool.SLASH,
+			CharPool.PERIOD);
 
-		JavaClass javaClass = _javaClasses.get(className);
+		JavaClass javaClass = _javaClasses.get(fullyQualifiedClassName);
 
 		if (javaClass == null) {
 			ClassLibrary classLibrary = new ClassLibrary();
@@ -4236,9 +4300,9 @@ public class ServiceBuilder {
 
 			builder.addSource(file);
 
-			javaClass = builder.getClassByName(className);
+			javaClass = builder.getClassByName(fullyQualifiedClassName);
 
-			_javaClasses.put(className, javaClass);
+			_javaClasses.put(fullyQualifiedClassName, javaClass);
 		}
 
 		return javaClass;
@@ -4248,7 +4312,7 @@ public class ServiceBuilder {
 		StringBundler sb = new StringBundler();
 
 		if (!javaMethod.isConstructor()) {
-			sb.append(getTypeGenericsName(javaMethod.getReturns()));
+			sb.append(getTypeGenericsName(javaMethod.getReturnType()));
 			sb.append(StringPool.SPACE);
 		}
 
@@ -4351,7 +4415,7 @@ public class ServiceBuilder {
 				_outputPath + "/model/impl/" + entity.getName() + "Impl.java");
 		}
 
-		String content = FileUtil.read(modelFile);
+		String content = FileUtils.readFileToString(modelFile);
 
 		Matcher matcher = _getterPattern.matcher(content);
 
@@ -4586,19 +4650,17 @@ public class ServiceBuilder {
 
 		String finderClass = "";
 
-		if (FileUtil.exists(
-				_outputPath + "/service/persistence/" + ejbName +
-					"FinderImpl.java")) {
+		File originalFinderImpl = new File(
+			_outputPath + "/service/persistence/" + ejbName +
+				"FinderImpl.java");
+		File newFinderImpl = new File(
+			_outputPath + "/service/persistence/impl/" + ejbName +
+				"FinderImpl.java");
 
-			FileUtil.move(
-				_outputPath + "/service/persistence/" + ejbName +
-					"FinderImpl.java",
-				_outputPath + "/service/persistence/impl/" + ejbName +
-					"FinderImpl.java");
+		if (originalFinderImpl.exists()) {
+			FileUtils.moveFile(originalFinderImpl, newFinderImpl);
 
-			String content = FileUtil.read(
-				_outputPath + "/service/persistence/impl/" + ejbName +
-					"FinderImpl.java");
+			String content = FileUtils.readFileToString(newFinderImpl);
 
 			StringBundler sb = new StringBundler();
 
@@ -4615,16 +4677,10 @@ public class ServiceBuilder {
 				content, "package " + _packagePath + ".service.persistence;",
 				sb.toString());
 
-			FileUtil.write(
-				_outputPath + "/service/persistence/impl/" + ejbName +
-					"FinderImpl.java",
-				content);
+			writeFileRaw(newFinderImpl, content);
 		}
 
-		if (FileUtil.exists(
-				_outputPath + "/service/persistence/impl/" + ejbName +
-					"FinderImpl.java")) {
-
+		if (newFinderImpl.exists()) {
 			finderClass =
 				_packagePath +
 					".service.persistence.impl." + ejbName + "FinderImpl";
@@ -4937,10 +4993,8 @@ public class ServiceBuilder {
 					finderColumnElement.attributeValue("case-sensitive"), true);
 				String finderColComparator = GetterUtil.getString(
 					finderColumnElement.attributeValue("comparator"), "=");
-				String finderColArrayableOperator =
-					GetterUtil.getString(
-						finderColumnElement.attributeValue(
-							"arrayable-operator"));
+				String finderColArrayableOperator = GetterUtil.getString(
+					finderColumnElement.attributeValue("arrayable-operator"));
 
 				EntityColumn col = Entity.getColumn(finderColName, columnList);
 
@@ -5072,84 +5126,84 @@ public class ServiceBuilder {
 	}
 
 	private void _removeActionableDynamicQuery(Entity entity) {
-		FileUtil.delete(
+		_deleteFile(
 			_serviceOutputPath + "/service/persistence/" +
 				entity.getName() + "ActionableDynamicQuery.java");
 	}
 
 	private void _removeExportActionableDynamicQuery(Entity entity) {
-		FileUtil.delete(
+		_deleteFile(
 			_serviceOutputPath + "/service/persistence/" +
 				entity.getName() + "ExportActionableDynamicQuery.java");
 	}
 
 	private void _removeFinder(Entity entity) {
-		FileUtil.delete(
+		_deleteFile(
 			_serviceOutputPath + "/service/persistence/" + entity.getName() +
 				"Finder.java");
 	}
 
 	private void _removeFinderUtil(Entity entity) {
-		FileUtil.delete(
+		_deleteFile(
 			_serviceOutputPath + "/service/persistence/" + entity.getName() +
 				"FinderUtil.java");
 	}
 
 	private void _removeService(Entity entity, int sessionType) {
-		FileUtil.delete(
+		_deleteFile(
 			_serviceOutputPath + "/service/" + entity.getName() +
 				_getSessionTypeName(sessionType) + "Service.java");
 	}
 
 	private void _removeServiceBaseImpl(Entity entity, int sessionType) {
-		FileUtil.delete(
+		_deleteFile(
 			_outputPath + "/service/base/" + entity.getName() +
 				_getSessionTypeName(sessionType) + "ServiceBaseImpl.java");
 	}
 
 	private void _removeServiceClp(Entity entity, int sessionType) {
-		FileUtil.delete(
+		_deleteFile(
 			_serviceOutputPath + "/service/" + entity.getName() +
 				_getSessionTypeName(sessionType) + "ServiceClp.java");
 	}
 
 	private void _removeServiceClpInvoker(Entity entity, int sessionType) {
-		FileUtil.delete(
+		_deleteFile(
 			_outputPath + "/service/base/" + entity.getName() +
 				_getSessionTypeName(sessionType) + "ServiceClpInvoker.java");
 	}
 
 	private void _removeServiceHttp(Entity entity) {
-		FileUtil.delete(
+		_deleteFile(
 			_outputPath + "/service/http/" + entity.getName() +
 				"ServiceHttp.java");
 	}
 
 	private void _removeServiceImpl(Entity entity, int sessionType) {
-		FileUtil.delete(
+		_deleteFile(
 			_outputPath + "/service/impl/" + entity.getName() +
 				_getSessionTypeName(sessionType) + "ServiceImpl.java");
 	}
 
 	private void _removeServiceSoap(Entity entity) {
-		FileUtil.delete(
+		_deleteFile(
 			_outputPath + "/service/http/" + entity.getName() +
 				"ServiceSoap.java");
 	}
 
 	private void _removeServiceUtil(Entity entity, int sessionType) {
-		FileUtil.delete(
+		_deleteFile(
 			_serviceOutputPath + "/service/" + entity.getName() +
 				_getSessionTypeName(sessionType) + "ServiceUtil.java");
 	}
 
 	private void _removeServiceWrapper(Entity entity, int sessionType) {
-		FileUtil.delete(
+		_deleteFile(
 			_serviceOutputPath + "/service/" + entity.getName() +
 				_getSessionTypeName(sessionType) + "ServiceWrapper.java");
 	}
 
-	private void _resolveEntity(Entity entity) throws IOException {
+	private void _resolveEntity(Entity entity) throws Exception {
 		if (entity.isResolved()) {
 			return;
 		}

@@ -16,24 +16,31 @@ package com.liferay.portal.lar.backgroundtask;
 
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
-import com.liferay.portal.kernel.backgroundtask.BaseBackgroundTaskExecutor;
-import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.staging.StagingUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.model.BackgroundTask;
+import com.liferay.portal.model.ExportImportConfiguration;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.spring.transaction.TransactionHandlerUtil;
 
+import java.io.File;
 import java.io.Serializable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * @author Daniel Kocsis
+ * @author Akos Thurzo
  */
 public class PortletImportBackgroundTaskExecutor
-	extends BaseBackgroundTaskExecutor {
+	extends BaseExportImportBackgroundTaskExecutor {
 
 	public PortletImportBackgroundTaskExecutor() {
 		setBackgroundTaskStatusMessageTranslator(
@@ -42,41 +49,97 @@ public class PortletImportBackgroundTaskExecutor
 		// Isolation level guarantees this will be serial in a group
 
 		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_GROUP);
-		setSerial(true);
 	}
 
 	@Override
 	public BackgroundTaskResult execute(BackgroundTask backgroundTask)
 		throws Exception {
 
-		Map<String, Serializable> taskContextMap =
-			backgroundTask.getTaskContextMap();
+		ExportImportConfiguration exportImportConfiguration =
+			getExportImportConfiguration(backgroundTask);
 
-		long userId = MapUtil.getLong(taskContextMap, "userId");
-		long plid = MapUtil.getLong(taskContextMap, "plid");
-		long groupId = MapUtil.getLong(taskContextMap, "groupId");
-		String portletId = MapUtil.getString(taskContextMap, "portletId");
+		Map<String, Serializable> settingsMap =
+			exportImportConfiguration.getSettingsMap();
+
+		long userId = MapUtil.getLong(settingsMap, "userId");
+		long targetPlid = MapUtil.getLong(settingsMap, "targetPlid");
+		long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
+		String portletId = MapUtil.getString(settingsMap, "portletId");
 		Map<String, String[]> parameterMap =
-			(Map<String, String[]>)taskContextMap.get("parameterMap");
+			(Map<String, String[]>)settingsMap.get("parameterMap");
 
 		List<FileEntry> attachmentsFileEntries =
 			backgroundTask.getAttachmentsFileEntries();
 
+		File file = null;
+
 		for (FileEntry attachmentsFileEntry : attachmentsFileEntries) {
-			LayoutLocalServiceUtil.importPortletInfo(
-				userId, plid, groupId, portletId, parameterMap,
-				attachmentsFileEntry.getContentStream());
+			try {
+				file = FileUtil.createTempFile("lar");
+
+				FileUtil.write(file, attachmentsFileEntry.getContentStream());
+
+				TransactionHandlerUtil.invoke(
+					transactionAttribute,
+					new PortletImportCallable(
+						file, parameterMap, portletId, targetGroupId,
+						targetPlid, userId));
+			}
+			catch (Throwable t) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(t, t);
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn("Unable to import portlet: " + t.getMessage());
+				}
+
+				throw new SystemException(t);
+			}
+			finally {
+				FileUtil.delete(file);
+			}
 		}
 
 		return BackgroundTaskResult.SUCCESS;
 	}
 
-	@Override
-	public String handleException(BackgroundTask backgroundTask, Exception e) {
-		JSONObject jsonObject = StagingUtil.getExceptionMessagesJSONObject(
-			getLocale(backgroundTask), e, backgroundTask.getTaskContextMap());
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortletImportBackgroundTaskExecutor.class);
 
-		return jsonObject.toString();
+	private class PortletImportCallable implements Callable<Void> {
+
+		public PortletImportCallable(
+			File file, Map<String, String[]> parameterMap, String portletId,
+			long targetGroupId, long targetPlid, long userId) {
+
+			_file = file;
+			_parameterMap = parameterMap;
+			_portletId = portletId;
+			_targetGroupId = targetGroupId;
+			_targetPlid = targetPlid;
+			_userId = userId;
+		}
+
+		@Override
+		public Void call() throws PortalException {
+			LayoutLocalServiceUtil.importPortletDataDeletions(
+				_userId, _targetPlid, _targetGroupId, _portletId, _parameterMap,
+				_file);
+
+			LayoutLocalServiceUtil.importPortletInfo(
+				_userId, _targetPlid, _targetGroupId, _portletId, _parameterMap,
+				_file);
+
+			return null;
+		}
+
+		private final File _file;
+		private final Map<String, String[]> _parameterMap;
+		private final String _portletId;
+		private final long _targetGroupId;
+		private final long _targetPlid;
+		private final long _userId;
+
 	}
 
 }

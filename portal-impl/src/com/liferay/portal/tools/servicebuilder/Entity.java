@@ -34,13 +34,6 @@ import java.util.Set;
  */
 public class Entity {
 
-	public static final String DEFAULT_DATA_SOURCE = "liferayDataSource";
-
-	public static final String DEFAULT_SESSION_FACTORY =
-		"liferaySessionFactory";
-
-	public static final String DEFAULT_TX_MANAGER = "liferayTransactionManager";
-
 	public static final Accessor<Entity, String> NAME_ACCESSOR =
 		new Accessor<Entity, String>() {
 
@@ -130,10 +123,10 @@ public class Entity {
 		_remoteService = remoteService;
 		_persistenceClass = persistenceClass;
 		_finderClass = finderClass;
-		_dataSource = GetterUtil.getString(dataSource, DEFAULT_DATA_SOURCE);
+		_dataSource = GetterUtil.getString(dataSource, _DATA_SOURCE_DEFAULT);
 		_sessionFactory = GetterUtil.getString(
-			sessionFactory, DEFAULT_SESSION_FACTORY);
-		_txManager = GetterUtil.getString(txManager, DEFAULT_TX_MANAGER);
+			sessionFactory, _SESSION_FACTORY_DEFAULT);
+		_txManager = GetterUtil.getString(txManager, _TX_MANAGER_DEFAULT);
 		_dynamicUpdateEnabled = dynamicUpdateEnabled;
 		_jsonEnabled = jsonEnabled;
 		_mvccEnabled = mvccEnabled;
@@ -633,7 +626,7 @@ public class Entity {
 	}
 
 	public boolean isDefaultDataSource() {
-		if (_dataSource.equals(DEFAULT_DATA_SOURCE)) {
+		if (_dataSource.equals(_DATA_SOURCE_DEFAULT)) {
 			return true;
 		}
 		else {
@@ -642,7 +635,7 @@ public class Entity {
 	}
 
 	public boolean isDefaultSessionFactory() {
-		if (_sessionFactory.equals(DEFAULT_SESSION_FACTORY)) {
+		if (_sessionFactory.equals(_SESSION_FACTORY_DEFAULT)) {
 			return true;
 		}
 		else {
@@ -651,7 +644,7 @@ public class Entity {
 	}
 
 	public boolean isDefaultTXManager() {
-		if (_txManager.equals(DEFAULT_TX_MANAGER)) {
+		if (_txManager.equals(_TX_MANAGER_DEFAULT)) {
 			return true;
 		}
 		else {
@@ -879,6 +872,14 @@ public class Entity {
 
 		return _pkList.get(0);
 	}
+
+	private static final String _DATA_SOURCE_DEFAULT = "liferayDataSource";
+
+	private static final String _SESSION_FACTORY_DEFAULT =
+		"liferaySessionFactory";
+
+	private static final String _TX_MANAGER_DEFAULT =
+		"liferayTransactionManager";
 
 	private final String _alias;
 	private List<EntityColumn> _blobList;

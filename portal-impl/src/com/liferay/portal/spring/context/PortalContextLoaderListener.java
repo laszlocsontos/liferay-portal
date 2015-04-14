@@ -15,7 +15,6 @@
 package com.liferay.portal.spring.context;
 
 import com.liferay.portal.bean.BeanLocatorImpl;
-import com.liferay.portal.cache.ehcache.ClearEhcacheThreadUtil;
 import com.liferay.portal.dao.orm.hibernate.FieldInterceptionHelperUtil;
 import com.liferay.portal.deploy.hot.IndexerPostProcessorRegistry;
 import com.liferay.portal.deploy.hot.SchedulerEntryRegistry;
@@ -124,13 +123,6 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		}
 
 		try {
-			ClearEhcacheThreadUtil.clearEhcacheReplicationThread();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-
-		try {
 			DirectServletRegistryUtil.clearServlets();
 		}
 		catch (Exception e) {
@@ -178,6 +170,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			catch (Exception e) {
 				_log.error(e, e);
 			}
+
+			_arrayApplicationContext.close();
 		}
 		finally {
 			PortalContextLoaderLifecycleThreadLocal.setDestroying(false);
@@ -249,6 +243,18 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			tempDir.getAbsolutePath();
 
 		try {
+			ModuleFrameworkUtilAdapter.initFramework();
+
+			_arrayApplicationContext = new ArrayApplicationContext(
+				PropsValues.SPRING_INFRASTRUCTURE_CONFIGS);
+
+			servletContext.setAttribute(
+				PortalApplicationContext.PARENT_APPLICATION_CONTEXT,
+				_arrayApplicationContext);
+
+			ModuleFrameworkUtilAdapter.registerContext(
+				_arrayApplicationContext);
+
 			ModuleFrameworkUtilAdapter.startFramework();
 		}
 		catch (Exception e) {
@@ -268,7 +274,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			ContextLoader.getCurrentWebApplicationContext();
 
 		try {
-			BeanReferenceRefreshUtil.refresh(applicationContext);
+			BeanReferenceRefreshUtil.refresh(
+				applicationContext.getAutowireCapableBeanFactory());
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -391,6 +398,7 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		}
 	}
 
+	private ArrayApplicationContext _arrayApplicationContext;
 	private IndexerPostProcessorRegistry _indexerPostProcessorRegistry;
 	private SchedulerEntryRegistry _schedulerEntryRegistry;
 	private ServiceWrapperRegistry _serviceWrapperRegistry;

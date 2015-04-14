@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.GCUtil;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.SyncThrowableThread;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.Time;
 
@@ -144,21 +145,20 @@ public class BaseIntrabandTest {
 			ReflectionTestUtil.setFieldValue(
 				AtomicReference.class, "valueOffset", valueOffset + 1);
 
-			FutureTask<Void> registerFutureTask =
-				new FutureTask<>(
-					new Callable<Void>() {
+			FutureTask<Void> registerFutureTask = new FutureTask<>(
+				new Callable<Void>() {
 
-						@Override
-						public Void call() {
-							_mockIntraband.registerDatagramReceiveHandler(
-								_TYPE, datagramReceiveHandler2);
+					@Override
+					public Void call() {
+						_mockIntraband.registerDatagramReceiveHandler(
+							_TYPE, datagramReceiveHandler2);
 
-							Assert.fail();
+						throw new AssertionError(
+							"Registering a datagram receive handle should " +
+								"fail with a NullPointerException");
+					}
 
-							return null;
-						}
-
-					});
+				});
 
 			Thread registerThread = new Thread(
 				registerFutureTask, "Register Thread");
@@ -357,26 +357,25 @@ public class BaseIntrabandTest {
 				sourceChannel.configureBlocking(false);
 				sinkChannel.configureBlocking(false);
 
-				Thread slowWritingThread = new Thread() {
+				SyncThrowableThread<Void> syncThrowableThread =
+					new SyncThrowableThread<>(
+						new Callable<Void>() {
 
-					@Override
-					public void run() {
-						try {
-							for (byte b : byteBuffer.array()) {
-								sinkChannel.write(
-									ByteBuffer.wrap(new byte[] {b}));
+							@Override
+							public Void call() throws Exception {
+								for (byte b : byteBuffer.array()) {
+									sinkChannel.write(
+										ByteBuffer.wrap(new byte[] {b}));
 
-								Thread.sleep(1);
+									Thread.sleep(1);
+								}
+
+								return null;
 							}
-						}
-						catch (Exception e) {
-							Assert.fail(e.getMessage());
-						}
-					}
 
-				};
+						});
 
-				slowWritingThread.start();
+				syncThrowableThread.start();
 
 				channelContext = new ChannelContext(null);
 
@@ -388,7 +387,7 @@ public class BaseIntrabandTest {
 					_mockIntraband.handleReading(sourceChannel, channelContext);
 				}
 
-				slowWritingThread.join();
+				syncThrowableThread.sync();
 
 				Assert.assertEquals(_TYPE, receiveDatagram.getType());
 

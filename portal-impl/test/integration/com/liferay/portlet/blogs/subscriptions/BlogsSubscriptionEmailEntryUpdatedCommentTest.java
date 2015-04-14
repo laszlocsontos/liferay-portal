@@ -22,9 +22,7 @@ import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.Sync;
-import com.liferay.portal.kernel.test.rule.SynchronousMailTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
-import com.liferay.portal.kernel.test.util.MailServiceTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -40,6 +38,8 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.MainServletTestRule;
+import com.liferay.portal.test.rule.SynchronousMailTestRule;
+import com.liferay.portal.util.test.MailServiceTestUtil;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.util.BlogsConstants;
@@ -105,7 +105,7 @@ public class BlogsSubscriptionEmailEntryUpdatedCommentTest {
 	public void testEmailEntryUpdatedSentWithEmailEntryUpdatedComment()
 		throws Exception {
 
-		setUpBlogsSettings();
+		setUpBlogsGroupServiceSettings();
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
@@ -143,7 +143,7 @@ public class BlogsSubscriptionEmailEntryUpdatedCommentTest {
 	public void testEmailEntryUpdatedSentWithEmptyEmailEntryUpdatedComment()
 		throws Exception {
 
-		setUpBlogsSettings();
+		setUpBlogsGroupServiceSettings();
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
@@ -175,7 +175,7 @@ public class BlogsSubscriptionEmailEntryUpdatedCommentTest {
 		Assert.assertEquals(message.getBody(), StringPool.NEW_LINE);
 	}
 
-	protected void setUpBlogsSettings() throws Exception {
+	protected void setUpBlogsGroupServiceSettings() throws Exception {
 		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
 			_group.getGroupId(), BlogsConstants.SERVICE_NAME);
 

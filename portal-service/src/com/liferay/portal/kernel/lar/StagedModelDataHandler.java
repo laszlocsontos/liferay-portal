@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.StagedModel;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,13 +38,14 @@ public interface StagedModelDataHandler<T extends StagedModel> {
 
 	public T fetchMissingReference(String uuid, long groupId);
 
-	public T fetchStagedModelByUuidAndCompanyId(String uuid, long companyId);
-
 	public T fetchStagedModelByUuidAndGroupId(String uuid, long groupId);
+
+	public List<T> fetchStagedModelsByUuidAndCompanyId(
+		String uuid, long companyId);
 
 	public String[] getClassNames();
 
-	public String getDisplayName(T StagedModel);
+	public String getDisplayName(T stagedModel);
 
 	public int[] getExportableStatuses();
 

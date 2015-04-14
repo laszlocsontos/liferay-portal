@@ -15,10 +15,8 @@
 package com.liferay.portal.kernel.messaging.proxy;
 
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.sender.MessageSender;
+import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.sender.SynchronousMessageSender;
-
-import java.util.Map;
 
 /**
  * @author Michael C. Han
@@ -29,12 +27,12 @@ public abstract class BaseMultiDestinationProxyBean {
 	public abstract String getDestinationName(ProxyRequest proxyRequest);
 
 	public void send(ProxyRequest proxyRequest) {
-		_messageSender.send(
+		_messageBus.sendMessage(
 			getDestinationName(proxyRequest), buildMessage(proxyRequest));
 	}
 
-	public void setMessageSender(MessageSender messageSender) {
-		_messageSender = messageSender;
+	public void setMessageBus(MessageBus messageBus) {
+		_messageBus = messageBus;
 	}
 
 	public void setSynchronousMessageSender(
@@ -64,18 +62,12 @@ public abstract class BaseMultiDestinationProxyBean {
 
 		message.setPayload(proxyRequest);
 
-		Map<String, Object> values = MessageValuesThreadLocal.getValues();
-
-		if (!values.isEmpty()) {
-			for (String key : values.keySet()) {
-				message.put(key, values.get(key));
-			}
-		}
+		MessageValuesThreadLocal.populateMessageFromThreadLocals(message);
 
 		return message;
 	}
 
-	private MessageSender _messageSender;
+	private MessageBus _messageBus;
 	private SynchronousMessageSender _synchronousMessageSender;
 
 }

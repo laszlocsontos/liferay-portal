@@ -25,8 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Michael C. Han
+ * @author     Michael C. Han
+ * @deprecated As of 7.0.0, replaced by {@link
+ *             com.liferay.portal.kernel.lar.exportimportconfiguration.ExportImportConfigurationSettingsMapFactory}
  */
+@Deprecated
 public class BackgroundTaskContextMapFactory {
 
 	public static Map<String, Serializable> buildTaskContextMap(
