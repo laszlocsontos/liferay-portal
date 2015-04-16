@@ -3416,14 +3416,10 @@ public class PortalImpl implements Portal {
 				}
 
 				if (!inheritLocales) {
-					String i18nPath = (String)request.getAttribute(
-						WebKeys.I18N_PATH);
+					String i18nLanguageCode = (String)request.getAttribute(
+						WebKeys.I18N_LANGUAGE_CODE);
 
-					int pos = i18nPath.lastIndexOf(CharPool.SLASH);
-
-					i18nLanguageId = i18nPath.substring(pos + 1);
-
-					locale = LanguageUtil.getLocale(groupId, i18nLanguageId);
+					locale = LanguageUtil.getLocale(groupId, i18nLanguageCode);
 
 					if (LanguageUtil.isAvailableLocale(groupId, locale)) {
 						return locale;
