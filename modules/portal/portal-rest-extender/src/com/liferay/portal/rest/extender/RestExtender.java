@@ -62,6 +62,8 @@ public class RestExtender {
 		addProviderDependencies();
 		addServiceDependencies();
 
+		_dependencyManager.add(_component);
+
 		_component.start();
 	}
 

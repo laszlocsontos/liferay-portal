@@ -16,6 +16,7 @@ package com.liferay.portal.soap.extender.test;
 
 import java.net.URL;
 
+import org.arquillian.liferay.deploymentscenario.annotations.BndFile;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
