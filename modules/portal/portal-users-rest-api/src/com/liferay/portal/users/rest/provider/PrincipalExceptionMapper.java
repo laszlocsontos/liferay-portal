@@ -14,38 +14,22 @@
 
 package com.liferay.portal.users.rest.provider;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.security.auth.PrincipalException;
 
-import javax.servlet.http.HttpServletRequest;
-
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import org.apache.cxf.jaxrs.ext.ContextProvider;
-import org.apache.cxf.message.Message;
-
-import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(
-	immediate = true, service = CompanyContextProvider.class
-)
 @Provider
-public class CompanyContextProvider implements ContextProvider<Company> {
+public class PrincipalExceptionMapper
+	implements ExceptionMapper<PrincipalException> {
 
 	@Override
-	public Company createContext(Message message) {
-		try {
-			return PortalUtil.getCompany(
-				(HttpServletRequest)message.getContextualProperty(
-					"HTTP.REQUEST"));
-		}
-		catch (PortalException e) {
-			return null;
-		}
+	public Response toResponse(PrincipalException exception) {
+		return Response.status(404).entity("Not found\n").build();
 	}
 
 }

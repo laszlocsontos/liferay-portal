@@ -17,27 +17,31 @@ package com.liferay.portal.users.rest.provider;
 import com.liferay.portal.model.VirtualHost;
 import com.liferay.portal.service.CompanyLocalService;
 import com.liferay.portal.service.VirtualHostLocalService;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+
+import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import java.io.IOException;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Carlos Sierra Andrés
  */
 @Component(
-	immediate = true,
-	property = {"liferay.provider=true"},
-	service = TokenRequestFilter.class)
+	immediate = true, property = {"liferay.provider=true"},
+	service = TokenRequestFilter.class
+)
 public class TokenRequestFilter implements ContainerRequestFilter {
 	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
+	public void filter(ContainerRequestContext requestContext)
+		throws IOException {
+
 		String host = requestContext.getHeaders().getFirst("Host");
 
-		VirtualHost virtualHost =
-			_virtualHostLocalService.fetchVirtualHost(host);
+		VirtualHost virtualHost = _virtualHostLocalService.fetchVirtualHost(
+			host);
 
 		if (virtualHost == null) {
 			return;
@@ -47,11 +51,7 @@ public class TokenRequestFilter implements ContainerRequestFilter {
 
 		requestContext.setProperty(
 			"liferay.company", _companyService.fetchCompanyById(companyId));
-
 	}
-
-	private CompanyLocalService _companyService;
-	private VirtualHostLocalService _virtualHostLocalService;
 
 	@Reference
 	public void setCompanyService(CompanyLocalService companyService) {
@@ -64,4 +64,8 @@ public class TokenRequestFilter implements ContainerRequestFilter {
 
 		_virtualHostLocalService = virtualHostLocalService;
 	}
+
+	private CompanyLocalService _companyService;
+	private VirtualHostLocalService _virtualHostLocalService;
+
 }

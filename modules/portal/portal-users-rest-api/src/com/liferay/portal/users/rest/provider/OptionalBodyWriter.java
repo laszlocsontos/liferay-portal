@@ -15,8 +15,13 @@
 package com.liferay.portal.users.rest.provider;
 
 import com.liferay.portal.users.rest.api.model.Optional;
-import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -27,27 +32,55 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@Provider
 @Produces("*/*")
+@Provider
 public class OptionalBodyWriter implements MessageBodyWriter<Optional<?>> {
+
+	public static Response createEmptyResponse(String resourceName) {
+		return Response.
+			status(422).
+			entity(new ResourceMissingEntity(
+				"Not found", resourceName, ""
+			)).build();
+	}
+
+	public static Class<?> getTargetClass(Class<?> type, Type genericType) {
+		if (type.isAssignableFrom(Optional.class)) {
+			if (genericType instanceof ParameterizedType) {
+				ParameterizedType parameterizedType =
+					(ParameterizedType)genericType;
+
+				return (Class<?>)parameterizedType.getActualTypeArguments()[0];
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public long getSize(
+		Optional<?> optional, Class<?> type, Type genericType,
+		Annotation[] annotations, MediaType mediaType) {
+
+		//Read MessageBodyWriter#getSize
+		return -1;
+	}
 
 	@Context
 	Providers _providers;
 
 	@Context
 	MessageContext _messageContext;
-
 
 	@Override
 	public boolean isWriteable(
@@ -72,29 +105,6 @@ public class OptionalBodyWriter implements MessageBodyWriter<Optional<?>> {
 			targetClass, targetClass, annotations, mediaType);
 	}
 
-	protected Class<?> getTargetClass(Class<?> type, Type genericType) {
-		if (type.isAssignableFrom(Optional.class)) {
-			if (genericType instanceof ParameterizedType) {
-				ParameterizedType parameterizedType =
-					(ParameterizedType) genericType;
-
-				return (Class<?>) parameterizedType.getActualTypeArguments()[0];
-			}
-		}
-
-		return null;
-	}
-
-	@Override
-	public long getSize(
-		Optional<?> optional, Class<?> type, Type genericType,
-		Annotation[] annotations, MediaType mediaType) {
-
-		//Read MessageBodyWriter#getSize
-		return -1;
-
-	}
-
 	@Override
 	public void writeTo(
 			Optional<?> optional, Class<?> type, Type genericType,
@@ -110,14 +120,8 @@ public class OptionalBodyWriter implements MessageBodyWriter<Optional<?>> {
 		}
 
 		if (!optional.isPresent()) {
-			Response response =
-				Response.
-					status(422).
-					entity(new ResourceMissingEntity(
-						"Not found", targetClass.getSimpleName(), ""
-					)).build();
-
-			_messageContext.put(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED, true);
+			Response response = createEmptyResponse(
+				targetClass.getSimpleName());
 
 			throw new WebApplicationException(response);
 		}
@@ -132,27 +136,84 @@ public class OptionalBodyWriter implements MessageBodyWriter<Optional<?>> {
 	}
 
 	@XmlRootElement
-	private static class ResourceMissingEntity {
+	public static class Errors {
 
-		String _message;
-		String _resource;
-		String _field;
-
-		public ResourceMissingEntity(String message, String resource, String field) {
-			_message = message;
-			_resource = resource;
-			_field = field;
+		public Errors() {
 		}
 
-		public ResourceMissingEntity() {
+		public Errors(String resource, String field, String code) {
+			_resource = resource;
+			_field = field;
+			_code = code;
+		}
+
+		public String getCode() {
+			return _code;
+		}
+
+		public String getField() {
+			return _field;
 		}
 
 		public String getResource() {
 			return _resource;
 		}
 
+		public void setCode(String code) {
+			_code = code;
+		}
+
+		public void setField(String field) {
+			_field = field;
+		}
+
+		public void setResource(String resource) {
+			_resource = resource;
+		}
+
+		private String _code;
+		private String _field;
+		private String _resource;
+
+	}
+
+	@XmlRootElement
+	private static class ResourceMissingEntity {
+
+		String _message;
+		String _resource;
+		String _field;
+
+		public ResourceMissingEntity() {
+		}
+
+		public ResourceMissingEntity(
+			String message, String resource, String field) {
+
+			_message = message;
+			_resource = resource;
+			_field = field;
+		}
+
+		@XmlElement
+		public Errors getErrors() {
+			return new Errors(_resource, _field, "missing");
+		}
+
 		public String getField() {
 			return _field;
+		}
+
+		public String getMessage() {
+			return _message;
+		}
+
+		public String getResource() {
+			return _resource;
+		}
+
+		public void setField(String field) {
+			_field = field;
 		}
 
 		public void setMessage(String message) {
@@ -163,60 +224,6 @@ public class OptionalBodyWriter implements MessageBodyWriter<Optional<?>> {
 			_resource = resource;
 		}
 
-		public void setField(String field) {
-			_field = field;
-		}
-
-		public String getMessage() {
-			return _message;
-		}
-
-		@XmlElement
-		public Errors getErrors() {
-			return new Errors(_resource, _field, "missing");
-		}
 	}
 
-	@XmlRootElement
-	public static class Errors {
-
-		public Errors(String resource, String field, String code) {
-			_resource = resource;
-			_field = field;
-			_code = code;
-		}
-
-		public Errors() {
-		}
-
-		public void setResource(String resource) {
-			_resource = resource;
-		}
-
-		public void setField(String field) {
-			_field = field;
-		}
-
-		public void setCode(String code) {
-			_code = code;
-		}
-
-		public String getResource() {
-			return _resource;
-		}
-
-		public String getField() {
-			return _field;
-		}
-
-		public String getCode() {
-			return _code;
-		}
-
-		private String _resource;
-		private String _field;
-		private String _code;
-
-
-	}
 }

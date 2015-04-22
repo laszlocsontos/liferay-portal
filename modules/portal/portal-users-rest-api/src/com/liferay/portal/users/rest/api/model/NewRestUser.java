@@ -14,7 +14,11 @@
 
 package com.liferay.portal.users.rest.api.model;
 
+import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.model.User;
+import com.liferay.portal.model.impl.UserImpl;
+
+import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -22,17 +26,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Carlos Sierra Andrés
  */
 @XmlRootElement
-public class RestUser {
+public class NewRestUser {
 
-	public RestUser() {
+	public NewRestUser() {
+		_user = new UserImpl();
 	}
 
-	public RestUser(User user) {
-		_user = user;
-	}
-
-	public long getContactId() {
-		return _user.getContactId();
+	public Date getBirthDay() {
+		return _birthDay;
 	}
 
 	public String getEmailAddress() {
@@ -47,6 +48,7 @@ public class RestUser {
 		return _user.getGreeting();
 	}
 
+	@AutoEscape
 	public String getJobTitle() {
 		return _user.getJobTitle();
 	}
@@ -63,8 +65,12 @@ public class RestUser {
 		return _user.getMiddleName();
 	}
 
-	public ResourceLink getPortraitLink() {
-		return _portraitLink;
+	public String getPassword() {
+		return _user.getPassword();
+	}
+
+	public String getPrefix() {
+		return _prefix;
 	}
 
 	public String getScreenName() {
@@ -75,12 +81,16 @@ public class RestUser {
 		return _user.getStatus();
 	}
 
-	public long getUserId() {
-		return _user.getUserId();
+	public String getSuffix() {
+		return _suffix;
 	}
 
-	public void setContactId(long contactId) {
-		_user.setContactId(contactId);
+	public boolean isMale() {
+		return _male;
+	}
+
+	public void setBirthDay(Date birthDay) {
+		_birthDay = birthDay;
 	}
 
 	public void setEmailAddress(String emailAddress) {
@@ -107,12 +117,20 @@ public class RestUser {
 		_user.setLastName(lastName);
 	}
 
+	public void setMale(boolean male) {
+		this._male = male;
+	}
+
 	public void setMiddleName(String middleName) {
 		_user.setMiddleName(middleName);
 	}
 
-	public void setPortraitLink(ResourceLink portraitLink) {
-		_portraitLink = portraitLink;
+	public void setPassword(String password) {
+		_user.setPassword(password);
+	}
+
+	public void setPrefix(String prefix) {
+		_prefix = prefix;
 	}
 
 	public void setScreenName(String screenName) {
@@ -123,12 +141,14 @@ public class RestUser {
 		_user.setStatus(status);
 	}
 
-	public void setUserId(long userId) {
-		_user.setUserId(userId);
+	public void setSuffix(String suffix) {
+		_suffix = suffix;
 	}
 
-	private ResourceLink _portraitLink;
-
-	private User _user;
+	private Date _birthDay;
+	private boolean _male;
+	private String _prefix;
+	private String _suffix;
+	private final User _user;
 
 }

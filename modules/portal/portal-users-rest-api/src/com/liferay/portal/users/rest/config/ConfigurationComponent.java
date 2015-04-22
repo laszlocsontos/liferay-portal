@@ -14,26 +14,30 @@
 
 package com.liferay.portal.users.rest.config;
 
+import com.liferay.portal.servlet.filters.authverifier.AuthVerifierFilter;
+
+import java.io.IOException;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import javax.servlet.Filter;
+
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-
-import java.io.IOException;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 
 /**
  * @author Carlos Sierra Andrés
  */
 @Component(immediate = true, service = ConfigurationComponent.class)
 public class ConfigurationComponent {
-
-	private Configuration _cxfConfiguration;
-	private Configuration _restConfiguration;
 
 	@Activate
 	public void activate(BundleContext bundleContext) throws IOException {
@@ -47,15 +51,26 @@ public class ConfigurationComponent {
 		_cxfConfiguration.update(properties);
 
 		_restConfiguration = _configurationAdmin.createFactoryConfiguration(
-			"com.liferay.portal.rest.extender.RestExtenderConfiguration",
-			null);
+			"com.liferay.portal.rest.extender.RestExtenderConfiguration", null);
+
+		properties = new Hashtable<>();
+
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "rest");
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_NAME,
+			"AuthVerifierFilter");
+		properties.put(
+			HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_PATTERN, "/*");
+
+		_authVerifierFilterServiceRegistration = bundleContext.registerService(
+			Filter.class, new AuthVerifierFilter(), properties);
 
 		properties = new Hashtable<>();
 
 		properties.put("contextPaths", new String[] {"/rest"});
 		properties.put(
-			"applicationFilters",
-			new String[] {"(jaxrs.application=true)"});
+			"applicationFilters", new String[] {"(jaxrs.application=true)"});
 
 		_restConfiguration.update(properties);
 	}
@@ -63,6 +78,8 @@ public class ConfigurationComponent {
 	@Deactivate
 	public void deactivate(BundleContext bundleContext) throws IOException {
 		_restConfiguration.delete();
+
+		_authVerifierFilterServiceRegistration.unregister();
 
 		_cxfConfiguration.delete();
 	}
@@ -72,5 +89,9 @@ public class ConfigurationComponent {
 		_configurationAdmin = configurationAdmin;
 	}
 
+	private ServiceRegistration<Filter> _authVerifierFilterServiceRegistration;
 	private ConfigurationAdmin _configurationAdmin;
+	private Configuration _cxfConfiguration;
+	private Configuration _restConfiguration;
+
 }

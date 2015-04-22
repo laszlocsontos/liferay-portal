@@ -45,7 +45,7 @@ public final class Optional<T> {
 	 */
 	public static <T> Optional<T> empty() {
 		@SuppressWarnings("unchecked")
-		Optional<T> t = (Optional<T>) EMPTY;
+		Optional<T> t = (Optional<T>)EMPTY;
 		return t;
 	}
 
@@ -72,7 +72,7 @@ public final class Optional<T> {
 	 * is non-null, otherwise an empty {@code Optional}
 	 */
 	public static <T> Optional<T> ofNullable(T value) {
-		return value == null ? (Optional<T>) empty() : of(value);
+		return value == null ? (Optional<T>)empty() : of(value);
 	}
 
 	/**
@@ -98,10 +98,9 @@ public final class Optional<T> {
 			return false;
 		}
 
-		Optional<?> other = (Optional<?>) obj;
+		Optional<?> other = (Optional<?>)obj;
 		return Objects.equals(value, other.value);
 	}
-
 
 	/**
 	 * If a value is present in this {@code Optional}, returns the value,
@@ -116,6 +115,7 @@ public final class Optional<T> {
 		if (value == null) {
 			throw new NoSuchElementException("No value present");
 		}
+
 		return value;
 	}
 
@@ -149,7 +149,6 @@ public final class Optional<T> {
 	public T orElse(T other) {
 		return value != null ? value : other;
 	}
-
 
 	/**
 	 * Returns a non-empty string representation of this Optional suitable for
@@ -193,9 +192,10 @@ public final class Optional<T> {
 	 * Common instance for {@code empty()}.
 	 */
 	private static final Optional<?> EMPTY = new Optional<>();
+
 	/**
 	 * If non-null, the value; if null, indicates no value is present
 	 */
 	private final T value;
-}
 
+}

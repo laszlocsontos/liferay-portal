@@ -111,6 +111,10 @@ class CXFJaxRSServiceRegistrator {
 
 		jaxrsServerFactoryBean.setProviders(providers);
 
+		for (Object service : _services) {
+			jaxrsServerFactoryBean.setServiceBean(service);
+		}
+
 		Server server = jaxrsServerFactoryBean.create();
 
 		server.start();
