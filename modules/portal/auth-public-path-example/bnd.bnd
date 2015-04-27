@@ -1,0 +1,4 @@
+Bundle-Name: Liferay Portal Auth Public Path Example
+Bundle-SymbolicName: com.liferay.portal.auth.pub.path.example
+Bundle-Version: 1.0.0
+Private-Package: com.liferay.portal.auth.pub.path.example
