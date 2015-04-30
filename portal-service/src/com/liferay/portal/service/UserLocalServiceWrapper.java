@@ -2971,6 +2971,12 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		return _userLocalService.updateLastLogin(userId, loginIP);
 	}
 
+	@Override
+	public void updateLockout(long companyId, java.lang.String login)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_userLocalService.updateLockout(companyId, login);
+	}
+
 	/**
 	* Updates whether the user is locked out from logging in.
 	*
