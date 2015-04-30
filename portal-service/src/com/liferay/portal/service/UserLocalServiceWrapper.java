@@ -3466,6 +3466,12 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		_userLocalService.verifyEmailAddress(ticketKey);
 	}
 
+	@Override
+	public long verifyLockout(long companyId, java.lang.String login)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userLocalService.verifyLockout(companyId, login);
+	}
+
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */

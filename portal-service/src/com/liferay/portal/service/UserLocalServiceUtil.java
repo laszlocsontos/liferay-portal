@@ -3284,6 +3284,11 @@ public class UserLocalServiceUtil {
 		getService().verifyEmailAddress(ticketKey);
 	}
 
+	public static long verifyLockout(long companyId, java.lang.String login)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().verifyLockout(companyId, login);
+	}
+
 	public static UserLocalService getService() {
 		if (_service == null) {
 			_service = (UserLocalService)PortalBeanLocatorUtil.locate(UserLocalService.class.getName());
