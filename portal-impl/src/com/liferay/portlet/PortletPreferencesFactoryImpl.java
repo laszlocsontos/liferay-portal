@@ -51,6 +51,7 @@ import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portal.xml.StAXReaderUtil;
 import com.liferay.portlet.portletconfiguration.util.ConfigurationPortletRequest;
@@ -897,7 +898,13 @@ public class PortletPreferencesFactoryImpl
 					cacheKeyGenerator.getClass().getName());
 		}
 
-		return String.valueOf(cacheKeyGenerator.getCacheKey(xml));
+		String key = xml;
+
+		if (xml.length() > PropsValues.CACHE_KEY_THRESHOLD_SIZE) {
+			key = xml.substring(0, PropsValues.CACHE_KEY_THRESHOLD_SIZE-1);
+		}
+
+		return String.valueOf(cacheKeyGenerator.getCacheKey(key));
 	}
 
 	private final Log _log = LogFactoryUtil.getLog(

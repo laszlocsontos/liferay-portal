@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.nio.charset.CharsetEncoderUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.util.PropsValues;
 
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
@@ -49,9 +48,7 @@ public abstract class BaseMessageDigestCacheKeyGenerator
 
 	@Override
 	public String getCacheKey(String key) {
-		if (((_maxLength > -1) && (key.length() < _maxLength)) ||
-			(key.length() < PropsValues.CACHE_KEY_THRESHOLD_SIZE)) {
-
+		if ((_maxLength > -1) && (key.length() < _maxLength)) {
 			return key;
 		}
 
@@ -76,9 +73,7 @@ public abstract class BaseMessageDigestCacheKeyGenerator
 
 	@Override
 	public String getCacheKey(StringBundler sb) {
-		if (((_maxLength > -1) && (sb.length() < _maxLength)) ||
-			(sb.length() < PropsValues.CACHE_KEY_THRESHOLD_SIZE)) {
-
+		if ((_maxLength > -1) && (sb.length() < _maxLength)) {
 			return sb.toString();
 		}
 
