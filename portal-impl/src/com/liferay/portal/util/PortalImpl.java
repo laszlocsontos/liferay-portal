@@ -1312,6 +1312,10 @@ public class PortalImpl implements Portal {
 		catch (AuthException ae) {
 		}
 
+		if (userId == 0) {
+			UserLocalServiceUtil.updateLockout(companyId, login);
+		}
+
 		return userId;
 	}
 
@@ -2198,6 +2202,10 @@ public class PortalImpl implements Portal {
 		userId = UserLocalServiceUtil.authenticateForDigest(
 			companyId, username, realm, nonce, request.getMethod(), uri,
 			response);
+
+		if (userId == 0) {
+			UserLocalServiceUtil.updateLockout(companyId, username);
+		}
 
 		return userId;
 	}
