@@ -2361,6 +2361,18 @@ public interface UserLocalService extends BaseLocalService,
 	/**
 	* Updates whether the user is locked out from logging in.
 	*
+	* @param companyId the primary key of the user's company
+	* @param login either the user's email address, screen name, or primary
+	key depending on the <code>authType</code> property of the given
+	company
+	* @throws PortalException if a portal exception occurred
+	*/
+	public void updateLockout(long companyId, java.lang.String login)
+		throws PortalException;
+
+	/**
+	* Updates whether the user is locked out from logging in.
+	*
 	* @param user the user
 	* @param lockout whether the user is locked out
 	* @return the user
