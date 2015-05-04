@@ -2763,4 +2763,7 @@ public interface UserLocalService extends BaseLocalService,
 	*/
 	public void verifyEmailAddress(java.lang.String ticketKey)
 		throws PortalException;
+
+	public long verifyLockout(long companyId, java.lang.String login)
+		throws PortalException;
 }
