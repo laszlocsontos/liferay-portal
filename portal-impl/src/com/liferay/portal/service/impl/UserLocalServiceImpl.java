@@ -1194,7 +1194,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long authenticateForBasic(
-			long companyId, String authType, String login, String password)
+			long companyId, String login, String password)
 		throws PortalException {
 
 		if (PropsValues.AUTH_LOGIN_DISABLED) {
@@ -1253,6 +1253,50 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Attempts to authenticate the user using HTTP basic access authentication,
+	 * without using the AuthPipeline. Primarily used for authenticating users
+	 * of <code>tunnel-web</code>.
+	 *
+	 * <p>
+	 * Authentication type specifies what <code>login</code> contains.The valid
+	 * values are:
+	 * </p>
+	 *
+	 * <ul>
+	 * <li>
+	 * <code>CompanyConstants.AUTH_TYPE_EA</code> - <code>login</code> is the
+	 * user's email address
+	 * </li>
+	 * <li>
+	 * <code>CompanyConstants.AUTH_TYPE_SN</code> - <code>login</code> is the
+	 * user's screen name
+	 * </li>
+	 * <li>
+	 * <code>CompanyConstants.AUTH_TYPE_ID</code> - <code>login</code> is the
+	 * user's primary key
+	 * </li>
+	 * </ul>
+	 *
+	 * @param  companyId the primary key of the user's company
+	 * @param  authType the type of authentication to perform
+	 * @param  login either the user's email address, screen name, or primary
+	 *         key depending on the value of <code>authType</code>
+	 * @param  password the user's password
+	 * @return the user's primary key if authentication is successful;
+	 *         <code>0</code> otherwise
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@Deprecated
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long authenticateForBasic(
+			long companyId, String authType, String login, String password)
+		throws PortalException {
+
+		return authenticateForBasic(companyId, login, password);
 	}
 
 	/**
