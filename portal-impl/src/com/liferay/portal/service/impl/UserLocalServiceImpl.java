@@ -1201,17 +1201,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			return 0;
 		}
 
-		User user = null;
-
-		if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
-			user = fetchUserByEmailAddress(companyId, login);
-		}
-		else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
-			user = fetchUserByScreenName(companyId, login);
-		}
-		else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
-			user = userPersistence.fetchByPrimaryKey(GetterUtil.getLong(login));
-		}
+		User user = fetchUserByLogin(companyId, login);
 
 		if (user == null) {
 			return 0;
@@ -4739,21 +4729,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			return;
 		}
 
-		User user = null;
-
-		Company company = companyLocalService.getCompany(companyId);
-
-		String authType = company.getAuthType();
-
-		if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
-			user = fetchUserByEmailAddress(companyId, login);
-		}
-		else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
-			user = fetchUserByScreenName(companyId, login);
-		}
-		else {
-			user = userPersistence.fetchByPrimaryKey(GetterUtil.getLong(login));
-		}
+		User user = fetchUserByLogin(companyId, login);
 
 		if (user == null) {
 			return;
@@ -6142,6 +6118,26 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		queryConfig.setScoreEnabled(false);
 
 		return searchContext;
+	}
+
+	protected User fetchUserByLogin(long companyId, String login)
+		throws PortalException {
+
+		Company company = companyLocalService.getCompany(companyId);
+
+		String authType = company.getAuthType();
+
+		if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
+			return fetchUserByEmailAddress(companyId, login);
+		}
+		else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
+			return fetchUserByScreenName(companyId, login);
+		}
+		else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
+			return userPersistence.fetchByPrimaryKey(GetterUtil.getLong(login));
+		}
+
+		return null;
 	}
 
 	protected Date getBirthday(
