@@ -377,14 +377,16 @@ public class Table {
 
 					StringBundler sb = new StringBundler();
 
-					String line = null;
+					String line = unsyncBufferedReader.readLine();
 
-					while ((line = unsyncBufferedReader.readLine()) != null) {
+					while (line != null) {
 						if (sb.length() != 0) {
 							sb.append(_SAFE_TABLE_NEWLINE_CHARACTER);
 						}
 
 						sb.append(line);
+
+						line = unsyncBufferedReader.readLine();
 					}
 
 					value = sb.toString();
@@ -414,14 +416,16 @@ public class Table {
 
 					StringBundler sb = new StringBundler();
 
-					String line = null;
+					String line = unsyncBufferedReader.readLine();
 
-					while ((line = unsyncBufferedReader.readLine()) != null) {
+					while (line != null) {
 						if (sb.length() != 0) {
 							sb.append(_SAFE_TABLE_NEWLINE_CHARACTER);
 						}
 
 						sb.append(line);
+
+						line = unsyncBufferedReader.readLine();
 					}
 
 					value = sb.toString();
@@ -517,7 +521,9 @@ public class Table {
 
 			int count = 0;
 
-			while ((line = unsyncBufferedReader.readLine()) != null) {
+			line = unsyncBufferedReader.readLine();
+
+			while (line != null) {
 				String[] values = StringUtil.split(line);
 
 				Object[][] columns = getColumns();
@@ -555,6 +561,8 @@ public class Table {
 				else {
 					populateTableRows(ps, false);
 				}
+
+				line = unsyncBufferedReader.readLine();
 			}
 
 			if (databaseMetaData.supportsBatchUpdates()) {
