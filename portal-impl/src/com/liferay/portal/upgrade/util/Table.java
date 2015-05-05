@@ -35,7 +35,9 @@ import com.liferay.portal.util.PropsUtil;
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 
+import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -361,6 +363,43 @@ public class Table {
 		else if (t == Types.BIT) {
 			value = GetterUtil.getBoolean(rs.getBoolean(name));
 		}
+		else if (t == Types.BLOB) {
+			try {
+				Blob blob = rs.getBlob(name);
+
+				if (blob == null) {
+					value = StringPool.BLANK;
+				}
+				else {
+					UnsyncBufferedReader unsyncBufferedReader =
+						new UnsyncBufferedReader(
+							new InputStreamReader(blob.getBinaryStream()));
+
+					StringBundler sb = new StringBundler();
+
+					String line = unsyncBufferedReader.readLine();
+
+					while (line != null) {
+						if (sb.length() != 0) {
+							sb.append(_SAFE_TABLE_NEWLINE_CHARACTER);
+						}
+
+						sb.append(line);
+
+						line = unsyncBufferedReader.readLine();
+					}
+
+					value = sb.toString();
+				}
+			}
+			catch (Exception e) {
+
+				// If the database doesn't allow BLOB types for the column
+				// value, then try retrieving it as a String
+
+				value = GetterUtil.getString(rs.getString(name));
+			}
+		}
 		else if (t == Types.BOOLEAN) {
 			value = GetterUtil.getBoolean(rs.getBoolean(name));
 		}
@@ -377,14 +416,16 @@ public class Table {
 
 					StringBundler sb = new StringBundler();
 
-					String line = null;
+					String line = unsyncBufferedReader.readLine();
 
-					while ((line = unsyncBufferedReader.readLine()) != null) {
+					while (line != null) {
 						if (sb.length() != 0) {
 							sb.append(_SAFE_TABLE_NEWLINE_CHARACTER);
 						}
 
 						sb.append(line);
+
+						line = unsyncBufferedReader.readLine();
 					}
 
 					value = sb.toString();
@@ -480,7 +521,9 @@ public class Table {
 
 			int count = 0;
 
-			while ((line = unsyncBufferedReader.readLine()) != null) {
+			line = unsyncBufferedReader.readLine();
+
+			while (line != null) {
 				String[] values = StringUtil.split(line);
 
 				Object[][] columns = getColumns();
@@ -518,6 +561,8 @@ public class Table {
 				else {
 					populateTableRows(ps, false);
 				}
+
+				line = unsyncBufferedReader.readLine();
 			}
 
 			if (databaseMetaData.supportsBatchUpdates()) {
@@ -568,8 +613,8 @@ public class Table {
 		else if (t == Types.BOOLEAN) {
 			ps.setBoolean(paramIndex, GetterUtil.getBoolean(value));
 		}
-		else if ((t == Types.CLOB) || (t == Types.LONGVARCHAR) ||
-				 (t == Types.VARCHAR)) {
+		else if ((t == Types.BLOB) || (t == Types.CLOB) ||
+				 (t == Types.LONGVARCHAR) || (t == Types.VARCHAR)) {
 
 			value = StringUtil.replace(
 				value, _SAFE_TABLE_CHARS[1], _SAFE_TABLE_CHARS[0]);
