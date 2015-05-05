@@ -4722,6 +4722,15 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		return user;
 	}
 
+	/**
+	 * Updates whether the user is locked out from logging in.
+	 *
+	 * @param  companyId the primary key of the user's company
+	 * @param  login either the user's email address, screen name, or primary
+	 *         key depending on the <code>authType</code> property of the given
+	 *         company
+	 * @throws PortalException if a portal exception occurred
+	 */
 	@Override
 	public void updateLockout(long companyId, String login)
 		throws PortalException {
