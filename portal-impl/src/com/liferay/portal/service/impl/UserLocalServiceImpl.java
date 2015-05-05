@@ -1162,30 +1162,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * without using the AuthPipeline. Primarily used for authenticating users
 	 * of <code>tunnel-web</code>.
 	 *
-	 * <p>
-	 * Authentication type specifies what <code>login</code> contains.The valid
-	 * values are:
-	 * </p>
-	 *
-	 * <ul>
-	 * <li>
-	 * <code>CompanyConstants.AUTH_TYPE_EA</code> - <code>login</code> is the
-	 * user's email address
-	 * </li>
-	 * <li>
-	 * <code>CompanyConstants.AUTH_TYPE_SN</code> - <code>login</code> is the
-	 * user's screen name
-	 * </li>
-	 * <li>
-	 * <code>CompanyConstants.AUTH_TYPE_ID</code> - <code>login</code> is the
-	 * user's primary key
-	 * </li>
-	 * </ul>
-	 *
 	 * @param  companyId the primary key of the user's company
-	 * @param  authType the type of authentication to perform
 	 * @param  login either the user's email address, screen name, or primary
-	 *         key depending on the value of <code>authType</code>
+	 *         key depending on the <code>authType</code> property of the given
+	 *         company
 	 * @param  password the user's password
 	 * @return the user's primary key if authentication is successful;
 	 *         <code>0</code> otherwise
@@ -1280,14 +1260,16 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * </li>
 	 * </ul>
 	 *
-	 * @param  companyId the primary key of the user's company
-	 * @param  authType the type of authentication to perform
-	 * @param  login either the user's email address, screen name, or primary
-	 *         key depending on the value of <code>authType</code>
-	 * @param  password the user's password
-	 * @return the user's primary key if authentication is successful;
-	 *         <code>0</code> otherwise
-	 * @throws PortalException if a portal exception occurred
+	 * @param      companyId the primary key of the user's company
+	 * @param      authType the type of authentication to perform
+	 * @param      login either the user's email address, screen name, or
+	 *             primary key depending on the value of <code>authType</code>
+	 * @param      password the user's password
+	 * @return     the user's primary key if authentication is successful;
+	 *             <code>0</code> otherwise
+	 * @throws     PortalException if a portal exception occurred
+	 * @deprecated As of 7.0.0, replaced by {@link #authenticateForBasic(long,
+	 *             String, String)}
 	 */
 	@Deprecated
 	@Override
