@@ -2358,6 +2358,9 @@ public interface UserLocalService extends BaseLocalService,
 	public com.liferay.portal.model.User updateLastLogin(long userId,
 		java.lang.String loginIP) throws PortalException;
 
+	public void updateLockout(long companyId, java.lang.String login)
+		throws PortalException;
+
 	/**
 	* Updates whether the user is locked out from logging in.
 	*

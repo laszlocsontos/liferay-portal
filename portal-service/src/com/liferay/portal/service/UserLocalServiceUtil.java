@@ -2805,6 +2805,11 @@ public class UserLocalServiceUtil {
 		return getService().updateLastLogin(userId, loginIP);
 	}
 
+	public static void updateLockout(long companyId, java.lang.String login)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().updateLockout(companyId, login);
+	}
+
 	/**
 	* Updates whether the user is locked out from logging in.
 	*
