@@ -151,6 +151,8 @@ public class I18nServlet extends HttpServlet {
 
 		Locale locale = LocaleUtil.fromLanguageId(i18nLanguageId);
 
+		String originalI18nLanguageId = i18nLanguageId;
+
 		if (Validator.isNull(locale.getCountry())) {
 
 			// Locales must contain the country code
@@ -167,7 +169,7 @@ public class I18nServlet extends HttpServlet {
 		}
 
 		return new String[] {
-			locale.getLanguage(), i18nLanguageId, i18nPath, redirect
+			originalI18nLanguageId, i18nLanguageId, i18nPath, redirect
 		};
 	}
 
