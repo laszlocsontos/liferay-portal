@@ -43,7 +43,6 @@ public class CacheResponseData implements Externalizable, Serializable {
 		throws IOException {
 
 		_byteBuffer = bufferCacheServletResponse.getByteBuffer();
-		_content = _byteBuffer.array();
 		_contentType = bufferCacheServletResponse.getContentType();
 		_headers = bufferCacheServletResponse.getHeaders();
 	}
@@ -53,10 +52,6 @@ public class CacheResponseData implements Externalizable, Serializable {
 	}
 
 	public ByteBuffer getByteBuffer() {
-		if (_byteBuffer == null) {
-			_byteBuffer = ByteBuffer.wrap(_content);
-		}
-
 		return _byteBuffer;
 	}
 
@@ -107,7 +102,6 @@ public class CacheResponseData implements Externalizable, Serializable {
 
 	private Map<String, Object> _attributes = new HashMap<>();
 	private transient ByteBuffer _byteBuffer;
-	private byte[] _content;
 	private String _contentType;
 	private Map<String, Set<Header>> _headers;
 
