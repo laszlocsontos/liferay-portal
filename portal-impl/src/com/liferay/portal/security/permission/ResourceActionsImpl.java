@@ -485,12 +485,11 @@ public class ResourceActionsImpl implements ResourceActions {
 		Set<String> actions = null;
 
 		try {
-			actions = getActions(
-				_portletResourceGuestUnsupportedActions, name);
-	
+			actions = getActions(_portletResourceGuestUnsupportedActions, name);
+
 			if (actions.contains(ActionKeys.CONFIGURATION) &&
 				actions.contains(ActionKeys.PERMISSIONS)) {
-	
+
 				return new ArrayList<>(actions);
 			}
 		}
@@ -528,8 +527,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		Set<String> actions = null;
 
 		try {
-			actions = getActions(
-				_portletResourceLayoutManagerActions, name);
+			actions = getActions(_portletResourceLayoutManagerActions, name);
 		}
 		finally {
 			readLock.unlock();
@@ -1168,10 +1166,12 @@ public class ResourceActionsImpl implements ResourceActions {
 			_portletResourceActions.put(name, supportsActions);
 
 			readGroupDefaultActions(
-				portletResourceElement, _portletResourceGroupDefaultActions, name);
+				portletResourceElement, _portletResourceGroupDefaultActions,
+				name);
 
 			Set<String> guestDefaultActions = readGuestDefaultActions(
-				portletResourceElement, _portletResourceGuestDefaultActions, name);
+				portletResourceElement, _portletResourceGuestDefaultActions,
+				name);
 
 			readGuestUnsupportedActions(
 				portletResourceElement, _portletResourceGuestUnsupportedActions,
@@ -1180,8 +1180,8 @@ public class ResourceActionsImpl implements ResourceActions {
 			_portletResourceGuestDefaultActions.put(name, guestDefaultActions);
 
 			readLayoutManagerActions(
-				portletResourceElement, _portletResourceLayoutManagerActions, name,
-				supportsActions);
+				portletResourceElement, _portletResourceLayoutManagerActions,
+				name, supportsActions);
 		}
 		finally {
 			writeLock.unlock();
