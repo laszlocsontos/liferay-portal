@@ -7263,7 +7263,21 @@ public class PortalImpl implements Portal {
 	@Override
 	public PortletMode updatePortletMode(
 		String portletId, User user, Layout layout, PortletMode portletMode,
-		HttpServletRequest request) {
+		HttpServletRequest request) throws PortalException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(
+			getCompanyId(request), portletId);
+
+		boolean hasAccessPermission = PortletPermissionUtil.hasAccessPermission(
+			themeDisplay.getPermissionChecker(), getScopeGroupId(request),
+			layout, portlet, portletMode);
+
+		if (!hasAccessPermission) {
+			return portletMode;
+		}
 
 		LayoutTypePortlet layoutType =
 			(LayoutTypePortlet)layout.getLayoutType();
