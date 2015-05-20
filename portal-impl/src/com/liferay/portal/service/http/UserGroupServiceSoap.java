@@ -193,6 +193,20 @@ public class UserGroupServiceSoap {
 		}
 	}
 
+	public static com.liferay.portal.model.UserGroupSoap fetchUserGroup(
+		long userGroupId) throws RemoteException {
+		try {
+			com.liferay.portal.model.UserGroup returnValue = UserGroupServiceUtil.fetchUserGroup(userGroupId);
+
+			return com.liferay.portal.model.UserGroupSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	/**
 	* Returns the user group with the primary key.
 	*
@@ -230,6 +244,20 @@ public class UserGroupServiceSoap {
 			com.liferay.portal.model.UserGroup returnValue = UserGroupServiceUtil.getUserGroup(name);
 
 			return com.liferay.portal.model.UserGroupSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portal.model.UserGroupSoap[] getUserGroups(
+		long companyId) throws RemoteException {
+		try {
+			java.util.List<com.liferay.portal.model.UserGroup> returnValue = UserGroupServiceUtil.getUserGroups(companyId);
+
+			return com.liferay.portal.model.UserGroupSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

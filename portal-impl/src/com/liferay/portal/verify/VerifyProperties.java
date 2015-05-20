@@ -352,6 +352,19 @@ public class VerifyProperties extends VerifyProcess {
 			"display.templates.config", "com.liferay.asset.tags.navigation.web"
 		},
 
+		// Auth Verifiers
+
+		new String[] {
+			"auth.verifier.DigestAuthenticationAuthVerifier.hosts.allowed",
+			"auth.verifier.DigestAuthenticationAuthVerifier.hosts.allowed",
+			"com.liferay.portal.security.auth.verifier"
+		},
+		new String[] {
+			"auth.verifier.DigestAuthenticationAuthVerifier.urls.includes",
+			"auth.verifier.DigestAuthenticationAuthVerifier.urls.includes",
+			"com.liferay.portal.security.auth.verifier"
+		},
+
 		// Bookmarks
 
 		new String[] {
@@ -939,6 +952,13 @@ public class VerifyProperties extends VerifyProcess {
 			"com.liferay.rss.web"
 		},
 
+		// Scripting
+
+		new String[] {
+			"scripting.forbidden.classes", "forbidden.classes",
+			"com.liferay.portal.scripting.javascript"
+		},
+
 		// Search
 
 		new String[] {
@@ -1062,7 +1082,10 @@ public class VerifyProperties extends VerifyProcess {
 			"CharBufferPoolFilter",
 		"com.liferay.portal.servlet.filters.monitoring.MonitoringFilter",
 		"com.liferay.portal.servlet.filters.validhtml.ValidHtmlFilter",
-		"commons.pool.enabled", "convert.processes", "discussion.thread.view",
+		"commons.pool.enabled", "company.settings.form.configuration",
+		"company.settings.form.identification",
+		"company.settings.form.miscellaneous", "company.settings.form.social",
+		"convert.processes", "discussion.thread.view",
 		"dl.file.entry.read.count.enabled",
 		"dynamic.data.lists.template.language.parser[ftl]",
 		"dynamic.data.lists.template.language.parser[vm]",
@@ -1093,11 +1116,15 @@ public class VerifyProperties extends VerifyProcess {
 		"ehcache.cache.manager.statistics.thread.pool.size",
 		"ehcache.statistics.enabled",
 		"hot.deploy.hook.custom.jsp.verification.enabled",
-		"index.filter.search.limit", "invitation.email.max.recipients",
-		"invitation.email.message.body", "invitation.email.message.subject",
-		"javax.persistence.validation.mode", "jbi.workflow.url",
-		"json.deserializer.strict.mode", "journal.article.form.translate",
-		"journal.article.types", "journal.articles.page.delta.values",
+		"hibernate.cache.region.factory_class",
+		"hibernate.cache.use_minimal_puts", "hibernate.cache.use_query_cache",
+		"hibernate.cache.use_second_level_cache",
+		"hibernate.cache.use_structured_entries", "index.filter.search.limit",
+		"invitation.email.max.recipients", "invitation.email.message.body",
+		"invitation.email.message.subject", "javax.persistence.validation.mode",
+		"jbi.workflow.url", "json.deserializer.strict.mode",
+		"journal.article.form.translate", "journal.article.types",
+		"journal.articles.page.delta.values",
 		"journal.template.language.parser[css]",
 		"journal.template.language.parser[ftl]",
 		"journal.template.language.parser[vm]",
@@ -1107,7 +1134,8 @@ public class VerifyProperties extends VerifyProcess {
 		"jpa.provider", "jpa.provider.property.eclipselink.allow-zero-id",
 		"jpa.provider.property.eclipselink.logging.level",
 		"jpa.provider.property.eclipselink.logging.timestamp",
-		"language.display.style.options", "layout.reset.portlet.ids",
+		"language.display.style.options", "layout.form.add",
+		"layout.form.update", "layout.reset.portlet.ids",
 		"layout.set.form.update", "layout.types", "lucene.analyzer",
 		"lucene.cluster.index.loading.sync.timeout", "lucene.file.extractor",
 		"lucene.file.extractor.regexp.strip", "lucene.replicate.write",
@@ -1122,7 +1150,16 @@ public class VerifyProperties extends VerifyProcess {
 		"memory.cluster.scheduler.lock.cache.enabled",
 		"message.boards.email.message.added.signature",
 		"message.boards.email.message.updated.signature",
-		"message.boards.thread.locking.enabled", "portal.ctx",
+		"message.boards.thread.locking.enabled",
+		"multicast.group.address[\"hibernate\"]",
+		"multicast.group.port[\"hibernate\"]",
+		"net.sf.ehcache.configurationResourceName",
+		"net.sf.ehcache.configurationResourceName.peerProviderProperties",
+		"organizations.form.add.identification", "organizations.form.add.main",
+		"organizations.form.add.miscellaneous",
+		"organizations.form.update.identification",
+		"organizations.form.update.main",
+		"organizations.form.update.miscellaneous", "portal.ctx",
 		"portal.security.manager.enable", "permissions.list.filter",
 		"permissions.thread.local.cache.max.size",
 		"permissions.user.check.algorithm", "persistence.provider",
@@ -1136,10 +1173,14 @@ public class VerifyProperties extends VerifyProcess {
 		"sites.form.update.main", "sites.form.update.miscellaneous",
 		"sites.form.update.seo", "staging.lock.enabled",
 		"table.mapper.cacheless.mapping.table.names", "tck.url",
-		"webdav.storage.class", "webdav.storage.show.edit.url",
-		"webdav.storage.show.view.url", "webdav.storage.tokens",
-		"wiki.email.page.added.signature", "wiki.email.page.updated.signature",
-		"xss.allow"
+		"users.form.add.identification", "users.form.add.main",
+		"users.form.add.miscellaneous", "users.form.my.account.identification",
+		"users.form.my.account.main", "users.form.my.account.miscellaneous",
+		"users.form.update.identification", "users.form.update.main",
+		"users.form.update.miscellaneous", "webdav.storage.class",
+		"webdav.storage.show.edit.url", "webdav.storage.show.view.url",
+		"webdav.storage.tokens", "wiki.email.page.added.signature",
+		"wiki.email.page.updated.signature", "xss.allow"
 	};
 
 	private static final String[] _OBSOLETE_SYSTEM_KEYS = new String[] {

@@ -48,8 +48,18 @@ import java.util.Map;
 public class FileShortcutStagedModelDataHandler
 	extends BaseStagedModelDataHandler<FileShortcut> {
 
-	public static final String[] CLASS_NAMES =
-		{DLFileShortcutConstants.getClassName()};
+	public static final String[] CLASS_NAMES = {
+		DLFileShortcutConstants.getClassName(), FileShortcut.class.getName(),
+		LiferayFileShortcut.class.getName()
+	};
+
+	@Override
+	public void deleteStagedModel(FileShortcut fileShortcut)
+		throws PortalException {
+
+		DLFileShortcutLocalServiceUtil.deleteFileShortcut(
+			fileShortcut.getFileShortcutId());
+	}
 
 	@Override
 	public void deleteStagedModel(
@@ -60,8 +70,7 @@ public class FileShortcutStagedModelDataHandler
 			uuid, groupId);
 
 		if (fileShortcut != null) {
-			DLFileShortcutLocalServiceUtil.deleteFileShortcut(
-				fileShortcut.getFileShortcutId());
+			deleteStagedModel(fileShortcut);
 		}
 	}
 

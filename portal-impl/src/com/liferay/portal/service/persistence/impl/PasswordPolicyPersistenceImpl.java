@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchPasswordPolicyException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -26,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -41,11 +41,14 @@ import com.liferay.portal.model.PasswordPolicy;
 import com.liferay.portal.model.impl.PasswordPolicyImpl;
 import com.liferay.portal.model.impl.PasswordPolicyModelImpl;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.PasswordPolicyPersistence;
 
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -3381,10 +3384,6 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(PasswordPolicyImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(PasswordPolicyImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -3631,6 +3630,32 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 			String uuid = PortalUUIDUtil.generate();
 
 			passwordPolicy.setUuid(uuid);
+		}
+
+		if (!ExportImportThreadLocal.isImportInProcess()) {
+			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+			Date now = new Date();
+
+			if (isNew && (passwordPolicy.getCreateDate() == null)) {
+				if (serviceContext == null) {
+					passwordPolicy.setCreateDate(now);
+				}
+				else {
+					passwordPolicy.setCreateDate(serviceContext.getCreateDate(
+							now));
+				}
+			}
+
+			if (!passwordPolicyModelImpl.hasSetModifiedDate()) {
+				if (serviceContext == null) {
+					passwordPolicy.setModifiedDate(now);
+				}
+				else {
+					passwordPolicy.setModifiedDate(serviceContext.getModifiedDate(
+							now));
+				}
+			}
 		}
 
 		Session session = null;
@@ -4170,7 +4195,6 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 	private static final String _ORDER_BY_ENTITY_TABLE = "PasswordPolicy.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No PasswordPolicy exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No PasswordPolicy exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(PasswordPolicyPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"

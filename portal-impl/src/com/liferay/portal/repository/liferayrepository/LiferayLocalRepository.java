@@ -174,26 +174,35 @@ public class LiferayLocalRepository
 
 	@Override
 	public void checkInFileEntry(
-		long userId, long fileEntryId, boolean major, String changeLog,
-		ServiceContext serviceContext) {
+			long userId, long fileEntryId, boolean major, String changeLog,
+			ServiceContext serviceContext)
+		throws PortalException {
 
-		throw new UnsupportedOperationException();
+		dlFileEntryLocalService.checkInFileEntry(
+			userId, fileEntryId, major, changeLog, serviceContext);
 	}
 
 	@Override
 	public void checkInFileEntry(
-		long userId, long fileEntryId, String lockUuid,
-		ServiceContext serviceContext) {
+			long userId, long fileEntryId, String lockUuid,
+			ServiceContext serviceContext)
+		throws PortalException {
 
-		throw new UnsupportedOperationException();
+		dlFileEntryLocalService.checkInFileEntry(
+			userId, fileEntryId, lockUuid, serviceContext);
 	}
 
 	@Override
 	public FileEntry copyFileEntry(
-		long userId, long groupId, long fileEntryId, long destFolderId,
-		ServiceContext serviceContext) {
+			long userId, long groupId, long fileEntryId, long destFolderId,
+			ServiceContext serviceContext)
+		throws PortalException {
 
-		throw new UnsupportedOperationException();
+		DLFileEntry dlFileEntry = dlFileEntryLocalService.copyFileEntry(
+			userId, groupId, getRepositoryId(), fileEntryId,
+			toFolderId(destFolderId), serviceContext);
+
+		return new LiferayFileEntry(dlFileEntry);
 	}
 
 	@Override
@@ -223,6 +232,43 @@ public class LiferayLocalRepository
 		if (dlFolder != null) {
 			dlFolderLocalService.deleteFolder(folderId);
 		}
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
+		long folderId, int status, int start, int end,
+		OrderByComparator<FileEntry> obc) {
+
+		List<DLFileEntry> dlFileEntries =
+			dlFileEntryLocalService.getFileEntries(
+				getGroupId(), toFolderId(folderId), status, start, end,
+				DLFileEntryOrderByComparator.getOrderByComparator(obc));
+
+		return RepositoryModelUtil.toFileEntries(dlFileEntries);
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
+		long folderId, int start, int end, OrderByComparator<FileEntry> obc) {
+
+		List<DLFileEntry> dlFileEntries =
+			dlFileEntryLocalService.getFileEntries(
+				getGroupId(), toFolderId(folderId), start, end,
+				DLFileEntryOrderByComparator.getOrderByComparator(obc));
+
+		return RepositoryModelUtil.toFileEntries(dlFileEntries);
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId) {
+		return dlFileEntryLocalService.getFileEntriesCount(
+			getGroupId(), toFolderId(folderId));
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId, int status) {
+		return dlFileEntryLocalService.getFileEntriesCount(
+			getGroupId(), toFolderId(folderId), status);
 	}
 
 	@Override
@@ -331,10 +377,12 @@ public class LiferayLocalRepository
 
 	@Override
 	public void revertFileEntry(
-		long userId, long fileEntryId, String version,
-		ServiceContext serviceContext) {
+			long userId, long fileEntryId, String version,
+			ServiceContext serviceContext)
+		throws PortalException {
 
-		throw new UnsupportedOperationException();
+		dlFileEntryLocalService.revertFileEntry(
+			userId, fileEntryId, version, serviceContext);
 	}
 
 	/**

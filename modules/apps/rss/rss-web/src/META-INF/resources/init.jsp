@@ -49,10 +49,11 @@ page import="java.util.List" %>
 <portlet:defineObjects />
 
 <%
-RSSPortletInstanceConfiguration rssPortletInstanceConfiguration = portletDisplay.getPortletInstanceConfiguration(RSSPortletInstanceConfiguration.class);
 RSSWebConfiguration rssWebConfiguration = (RSSWebConfiguration)renderRequest.getAttribute(RSSWebConfiguration.class.getName());
 
-RSSDisplayContext rssDisplayContext = new RSSDisplayContext(rssPortletInstanceConfiguration, rssWebConfiguration);
+RSSDisplayContext rssDisplayContext = new RSSDisplayContext(request, rssWebConfiguration);
+
+RSSPortletInstanceConfiguration rssPortletInstanceConfiguration = rssDisplayContext.getRSSPortletInstanceConfiguration();
 
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 %>

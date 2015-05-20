@@ -29,11 +29,14 @@ import ${packagePath}.service.persistence.${entity.name}Persistence;
 	import ${packagePath}.service.persistence.${entity.PKClassName};
 </#if>
 
+<#if entity.isStagedModel()>
+	import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
+</#if>
+
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.jdbc.MappingSqlQuery;
 import com.liferay.portal.kernel.dao.jdbc.MappingSqlQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.RowMapper;
@@ -71,6 +74,8 @@ import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.service.persistence.impl.NestedSetsTreeManager;
 import com.liferay.portal.service.persistence.impl.PersistenceNestedSetsTreeManager;
@@ -257,10 +262,6 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(${entity.name}Impl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(${entity.name}Impl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -535,6 +536,10 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 			</#list>
 		</#if>
 
+		<#if entity.hasColumn("createDate", "Date") && entity.hasColumn("modifiedDate", "Date")>
+			<#assign castEntityModelImpl = true>
+		</#if>
+
 		<#if castEntityModelImpl>
 			${entity.name}ModelImpl ${entity.varName}ModelImpl = (${entity.name}ModelImpl)${entity.varName};
 		</#if>
@@ -545,6 +550,38 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 
 				${entity.varName}.setUuid(uuid);
 			}
+		</#if>
+
+		<#if entity.hasColumn("createDate", "Date") && entity.hasColumn("modifiedDate", "Date")>
+			<#if entity.isStagedModel()>
+				if (!ExportImportThreadLocal.isImportInProcess()) {
+			</#if>
+
+			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+			Date now = new Date();
+
+			if (isNew && (${entity.varName}.getCreateDate() == null)) {
+				if (serviceContext == null) {
+					${entity.varName}.setCreateDate(now);
+				}
+				else {
+					${entity.varName}.setCreateDate(serviceContext.getCreateDate(now));
+				}
+			}
+
+			if (!${entity.varName}ModelImpl.hasSetModifiedDate()) {
+				if (serviceContext == null) {
+					${entity.varName}.setModifiedDate(now);
+				}
+				else {
+					${entity.varName}.setModifiedDate(serviceContext.getModifiedDate(now));
+				}
+			}
+
+			<#if entity.isStagedModel()>
+				}
+			</#if>
 		</#if>
 
 		<#assign sanitizeTuples = modelHintsUtil.getSanitizeTuples("${packagePath}.model.${entity.name}")>
@@ -1728,8 +1765,6 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 	<#if entity.getFinderList()?size != 0>
 		private static final String _NO_SUCH_ENTITY_WITH_KEY = "No ${entity.name} exists with the key {";
 	</#if>
-
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = <#if pluginName != "">GetterUtil.getBoolean(PropsUtil.get(PropsKeys.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE))<#else>com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE</#if>;
 
 	private static final Log _log = LogFactoryUtil.getLog(${entity.name}PersistenceImpl.class);
 

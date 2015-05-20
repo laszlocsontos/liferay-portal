@@ -123,6 +123,12 @@ public class UserGroupServiceWrapper implements UserGroupService,
 		_userGroupService.deleteUserGroup(userGroupId);
 	}
 
+	@Override
+	public com.liferay.portal.model.UserGroup fetchUserGroup(long userGroupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userGroupService.fetchUserGroup(userGroupId);
+	}
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -161,6 +167,13 @@ public class UserGroupServiceWrapper implements UserGroupService,
 	public com.liferay.portal.model.UserGroup getUserGroup(long userGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _userGroupService.getUserGroup(userGroupId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.model.UserGroup> getUserGroups(
+		long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _userGroupService.getUserGroups(companyId);
 	}
 
 	/**

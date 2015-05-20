@@ -1054,18 +1054,9 @@ public class LiferaySeleniumHelper {
 			return true;
 		}
 
-		// LPS-55120, temporary workaround until Matthew Tambara fixes it
+		// LPS-55491, temporary workaround until Michael Han fixes it
 
-		if (line.contains("Stream closed.")) {
-			return true;
-		}
-
-		// LPS-55154, temporary workaround until Shuyang Zhou fixes it
-
-		if (line.contains(
-				"Unable to process message " +
-					"{destinationName=liferay/hot_deploy")) {
-
+		if (line.contains("failure in bulk execution")) {
 			return true;
 		}
 
@@ -1485,7 +1476,7 @@ public class LiferaySeleniumHelper {
 				_screen.type("9", Key.SHIFT);
 			}
 			else if (specialCharacter.equals("${line.separator}")) {
-				liferaySelenium.keyPress(locator, "\\ESCAPE");
+				liferaySelenium.keyPress(locator, "\\SPACE");
 				liferaySelenium.keyPress(locator, "\\RETURN");
 			}
 

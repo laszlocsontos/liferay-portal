@@ -85,7 +85,7 @@
 			<var name="portletName" value="Web Content" />
 		</execute>
 
-		<execute macro="WebContent#addCPwithStructure">
+		<execute macro="WebContent#addWithStructureCP">
 			<var name="structureName" value="${structureName}" />
 			<var name="templateName" value="${templateName}" />
 			<var name="webContentImage" value="${webContentImage}" />
@@ -105,6 +105,8 @@
 		<execute macro="WebContentDisplayPortlet#selectWebContent">
 			<var name="webContentTitle" value="${webContentTitle}" />
 		</execute>
+
+		<execute macro="WebContentNavigator#gotoEditPGViaWCD" />
 
 		<execute macro="WebContent#addTagPGViaWCD">
 			<var name="tagName" value="european" />

@@ -16,7 +16,6 @@ package com.liferay.portlet.mobiledevicerules.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -24,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -33,6 +33,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.mobiledevicerules.NoSuchActionException;
@@ -44,6 +46,7 @@ import com.liferay.portlet.mobiledevicerules.service.persistence.MDRActionPersis
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1955,10 +1958,6 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(MDRActionImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(MDRActionImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -2161,6 +2160,31 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 			String uuid = PortalUUIDUtil.generate();
 
 			mdrAction.setUuid(uuid);
+		}
+
+		if (!ExportImportThreadLocal.isImportInProcess()) {
+			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+			Date now = new Date();
+
+			if (isNew && (mdrAction.getCreateDate() == null)) {
+				if (serviceContext == null) {
+					mdrAction.setCreateDate(now);
+				}
+				else {
+					mdrAction.setCreateDate(serviceContext.getCreateDate(now));
+				}
+			}
+
+			if (!mdrActionModelImpl.hasSetModifiedDate()) {
+				if (serviceContext == null) {
+					mdrAction.setModifiedDate(now);
+				}
+				else {
+					mdrAction.setModifiedDate(serviceContext.getModifiedDate(
+							now));
+				}
+			}
 		}
 
 		Session session = null;
@@ -2668,7 +2692,6 @@ public class MDRActionPersistenceImpl extends BasePersistenceImpl<MDRAction>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "mdrAction.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No MDRAction exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No MDRAction exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(MDRActionPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "type"

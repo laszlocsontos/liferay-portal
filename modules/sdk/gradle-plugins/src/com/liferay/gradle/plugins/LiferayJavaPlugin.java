@@ -16,9 +16,14 @@ package com.liferay.gradle.plugins;
 
 import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.javadoc.formatter.JavadocFormatterPlugin;
+import com.liferay.gradle.plugins.lang.builder.BuildLangTask;
+import com.liferay.gradle.plugins.lang.builder.LangBuilderPlugin;
+import com.liferay.gradle.plugins.service.builder.BuildServiceTask;
+import com.liferay.gradle.plugins.service.builder.ServiceBuilderPlugin;
 import com.liferay.gradle.plugins.source.formatter.SourceFormatterPlugin;
 import com.liferay.gradle.plugins.tasks.BuildCssTask;
 import com.liferay.gradle.plugins.tasks.InitGradleTask;
+import com.liferay.gradle.plugins.tld.formatter.TLDFormatterPlugin;
 import com.liferay.gradle.plugins.wsdd.builder.BuildWSDDTask;
 import com.liferay.gradle.plugins.wsdd.builder.WSDDBuilderPlugin;
 import com.liferay.gradle.plugins.wsdl.builder.BuildWSDLTask;
@@ -36,6 +41,7 @@ import groovy.util.ConfigObject;
 import java.io.File;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,7 +63,10 @@ import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.WarPlugin;
+import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetOutput;
+import org.gradle.api.tasks.bundling.Jar;
 
 /**
  * @author Andrea Di Giorgi
@@ -66,6 +75,8 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 
 	public static final String BUILD_CSS_TASK_NAME = "buildCss";
 
+	public static final String DEPLOY_TASK_NAME = "deploy";
+
 	public static final String FORMAT_WSDL_TASK_NAME = "formatWSDL";
 
 	public static final String FORMAT_XSD_TASK_NAME = "formatXSD";
@@ -73,6 +84,8 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 	public static final String INIT_GRADLE_TASK_NAME = "initGradle";
 
 	public static final String PORTAL_WEB_CONFIGURATION_NAME = "portalWeb";
+
+	public static final String PROVIDED_CONFIGURATION_NAME = "provided";
 
 	@Override
 	public void apply(Project project) {
@@ -91,6 +104,7 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 
 		applyConfigScripts(project);
 
+		configureTaskBuildService(project);
 		configureTaskBuildWSDD(project);
 		configureTaskBuildWSDL(project);
 		configureTaskBuildXSD(project);
@@ -131,8 +145,27 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		return configuration;
 	}
 
+	protected Configuration addConfigurationProvided(Project project) {
+		Configuration configuration = GradleUtil.addConfiguration(
+			project, PROVIDED_CONFIGURATION_NAME);
+
+		SourceSet sourceSet = GradleUtil.getSourceSet(
+			project, SourceSet.MAIN_SOURCE_SET_NAME);
+
+		configuration.setDescription(
+			"Provided classpath for " + sourceSet + ".");
+		configuration.setVisible(false);
+
+		FileCollection fileCollection = sourceSet.getCompileClasspath();
+
+		sourceSet.setCompileClasspath(fileCollection.plus(configuration));
+
+		return configuration;
+	}
+
 	protected void addConfigurations(Project project) {
 		addConfigurationPortalWeb(project);
+		addConfigurationProvided(project);
 	}
 
 	protected void addDependenciesPortalWeb(Project project) {
@@ -154,6 +187,14 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		buildCssTask.setGroup(BasePlugin.BUILD_GROUP);
 
 		return buildCssTask;
+	}
+
+	protected Copy addTaskDeploy(Project project) {
+		Copy copy = GradleUtil.addTask(project, DEPLOY_TASK_NAME, Copy.class);
+
+		copy.setDescription("Assembles the project and deploys it to Liferay.");
+
+		return copy;
 	}
 
 	protected FormatXMLTask addTaskFormatWSDL(Project project) {
@@ -191,6 +232,7 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		Project project, LiferayExtension liferayExtension) {
 
 		addTaskBuildCss(project);
+		addTaskDeploy(project);
 		addTaskFormatWSDL(project);
 		addTaskFormatXSD(project);
 		addTaskInitGradle(project);
@@ -216,7 +258,10 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		GradleUtil.applyPlugin(project, JavaPlugin.class);
 
 		GradleUtil.applyPlugin(project, JavadocFormatterPlugin.class);
+		GradleUtil.applyPlugin(project, LangBuilderPlugin.class);
+		GradleUtil.applyPlugin(project, ServiceBuilderPlugin.class);
 		GradleUtil.applyPlugin(project, SourceFormatterPlugin.class);
+		GradleUtil.applyPlugin(project, TLDFormatterPlugin.class);
 		GradleUtil.applyPlugin(project, WSDDBuilderPlugin.class);
 		GradleUtil.applyPlugin(project, WSDLBuilderPlugin.class);
 		GradleUtil.applyPlugin(project, XMLFormatterPlugin.class);
@@ -331,6 +376,12 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 
 			liferayExtension.setDeployDir(deployDir);
 		}
+
+		if (liferayExtension.getLiferayHome() == null) {
+			File liferayHome = appServerParentDir.getParentFile();
+
+			liferayExtension.setLiferayHome(liferayHome);
+		}
 	}
 
 	protected void configureProperties(Project project) {
@@ -353,16 +404,28 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 	}
 
 	protected void configureSourceSetMain(Project project) {
+		File classesDir = project.file("classes");
+		File srcDir = project.file("src");
+
+		configureSourceSetMain(project, classesDir, srcDir);
+	}
+
+	protected void configureSourceSetMain(
+		Project project, File classesDir, File srcDir) {
+
 		SourceSet sourceSet = GradleUtil.getSourceSet(
 			project, SourceSet.MAIN_SOURCE_SET_NAME);
 
 		SourceDirectorySet javaSourceDirectorySet = sourceSet.getJava();
 
-		File srcDir = project.file("src");
-
 		Set<File> srcDirs = Collections.singleton(srcDir);
 
 		javaSourceDirectorySet.setSrcDirs(srcDirs);
+
+		SourceSetOutput sourceSetOutput = sourceSet.getOutput();
+
+		sourceSetOutput.setClassesDir(classesDir);
+		sourceSetOutput.setResourcesDir(classesDir);
 
 		SourceDirectorySet resourcesSourceDirectorySet =
 			sourceSet.getResources();
@@ -425,6 +488,189 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		}
 	}
 
+	protected void configureTaskBuildLang(Project project) {
+		BuildLangTask buildLangTask = (BuildLangTask)GradleUtil.getTask(
+			project, LangBuilderPlugin.BUILD_LANG_TASK_NAME);
+
+		configureTaskBuildLangLangDirName(buildLangTask);
+	}
+
+	protected void configureTaskBuildLangLangDirName(
+		BuildLangTask buildLangTask) {
+
+		Project project = buildLangTask.getProject();
+
+		File langDir = new File(getResourcesDir(project), "content");
+
+		buildLangTask.setLangDirName(project.relativePath(langDir));
+	}
+
+	protected void configureTaskBuildService(Project project) {
+		BuildServiceTask buildServiceTask =
+			(BuildServiceTask)GradleUtil.getTask(
+				project, ServiceBuilderPlugin.BUILD_SERVICE_TASK_NAME);
+
+		configureTaskBuildServiceApiDirName(buildServiceTask);
+		configureTaskBuildServiceAutoNamespaceTables(buildServiceTask);
+		configureTaskBuildServiceBeanLocatorUtil(buildServiceTask);
+		configureTaskBuildServiceHbmFileName(buildServiceTask);
+		configureTaskBuildServiceImplDirName(buildServiceTask);
+		configureTaskBuildServiceInputFileName(buildServiceTask);
+		configureTaskBuildServiceModelHintsFileName(buildServiceTask);
+		configureTaskBuildServiceOsgiModule(buildServiceTask);
+		configureTaskBuildServicePluginName(buildServiceTask);
+		configureTaskBuildServicePropsUtil(buildServiceTask);
+		configureTaskBuildServiceRemotingFileName(buildServiceTask);
+		configureTaskBuildServiceResourcesDirName(buildServiceTask);
+		configureTaskBuildServiceSpringFileName(buildServiceTask);
+		configureTaskBuildServiceSpringNamespaces(buildServiceTask);
+		configureTaskBuildServiceSqlDirName(buildServiceTask);
+		configureTaskBuildServiceSqlFileName(buildServiceTask);
+		configureTaskBuildServiceTestDirName(buildServiceTask);
+	}
+
+	protected void configureTaskBuildServiceApiDirName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		File apiDir = new File(getServiceBaseDir(project), "service");
+
+		buildServiceTask.setApiDirName(project.relativePath(apiDir));
+	}
+
+	protected void configureTaskBuildServiceAutoNamespaceTables(
+		BuildServiceTask buildServiceTask) {
+
+		buildServiceTask.setAutoNamespaceTables(true);
+	}
+
+	protected void configureTaskBuildServiceBeanLocatorUtil(
+		BuildServiceTask buildServiceTask) {
+
+		buildServiceTask.setBeanLocatorUtil(
+			"com.liferay.util.bean.PortletBeanLocatorUtil");
+	}
+
+	protected void configureTaskBuildServiceHbmFileName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		File hbmFile = new File(
+			getResourcesDir(project), "META-INF/portlet-hbm.xml");
+
+		buildServiceTask.setHbmFileName(project.relativePath(hbmFile));
+	}
+
+	protected void configureTaskBuildServiceImplDirName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		File implDir = getJavaDir(project);
+
+		buildServiceTask.setImplDirName(project.relativePath(implDir));
+	}
+
+	protected void configureTaskBuildServiceInputFileName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		File inputFile = new File(getServiceBaseDir(project), "service.xml");
+
+		buildServiceTask.setInputFileName(project.relativePath(inputFile));
+	}
+
+	protected void configureTaskBuildServiceModelHintsFileName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		File modelHintsFile = new File(
+			getResourcesDir(project), "META-INF/portlet-model-hints.xml");
+
+		buildServiceTask.setModelHintsFileName(
+			project.relativePath(modelHintsFile));
+	}
+
+	protected void configureTaskBuildServiceOsgiModule(
+		BuildServiceTask buildServiceTask) {
+
+		buildServiceTask.setOsgiModule(false);
+	}
+
+	protected void configureTaskBuildServicePluginName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		buildServiceTask.setPluginName(project.getName());
+	}
+
+	protected void configureTaskBuildServicePropsUtil(
+		BuildServiceTask buildServiceTask) {
+
+		buildServiceTask.setPropsUtil("com.liferay.util.service.ServiceProps");
+	}
+
+	protected void configureTaskBuildServiceRemotingFileName(
+		BuildServiceTask buildServiceTask) {
+
+		buildServiceTask.setRemotingFileName("");
+	}
+
+	protected void configureTaskBuildServiceResourcesDirName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		File resourcesDir = getResourcesDir(project);
+
+		buildServiceTask.setResourcesDirName(
+			project.relativePath(resourcesDir));
+	}
+
+	protected void configureTaskBuildServiceSpringFileName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		File springFile = new File(
+			getResourcesDir(project), "META-INF/portlet-spring.xml");
+
+		buildServiceTask.setSpringFileName(project.relativePath(springFile));
+	}
+
+	protected void configureTaskBuildServiceSpringNamespaces(
+		BuildServiceTask buildServiceTask) {
+
+		buildServiceTask.setSpringNamespaces(new String[] {"beans"});
+	}
+
+	protected void configureTaskBuildServiceSqlDirName(
+		BuildServiceTask buildServiceTask) {
+
+		Project project = buildServiceTask.getProject();
+
+		File sqlDir = new File(getServiceBaseDir(project), "sql");
+
+		buildServiceTask.setSqlDirName(project.relativePath(sqlDir));
+	}
+
+	protected void configureTaskBuildServiceSqlFileName(
+		BuildServiceTask buildServiceTask) {
+
+		buildServiceTask.setSqlFileName("tables.sql");
+	}
+
+	protected void configureTaskBuildServiceTestDirName(
+		BuildServiceTask buildServiceTask) {
+
+		buildServiceTask.setTestDirName("");
+	}
+
 	protected void configureTaskBuildWSDD(Project project) {
 		BuildWSDDTask buildWSDDTask = (BuildWSDDTask)GradleUtil.getTask(
 			project, WSDDBuilderPlugin.BUILD_WSDD_TASK_NAME);
@@ -437,14 +683,7 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 
 		Project project = buildWSDDTask.getProject();
 
-		SourceSet sourceSet = GradleUtil.getSourceSet(
-			project, SourceSet.MAIN_SOURCE_SET_NAME);
-
-		SourceDirectorySet javaSourceDirectorySet = sourceSet.getJava();
-
-		Set<File> srcDirs = javaSourceDirectorySet.getSrcDirs();
-
-		File outputDir = srcDirs.iterator().next();
+		File outputDir = getJavaDir(project);
 
 		buildWSDDTask.setOutputDirName(project.relativePath(outputDir));
 	}
@@ -535,6 +774,28 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 				true, BasePlugin.CLEAN_TASK_NAME));
 	}
 
+	protected void configureTaskDeploy(
+		Project project, LiferayExtension liferayExtension) {
+
+		Copy copy = (Copy)GradleUtil.getTask(project, DEPLOY_TASK_NAME);
+
+		configureTaskDeployFrom(copy);
+		configureTaskDeployInto(copy, liferayExtension);
+	}
+
+	protected void configureTaskDeployFrom(Copy deployTask) {
+		Jar jar = (Jar)GradleUtil.getTask(
+			deployTask.getProject(), JavaPlugin.JAR_TASK_NAME);
+
+		deployTask.from(jar.getOutputs());
+	}
+
+	protected void configureTaskDeployInto(
+		Copy deployTask, LiferayExtension liferayExtension) {
+
+		deployTask.into(liferayExtension.getDeployDir());
+	}
+
 	protected void configureTaskFormatWSDL(Project project) {
 		FormatXMLTask formatXMLTask = (FormatXMLTask)GradleUtil.getTask(
 			project, FORMAT_WSDL_TASK_NAME);
@@ -581,8 +842,10 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		Project project, LiferayExtension liferayExtension) {
 
 		configureTaskBuildCss(project, liferayExtension);
+		configureTaskBuildLang(project);
 		configureTaskClasses(project);
 		configureTaskClean(project);
+		configureTaskDeploy(project, liferayExtension);
 		configureTaskFormatWSDL(project);
 		configureTaskFormatXSD(project);
 	}
@@ -622,8 +885,39 @@ public class LiferayJavaPlugin implements Plugin<Project> {
 		return value;
 	}
 
+	protected File getJavaDir(Project project) {
+		SourceSet sourceSet = GradleUtil.getSourceSet(
+			project, SourceSet.MAIN_SOURCE_SET_NAME);
+
+		SourceDirectorySet javaSourceDirectorySet = sourceSet.getJava();
+
+		Set<File> srcDirs = javaSourceDirectorySet.getSrcDirs();
+
+		Iterator<File> iterator = srcDirs.iterator();
+
+		return iterator.next();
+	}
+
 	protected File getLibDir(Project project) {
 		return project.file("lib");
+	}
+
+	protected File getResourcesDir(Project project) {
+		SourceSet sourceSet = GradleUtil.getSourceSet(
+			project, SourceSet.MAIN_SOURCE_SET_NAME);
+
+		SourceDirectorySet resourcesSourceDirectorySet =
+			sourceSet.getResources();
+
+		Set<File> srcDirs = resourcesSourceDirectorySet.getSrcDirs();
+
+		Iterator<File> iterator = srcDirs.iterator();
+
+		return iterator.next();
+	}
+
+	protected File getServiceBaseDir(Project project) {
+		return project.getProjectDir();
 	}
 
 	protected static final String[] COMPILE_DEPENDENCY_NOTATIONS = {

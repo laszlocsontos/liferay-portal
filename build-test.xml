@@ -40,7 +40,6 @@
 			<if>
 				<not>
 					<or>
-						<equals arg1="${app.server.type}" arg2="geronimo" />
 						<equals arg1="${app.server.type}" arg2="glassfish" />
 						<equals arg1="${app.server.type}" arg2="jboss" />
 						<equals arg1="${app.server.type}" arg2="jetty" />
@@ -53,7 +52,7 @@
 					</or>
 				</not>
 				<then>
-					<fail>Please set "app.server.type" to one of the following:${line.separator}geronimo, glassfish, jboss, jetty, jonas, resin, tcserver, tomcat, weblogic, or websphere.</fail>
+					<fail>Please set "app.server.type" to one of the following:${line.separator}, glassfish, jboss, jetty, jonas, resin, tcserver, tomcat, weblogic, or websphere.</fail>
 				</then>
 			</if>
 
@@ -1237,7 +1236,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			<fail message="Please set the property ${mobile.android.home}." unless="mobile.android.home" />
 
 			<execute>
-				echo no | ${mobile.android.home}/tools/android create avd -n deviceName -t android-19
+				echo no | ${mobile.android.home}/tools/android create avd -f -n deviceName -t android-19
 			</execute>
 
 			<echo file="${user.home}/.android/avd/deviceName.avd/config.ini" append="true">
@@ -3361,6 +3360,10 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			<equals arg1="${setup.wizard.enabled}" arg2="true" />
 			<then>
 				<replace file="portal-impl/src/portal-ext.properties" token="setup.wizard.enabled=false" value="" />
+
+				<echo append="true" file="portal-impl/src/portal-ext.properties">
+
+include-and-override=${liferay.home}/portal-setup-wizard.properties</echo>
 			</then>
 		</if>
 
@@ -3474,15 +3477,6 @@ module.framework.properties.osgi.console=11312</echo>
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
 					mobile.android.home=${mobile.android.home}
-				</echo>
-			</then>
-		</if>
-
-		<if>
-			<isset property="ignore.errors.delimiter" />
-			<then>
-				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
-					ignore.errors.delimiter=${ignore.errors.delimiter}
 				</echo>
 			</then>
 		</if>
@@ -3682,6 +3676,42 @@ module.framework.properties.osgi.console=11312</echo>
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
 					database.db2.username=${database.db2.username}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="database.hsql.driver" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					database.hsql.driver=${database.hsql.driver}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="database.hsql.password" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					database.hsql.password=${database.hsql.password}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="database.hsql.url" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					database.hsql.url=${database.hsql.url}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="database.hsql.username" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					database.hsql.username=${database.hsql.username}
 				</echo>
 			</then>
 		</if>
@@ -3950,6 +3980,42 @@ module.framework.properties.osgi.console=11312</echo>
 		</if>
 
 		<if>
+			<isset property="lcs.email.address.3" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.address.3=${lcs.email.address.3}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="lcs.email.id.1" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.id.1=${lcs.email.id.1}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="lcs.email.id.2" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.id.2=${lcs.email.id.2}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="lcs.email.id.3" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.id.3=${lcs.email.id.3}
+				</echo>
+			</then>
+		</if>
+
+		<if>
 			<isset property="lcs.email.password.1" />
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
@@ -3963,6 +4029,15 @@ module.framework.properties.osgi.console=11312</echo>
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
 					lcs.email.password.2=${lcs.email.password.2}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="lcs.email.password.3" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					lcs.email.password.3=${lcs.email.password.3}
 				</echo>
 			</then>
 		</if>
@@ -4086,6 +4161,17 @@ module.framework.properties.osgi.console=11312</echo>
 			</then>
 		</if>
 
+		<get-testcase-property property.name="ignore.errors.delimiter" />
+
+		<if>
+			<isset property="ignore.errors.delimiter" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					ignore.errors.delimiter=${ignore.errors.delimiter}
+				</echo>
+			</then>
+		</if>
+
 		<get-testcase-property property.name="mobile.device.enabled" />
 
 		<if>
@@ -4156,23 +4242,6 @@ app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.27</echo>
 		<antcall target="record-git-commit-portal" inheritAll="false" />
 
 		<antcall target="compile" inheritAll="false" />
-
-		<if>
-			<matches pattern="http" string="${test.build.bundle.geronimo.zip.url}" />
-			<then>
-				<antcall target="prepare-test-bundle">
-					<param name="app.server.type" value="geronimo" />
-					<param name="test.app.server.bin.dir" value="${app.server.geronimo.bin.dir}" />
-					<param name="test.build.bundle.zip.url" value="${test.build.bundle.geronimo.zip.url}" />
-				</antcall>
-			</then>
-			<elseif>
-				<equals arg1="${test.build.bundle.geronimo}" arg2="true" />
-				<then>
-					<ant antfile="build-dist.xml" target="build-dist-geronimo" inheritAll="false" />
-				</then>
-			</elseif>
-		</if>
 
 		<if>
 			<matches pattern="http" string="${test.build.bundle.glassfish.zip.url}" />
@@ -4859,6 +4928,10 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 		</if>
 	</target>
 
+	<target name="record-database-type">
+		<echo file="database-type" append="true">${database.type},</echo>
+	</target>
+
 	<target name="record-git-commit-bottom-test-jsp">
 		<exec dir="${project.dir}" executable="git" outputproperty="git.commit.portal.rev.parse">
 			<arg line="rev-parse HEAD" />
@@ -5250,6 +5323,7 @@ if (ppstate.equals("normal")) {
 			<then>
 				<antcall target="rebuild-database" inheritAll="false">
 					<param name="database.type" value="mysql" />
+					<param name="delete.liferay.home" value="false" />
 				</antcall>
 
 				<echo file="portal-impl/classes/portal-ext.properties">liferay.home=${liferay.home}

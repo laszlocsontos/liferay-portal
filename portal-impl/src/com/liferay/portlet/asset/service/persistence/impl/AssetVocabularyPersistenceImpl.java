@@ -16,7 +16,6 @@ package com.liferay.portlet.asset.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -25,6 +24,7 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -38,6 +38,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
 import com.liferay.portlet.asset.NoSuchVocabularyException;
@@ -49,6 +51,7 @@ import com.liferay.portlet.asset.service.persistence.AssetVocabularyPersistence;
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -4463,10 +4466,6 @@ public class AssetVocabularyPersistenceImpl extends BasePersistenceImpl<AssetVoc
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(AssetVocabularyImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(AssetVocabularyImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -4711,6 +4710,32 @@ public class AssetVocabularyPersistenceImpl extends BasePersistenceImpl<AssetVoc
 			String uuid = PortalUUIDUtil.generate();
 
 			assetVocabulary.setUuid(uuid);
+		}
+
+		if (!ExportImportThreadLocal.isImportInProcess()) {
+			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+			Date now = new Date();
+
+			if (isNew && (assetVocabulary.getCreateDate() == null)) {
+				if (serviceContext == null) {
+					assetVocabulary.setCreateDate(now);
+				}
+				else {
+					assetVocabulary.setCreateDate(serviceContext.getCreateDate(
+							now));
+				}
+			}
+
+			if (!assetVocabularyModelImpl.hasSetModifiedDate()) {
+				if (serviceContext == null) {
+					assetVocabulary.setModifiedDate(now);
+				}
+				else {
+					assetVocabulary.setModifiedDate(serviceContext.getModifiedDate(
+							now));
+				}
+			}
 		}
 
 		Session session = null;
@@ -5244,7 +5269,6 @@ public class AssetVocabularyPersistenceImpl extends BasePersistenceImpl<AssetVoc
 	private static final String _ORDER_BY_ENTITY_TABLE = "AssetVocabulary.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No AssetVocabulary exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No AssetVocabulary exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(AssetVocabularyPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid", "settings"

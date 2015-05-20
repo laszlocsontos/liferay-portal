@@ -34,9 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Iván Zaera
  */
-@Component(
-	service = DLStoreConvertProcess.class
-)
+@Component(service = DLStoreConvertProcess.class)
 public class WikiDLStoreConvertProcess implements DLStoreConvertProcess {
 
 	@Override
@@ -66,7 +64,9 @@ public class WikiDLStoreConvertProcess implements DLStoreConvertProcess {
 			new ActionableDynamicQuery.PerformActionMethod() {
 
 				@Override
-				public void performAction(Object object) {
+				public void performAction(Object object)
+					throws PortalException {
+
 					WikiPage wikiPage = (WikiPage)object;
 
 					for (FileEntry fileEntry :

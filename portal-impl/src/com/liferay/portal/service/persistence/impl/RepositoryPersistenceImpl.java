@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.NoSuchRepositoryException;
-import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -25,6 +24,7 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -38,11 +38,14 @@ import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.impl.RepositoryImpl;
 import com.liferay.portal.model.impl.RepositoryModelImpl;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.RepositoryPersistence;
 
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -2262,10 +2265,6 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	 */
 	@Override
 	public void clearCache() {
-		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
-			CacheRegistryUtil.clear(RepositoryImpl.class.getName());
-		}
-
 		EntityCacheUtil.clearCache(RepositoryImpl.class);
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
@@ -2514,6 +2513,31 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 			String uuid = PortalUUIDUtil.generate();
 
 			repository.setUuid(uuid);
+		}
+
+		if (!ExportImportThreadLocal.isImportInProcess()) {
+			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+
+			Date now = new Date();
+
+			if (isNew && (repository.getCreateDate() == null)) {
+				if (serviceContext == null) {
+					repository.setCreateDate(now);
+				}
+				else {
+					repository.setCreateDate(serviceContext.getCreateDate(now));
+				}
+			}
+
+			if (!repositoryModelImpl.hasSetModifiedDate()) {
+				if (serviceContext == null) {
+					repository.setModifiedDate(now);
+				}
+				else {
+					repository.setModifiedDate(serviceContext.getModifiedDate(
+							now));
+				}
+			}
 		}
 
 		Session session = null;
@@ -3019,7 +3043,6 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "repository.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Repository exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Repository exists with the key {";
-	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = com.liferay.portal.util.PropsValues.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE;
 	private static final Log _log = LogFactoryUtil.getLog(RepositoryPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"
