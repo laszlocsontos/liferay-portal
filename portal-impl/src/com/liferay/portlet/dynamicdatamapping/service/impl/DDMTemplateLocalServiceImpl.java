@@ -51,7 +51,6 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -170,7 +169,6 @@ public class DDMTemplateLocalServiceImpl
 		// Template
 
 		User user = userPersistence.findByPrimaryKey(userId);
-		Date now = new Date();
 
 		if (Validator.isNull(templateKey)) {
 			templateKey = String.valueOf(counterLocalService.increment());
@@ -208,8 +206,6 @@ public class DDMTemplateLocalServiceImpl
 		template.setCompanyId(user.getCompanyId());
 		template.setUserId(user.getUserId());
 		template.setUserName(user.getFullName());
-		template.setCreateDate(serviceContext.getCreateDate(now));
-		template.setModifiedDate(serviceContext.getModifiedDate(now));
 		template.setClassNameId(classNameId);
 		template.setClassPK(classPK);
 		template.setResourceClassNameId(resourceClassNameId);
@@ -1262,8 +1258,6 @@ public class DDMTemplateLocalServiceImpl
 		DDMTemplate template = ddmTemplateLocalService.getDDMTemplate(
 			templateId);
 
-		template.setModifiedDate(serviceContext.getModifiedDate(null));
-
 		if ((template.getClassPK() == 0) && (classPK > 0)) {
 
 			// Allow users to set the structure if and only if it currently does
@@ -1360,6 +1354,8 @@ public class DDMTemplateLocalServiceImpl
 		templateVersion.setUserId(template.getUserId());
 		templateVersion.setUserName(template.getUserName());
 		templateVersion.setCreateDate(template.getModifiedDate());
+		templateVersion.setClassNameId(template.getClassNameId());
+		templateVersion.setClassPK(template.getClassPK());
 		templateVersion.setTemplateId(template.getTemplateId());
 		templateVersion.setVersion(version);
 		templateVersion.setName(template.getName());

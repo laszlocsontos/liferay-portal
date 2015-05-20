@@ -65,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.render-weight=50",
 		"com.liferay.portlet.scopeable=true",
 		"com.liferay.portlet.use-default-template=true",
-		"javax.portlet.display-name=Dynamic Data Lists Form Display",
+		"javax.portlet.display-name=Dynamic Data Lists Form",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.config-template=/configuration.jsp",
 		"javax.portlet.init-param.copy-request-parameters=true",
@@ -90,8 +90,8 @@ public class DDLFormPortlet extends MVCPortlet {
 		}
 		catch (Exception e) {
 			if (isSessionErrorException(e)) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(e, e);
+				if (_log.isWarnEnabled()) {
+					_log.warn(e, e);
 				}
 
 				hideDefaultErrorMessage(renderRequest);

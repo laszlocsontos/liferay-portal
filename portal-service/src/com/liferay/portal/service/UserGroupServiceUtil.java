@@ -129,6 +129,12 @@ public class UserGroupServiceUtil {
 		getService().deleteUserGroup(userGroupId);
 	}
 
+	public static com.liferay.portal.model.UserGroup fetchUserGroup(
+		long userGroupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().fetchUserGroup(userGroupId);
+	}
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -165,6 +171,12 @@ public class UserGroupServiceUtil {
 		long userGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getUserGroup(userGroupId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.UserGroup> getUserGroups(
+		long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().getUserGroups(companyId);
 	}
 
 	/**

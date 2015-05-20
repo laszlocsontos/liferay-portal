@@ -124,6 +124,10 @@ public interface UserGroupService extends BaseService {
 	*/
 	public void deleteUserGroup(long userGroupId) throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.model.UserGroup fetchUserGroup(long userGroupId)
+		throws PortalException;
+
 	/**
 	* Returns the Spring bean ID for this bean.
 	*
@@ -155,6 +159,10 @@ public interface UserGroupService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.UserGroup getUserGroup(long userGroupId)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getUserGroups(
+		long companyId) throws PortalException;
 
 	/**
 	* Returns all the user groups to which the user belongs.

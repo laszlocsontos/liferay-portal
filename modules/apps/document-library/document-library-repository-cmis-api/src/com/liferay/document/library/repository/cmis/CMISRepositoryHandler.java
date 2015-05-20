@@ -161,6 +161,16 @@ public abstract class CMISRepositoryHandler
 
 	@Override
 	public List<FileEntry> getFileEntries(
+			long folderId, int status, int start, int end,
+			OrderByComparator<FileEntry> obc)
+		throws PortalException {
+
+		return _baseCmisRepository.getFileEntries(
+			folderId, status, start, end, obc);
+	}
+
+	@Override
+	public List<FileEntry> getFileEntries(
 			long folderId, int start, int end, OrderByComparator<FileEntry> obc)
 		throws PortalException {
 
@@ -190,6 +200,13 @@ public abstract class CMISRepositoryHandler
 	@Override
 	public int getFileEntriesCount(long folderId) throws PortalException {
 		return _baseCmisRepository.getFileEntriesCount(folderId);
+	}
+
+	@Override
+	public int getFileEntriesCount(long folderId, int status)
+		throws PortalException {
+
+		return _baseCmisRepository.getFileEntriesCount(folderId, status);
 	}
 
 	@Override
@@ -570,7 +587,11 @@ public abstract class CMISRepositoryHandler
 
 	@Override
 	public void updateFileShortcuts(
-		long oldToFileEntryId, long newToFileEntryId) {
+			long oldToFileEntryId, long newToFileEntryId)
+		throws PortalException {
+
+		_baseCmisRepository.updateFileShortcuts(
+			oldToFileEntryId, newToFileEntryId);
 	}
 
 	@Override

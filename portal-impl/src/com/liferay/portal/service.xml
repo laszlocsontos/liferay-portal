@@ -1913,7 +1913,6 @@
 		<reference package-path="com.liferay.portal" entity="Portlet" />
 		<reference package-path="com.liferay.portal" entity="PortletItem" />
 	</entity>
-	<entity name="Quartz" local-service="true" remote-service="false" />
 	<entity name="Region" local-service="false" remote-service="true">
 
 		<!-- PK fields -->
@@ -3362,8 +3361,7 @@
 		<exception>CompanyWebId</exception>
 		<exception>ContactBirthday</exception>
 		<exception>ContactClassName</exception>
-		<exception>ContactFirstName</exception>
-		<exception>ContactLastName</exception>
+		<exception>ContactName</exception>
 		<exception>CountryA2</exception>
 		<exception>CountryA3</exception>
 		<exception>CountryIdd</exception>

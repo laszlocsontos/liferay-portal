@@ -108,7 +108,6 @@
 	<bean id="com.liferay.portal.service.PortletPreferencesService" class="com.liferay.portal.service.impl.PortletPreferencesServiceImpl" />
 	<bean id="com.liferay.portal.service.persistence.PortletPreferencesPersistence" class="com.liferay.portal.service.persistence.impl.PortletPreferencesPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.portal.service.persistence.PortletPreferencesFinder" class="com.liferay.portal.service.persistence.impl.PortletPreferencesFinderImpl" parent="basePersistence" />
-	<bean id="com.liferay.portal.service.QuartzLocalService" class="com.liferay.portal.service.impl.QuartzLocalServiceImpl" />
 	<bean id="com.liferay.portal.service.RegionService" class="com.liferay.portal.service.impl.RegionServiceImpl" />
 	<bean id="com.liferay.portal.service.persistence.RegionPersistence" class="com.liferay.portal.service.persistence.impl.RegionPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.portal.service.ReleaseLocalService" class="com.liferay.portal.service.impl.ReleaseLocalServiceImpl" />
@@ -140,6 +139,7 @@
 	<bean id="com.liferay.portal.service.persistence.RoleFinder" class="com.liferay.portal.service.persistence.impl.RoleFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.portal.service.ServiceComponentLocalService" class="com.liferay.portal.service.impl.ServiceComponentLocalServiceImpl" />
 	<bean id="com.liferay.portal.service.persistence.ServiceComponentPersistence" class="com.liferay.portal.service.persistence.impl.ServiceComponentPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.portal.service.persistence.ServiceComponentFinder" class="com.liferay.portal.service.persistence.impl.ServiceComponentFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.portal.service.ShardLocalService" class="com.liferay.portal.service.impl.ShardLocalServiceImpl" />
 	<bean id="com.liferay.portal.service.persistence.ShardPersistence" class="com.liferay.portal.service.persistence.impl.ShardPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.portal.service.StagingLocalService" class="com.liferay.portal.service.impl.StagingLocalServiceImpl" />

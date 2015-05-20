@@ -47,11 +47,16 @@ public class InstrumentationAgent {
 		_whipClassFileTransformer = null;
 
 		try {
-			ProjectData projectData = ProjectDataUtil.captureProjectData(false);
+			ProjectData projectData = ProjectDataUtil.captureProjectData(
+				false, false);
 
 			List<AssertionError> assertionErrors = new ArrayList<>();
 
 			for (Class<?> clazz : classes) {
+				if (clazz.isSynthetic()) {
+					continue;
+				}
+
 				ClassData classData = projectData.getClassData(clazz.getName());
 
 				_assertClassDataCoverage(assertionErrors, clazz, classData);
@@ -61,6 +66,10 @@ public class InstrumentationAgent {
 
 					declaredClass:
 					for (Class<?> declaredClass : declaredClasses) {
+						if (declaredClass.isSynthetic()) {
+							continue;
+						}
+
 						for (Class<?> clazz2 : classes) {
 							if (clazz2.equals(declaredClass)) {
 								continue declaredClass;
@@ -94,9 +103,8 @@ public class InstrumentationAgent {
 					List<ClassDefinition> classDefinitions = new ArrayList<>(
 						_originalClassDefinitions.size());
 
-					for (int i = 0; i < _originalClassDefinitions.size(); i++) {
-						OriginalClassDefinition originalClassDefinition =
-							_originalClassDefinitions.get(i);
+					for (OriginalClassDefinition originalClassDefinition :
+							_originalClassDefinitions) {
 
 						ClassDefinition classDefinition =
 							originalClassDefinition.toClassDefinition();
@@ -227,7 +235,10 @@ public class InstrumentationAgent {
 
 					@Override
 					public void run() {
-						ProjectDataUtil.captureProjectData(true);
+						ProjectDataUtil.captureProjectData(
+							true,
+							Boolean.getBoolean(
+								"whip.static.instrument.use.data.file"));
 					}
 
 				});
@@ -294,15 +305,7 @@ public class InstrumentationAgent {
 		List<AssertionError> assertionErrors, Class<?> clazz,
 		ClassData classData) {
 
-		if (clazz.isInterface() || clazz.isSynthetic()) {
-			return;
-		}
-
-		if (classData == null) {
-			assertionErrors.add(
-				new AssertionError(
-					"Class " + clazz.getName() + " has no coverage data"));
-
+		if (clazz.isInterface()) {
 			return;
 		}
 
@@ -371,17 +374,7 @@ public class InstrumentationAgent {
 
 	private static class OriginalClassDefinition {
 
-		public OriginalClassDefinition(
-			ClassLoader classLoader, String className, byte[] bytes) {
-
-			_classLoader = classLoader;
-			_className = className.replace('/', '.');
-			_bytes = bytes;
-		}
-
-		public ClassDefinition toClassDefinition()
-			throws ClassNotFoundException {
-
+		public ClassDefinition toClassDefinition() {
 			try {
 				Class<?> clazz = Class.forName(_className, true, _classLoader);
 
@@ -390,6 +383,14 @@ public class InstrumentationAgent {
 			catch (Throwable t) {
 				return null;
 			}
+		}
+
+		private OriginalClassDefinition(
+			ClassLoader classLoader, String className, byte[] bytes) {
+
+			_classLoader = classLoader;
+			_className = className.replace('/', '.');
+			_bytes = bytes;
 		}
 
 		private final byte[] _bytes;

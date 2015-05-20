@@ -98,9 +98,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Raymond Augé
  */
-@Component(
-	immediate = true, service = PortletTracker.class
-)
+@Component(immediate = true, service = PortletTracker.class)
 public class PortletTracker
 	implements
 		ServiceTrackerCustomizer<Portlet, com.liferay.portal.model.Portlet> {
@@ -178,7 +176,7 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.model.Portlet portletModel) {
 
-		portletModel.setReady(false);
+		portletModel.unsetReady();
 
 		ServiceRegistrations serviceRegistrations = _serviceRegistrations.get(
 			serviceReference.getBundle());
