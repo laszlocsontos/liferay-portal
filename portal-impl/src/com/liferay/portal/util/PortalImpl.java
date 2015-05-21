@@ -7265,11 +7265,11 @@ public class PortalImpl implements Portal {
 		String portletId, User user, Layout layout, PortletMode portletMode,
 		HttpServletRequest request) throws PortalException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
 			getCompanyId(request), portletId);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		boolean hasAccessPermission = PortletPermissionUtil.hasAccessPermission(
 			themeDisplay.getPermissionChecker(), getScopeGroupId(request),
