@@ -553,8 +553,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		org.apache.lucene.search.Query luceneQuery =
 			(org.apache.lucene.search.Query)_queryTranslator.translate(query);
 
-		int scoredFieldNamesCount = _luceneHelper.countScoredFieldNames(
-			luceneQuery, ArrayUtil.toStringArray(indexedFieldNames.toArray()));
+		int scoredFieldNamesCount = -1;
 
 		Hits hits = new HitsImpl();
 
@@ -605,8 +604,17 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 
 			Float subsetScore = browseHits[i].getScore();
 
-			if (scoredFieldNamesCount > 0) {
-				subsetScore = subsetScore / scoredFieldNamesCount;
+			if (subsetScore > 0) {
+				if (scoredFieldNamesCount == -1) {
+					scoredFieldNamesCount =
+						LuceneHelperUtil.countScoredFieldNames(luceneQuery,
+							ArrayUtil.toStringArray(
+								indexedFieldNames.toArray()));
+				}
+
+				if (scoredFieldNamesCount > 0) {
+					subsetScore = subsetScore / scoredFieldNamesCount;
+				}
 			}
 
 			subsetScores.add(subsetScore);
