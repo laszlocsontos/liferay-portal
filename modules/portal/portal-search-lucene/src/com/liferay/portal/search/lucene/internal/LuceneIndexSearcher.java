@@ -45,7 +45,6 @@ import com.liferay.portal.kernel.search.HitsImpl;
 import com.liferay.portal.kernel.search.ParseException;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
-import com.liferay.portal.kernel.search.QuerySuggester;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
@@ -55,6 +54,7 @@ import com.liferay.portal.kernel.search.facet.RangeFacet;
 import com.liferay.portal.kernel.search.facet.SimpleFacet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
+import com.liferay.portal.kernel.search.suggest.QuerySuggester;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -553,8 +553,7 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 		org.apache.lucene.search.Query luceneQuery =
 			(org.apache.lucene.search.Query)_queryTranslator.translate(query);
 
-		int scoredFieldNamesCount = _luceneHelper.countScoredFieldNames(
-			luceneQuery, ArrayUtil.toStringArray(indexedFieldNames.toArray()));
+		int scoredFieldNamesCount = -1;
 
 		Hits hits = new HitsImpl();
 
@@ -605,8 +604,17 @@ public class LuceneIndexSearcher extends BaseIndexSearcher {
 
 			Float subsetScore = browseHits[i].getScore();
 
-			if (scoredFieldNamesCount > 0) {
-				subsetScore = subsetScore / scoredFieldNamesCount;
+			if (subsetScore > 0) {
+				if (scoredFieldNamesCount == -1) {
+					scoredFieldNamesCount =
+						LuceneHelperUtil.countScoredFieldNames(luceneQuery,
+							ArrayUtil.toStringArray(
+								indexedFieldNames.toArray()));
+				}
+
+				if (scoredFieldNamesCount > 0) {
+					subsetScore = subsetScore / scoredFieldNamesCount;
+				}
 			}
 
 			subsetScores.add(subsetScore);
