@@ -434,6 +434,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SCOPE</td>
+	<td>//div[contains(.,'Scope')]//a[contains(@id,'_menu')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SCOPE_SELECTION</td>
+	<td>//ul[contains(@class,'lfr-menu-list')]/li/a[contains(.,'${key_scopeSelection}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SHORTCUT</td>
 	<td>//a[@role='menuitem' and contains(.,'Shortcut')]</td>
 	<td></td>
@@ -506,6 +516,11 @@
 <tr>
 	<td>UNLOCK_THREAD</td>
 	<td>//a[@role='menuitem' and contains(.,'Unlock Thread')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>UNINSTALL</td>
+	<td>//a[@role='menuitem' and contains(.,'Uninstall')]</td>
 	<td></td>
 </tr>
 <tr>

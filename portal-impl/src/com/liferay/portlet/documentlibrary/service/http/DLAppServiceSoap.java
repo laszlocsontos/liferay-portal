@@ -540,7 +540,7 @@ public class DLAppServiceSoap {
 	}
 
 	/**
-	* Returns a range of all the file entries in the folder.
+	* Returns a name-ordered range of all the file entries in the folder.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
@@ -556,7 +556,7 @@ public class DLAppServiceSoap {
 	* @param folderId the primary key of the file entry's folder
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of file entries in the folder
+	* @return the name-ordered range of file entries in the folder
 	* @throws PortalException if the folder could not be found
 	*/
 	public static com.liferay.portal.kernel.repository.model.FileEntrySoap[] getFileEntries(
@@ -644,15 +644,15 @@ public class DLAppServiceSoap {
 	}
 
 	/**
-	* Returns a range of all the file entries with the file entry type in the
-	* folder.
+	* Returns a name-ordered range of all the file entries with the file entry
+	* type in the folder.
 	*
 	* @param repositoryId the primary key of the file entry's repository
 	* @param folderId the primary key of the file entry's folder
 	* @param fileEntryTypeId the primary key of the file entry type
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the file entries in the folder
+	* @return the name-ordered range of the file entries in the folder
 	* @throws PortalException if the folder could not be found
 	*/
 	public static com.liferay.portal.kernel.repository.model.FileEntrySoap[] getFileEntries(
@@ -1022,8 +1022,9 @@ public class DLAppServiceSoap {
 	}
 
 	/**
-	* Returns a range of all the immediate subfolders of the parent folder,
-	* optionally including mount folders for third-party repositories.
+	* Returns a name-ordered range of all the immediate subfolders of the
+	* parent folder, optionally including mount folders for third-party
+	* repositories.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
@@ -1041,7 +1042,8 @@ public class DLAppServiceSoap {
 	third-party repositories
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of immediate subfolders of the parent folder
+	* @return the name-ordered range of immediate subfolders of the parent
+	folder
 	* @throws PortalException if the parent folder could not be found
 	*/
 	public static com.liferay.portal.kernel.repository.model.FolderSoap[] getFolders(
@@ -1153,7 +1155,8 @@ public class DLAppServiceSoap {
 	}
 
 	/**
-	* Returns a range of all the immediate subfolders of the parent folder.
+	* Returns a name-ordered range of all the immediate subfolders of the
+	* parent folder.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
@@ -1169,7 +1172,8 @@ public class DLAppServiceSoap {
 	* @param parentFolderId the primary key of the folder's parent folder
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of immediate subfolders of the parent folder
+	* @return the name-ordered range of immediate subfolders of the parent
+	folder
 	* @throws PortalException if the parent folder could not be found
 	*/
 	public static com.liferay.portal.kernel.repository.model.FolderSoap[] getFolders(
@@ -1675,9 +1679,9 @@ public class DLAppServiceSoap {
 	}
 
 	/**
-	* Returns a range of all the immediate subfolders of the parent folder that
-	* are used for mounting third-party repositories. This method is only
-	* supported by the Liferay repository.
+	* Returns a name-ordered range of all the immediate subfolders of the
+	* parent folder that are used for mounting third-party repositories. This
+	* method is only supported by the Liferay repository.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end -
@@ -1693,8 +1697,8 @@ public class DLAppServiceSoap {
 	* @param parentFolderId the primary key of the parent folder
 	* @param start the lower bound of the range of results
 	* @param end the upper bound of the range of results (not inclusive)
-	* @return the range of immediate subfolders of the parent folder that are
-	used for mounting third-party repositories
+	* @return the name-ordered range of immediate subfolders of the parent
+	folder that are used for mounting third-party repositories
 	* @throws PortalException if the repository or parent folder could not be
 	found
 	*/
@@ -1878,6 +1882,59 @@ public class DLAppServiceSoap {
 	}
 
 	/**
+	* Locks the folder. This method is primarily used by WebDAV.
+	*
+	* @param repositoryId the primary key of the repository
+	* @param folderId the primary key of the folder
+	* @return the lock object
+	* @throws PortalException if the repository or folder could not be found
+	*/
+	public static com.liferay.portal.kernel.lock.Lock lockFolder(
+		long repositoryId, long folderId) throws RemoteException {
+		try {
+			com.liferay.portal.kernel.lock.Lock returnValue = DLAppServiceUtil.lockFolder(repositoryId,
+					folderId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Locks the folder. This method is primarily used by WebDAV.
+	*
+	* @param repositoryId the primary key of the repository
+	* @param folderId the primary key of the folder
+	* @param owner the owner string for the checkout (optionally
+	<code>null</code>)
+	* @param inheritable whether the lock must propagate to descendants
+	* @param expirationTime the time in milliseconds before the lock expires.
+	If the value is <code>0</code>, the default expiration time will
+	be used from <code>portal.properties>.
+	* @return the lock object
+	* @throws PortalException if the repository or folder could not be found
+	*/
+	public static com.liferay.portal.kernel.lock.Lock lockFolder(
+		long repositoryId, long folderId, java.lang.String owner,
+		boolean inheritable, long expirationTime) throws RemoteException {
+		try {
+			com.liferay.portal.kernel.lock.Lock returnValue = DLAppServiceUtil.lockFolder(repositoryId,
+					folderId, owner, inheritable, expirationTime);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
 	* Moves the file entry to the new folder.
 	*
 	* @param fileEntryId the primary key of the file entry
@@ -2018,6 +2075,62 @@ public class DLAppServiceSoap {
 			com.liferay.portal.kernel.repository.model.Folder returnValue = DLAppServiceUtil.moveFolderToTrash(folderId);
 
 			return com.liferay.portal.kernel.repository.model.FolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Refreshes the lock for the file entry. This method is primarily used by
+	* WebDAV.
+	*
+	* @param lockUuid the lock's UUID
+	* @param companyId the primary key of the file entry's company
+	* @param expirationTime the time in milliseconds before the lock expires.
+	If the value is <code>0</code>, the default expiration time will
+	be used from <code>portal.properties>.
+	* @return the lock object
+	* @throws PortalException if the file entry or lock could not be found
+	*/
+	public static com.liferay.portal.kernel.lock.Lock refreshFileEntryLock(
+		java.lang.String lockUuid, long companyId, long expirationTime)
+		throws RemoteException {
+		try {
+			com.liferay.portal.kernel.lock.Lock returnValue = DLAppServiceUtil.refreshFileEntryLock(lockUuid,
+					companyId, expirationTime);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Refreshes the lock for the folder. This method is primarily used by
+	* WebDAV.
+	*
+	* @param lockUuid the lock's UUID
+	* @param companyId the primary key of the file entry's company
+	* @param expirationTime the time in milliseconds before the lock expires.
+	If the value is <code>0</code>, the default expiration time will
+	be used from <code>portal.properties>.
+	* @return the lock object
+	* @throws PortalException if the folder or lock could not be found
+	*/
+	public static com.liferay.portal.kernel.lock.Lock refreshFolderLock(
+		java.lang.String lockUuid, long companyId, long expirationTime)
+		throws RemoteException {
+		try {
+			com.liferay.portal.kernel.lock.Lock returnValue = DLAppServiceUtil.refreshFolderLock(lockUuid,
+					companyId, expirationTime);
+
+			return returnValue;
 		}
 		catch (Exception e) {
 			_log.error(e, e);

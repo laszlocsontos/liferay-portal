@@ -14,9 +14,6 @@
 
 package com.liferay.portlet.documentlibrary.service.impl;
 
-import com.liferay.portal.ExpiredLockException;
-import com.liferay.portal.InvalidLockException;
-import com.liferay.portal.NoSuchLockException;
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -33,6 +30,11 @@ import com.liferay.portal.kernel.increment.NumberIncrement;
 import com.liferay.portal.kernel.interval.IntervalActionProcessor;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
+import com.liferay.portal.kernel.lock.ExpiredLockException;
+import com.liferay.portal.kernel.lock.InvalidLockException;
+import com.liferay.portal.kernel.lock.Lock;
+import com.liferay.portal.kernel.lock.LockManagerUtil;
+import com.liferay.portal.kernel.lock.NoSuchLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -62,7 +64,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Image;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.ModelHintsUtil;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.ResourceConstants;
@@ -110,6 +111,7 @@ import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.model.ExpandoRow;
 import com.liferay.portlet.expando.model.ExpandoTable;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
+import com.liferay.portlet.expando.util.ExpandoBridgeUtil;
 
 import java.awt.image.RenderedImage;
 
@@ -416,7 +418,7 @@ public class DLFileEntryLocalServiceImpl
 
 		if (Validator.isNotNull(lockUuid)) {
 			try {
-				Lock lock = lockLocalService.getLock(
+				Lock lock = LockManagerUtil.getLock(
 					DLFileEntry.class.getName(), fileEntryId);
 
 				if (!Validator.equals(lock.getUuid(), lockUuid)) {
@@ -491,7 +493,7 @@ public class DLFileEntryLocalServiceImpl
 				expirationTime = DLFileEntryImpl.LOCK_EXPIRATION_TIME;
 			}
 
-			lockLocalService.lock(
+			LockManagerUtil.lock(
 				userId, DLFileEntry.class.getName(), fileEntryId, owner, false,
 				expirationTime);
 		}
@@ -603,14 +605,14 @@ public class DLFileEntryLocalServiceImpl
 
 		int total = dlFileEntryFinder.countByExtraSettings();
 
-		final IntervalActionProcessor intervalActionProcessor =
-			new IntervalActionProcessor(total);
+		final IntervalActionProcessor<Void> intervalActionProcessor =
+			new IntervalActionProcessor<>(total);
 
 		intervalActionProcessor.setPerformIntervalActionMethod(
-			new IntervalActionProcessor.PerformIntervalActionMethod() {
+			new IntervalActionProcessor.PerformIntervalActionMethod<Void>() {
 
 				@Override
-				public void performIntervalAction(int start, int end)
+				public Void performIntervalAction(int start, int end)
 					throws PortalException {
 
 					List<DLFileEntry> dlFileEntries =
@@ -622,6 +624,8 @@ public class DLFileEntryLocalServiceImpl
 
 					intervalActionProcessor.incrementStart(
 						dlFileEntries.size());
+
+					return null;
 				}
 
 			});
@@ -660,6 +664,10 @@ public class DLFileEntryLocalServiceImpl
 		DLFileVersion dlFileVersion = dlFileEntry.getFileVersion();
 
 		DLFileVersion newDlFileVersion = newDlFileEntry.getFileVersion();
+
+		ExpandoBridgeUtil.copyExpandoBridgeAttributes(
+			dlFileVersion.getExpandoBridge(),
+			newDlFileVersion.getExpandoBridge());
 
 		copyFileEntryMetadata(
 			dlFileVersion.getCompanyId(), dlFileVersion.getFileEntryTypeId(),
@@ -962,14 +970,14 @@ public class DLFileEntryLocalServiceImpl
 
 		int total = dlFileEntryPersistence.countByR_F(repositoryId, folderId);
 
-		final IntervalActionProcessor intervalActionProcessor =
-			new IntervalActionProcessor(total);
+		final IntervalActionProcessor<Void> intervalActionProcessor =
+			new IntervalActionProcessor<>(total);
 
 		intervalActionProcessor.setPerformIntervalActionMethod(
-			new IntervalActionProcessor.PerformIntervalActionMethod() {
+			new IntervalActionProcessor.PerformIntervalActionMethod<Void>() {
 
 				@Override
-				public void performIntervalAction(int start, int end)
+				public Void performIntervalAction(int start, int end)
 					throws PortalException {
 
 					List<DLFileEntry> dlFileEntries =
@@ -987,6 +995,8 @@ public class DLFileEntryLocalServiceImpl
 							intervalActionProcessor.incrementStart();
 						}
 					}
+
+					return null;
 				}
 
 			});
@@ -1510,7 +1520,7 @@ public class DLFileEntryLocalServiceImpl
 
 		long folderId = dlFileEntry.getFolderId();
 
-		boolean hasLock = lockLocalService.hasLock(
+		boolean hasLock = LockManagerUtil.hasLock(
 			userId, DLFileEntry.class.getName(), fileEntryId);
 
 		if (!hasLock &&
@@ -1578,11 +1588,11 @@ public class DLFileEntryLocalServiceImpl
 		throws PortalException {
 
 		if (hasFileEntryLock(userId, fileEntryId)) {
-			return lockLocalService.getLock(
+			return LockManagerUtil.getLock(
 				DLFileEntry.class.getName(), fileEntryId);
 		}
 
-		return lockLocalService.lock(
+		return LockManagerUtil.lock(
 			userId, DLFileEntry.class.getName(), fileEntryId, null, false,
 			DLFileEntryImpl.LOCK_EXPIRATION_TIME);
 	}
@@ -1782,7 +1792,7 @@ public class DLFileEntryLocalServiceImpl
 
 	@Override
 	public void unlockFileEntry(long fileEntryId) {
-		lockLocalService.unlock(DLFileEntry.class.getName(), fileEntryId);
+		LockManagerUtil.unlock(DLFileEntry.class.getName(), fileEntryId);
 	}
 
 	@Override
@@ -2042,7 +2052,7 @@ public class DLFileEntryLocalServiceImpl
 		boolean lockVerified = false;
 
 		try {
-			Lock lock = lockLocalService.getLock(
+			Lock lock = LockManagerUtil.getLock(
 				DLFileEntry.class.getName(), fileEntryId);
 
 			if (Validator.equals(lock.getUuid(), lockUuid)) {
@@ -2290,9 +2300,9 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	/**
-	 * @see com.liferay.portlet.dynamicdatalists.service.impl.DDLRecordLocalServiceImpl#isKeepRecordVersionLabel(
-	 *      com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion,
-	 *      com.liferay.portlet.dynamicdatalists.model.DDLRecordVersion,
+	 * @see com.liferay.dynamic.data.lists.service.impl.DDLRecordLocalServiceImpl#isKeepRecordVersionLabel(
+	 *      com.liferay.dynamic.data.lists.model.DDLRecordVersion,
+	 *      com.liferay.dynamic.data.lists.model.DDLRecordVersion,
 	 *      ServiceContext)
 	 */
 	protected boolean isKeepFileVersionLabel(
@@ -2562,7 +2572,8 @@ public class DLFileEntryLocalServiceImpl
 
 		if (!checkedOut && dlFileVersion.isApproved() &&
 			!Validator.equals(
-				dlFileVersion.getUuid(), serviceContext.getUuid())) {
+				dlFileVersion.getUuid(),
+				serviceContext.getUuidWithoutReset())) {
 
 			autoCheckIn = true;
 		}
@@ -2580,8 +2591,14 @@ public class DLFileEntryLocalServiceImpl
 		}
 
 		if (checkedOut || autoCheckIn) {
+			ExpandoBridge oldExpandoBridge = dlFileVersion.getExpandoBridge();
+
 			dlFileVersion = dlFileVersionLocalService.getLatestFileVersion(
 				fileEntryId, false);
+
+			ExpandoBridgeUtil.setExpandoBridgeAttributes(
+				oldExpandoBridge, dlFileVersion.getExpandoBridge(),
+				serviceContext);
 		}
 
 		try {

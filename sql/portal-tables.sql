@@ -384,58 +384,6 @@ create table CyrusVirtual (
 	userId VARCHAR(75) not null
 );
 
-create table DDLRecord (
-	uuid_ VARCHAR(75) null,
-	recordId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	versionUserId LONG,
-	versionUserName VARCHAR(75) null,
-	createDate DATE null,
-	modifiedDate DATE null,
-	DDMStorageId LONG,
-	recordSetId LONG,
-	version VARCHAR(75) null,
-	displayIndex INTEGER
-);
-
-create table DDLRecordSet (
-	uuid_ VARCHAR(75) null,
-	recordSetId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	modifiedDate DATE null,
-	DDMStructureId LONG,
-	recordSetKey VARCHAR(75) null,
-	name STRING null,
-	description STRING null,
-	minDisplayRows INTEGER,
-	scope INTEGER
-);
-
-create table DDLRecordVersion (
-	recordVersionId LONG not null primary key,
-	groupId LONG,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	DDMStorageId LONG,
-	recordSetId LONG,
-	recordId LONG,
-	version VARCHAR(75) null,
-	displayIndex INTEGER,
-	status INTEGER,
-	statusByUserId LONG,
-	statusByUserName VARCHAR(75) null,
-	statusDate DATE null
-);
-
 create table DDMContent (
 	uuid_ VARCHAR(75) null,
 	contentId LONG not null primary key,
@@ -465,6 +413,8 @@ create table DDMStructure (
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
+	versionUserId LONG,
+	versionUserName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
 	parentStructureId LONG,
@@ -511,7 +461,11 @@ create table DDMStructureVersion (
 	description STRING null,
 	definition TEXT null,
 	storageType VARCHAR(75) null,
-	type_ INTEGER
+	type_ INTEGER,
+	status INTEGER,
+	statusByUserId LONG,
+	statusByUserName VARCHAR(75) null,
+	statusDate DATE null
 );
 
 create table DDMTemplate (
@@ -521,6 +475,8 @@ create table DDMTemplate (
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
+	versionUserId LONG,
+	versionUserName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
 	classNameId LONG,
@@ -561,7 +517,11 @@ create table DDMTemplateVersion (
 	name STRING null,
 	description STRING null,
 	language VARCHAR(75) null,
-	script TEXT null
+	script TEXT null,
+	status INTEGER,
+	statusByUserId LONG,
+	statusByUserName VARCHAR(75) null,
+	statusDate DATE null
 );
 
 create table DLContent (
@@ -1151,21 +1111,6 @@ create table ListType (
 	listTypeId LONG not null primary key,
 	name VARCHAR(75) null,
 	type_ VARCHAR(75) null
-);
-
-create table Lock_ (
-	mvccVersion LONG default 0,
-	uuid_ VARCHAR(75) null,
-	lockId LONG not null primary key,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	className VARCHAR(75) null,
-	key_ VARCHAR(200) null,
-	owner VARCHAR(1024) null,
-	inheritable BOOLEAN,
-	expirationDate DATE null
 );
 
 create table MBBan (

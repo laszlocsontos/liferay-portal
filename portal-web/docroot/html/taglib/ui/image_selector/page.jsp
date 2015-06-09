@@ -94,16 +94,26 @@ if (fileEntryId != 0) {
 	</div>
 </div>
 
-<liferay-portlet:renderURL portletName="<%= PortletKeys.ITEM_SELECTOR %>" varImpl="itemSelectorURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-	<portlet:param name="mvcPath" value="/view.jsp" />
-	<portlet:param name="tabs1Names" value="documents" />
-	<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
-	<portlet:param name="checkContentDisplayPage" value="true" />
-	<portlet:param name="type" value="image" />
-	<portlet:param name="eventName" value='<%= randomNamespace + "selectImage" %>' />
-</liferay-portlet:renderURL>
-
 <%
+PortletURL itemSelectorURL = liferayPortletResponse.createRenderURL(PortletKeys.ITEM_SELECTOR);
+
+itemSelectorURL.setParameter("criteria", "com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion");
+itemSelectorURL.setParameter("itemSelectedEventName", liferayPortletResponse.getNamespace() + "selectImage");
+
+JSONObject itemSelectorJSONParamJSONObject = JSONFactoryUtil.createJSONObject();
+
+JSONArray desiredReturnTypesJSONArray = JSONFactoryUtil.createJSONArray();
+
+desiredReturnTypesJSONArray.put(URL.class.getName());
+desiredReturnTypesJSONArray.put(FileEntry.class.getName());
+
+itemSelectorJSONParamJSONObject.put("desiredReturnTypes", desiredReturnTypesJSONArray);
+
+itemSelectorURL.setParameter("0_json", itemSelectorJSONParamJSONObject.toString());
+
+itemSelectorURL.setPortletMode(PortletMode.VIEW);
+itemSelectorURL.setWindowState(LiferayWindowState.POP_UP);
+
 String modules = "liferay-image-selector";
 
 if (!draggableImage.equals("none")) {

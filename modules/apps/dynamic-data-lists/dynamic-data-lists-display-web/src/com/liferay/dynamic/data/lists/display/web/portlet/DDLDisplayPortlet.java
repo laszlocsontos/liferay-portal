@@ -15,6 +15,9 @@
 package com.liferay.dynamic.data.lists.display.web.portlet;
 
 import com.liferay.dynamic.data.lists.display.web.constants.DDLDisplayPortletKeys;
+import com.liferay.dynamic.data.lists.exception.NoSuchRecordSetException;
+import com.liferay.dynamic.data.lists.model.DDLRecordSet;
+import com.liferay.dynamic.data.lists.service.DDLRecordSetService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -23,10 +26,6 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.PrefsParamUtil;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.util.WebKeys;
-import com.liferay.portlet.dynamicdatalists.NoSuchRecordSetException;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
-import com.liferay.portlet.dynamicdatalists.service.DDLRecordSetService;
-import com.liferay.util.log4j.Log4JUtil;
 
 import java.io.IOException;
 
@@ -35,7 +34,6 @@ import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -97,13 +95,6 @@ public class DDLDisplayPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
-	@Activate
-	protected void activate() {
-		Class<? extends MVCPortlet> clazz = getClass();
-
-		initLogger(clazz.getClassLoader());
-	}
-
 	@Override
 	protected void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
@@ -119,11 +110,6 @@ public class DDLDisplayPortlet extends MVCPortlet {
 		else {
 			super.doDispatch(renderRequest, renderResponse);
 		}
-	}
-
-	protected void initLogger(ClassLoader classLoader) {
-		Log4JUtil.configureLog4J(
-			classLoader.getResource("META-INF/portal-log4j.xml"));
 	}
 
 	@Override

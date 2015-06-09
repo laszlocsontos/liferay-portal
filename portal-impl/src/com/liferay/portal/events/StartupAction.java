@@ -42,7 +42,6 @@ import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.plugin.PluginPackageIndexer;
 import com.liferay.portal.service.BackgroundTaskLocalServiceUtil;
-import com.liferay.portal.service.LockLocalServiceUtil;
 import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
@@ -118,22 +117,6 @@ public class StartupAction extends SimpleAction {
 		}
 
 		DBUpgrader.upgrade();
-
-		// Clear locks
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Clear locks");
-		}
-
-		try {
-			LockLocalServiceUtil.clear();
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to clear locks because Lock table does not exist");
-			}
-		}
 
 		// Ehache bootstrap
 

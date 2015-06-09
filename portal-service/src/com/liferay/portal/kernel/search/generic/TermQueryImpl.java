@@ -16,8 +16,8 @@ package com.liferay.portal.kernel.search.generic;
 
 import com.liferay.portal.kernel.search.BaseQueryImpl;
 import com.liferay.portal.kernel.search.QueryTerm;
-import com.liferay.portal.kernel.search.QueryVisitor;
 import com.liferay.portal.kernel.search.TermQuery;
+import com.liferay.portal.kernel.search.query.QueryVisitor;
 
 /**
  * @author Michael C. Han
@@ -26,6 +26,10 @@ public class TermQueryImpl extends BaseQueryImpl implements TermQuery {
 
 	public TermQueryImpl(QueryTerm queryTerm) {
 		_queryTerm = queryTerm;
+	}
+
+	public TermQueryImpl(String field, String value) {
+		this(new QueryTermImpl(field, value));
 	}
 
 	@Override

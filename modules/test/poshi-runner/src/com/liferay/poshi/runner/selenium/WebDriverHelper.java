@@ -24,23 +24,50 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * @author Kenji Heigel
  */
 public class WebDriverHelper {
+
+	public static void addSelection(
+		WebDriver webDriver, String locator, String optionLocator) {
+
+		Select select = new Select(getWebElement(webDriver, locator));
+
+		if (optionLocator.startsWith("index=")) {
+			select.selectByIndex(
+				GetterUtil.getInteger(optionLocator.substring(6)));
+		}
+		else if (optionLocator.startsWith("label=")) {
+			select.selectByVisibleText(optionLocator.substring(6));
+		}
+		else if (optionLocator.startsWith("value=")) {
+			select.selectByValue(optionLocator.substring(6));
+		}
+		else {
+			select.selectByVisibleText(optionLocator);
+		}
+	}
 
 	public static void assertJavaScriptErrors(
 			WebDriver webDriver, String ignoreJavaScriptError)
@@ -130,6 +157,14 @@ public class WebDriverHelper {
 		}
 	}
 
+	public static void check(WebDriver webDriver, String locator) {
+		WebElement webElement = getWebElement(webDriver, locator);
+
+		if (!webElement.isSelected()) {
+			webElement.click();
+		}
+	}
+
 	public static String getAttribute(
 		WebDriver webDriver, String attributeLocator) {
 
@@ -142,6 +177,26 @@ public class WebDriverHelper {
 		String attribute = attributeLocator.substring(pos + 1);
 
 		return webElement.getAttribute(attribute);
+	}
+
+	public static String getConfirmation(WebDriver webDriver) {
+		webDriver.switchTo();
+
+		WebDriverWait webDriverWait = new WebDriverWait(webDriver, 1);
+
+		try {
+			Alert alert = webDriverWait.until(
+				ExpectedConditions.alertIsPresent());
+
+			String confirmation = alert.getText();
+
+			alert.accept();
+
+			return confirmation;
+		}
+		catch (Exception e) {
+			throw new WebDriverException();
+		}
 	}
 
 	public static String getDefaultWindowHandle() {
@@ -347,12 +402,34 @@ public class WebDriverHelper {
 		return point.getY();
 	}
 
+	public static void goBack(WebDriver webDriver) {
+		WebDriver.Navigation navigation = webDriver.navigate();
+
+		navigation.back();
+	}
+
+	public static boolean isElementNotPresent(
+		WebDriver webDriver, String locator) {
+
+		return !isElementPresent(webDriver, locator);
+	}
+
 	public static boolean isElementPresent(
 		WebDriver webDriver, String locator) {
 
 		List<WebElement> webElements = getWebElements(webDriver, locator, "1");
 
 		return !webElements.isEmpty();
+	}
+
+	public static boolean isPartialText(
+		WebDriver webDriver, String locator, String value) {
+
+		WebElement webElement = getWebElement(webDriver, locator, "1");
+
+		String text = webElement.getText();
+
+		return text.contains(value);
 	}
 
 	public static void makeVisible(WebDriver webDriver, String locator) {
@@ -419,6 +496,63 @@ public class WebDriverHelper {
 		WebDriver.Navigation navigation = webDriver.navigate();
 
 		navigation.refresh();
+	}
+
+	public static void select(
+		WebDriver webDriver, String selectLocator, String optionLocator) {
+
+		WebElement webElement = getWebElement(webDriver, selectLocator);
+
+		Select select = new Select(webElement);
+
+		String label = optionLocator;
+
+		if (optionLocator.startsWith("index=")) {
+			String indexString = optionLocator.substring(6);
+
+			int index = GetterUtil.getInteger(indexString);
+
+			select.selectByIndex(index - 1);
+		}
+		else if (optionLocator.startsWith("value=")) {
+			String value = optionLocator.substring(6);
+
+			if (value.startsWith("regexp:")) {
+				String regexp = value.substring(7);
+
+				selectByRegexpValue(webDriver, selectLocator, regexp);
+			}
+			else {
+				List<WebElement> optionWebElements = select.getOptions();
+
+				for (WebElement optionWebElement : optionWebElements) {
+					String optionWebElementValue =
+						optionWebElement.getAttribute("value");
+
+					if (optionWebElementValue.equals(value)) {
+						label = optionWebElement.getText();
+
+						break;
+					}
+				}
+
+				select.selectByValue(label);
+			}
+		}
+		else {
+			if (optionLocator.startsWith("label=")) {
+				label = optionLocator.substring(6);
+			}
+
+			if (label.startsWith("regexp:")) {
+				String regexp = label.substring(7);
+
+				selectByRegexpText(webDriver, selectLocator, regexp);
+			}
+			else {
+				select.selectByVisibleText(label);
+			}
+		}
 	}
 
 	public static void selectFrame(WebDriver webDriver, String locator) {
@@ -560,6 +694,14 @@ public class WebDriverHelper {
 		javascriptExecutor.executeScript(sb.toString());
 	}
 
+	public static void uncheck(WebDriver webdDriver, String locator) {
+		WebElement webElement = getWebElement(webdDriver, locator);
+
+		if (webElement.isSelected()) {
+			webElement.click();
+		}
+	}
+
 	protected static WebElement getWebElement(
 		WebDriver webDriver, String locator) {
 
@@ -651,6 +793,63 @@ public class WebDriverHelper {
 
 		javascriptExecutor.executeScript(
 			"arguments[0].scrollIntoView();", webElement);
+	}
+
+	protected static void selectByRegexpText(
+		WebDriver webDriver, String selectLocator, String regexp) {
+
+		WebElement webElement = getWebElement(webDriver, selectLocator);
+
+		Select select = new Select(webElement);
+
+		List<WebElement> optionWebElements = select.getOptions();
+
+		Pattern pattern = Pattern.compile(regexp);
+
+		int index = -1;
+
+		for (WebElement optionWebElement : optionWebElements) {
+			String optionWebElementText = optionWebElement.getText();
+
+			Matcher matcher = pattern.matcher(optionWebElementText);
+
+			if (matcher.matches()) {
+				index = optionWebElements.indexOf(optionWebElement);
+
+				break;
+			}
+		}
+
+		select.selectByIndex(index);
+	}
+
+	protected static void selectByRegexpValue(
+		WebDriver webDriver, String selectLocator, String regexp) {
+
+		WebElement webElement = getWebElement(webDriver, selectLocator);
+
+		Select select = new Select(webElement);
+
+		List<WebElement> optionWebElements = select.getOptions();
+
+		Pattern pattern = Pattern.compile(regexp);
+
+		int index = -1;
+
+		for (WebElement optionWebElement : optionWebElements) {
+			String optionWebElementValue = optionWebElement.getAttribute(
+				"value");
+
+			Matcher matcher = pattern.matcher(optionWebElementValue);
+
+			if (matcher.matches()) {
+				index = optionWebElements.indexOf(optionWebElement);
+
+				break;
+			}
+		}
+
+		select.selectByIndex(index);
 	}
 
 	private static String _defaultWindowHandle;

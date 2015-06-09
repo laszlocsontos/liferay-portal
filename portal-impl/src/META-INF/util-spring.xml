@@ -259,6 +259,11 @@
 			<bean class="com.liferay.portal.sanitizer.SanitizerImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.kernel.search.SearchResultManagerUtil" class="com.liferay.portal.kernel.search.SearchResultManagerUtil">
+		<property name="searchResultManager">
+			<bean class="com.liferay.portal.search.SearchResultManagerImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.kernel.servlet.BrowserSnifferUtil" class="com.liferay.portal.kernel.servlet.BrowserSnifferUtil">
 		<property name="browserSniffer">
 			<bean class="com.liferay.portal.servlet.BrowserSnifferImpl" />
@@ -434,14 +439,16 @@
 			<bean class="com.liferay.portal.workflow.permission.WorkflowPermissionImpl" />
 		</property>
 	</bean>
-	<bean id="com.liferay.portal.kernel.xml.SAXReaderUtil" class="com.liferay.portal.kernel.xml.SAXReaderUtil">
-		<property name="secureSAXReader">
+	<bean id="com.liferay.portal.kernel.xml.SAXReaderUtil" class="com.liferay.portal.kernel.xml.SAXReaderUtil" depends-on="com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil">
+		<property name="SAXReader">
 			<bean class="com.liferay.portal.xml.SAXReaderImpl">
 				<property name="secure" value="true" />
 				<property name="secureXMLFactoryProvider" ref="com.liferay.portal.security.xml.SecureXMLFactoryProvider" />
 			</bean>
 		</property>
-		<property name="unsecureSAXReader">
+	</bean>
+	<bean id="com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil" class="com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil">
+		<property name="SAXReader">
 			<bean class="com.liferay.portal.xml.SAXReaderImpl">
 				<property name="secure" value="false" />
 				<property name="secureXMLFactoryProvider" ref="com.liferay.portal.security.xml.SecureXMLFactoryProvider" />
@@ -527,13 +534,13 @@
 	</bean>
 	<bean id="com.liferay.portal.sanitizer.DummySanitizerImpl" class="com.liferay.portal.sanitizer.DummySanitizerImpl" />
 	<bean id="com.liferay.portal.scripting.ruby.RubyExecutor" class="com.liferay.portal.scripting.ruby.RubyExecutor" depends-on="com.liferay.portal.kernel.util.FileUtil" />
-	<bean id="com.liferay.portal.security.ac.AccessControlUtil" class="com.liferay.portal.security.ac.AccessControlUtil">
+	<bean id="com.liferay.portal.security.access.control.AccessControlUtil" class="com.liferay.portal.security.access.control.AccessControlUtil">
 		<property name="accessControl">
-			<bean class="com.liferay.portal.security.ac.AccessControlImpl" />
+			<bean class="com.liferay.portal.security.access.control.AccessControlImpl" />
 		</property>
 	</bean>
-	<bean id="com.liferay.portal.security.ac.AllowedHostsAccessControlPolicy" class="com.liferay.portal.security.ac.AllowedHostsAccessControlPolicy" />
-	<bean id="com.liferay.portal.security.ac.AuthenticatedAccessControlPolicy" class="com.liferay.portal.security.ac.AuthenticatedAccessControlPolicy" />
+	<bean id="com.liferay.portal.security.access.control.AllowedHostsAccessControlPolicy" class="com.liferay.portal.security.access.control.AllowedHostsAccessControlPolicy" />
+	<bean id="com.liferay.portal.security.access.control.AuthenticatedAccessControlPolicy" class="com.liferay.portal.security.access.control.AuthenticatedAccessControlPolicy" />
 	<bean id="com.liferay.portal.security.auth.AuthenticatedUserUUIDStoreUtil" class="com.liferay.portal.security.auth.AuthenticatedUserUUIDStoreUtil">
 		<property name="authenticatedUserUUIDStore">
 			<bean class="com.liferay.portal.security.auth.DefaultAuthenticatedUserUUIDStoreImpl" />
@@ -545,7 +552,6 @@
 		</property>
 	</bean>
 	<bean id="com.liferay.portal.security.auth.AuthTokenUtil" class="com.liferay.portal.security.auth.AuthTokenUtil" />
-	<bean id="com.liferay.portal.security.auth.BasicAuthHeaderAutoLogin" class="com.liferay.portal.security.auth.BasicAuthHeaderAutoLogin" />
 	<bean id="com.liferay.portal.security.auth.DefaultEmailAddressGenerator" class="com.liferay.portal.security.auth.DefaultEmailAddressGenerator" />
 	<bean id="com.liferay.portal.security.auth.DefaultEmailAddressValidator" class="com.liferay.portal.security.auth.DefaultEmailAddressValidator" />
 	<bean id="com.liferay.portal.security.auth.DefaultFullNameGenerator" class="com.liferay.portal.security.auth.DefaultFullNameGenerator" />
@@ -566,14 +572,9 @@
 	<bean id="com.liferay.portal.security.auth.LiberalScreenNameValidator" class="com.liferay.portal.security.auth.LiberalScreenNameValidator" />
 	<bean id="com.liferay.portal.security.auth.LoginFailure" class="com.liferay.portal.security.auth.LoginFailure" />
 	<bean id="com.liferay.portal.security.auth.LoginMaxFailures" class="com.liferay.portal.security.auth.LoginMaxFailures" />
-	<bean id="com.liferay.portal.security.auth.ParameterAutoLogin" class="com.liferay.portal.security.auth.ParameterAutoLogin" />
-	<bean id="com.liferay.portal.security.auth.PortalSessionAuthVerifier" class="com.liferay.portal.security.auth.PortalSessionAuthVerifier" />
-	<bean id="com.liferay.portal.security.auth.RememberMeAutoLogin" class="com.liferay.portal.security.auth.RememberMeAutoLogin" />
-	<bean id="com.liferay.portal.security.auth.RequestHeaderAutoLogin" class="com.liferay.portal.security.auth.RequestHeaderAutoLogin" />
 	<bean id="com.liferay.portal.security.auth.ScreenNameGeneratorFactory" class="com.liferay.portal.security.auth.ScreenNameGeneratorFactory" />
 	<bean id="com.liferay.portal.security.auth.ScreenNameValidatorFactory" class="com.liferay.portal.security.auth.ScreenNameValidatorFactory" />
 	<bean id="com.liferay.portal.security.auth.SessionAuthToken" class="com.liferay.portal.security.auth.SessionAuthToken" />
-	<bean id="com.liferay.portal.security.auth.TunnelingServletAuthVerifier" class="com.liferay.portal.security.auth.TunnelingServletAuthVerifier" />
 	<bean id="com.liferay.portal.security.membershippolicy.DefaultSiteMembershipPolicy" class="com.liferay.portal.security.membershippolicy.DefaultSiteMembershipPolicy" />
 	<bean id="com.liferay.portal.security.membershippolicy.DummyOrganizationMembershipPolicy" class="com.liferay.portal.security.membershippolicy.DummyOrganizationMembershipPolicy" />
 	<bean id="com.liferay.portal.security.membershippolicy.DummyRoleMembershipPolicy" class="com.liferay.portal.security.membershippolicy.DummyRoleMembershipPolicy" />
@@ -878,26 +879,6 @@
 			<bean class="com.liferay.portlet.documentlibrary.util.DLValidatorImpl" />
 		</property>
 	</bean>
-	<bean id="com.liferay.portlet.dynamicdatalists.lar.DDLRecordSetStagedModelDataHandler" class="com.liferay.portlet.dynamicdatalists.lar.DDLRecordSetStagedModelDataHandler" />
-	<bean id="com.liferay.portlet.dynamicdatalists.lar.DDLRecordStagedModelDataHandler" class="com.liferay.portlet.dynamicdatalists.lar.DDLRecordStagedModelDataHandler" />
-	<bean id="com.liferay.portlet.dynamicdatalists.util.DDLExporterFactory" class="com.liferay.portlet.dynamicdatalists.util.DDLExporterFactory">
-		<property name="DDLExporters">
-			<map>
-				<entry key="csv">
-					<bean class="com.liferay.portlet.dynamicdatalists.util.DDLCSVExporter" />
-				</entry>
-				<entry key="xml">
-					<bean class="com.liferay.portlet.dynamicdatalists.util.DDLXMLExporter" />
-				</entry>
-			</map>
-		</property>
-	</bean>
-	<bean id="com.liferay.portlet.dynamicdatalists.util.DDLIndexer" class="com.liferay.portlet.dynamicdatalists.util.DDLIndexer" />
-	<bean id="com.liferay.portlet.dynamicdatalists.util.DDLUtil" class="com.liferay.portlet.dynamicdatalists.util.DDLUtil">
-		<property name="DDL">
-			<bean class="com.liferay.portlet.dynamicdatalists.util.DDLImpl" />
-		</property>
-	</bean>
 	<bean id="com.liferay.portlet.dynamicdatamapping.io.DDMFormFieldTypesJSONSerializerUtil" class="com.liferay.portlet.dynamicdatamapping.io.DDMFormFieldTypesJSONSerializerUtil">
 		<property name="DDMFormFieldTypesJSONSerializer">
 			<bean class="com.liferay.portlet.dynamicdatamapping.io.DDMFormFieldTypesJSONSerializerImpl" />
@@ -922,10 +903,9 @@
 			<bean class="com.liferay.portlet.dynamicdatamapping.io.DDMFormLayoutJSONSerializerImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializer" class="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializerImpl" />
 	<bean id="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializerUtil" class="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializerUtil">
-		<property name="DDMFormValuesJSONDeserializer">
-			<bean class="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializerImpl" />
-		</property>
+		<property name="DDMFormValuesJSONDeserializer" ref="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONDeserializer" />
 	</bean>
 	<bean id="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONSerializerUtil" class="com.liferay.portlet.dynamicdatamapping.io.DDMFormValuesJSONSerializerUtil">
 		<property name="DDMFormValuesJSONSerializer">
@@ -1018,22 +998,20 @@
 			<bean class="com.liferay.portlet.dynamicdatamapping.storage.query.ConditionFactoryImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDM" class="com.liferay.portlet.dynamicdatamapping.util.DDMImpl" />
+	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverter" class="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverterImpl" />
 	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverterUtil" class="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverterUtil">
-		<property name="DDMFormValuesToFieldsConverter">
-			<bean class="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverterImpl" />
-		</property>
+		<property name="DDMFormValuesToFieldsConverter" ref="com.liferay.portlet.dynamicdatamapping.util.DDMFormValuesToFieldsConverter" />
 	</bean>
+	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMIndexer" class="com.liferay.portlet.dynamicdatamapping.util.DDMIndexerImpl" />
 	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil" class="com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil">
-		<property name="DDMIndexer">
-			<bean class="com.liferay.portlet.dynamicdatamapping.util.DDMIndexerImpl" />
-		</property>
+		<property name="DDMIndexer" ref="com.liferay.portlet.dynamicdatamapping.util.DDMIndexer" />
 	</bean>
 	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperUtil" class="com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperUtil">
 		<property name="DDMTemplateHelper">
 			<bean class="com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperImpl" />
 		</property>
 	</bean>
-	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDM" class="com.liferay.portlet.dynamicdatamapping.util.DDMImpl" />
 	<bean id="com.liferay.portlet.dynamicdatamapping.util.DDMUtil" class="com.liferay.portlet.dynamicdatamapping.util.DDMUtil">
 		<property name="DDM" ref="com.liferay.portlet.dynamicdatamapping.util.DDM" />
 	</bean>
@@ -1111,6 +1089,14 @@
 	</bean>
 	<bean id="com.liferay.portlet.journal.workflow.JournalArticleWorkflowHandler" class="com.liferay.portlet.journal.workflow.JournalArticleWorkflowHandler" />
 	<bean id="com.liferay.portlet.layoutprototypes.lar.LayoutPrototypeStagedModelDataHandler" class="com.liferay.portlet.layoutprototypes.lar.LayoutPrototypeStagedModelDataHandler" />
+	<bean id="com.liferay.portlet.layoutsadmin.LayoutAdminViewPortletProvider" class="com.liferay.portlet.layoutsadmin.LayoutAdminEditPortletProvider" />
+	<bean id="com.liferay.portlet.layoutsadmin.lar.LayoutFriendlyURLStagedModelDataHandler" class="com.liferay.portlet.layoutsadmin.lar.LayoutFriendlyURLStagedModelDataHandler" />
+	<bean id="com.liferay.portlet.layoutsadmin.lar.LayoutStagedModelDataHandler" class="com.liferay.portlet.layoutsadmin.lar.LayoutStagedModelDataHandler">
+		<property name="LayoutLocalServiceHelper">
+			<bean class="com.liferay.portal.service.impl.LayoutLocalServiceHelper" />
+		</property>
+	</bean>
+	<bean id="com.liferay.portlet.layoutsadmin.lar.StagedThemeStagedModelDataHandler" class="com.liferay.portlet.layoutsadmin.lar.StagedThemeStagedModelDataHandler" />
 	<bean id="com.liferay.portlet.layoutsadmin.util.SitemapUtil" class="com.liferay.portlet.layoutsadmin.util.SitemapUtil">
 		<property name="sitemap">
 			<bean class="com.liferay.portlet.layoutsadmin.util.SitemapImpl" />

@@ -163,7 +163,7 @@
 		</execute>
 	</command>
 
-	<command known-issues="LPS-54712" name="AddCategorywithSiteRole" priority="4">
+	<command name="AddCategorywithSiteRole" priority="4">
 		<var name="pageName" value="Test Page Name" />
 		<var name="siteName" value="Test Site Name" />
 
@@ -457,7 +457,7 @@
 		</execute>
 	</command>
 
-	<command known-issues="LPS-54712" name="DeletePartialCategory" priority="5">
+	<command name="DeletePartialCategory" priority="5">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Categories" />
 		</execute>
@@ -612,7 +612,7 @@
 		</execute>
 
 		<execute macro="WebContent#viewCategorizationCategoryCP">
-			<var name="categoryName" value="Category Name 2" />
+			<var name="categoryNameList" value="Category Name 2" />
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 
@@ -651,20 +651,18 @@
 			<var name="webContentTitle" value="Web Content Title Multiple Categories" />
 		</execute>
 
-		<for list="Category Name 1,Category Name 2" param="categoryName">
-			<execute macro="Page#gotoContentCP">
-				<var name="portletName" value="Web Content" />
-			</execute>
+		<execute macro="Page#gotoContentCP">
+			<var name="portletName" value="Web Content" />
+		</execute>
 
-			<execute macro="WebContentNavigator#gotoEditCP">
-				<var name="webContentTitle" value="Web Content Title Multiple Categories" />
-			</execute>
+		<execute macro="WebContentNavigator#gotoEditCP">
+			<var name="webContentTitle" value="Web Content Title Multiple Categories" />
+		</execute>
 
-			<execute macro="WebContent#viewCategorizationCategoryCP">
-				<var name="categoryName" value="${categoryName}" />
-				<var name="webContentTitle" value="Web Content Title Multiple Categories" />
-			</execute>
-		</for>
+		<execute macro="WebContent#viewCategorizationCategoryCP">
+			<var name="categoryNameList" value="Category Name 1,Category Name 2" />
+			<var name="webContentTitle" value="Web Content Title Multiple Categories" />
+		</execute>
 	</command>
 
 	<command known-issues="LPS-54823" name="DuplicateCategoriesViaWebContentCopy" priority="3">
@@ -784,10 +782,8 @@
 			<var name="categoryName" value="Category Name" />
 		</execute>
 
-		<execute macro="Page#gotoPagesCP">
-			<var name="portletName" value="Site Pages" />
+		<execute macro="LAR#gotoExportSite">
 			<var name="siteScopeName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute function="AssertClick" locator1="CPSitepages#TOOLBAR_EXPORT" value1="Export" />
@@ -852,7 +848,7 @@
 		</execute>
 
 		<execute macro="WebContent#viewCategorizationCategoryCP">
-			<var name="categoryName" value="Category Name" />
+			<var name="categoryNameList" value="Category Name" />
 			<var name="webContentTitle" value="Web Content Title" />
 		</execute>
 	</command>

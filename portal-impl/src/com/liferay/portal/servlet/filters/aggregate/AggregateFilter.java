@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.BrowserSniffer;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
-import com.liferay.portal.kernel.servlet.FileTimestampUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
 import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
@@ -264,12 +263,11 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		String bundleDirName = PropsUtil.get(
 			PropsKeys.JAVASCRIPT_BUNDLE_DIR, new Filter(bundleId));
 
-		ServletContext portalWebResourcesServletContext =
+		ServletContext jsServletContext =
 			PortalWebResourcesUtil.getServletContext(
 				PortalWebResourceConstants.RESOURCE_TYPE_JS);
 
-		URL bundleDirURL = portalWebResourcesServletContext.getResource(
-			bundleDirName);
+		URL bundleDirURL = jsServletContext.getResource(bundleDirName);
 
 		if (bundleDirURL == null) {
 			return null;
@@ -282,21 +280,10 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		File cacheFile = new File(_tempDir, cacheFileName);
 
 		if (cacheFile.exists()) {
-			boolean staleCache = false;
+			long lastModified = PortalWebResourcesUtil.getLastModified(
+				PortalWebResourceConstants.RESOURCE_TYPE_JS);
 
-			for (String fileName : fileNames) {
-				long lastModified = FileTimestampUtil.getTimestamp(
-					portalWebResourcesServletContext,
-					bundleDirName.concat(StringPool.SLASH).concat(fileName));
-
-				if (lastModified > cacheFile.lastModified()) {
-					staleCache = true;
-
-					break;
-				}
-			}
-
-			if (!staleCache) {
+			if (lastModified <= cacheFile.lastModified()) {
 				response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 
 				return cacheFile;
@@ -314,9 +301,7 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		}
 		else {
 			content = aggregateJavaScript(
-				new ServletPaths(
-					portalWebResourcesServletContext, bundleDirName),
-				fileNames);
+				new ServletPaths(jsServletContext, bundleDirName), fileNames);
 		}
 
 		response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
@@ -375,7 +360,12 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		URL resourceURL = _servletContext.getResource(resourcePath);
 
 		if (resourceURL == null) {
-			return null;
+			resourceURL = PortalWebResourcesUtil.getServletContextResource(
+				resourcePath);
+
+			if (resourceURL == null) {
+				return null;
+			}
 		}
 
 		String cacheCommonFileName = getCacheFileName(request);
@@ -465,8 +455,20 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 		String resourcePath, String content) {
 
 		try {
+			ServletContext cssServletContext = null;
+
+			String requestURI = request.getRequestURI();
+
+			if (PortalWebResourcesUtil.isResourceContextPath(requestURI)) {
+				cssServletContext = PortalWebResourcesUtil.getServletContext(
+					PortalWebResourceConstants.RESOURCE_TYPE_CSS);
+			}
+			else {
+				cssServletContext = _servletContext;
+			}
+
 			content = DynamicCSSUtil.parseSass(
-				_servletContext, request, resourcePath, content);
+				cssServletContext, request, resourcePath, content);
 		}
 		catch (Exception e) {
 			_log.error("Unable to parse SASS on CSS " + resourcePath, e);
@@ -520,10 +522,7 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 	protected boolean isModuleRequest(HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
 
-		String contextPath = PortalWebResourcesUtil.getContextPath(
-			PortalWebResourceConstants.RESOURCE_TYPE_JS);
-
-		if (requestURI.startsWith(contextPath)) {
+		if (PortalWebResourcesUtil.isResourceContextPath(requestURI)) {
 			return false;
 		}
 

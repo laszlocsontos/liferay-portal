@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.cache.AbstractPortalCacheManager;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheManagerTypes;
 import com.liferay.portal.kernel.cache.PortalCacheWrapper;
+import com.liferay.portal.kernel.cache.configuration.PortalCacheConfiguration;
 import com.liferay.portal.kernel.cache.configuration.PortalCacheManagerConfiguration;
 import com.liferay.portal.kernel.cache.configurator.PortalCacheConfiguratorSettings;
 import com.liferay.portal.kernel.log.Log;
@@ -67,12 +68,14 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 
 	@Override
 	public void reconfigureCaches(URL configurationURL) {
-		_configurationPair = EhcacheConfigurationHelperUtil.getConfiguration(
-			configurationURL, isClusterAware(), _usingDefault, props);
+		ObjectValuePair<Configuration, PortalCacheManagerConfiguration>
+			configurationObjectValuePair =
+				EhcacheConfigurationHelperUtil.getConfigurationObjectValuePair(
+					configurationURL, isClusterAware(), _usingDefault, props);
 
-		reconfigEhcache(_configurationPair.getKey());
+		reconfigEhcache(configurationObjectValuePair.getKey());
 
-		reconfigPortalCache(_configurationPair.getValue());
+		reconfigPortalCache(configurationObjectValuePair.getValue());
 	}
 
 	public void setConfigFile(String configFile) {
@@ -124,14 +127,25 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 	}
 
 	@Override
-	protected PortalCache<K, V> createPortalCache(String cacheName) {
+	protected PortalCache<K, V> createPortalCache(
+		PortalCacheConfiguration portalCacheConfiguration) {
+
+		String portalCacheName = portalCacheConfiguration.getPortalCacheName();
+
 		synchronized (_cacheManager) {
-			if (!_cacheManager.cacheExists(cacheName)) {
-				_cacheManager.addCache(cacheName);
+			if (!_cacheManager.cacheExists(portalCacheName)) {
+				_cacheManager.addCache(portalCacheName);
 			}
 		}
 
-		Cache cache = _cacheManager.getCache(cacheName);
+		Cache cache = _cacheManager.getCache(portalCacheName);
+
+		EhcachePortalCacheConfiguration ehcachePortalCacheConfiguration =
+			(EhcachePortalCacheConfiguration)portalCacheConfiguration;
+
+		if (ehcachePortalCacheConfiguration.isRequireSerialization()) {
+			return new SerializableEhcachePortalCache<>(this, cache);
+		}
 
 		return new EhcachePortalCache<>(this, cache);
 	}
@@ -151,15 +165,15 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 	}
 
 	@Override
-	protected void doRemoveCache(String cacheName) {
-		_cacheManager.removeCache(cacheName);
+	protected void doRemoveCache(String portalCacheName) {
+		_cacheManager.removeCache(portalCacheName);
 	}
 
 	@Override
 	protected PortalCacheManagerConfiguration
 		getPortalCacheManagerConfiguration() {
 
-		return _configurationPair.getValue();
+		return _portalCacheManagerConfiguration;
 	}
 
 	@Override
@@ -197,10 +211,15 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 
 		_usingDefault = _configFile.equals(_defaultConfigFile);
 
-		_configurationPair = EhcacheConfigurationHelperUtil.getConfiguration(
-			configFileURL, isClusterAware(), _usingDefault, props);
+		ObjectValuePair<Configuration, PortalCacheManagerConfiguration>
+			configurationObjectValuePair =
+				EhcacheConfigurationHelperUtil.getConfigurationObjectValuePair(
+					configFileURL, isClusterAware(), _usingDefault, props);
 
-		_cacheManager = new CacheManager(_configurationPair.getKey());
+		_cacheManager = new CacheManager(configurationObjectValuePair.getKey());
+
+		_portalCacheManagerConfiguration =
+			configurationObjectValuePair.getValue();
 
 		_cacheManager.setName(getName());
 
@@ -343,10 +362,9 @@ public class EhcachePortalCacheManager<K extends Serializable, V>
 
 	private CacheManager _cacheManager;
 	private String _configFile;
-	private ObjectValuePair<Configuration, PortalCacheManagerConfiguration>
-		_configurationPair;
 	private String _defaultConfigFile;
 	private ManagementService _managementService;
+	private PortalCacheManagerConfiguration _portalCacheManagerConfiguration;
 	private boolean _registerCacheConfigurations = true;
 	private boolean _registerCacheManager = true;
 	private boolean _registerCaches = true;

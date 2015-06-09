@@ -18,15 +18,16 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lar.StagedModelType;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.capabilities.Capability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
@@ -245,6 +246,13 @@ public class FileEntryProxyBean
 	}
 
 	@Override
+	public <T extends Capability> T getRepositoryCapability(
+		Class<T> capabilityClass) {
+
+		return _fileEntry.getRepositoryCapability(capabilityClass);
+	}
+
+	@Override
 	public long getRepositoryId() {
 		return _fileEntry.getRepositoryId();
 	}
@@ -385,6 +393,13 @@ public class FileEntryProxyBean
 	@Override
 	public boolean isManualCheckInRequired() {
 		return _fileEntry.isManualCheckInRequired();
+	}
+
+	@Override
+	public <T extends Capability> boolean isRepositoryCapabilityProvided(
+		Class<T> capabilityClass) {
+
+		return _fileEntry.isRepositoryCapabilityProvided(capabilityClass);
 	}
 
 	@Override

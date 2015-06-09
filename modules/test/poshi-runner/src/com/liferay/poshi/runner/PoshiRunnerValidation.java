@@ -18,14 +18,13 @@ import com.liferay.poshi.runner.util.OSDetector;
 import com.liferay.poshi.runner.util.PropsValues;
 import com.liferay.poshi.runner.util.Validator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -95,10 +94,12 @@ public class PoshiRunnerValidation {
 	}
 
 	private static String _getPrimaryAttributeName(
-		Element element, List<String> primaryAttributeNames, String filePath) {
+		Element element, List<String> multiplePrimaryAttributeNames,
+		List<String> primaryAttributeNames, String filePath) {
 
 		_validateHasPrimaryAttributeName(
-			element, primaryAttributeNames, filePath);
+			element, multiplePrimaryAttributeNames, primaryAttributeNames,
+			filePath);
 
 		for (String primaryAttributeName : primaryAttributeNames) {
 			if (Validator.isNotNull(
@@ -109,6 +110,13 @@ public class PoshiRunnerValidation {
 		}
 
 		return null;
+	}
+
+	private static String _getPrimaryAttributeName(
+		Element element, List<String> primaryAttributeNames, String filePath) {
+
+		return _getPrimaryAttributeName(
+			element, null, primaryAttributeNames, filePath);
 	}
 
 	private static void _parseElements(Element element, String filePath) {
@@ -141,6 +149,9 @@ public class PoshiRunnerValidation {
 			}
 			else if (elementName.equals("if")) {
 				_validateIfElement(childElement, filePath);
+			}
+			else if (elementName.equals("property")) {
+				_validatePropertyElement(childElement, filePath);
 			}
 			else if (elementName.equals("take-screenshot")) {
 				_validateTakeScreenshotElement(childElement, filePath);
@@ -186,7 +197,7 @@ public class PoshiRunnerValidation {
 				new Exception(
 					"Invalid " + classType + " class " + className + "\n" +
 						filePath + ":" +
-						element.attributeValue("line-number")));
+							element.attributeValue("line-number")));
 		}
 
 		String commandElementKey = classType + "#" + classCommandName;
@@ -217,11 +228,18 @@ public class PoshiRunnerValidation {
 
 		String elementName = element.getName();
 
-		if (elementName.equals("and")) {
+		if (elementName.equals("and") || elementName.equals("or")) {
 			_validateHasChildElements(element, filePath);
 			_validateHasNoAttributes(element, filePath);
 
 			List<Element> childElements = element.elements();
+
+			if (childElements.size() < 2) {
+				_exceptions.add(
+					new Exception(
+						"Too few child elements\n" + filePath + ":" +
+							element.attributeValue("line-number")));
+			}
 
 			for (Element childElement : childElements) {
 				_validateConditionElement(childElement, filePath);
@@ -233,6 +251,10 @@ public class PoshiRunnerValidation {
 
 			String primaryAttributeName = _getPrimaryAttributeName(
 				element, primaryAttributeNames, filePath);
+
+			if (Validator.isNull(primaryAttributeName)) {
+				return;
+			}
 
 			if (primaryAttributeName.equals("function")) {
 				_validateRequiredAttributeNames(
@@ -280,22 +302,11 @@ public class PoshiRunnerValidation {
 		else if (elementName.equals("not")) {
 			_validateHasChildElements(element, filePath);
 			_validateHasNoAttributes(element, filePath);
+			_validateNumberOfChildElements(element, 1, filePath);
 
 			List<Element> childElements = element.elements();
 
-			for (Element childElement : childElements) {
-				_validateConditionElement(childElement, filePath);
-			}
-		}
-		else if (elementName.equals("or")) {
-			_validateHasChildElements(element, filePath);
-			_validateHasNoAttributes(element, filePath);
-
-			List<Element> childElements = element.elements();
-
-			for (Element childElement : childElements) {
-				_validateConditionElement(childElement, filePath);
-			}
+			_validateConditionElement(childElements.get(0), filePath);
 		}
 	}
 
@@ -304,7 +315,7 @@ public class PoshiRunnerValidation {
 
 		String elementName = element.getName();
 
-		if (!StringUtils.equals(elementName, "definition")) {
+		if (!Validator.equals(elementName, "definition")) {
 			_exceptions.add(
 				new Exception(
 					"Invalid " + elementName + " element\n" + filePath + ":" +
@@ -359,6 +370,12 @@ public class PoshiRunnerValidation {
 					"Too many else elements\n" + filePath + ":" +
 						element.attributeValue("line-number")));
 		}
+
+		if (!elseElements.isEmpty()) {
+			Element elseElement = elseElements.get(0);
+
+			_parseElements(elseElement, filePath);
+		}
 	}
 
 	private static void _validateElseIfElement(
@@ -366,15 +383,10 @@ public class PoshiRunnerValidation {
 
 		_validateHasChildElements(element, filePath);
 		_validateHasNoAttributes(element, filePath);
+		_validateNumberOfChildElements(element, 2, filePath);
+		_validateThenElement(element, filePath);
 
 		List<Element> childElements = element.elements();
-
-		if (childElements.size() > 2) {
-			_exceptions.add(
-				new Exception(
-					"Too many elseif child elements" + filePath + ":" +
-						element.attributeValue("line-number")));
-		}
 
 		List<String> conditionTags = Arrays.asList(
 			"and", "condition", "contains", "equals", "isset", "not", "or");
@@ -389,35 +401,36 @@ public class PoshiRunnerValidation {
 		else {
 			_exceptions.add(
 				new Exception(
-					"Invalid " + conditionElementName + " element" + filePath +
-						":" + element.attributeValue("line-number")));
+					"Invalid " + conditionElementName + " element\n" +
+						filePath + ":" +
+							element.attributeValue("line-number")));
 		}
 
-		Element thenElement = childElements.get(1);
+		Element thenElement = element.element("then");
 
-		if (StringUtils.equals("then", thenElement.getName())) {
-			_validateHasChildElements(thenElement, filePath);
-			_validateHasNoAttributes(thenElement, filePath);
+		_validateHasChildElements(thenElement, filePath);
+		_validateHasNoAttributes(thenElement, filePath);
 
-			_parseElements(thenElement, filePath);
-		}
-		else {
-			_exceptions.add(
-				new Exception(
-					"Missing then element" + filePath + ":" +
-						element.attributeValue("line-number")));
-		}
+		_parseElements(thenElement, filePath);
 	}
 
 	private static void _validateExecuteElement(
 		Element element, String filePath) {
+
+		List<String> multiplePrimaryAttributeNames = Arrays.asList(
+			"macro-desktop", "macro-mobile");
 
 		List<String> primaryAttributeNames = Arrays.asList(
 			"function", "macro", "macro-desktop", "macro-mobile", "selenium",
 			"test-case");
 
 		String primaryAttributeName = _getPrimaryAttributeName(
-			element, primaryAttributeNames, filePath);
+			element, multiplePrimaryAttributeNames, primaryAttributeNames,
+			filePath);
+
+		if (primaryAttributeName == null) {
+			return;
+		}
 
 		if (primaryAttributeName.equals("function")) {
 			List<String> possibleAttributeNames = Arrays.asList(
@@ -469,6 +482,8 @@ public class PoshiRunnerValidation {
 
 			_validatePossibleAttributeNames(
 				element, possibleAttributeNames, filePath);
+
+			_validateTestCaseContext(element, filePath);
 		}
 
 		List<Element> childElements = element.elements();
@@ -478,10 +493,11 @@ public class PoshiRunnerValidation {
 				"function", "macro", "macro-desktop", "macro-mobile");
 
 			_validateHasPrimaryAttributeName(
-				element, primaryAttributeNames, filePath);
+				element, multiplePrimaryAttributeNames, primaryAttributeNames,
+				filePath);
 
 			for (Element childElement : childElements) {
-				if (StringUtils.equals(childElement.getName(), "var")) {
+				if (Validator.equals(childElement.getName(), "var")) {
 					_validateVarElement(childElement, filePath);
 
 					continue;
@@ -583,19 +599,36 @@ public class PoshiRunnerValidation {
 		}
 	}
 
+	private static void _validateHasMultiplePrimaryAttributeNames(
+		Element element, List<String> attributeNames,
+		List<String> multiplePrimaryAttributeNames, String filePath) {
+
+		if (!multiplePrimaryAttributeNames.equals(attributeNames)) {
+			_exceptions.add(
+				new Exception(
+					"Too many attributes: " + "\n" + filePath + ":" +
+						element.attributeValue("line-number")));
+		}
+	}
+
 	private static void _validateHasNoAttributes(
 		Element element, String filePath) {
 
 		List<Attribute> attributes = element.attributes();
 
-		if (attributes.size() > 1) {
-			Attribute attribute = attributes.get(1);
+		if (!attributes.isEmpty()) {
+			for (Attribute attribute : attributes) {
+				String attributeName = attribute.getName();
 
-			_exceptions.add(
-				new Exception(
-					"Invalid " + attribute.getName() + " attribute\n" +
-						filePath + ":" +
-						element.attributeValue("line-number")));
+				if (attributeName.equals("line-number")) {
+					continue;
+				}
+
+				_exceptions.add(
+					new Exception(
+						"Invalid " + attributeName + " attribute\n" + filePath +
+							":" + element.attributeValue("line-number")));
+			}
 		}
 	}
 
@@ -613,32 +646,45 @@ public class PoshiRunnerValidation {
 	}
 
 	private static void _validateHasPrimaryAttributeName(
-		Element element, List<String> primaryAttributeNames, String filePath) {
+		Element element, List<String> multiplePrimaryAttributeNames,
+		List<String> primaryAttributeNames, String filePath) {
 
-		boolean found = false;
+		List<String> attributeNames = new ArrayList<>();
 
 		for (String primaryAttributeName : primaryAttributeNames) {
 			if (Validator.isNotNull(
 					element.attributeValue(primaryAttributeName))) {
 
-				if (!found) {
-					found = true;
-				}
-				else {
-					_exceptions.add(
-						new Exception(
-							"Too many attributes: " + "\n" + filePath + ":" +
-								element.attributeValue("line-number")));
-				}
+				attributeNames.add(primaryAttributeName);
 			}
 		}
 
-		if (!found) {
+		if (attributeNames.size() < 1) {
 			_exceptions.add(
 				new Exception(
 					"Invalid or missing attribute\n" + filePath + ":" +
 						element.attributeValue("line-number")));
 		}
+		else if (attributeNames.size() > 1) {
+			if (Validator.isNull(multiplePrimaryAttributeNames)) {
+				_exceptions.add(
+					new Exception(
+						"Too many attributes\n" + filePath + ":" +
+							element.attributeValue("line-number")));
+			}
+			else {
+				_validateHasMultiplePrimaryAttributeNames(
+					element, attributeNames, multiplePrimaryAttributeNames,
+					filePath);
+			}
+		}
+	}
+
+	private static void _validateHasPrimaryAttributeName(
+		Element element, List<String> primaryAttributeNames, String filePath) {
+
+		_validateHasPrimaryAttributeName(
+			element, null, primaryAttributeNames, filePath);
 	}
 
 	private static void _validateIfElement(Element element, String filePath) {
@@ -649,31 +695,32 @@ public class PoshiRunnerValidation {
 
 		List<Element> childElements = element.elements();
 
+		List<String> conditionTags = Arrays.asList(
+			"and", "condition", "contains", "equals", "isset", "not", "or");
+
 		if (fileName.equals("function")) {
-			Element firstChildElement = childElements.get(0);
-
-			_validateConditionElement(firstChildElement, filePath);
-
-			List<String> possibleElementNames = Arrays.asList(
-				"condition", "contains");
-
-			_validateElementName(
-				firstChildElement, possibleElementNames, filePath);
+			conditionTags = Arrays.asList("condition", "contains");
 		}
 
 		_validateElseElement(element, filePath);
 		_validateThenElement(element, filePath);
-
-		List<String> conditionTags = Arrays.asList(
-			"and", "condition", "contains", "equals", "isset", "not", "or");
 
 		for (int i = 0; i < childElements.size(); i++) {
 			Element childElement = childElements.get(i);
 
 			String childElementName = childElement.getName();
 
-			if (conditionTags.contains(childElementName) && (i == 0)) {
-				_validateConditionElement(childElement, filePath);
+			if (i == 0) {
+				if (conditionTags.contains(childElementName)) {
+					_validateConditionElement(childElement, filePath);
+				}
+				else {
+					_exceptions.add(
+						new Exception(
+							"Missing or invalid if condition element\n" +
+								filePath + ":" +
+								element.attributeValue("line-number")));
+				}
 			}
 			else if (childElementName.equals("else")) {
 				_validateHasChildElements(childElement, filePath);
@@ -762,10 +809,62 @@ public class PoshiRunnerValidation {
 		}
 	}
 
+	private static void _validateNumberOfAttributes(
+		Element element, int number, String filePath) {
+
+		List<Attribute> attributes = element.attributes();
+
+		if (attributes.isEmpty()) {
+			_exceptions.add(
+				new Exception(
+					"Missing attributes\n" + filePath + ":" +
+						element.attributeValue("line-number")));
+		}
+		else if (attributes.size() > number) {
+			_exceptions.add(
+				new Exception(
+					"Too many attributes\n" + filePath + ":" +
+						element.attributeValue("line-number")));
+		}
+		else if (attributes.size() < number) {
+			_exceptions.add(
+				new Exception(
+					"Too few attributes\n" + filePath + ":" +
+						element.attributeValue("line-number")));
+		}
+	}
+
+	private static void _validateNumberOfChildElements(
+		Element element, int number, String filePath) {
+
+		List<Element> childElements = element.elements();
+
+		if (childElements.isEmpty()) {
+			_exceptions.add(
+				new Exception(
+					"Missing child elements\n" + filePath + ":" +
+						element.attributeValue("line-number")));
+		}
+		else if (childElements.size() > number) {
+			_exceptions.add(
+				new Exception(
+					"Too many child elements\n" + filePath + ":" +
+						element.attributeValue("line-number")));
+		}
+		else if (childElements.size() < number) {
+			_exceptions.add(
+				new Exception(
+					"Too few child elements\n" + filePath + ":" +
+						element.attributeValue("line-number")));
+		}
+	}
+
 	private static void _validatePathFile(Element element, String filePath) {
+		String className = PoshiRunnerGetterUtil.getClassNameFromFilePath(
+			filePath);
 		String rootElementName = element.getName();
 
-		if (!StringUtils.equals(rootElementName, "html")) {
+		if (!Validator.equals(rootElementName, "html")) {
 			_exceptions.add(
 				new Exception(
 					"Invalid " + rootElementName + " element\n" + filePath +
@@ -773,6 +872,114 @@ public class PoshiRunnerValidation {
 		}
 
 		_validateHasChildElements(element, filePath);
+		_validateNumberOfChildElements(element, 2, filePath);
+		_validateRequiredChildElementNames(
+			element, Arrays.asList("body", "head"), filePath);
+
+		Element bodyElement = element.element("body");
+
+		_validateHasChildElements(bodyElement, filePath);
+		_validateNumberOfChildElements(bodyElement, 1, filePath);
+		_validateRequiredChildElementName(bodyElement, "table", filePath);
+
+		Element tableElement = bodyElement.element("table");
+
+		List<String> requiredTableAttributeNames = Arrays.asList(
+			"border", "cellpadding", "cellspacing", "line-number");
+
+		_validateHasChildElements(tableElement, filePath);
+		_validateNumberOfChildElements(tableElement, 2, filePath);
+		_validateRequiredAttributeNames(
+			tableElement, requiredTableAttributeNames, filePath);
+		_validateRequiredChildElementNames(
+			tableElement, Arrays.asList("tbody", "thead"), filePath);
+
+		Element tBodyElement = tableElement.element("tbody");
+
+		if (!Validator.equals(className, "BaseLiferay")) {
+			_validateHasChildElements(tBodyElement, filePath);
+			_validateRequiredChildElementName(tBodyElement, "tr", filePath);
+
+			List<Element> trElements = tBodyElement.elements();
+
+			for (Element trElement : trElements) {
+				_validateHasChildElements(trElement, filePath);
+				_validateNumberOfChildElements(trElement, 3, filePath);
+				_validateRequiredChildElementName(trElement, "td", filePath);
+
+				List<Element> tdElements = trElement.elements();
+
+				Element locatorElement = tdElements.get(1);
+
+				String locator = locatorElement.getText();
+
+				Element locatorKeyElement = tdElements.get(0);
+
+				String locatorKey = locatorKeyElement.getText();
+
+				if (Validator.isNull(locator) && Validator.isNull(locatorKey)) {
+					continue;
+				}
+				else if (Validator.isNotNull(locator) &&
+						 Validator.isNotNull(locatorKey)) {
+
+					continue;
+				}
+
+				_exceptions.add(
+					new Exception(
+						"Missing locator\n" + filePath + ":" +
+							trElement.attributeValue("line-number")));
+			}
+		}
+
+		Element theadElement = tableElement.element("thead");
+
+		_validateHasChildElements(theadElement, filePath);
+		_validateNumberOfChildElements(theadElement, 1, filePath);
+		_validateRequiredChildElementName(theadElement, "tr", filePath);
+
+		Element trElement = theadElement.element("tr");
+
+		_validateHasChildElements(trElement, filePath);
+		_validateNumberOfChildElements(trElement, 1, filePath);
+		_validateRequiredChildElementName(trElement, "td", filePath);
+
+		Element tdElement = trElement.element("td");
+
+		_validateRequiredAttributeNames(
+			tdElement, Arrays.asList("colspan", "rowspan"), filePath);
+
+		String theadClassName = tdElement.getText();
+
+		if (Validator.isNull(theadClassName)) {
+			_exceptions.add(
+				new Exception(
+					"Missing thead class name\n" + filePath + ":" +
+						trElement.attributeValue("line-number")));
+		}
+		else if (!Validator.equals(theadClassName, className)) {
+			_exceptions.add(
+				new Exception(
+					"Thead class name does not match file name\n" +
+						filePath + ":" +
+						trElement.attributeValue("line-number")));
+		}
+
+		Element headElement = element.element("head");
+
+		_validateHasChildElements(headElement, filePath);
+		_validateNumberOfChildElements(headElement, 1, filePath);
+		_validateRequiredChildElementName(headElement, "title", filePath);
+
+		Element titleElement = headElement.element("title");
+
+		if (!Validator.equals(titleElement.getText(), className)) {
+			_exceptions.add(
+				new Exception(
+					"File name and title are different\n" + filePath + ":" +
+						titleElement.attributeValue("line-number")));
+		}
 	}
 
 	private static void _validatePossibleAttributeNames(
@@ -789,6 +996,28 @@ public class PoshiRunnerValidation {
 						"Invalid " + attributeName + " attribute\n" + filePath +
 							":" + element.attributeValue("line-number")));
 			}
+		}
+	}
+
+	private static void _validatePropertyElement(
+		Element element, String filePath) {
+
+		List<String> attributeNames = Arrays.asList(
+			"line-number", "name", "value");
+
+		_validatePossibleAttributeNames(element, attributeNames, filePath);
+		_validateRequiredAttributeNames(element, attributeNames, filePath);
+
+		List<String> testCaseAvailablePropertyNames =
+			PoshiRunnerContext.getTestCaseAvailablePropertyNames();
+
+		String propertyName = element.attributeValue("name");
+
+		if (!testCaseAvailablePropertyNames.contains(propertyName)) {
+			_exceptions.add(
+				new Exception(
+					"Invalid property name " + propertyName + "\n" + filePath +
+						":" + element.attributeValue("line-number")));
 		}
 	}
 
@@ -814,9 +1043,7 @@ public class PoshiRunnerValidation {
 		List<Element> childElements = element.elements();
 
 		for (Element childElement : childElements) {
-			if (StringUtils.equals(
-					childElement.getName(), requiredElementName)) {
-
+			if (Validator.equals(childElement.getName(), requiredElementName)) {
 				found = true;
 
 				break;
@@ -865,6 +1092,26 @@ public class PoshiRunnerValidation {
 		_parseElements(element, filePath);
 	}
 
+	private static void _validateTestCaseContext(
+		Element element, String filePath) {
+
+		String testName = element.attributeValue("test-case");
+
+		String className =
+			PoshiRunnerGetterUtil.getClassNameFromClassCommandName(testName);
+
+		String commandName =
+			PoshiRunnerGetterUtil.getCommandNameFromClassCommandName(testName);
+
+		if (className.equals("super")) {
+			className = PoshiRunnerGetterUtil.getExtendedTestCaseName(filePath);
+		}
+
+		_validateTestName(
+			className + "#" + commandName,
+			filePath + ":" + element.attributeValue("line-number"));
+	}
+
 	private static void _validateTestCaseFile(
 		Element element, String filePath) {
 
@@ -881,6 +1128,8 @@ public class PoshiRunnerValidation {
 		List<String> possibleTagElementNames = Arrays.asList(
 			"command", "property", "set-up", "tear-down", "var");
 
+		List<String> propertyNames = new ArrayList<>();
+
 		for (Element childElement : childElements) {
 			String childElementName = childElement.getName();
 
@@ -889,7 +1138,7 @@ public class PoshiRunnerValidation {
 					new Exception(
 						"Invalid " + childElementName + " element\n" +
 							filePath + ":" +
-							childElement.attributeValue("line-number")));
+								childElement.attributeValue("line-number")));
 			}
 
 			if (childElementName.equals("command")) {
@@ -913,13 +1162,20 @@ public class PoshiRunnerValidation {
 				_parseElements(childElement, filePath);
 			}
 			else if (childElementName.equals("property")) {
-				List<String> attributeNames = Arrays.asList(
-					"line-number", "name", "value");
+				_validatePropertyElement(childElement, filePath);
 
-				_validatePossibleAttributeNames(
-					childElement, attributeNames, filePath);
-				_validateRequiredAttributeNames(
-					childElement, attributeNames, filePath);
+				String propertyName = childElement.attributeValue("name");
+
+				if (!propertyNames.contains(propertyName)) {
+					propertyNames.add(propertyName);
+				}
+				else {
+					_exceptions.add(
+						new Exception(
+							"Duplicate property name " + propertyName + "\n" +
+								filePath + ":" +
+								childElement.attributeValue("line-number")));
+				}
 			}
 			else if (childElementName.equals("set-up") ||
 					 childElementName.equals("tear-down")) {
@@ -936,15 +1192,22 @@ public class PoshiRunnerValidation {
 	}
 
 	private static void _validateTestName(String testName) {
+		_validateTestName(testName, "");
+	}
+
+	private static void _validateTestName(
+		String testName, String filePathLineNumber) {
+
 		String className =
 			PoshiRunnerGetterUtil.getClassNameFromClassCommandName(testName);
 
 		if (!PoshiRunnerContext.isRootElement("test-case#" + className)) {
 			_exceptions.add(
-				new Exception("Invalid test case class " + className));
+				new Exception(
+					"Invalid test case class " + className + "\n" +
+						filePathLineNumber));
 		}
-
-		if (testName.contains("#")) {
+		else if (testName.contains("#")) {
 			String commandElementKey = "test-case#" + testName;
 
 			if (!PoshiRunnerContext.isCommandElement(commandElementKey)) {
@@ -953,7 +1216,9 @@ public class PoshiRunnerValidation {
 						testName);
 
 				_exceptions.add(
-					new Exception("Invalid test case command " + commandName));
+					new Exception(
+						"Invalid test case command " + commandName + "\n" +
+							filePathLineNumber));
 			}
 		}
 	}
@@ -976,6 +1241,7 @@ public class PoshiRunnerValidation {
 	}
 
 	private static void _validateVarElement(Element element, String filePath) {
+		_validateHasNoChildElements(element, filePath);
 		_validateRequiredAttributeNames(
 			element, Arrays.asList("name"), filePath);
 
@@ -996,11 +1262,38 @@ public class PoshiRunnerValidation {
 
 		_validatePossibleAttributeNames(
 			element, possibleAttributeNames, filePath);
+
+		if (Validator.isNotNull(element.attributeValue("attribute"))) {
+			List<String> attributeNames = Arrays.asList(
+				"attribute", "line-number", "locator", "name");
+
+			_validatePossibleAttributeNames(element, attributeNames, filePath);
+			_validateRequiredAttributeNames(element, attributeNames, filePath);
+		}
+		else if (Validator.isNotNull(element.attributeValue("group")) ||
+				 Validator.isNotNull(element.attributeValue("input")) ||
+				 Validator.isNotNull(element.attributeValue("pattern"))) {
+
+			List<String> attributeNames = Arrays.asList(
+				"group", "line-number", "input", "name", "pattern");
+
+			_validatePossibleAttributeNames(element, attributeNames, filePath);
+			_validateRequiredAttributeNames(element, attributeNames, filePath);
+		}
+		else if (Validator.isNotNull(element.attributeValue("locator")) ||
+				 Validator.isNotNull(element.attributeValue("method")) ||
+				 Validator.isNotNull(
+					 element.attributeValue("property-value")) ||
+				 Validator.isNotNull(element.attributeValue("var"))) {
+
+			_validateNumberOfAttributes(element, 3, filePath);
+		}
 	}
 
 	private static void _validateWhileElement(
 		Element element, String filePath) {
 
+		_validateHasChildElements(element, filePath);
 		_validatePossibleAttributeNames(
 			element, Arrays.asList("line-number", "max-iterations"), filePath);
 		_validateThenElement(element, filePath);
@@ -1015,8 +1308,17 @@ public class PoshiRunnerValidation {
 
 			String childElementName = childElement.getName();
 
-			if (conditionTags.contains(childElementName) && (i == 0)) {
-				_validateConditionElement(childElement, filePath);
+			if (i == 0) {
+				if (conditionTags.contains(childElementName)) {
+					_validateConditionElement(childElement, filePath);
+				}
+				else {
+					_exceptions.add(
+						new Exception(
+							"Missing while condition element\n" +
+								filePath + ":" +
+								element.attributeValue("line-number")));
+				}
 			}
 			else if (childElementName.equals("then")) {
 				_validateHasChildElements(childElement, filePath);

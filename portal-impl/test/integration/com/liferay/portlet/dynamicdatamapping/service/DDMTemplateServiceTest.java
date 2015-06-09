@@ -33,6 +33,7 @@ import com.liferay.portlet.dynamicdatamapping.TemplateNameException;
 import com.liferay.portlet.dynamicdatamapping.TemplateScriptException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
+import com.liferay.portlet.dynamicdatamapping.service.test.BaseDDMServiceTestCase;
 import com.liferay.portlet.dynamicdatamapping.util.comparator.TemplateIdComparator;
 
 import java.util.List;
@@ -455,11 +456,12 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 		throws Exception {
 
 		return DDMTemplateLocalServiceUtil.updateTemplate(
-			template.getTemplateId(), template.getClassPK(),
-			template.getNameMap(), template.getDescriptionMap(),
-			template.getType(), template.getMode(), template.getLanguage(),
-			template.getScript(), template.isCacheable(),
-			template.isSmallImage(), template.getSmallImageURL(), null,
+			template.getUserId(), template.getTemplateId(),
+			template.getClassPK(), template.getNameMap(),
+			template.getDescriptionMap(), template.getType(),
+			template.getMode(), template.getLanguage(), template.getScript(),
+			template.isCacheable(), template.isSmallImage(),
+			template.getSmallImageURL(), null,
 			ServiceContextTestUtil.getServiceContext());
 	}
 

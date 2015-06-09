@@ -27,13 +27,14 @@ import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFuture;
 import com.liferay.portal.kernel.concurrent.NoticeableFutureConverter;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lock.Lock;
+import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.resiliency.spi.SPIUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Lock;
-import com.liferay.portal.service.LockLocalService;
+import com.liferay.portal.model.Release;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -173,7 +174,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 				_clusterExecutor.removeClusterEventListener(
 					_clusterEventListener);
 
-				_lockLocalService.unlock(
+				_lockManager.unlock(
 					_LOCK_CLASS_NAME, _LOCK_CLASS_NAME, _localClusterNodeId);
 			}
 			catch (SystemException se) {
@@ -197,12 +198,12 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 				Lock lock = null;
 
 				if (owner == null) {
-					lock = _lockLocalService.lock(
+					lock = _lockManager.lock(
 						_LOCK_CLASS_NAME, _LOCK_CLASS_NAME,
 						_localClusterNodeId);
 				}
 				else {
-					lock = _lockLocalService.lock(
+					lock = _lockManager.lock(
 						_LOCK_CLASS_NAME, _LOCK_CLASS_NAME, owner,
 						_localClusterNodeId);
 				}
@@ -273,8 +274,12 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 	}
 
 	@Reference(unbind = "-")
-	protected void setLockLocalService(LockLocalService localLocalService) {
-		_lockLocalService = localLocalService;
+	protected void setLockManager(LockManager lockManager) {
+		_lockManager = lockManager;
+	}
+
+	@Reference(target = "(servlet.context.name=portal)", unbind = "-")
+	protected void setRelease(Release release) {
 	}
 
 	private static final String _LOCK_CLASS_NAME =
@@ -291,7 +296,7 @@ public class ClusterMasterExecutorImpl implements ClusterMasterExecutor {
 		_clusterMasterTokenTransitionListeners = new HashSet<>();
 	private boolean _enabled;
 	private volatile String _localClusterNodeId;
-	private volatile LockLocalService _lockLocalService;
+	private LockManager _lockManager;
 
 	private class ClusterMasterTokenClusterEventListener
 		implements ClusterEventListener {

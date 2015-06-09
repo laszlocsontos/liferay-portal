@@ -8,9 +8,9 @@
 
 	var INPUT_EL = document.createElement('input');
 
-	var PATH_JAVASCRIPT = LiferayAUI.getJavaScriptRootPath();
-
 	var PATH_EDITORS = LiferayAUI.getEditorsPath();
+
+	var PATH_JAVASCRIPT = LiferayAUI.getJavaScriptRootPath();
 
 	var SUPPORTS_INPUT_SELECTION = typeof INPUT_EL.selectionStart === 'number' && typeof INPUT_EL.selectionEnd === 'number';
 
@@ -327,27 +327,6 @@
 							'liferay-search-filter'
 						]
 					},
-					'liferay-dockbar-add-page': {
-						path: 'dockbar_add_page.js',
-						requires: [
-							'aui-loading-mask-deprecated',
-							'aui-parse-content',
-							'aui-toggler-delegate',
-							'liferay-dockbar',
-							'liferay-dockbar-add-base',
-							'liferay-dockbar-add-page-search',
-							'liferay-portlet-base',
-							'liferay-toggler-key-filter'
-						]
-					},
-					'liferay-dockbar-add-page-search': {
-						path: 'dockbar_add_page_search.js',
-						requires: [
-							'aui-base',
-							'liferay-dockbar',
-							'liferay-search-filter'
-						]
-					},
 					'liferay-dockbar-device-preview': {
 						path: 'dockbar_device_preview.js',
 						requires: [
@@ -531,6 +510,12 @@
 						requires: [
 							'liferay-item-viewer',
 							'liferay-portlet-base'
+						]
+					},
+					'liferay-item-selector-dialog': {
+						path: 'item_selector_dialog.js',
+						requires: [
+							'aui-component'
 						]
 					},
 					'liferay-item-viewer': {
@@ -851,6 +836,7 @@
 							'aui-component',
 							'aui-io-request',
 							'aui-parse-content',
+							'liferay-form',
 							'liferay-portlet-url',
 							'liferay-util-window',
 							'plugin'

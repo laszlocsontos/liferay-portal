@@ -1,6 +1,6 @@
 <definition>
 	<command name="addDraft">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -12,7 +12,7 @@
 	</command>
 
 	<command name="addDraftViaAutoSave">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -24,7 +24,7 @@
 	</command>
 
 	<command name="addEntry">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -36,7 +36,7 @@
 	</command>
 
 	<command name="addScheduled">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -92,7 +92,7 @@
 	</command>
 
 	<command name="addWithCategory">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -111,7 +111,7 @@
 	</command>
 
 	<command name="addWithCustomAbstract">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -145,7 +145,7 @@
 	</command>
 
 	<command name="addWithInvalidContent">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryInvalidContent}" />
@@ -157,7 +157,7 @@
 	</command>
 
 	<command name="addWithInvalidTitle">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -169,7 +169,7 @@
 	</command>
 
 	<command name="addWithInvalidTitleLength">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -183,7 +183,7 @@
 	</command>
 
 	<command name="addWithTag">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -215,7 +215,7 @@
 	</command>
 
 	<command name="addWithWorkflow">
-		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add" />
+		<execute function="AssertClick" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
 
 		<execute macro="BlogsEntry#addEntryContent">
 			<var name="entryContent" value="${entryContent}" />
@@ -283,11 +283,7 @@
 	</command>
 
 	<command name="publishDraftCP">
-		<execute macro="BlogsNavigator#gotoDraftCP">
-			<var name="entryTitle" value="${entryTitle}" />
-		</execute>
-
-		<execute macro="BlogsEntry#gotoEditPG">
+		<execute macro="BlogsNavigator#gotoEditCP">
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
 
@@ -298,6 +294,44 @@
 		</execute>
 
 		<execute macro="BlogsEntry#publish" />
+	</command>
+
+	<command name="subscribePG">
+		<execute function="AssertClick" locator1="Link#SUBSCRIBE" value1="Subscribe" />
+
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+	</command>
+
+	<command name="tearDownConfigurationDisplaySettingsPG">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="BlogsNavigator#gotoConfigurationSetupPG">
+			<var name="soPage" value="${soPage}" />
+		</execute>
+
+		<execute macro="BlogsPortlet#selectDisplayTemplate">
+			<var name="displayTemplate" value="Abstract" />
+		</execute>
+
+		<execute macro="IFrame#saveConfiguration" />
+	</command>
+
+	<command name="tearDownConfigurationScopePG">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="BlogsNavigator#gotoConfigurationSetupPG">
+			<var name="soPage" value="${soPage}" />
+		</execute>
+
+		<execute macro="BlogsNavigator#gotoConfigurationScopePG" />
+
+		<execute macro="BlogsPortlet#selectScopePG">
+			<var name="scopeSelection" value="Liferay" />
+		</execute>
 	</command>
 
 	<command name="tearDownCP">
@@ -323,6 +357,34 @@
 		<execute macro="RecycleBin#emptyCP" />
 	</command>
 
+	<command name="tearDownSubscribePG">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute function="AssertClick" locator1="PGBlogs#UNSUBSCRIBE_LINK" value1="Unsubscribe" />
+		<execute function="AssertTextEquals" locator1="PGBlogs#SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
+	<command name="unsubscribePG">
+		<execute function="AssertClick" locator1="Link#UNSUBSCRIBE" value1="Unsubscribe" />
+
+		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+	</command>
+
+	<command name="viewAsSiteMemberPG">
+		<execute function="AssertElementNotPresent" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
+		<execute function="AssertElementNotPresent" locator1="Button#PERMISSIONS" value1="Permissions" />
+		<execute function="AssertTextEquals" locator1="Link#SUBSCRIBE" value1="Subscribe" />
+		<execute function="AssertTextEquals" locator1="Link#RSS" value1="RSS" />
+	</command>
+
+	<command name="viewControlsPG">
+		<execute function="AssertTextEquals" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
+		<execute function="AssertTextEquals" locator1="Link#SUBSCRIBE" value1="Subscribe" />
+		<execute function="AssertTextEquals" locator1="Link#RSS" value1="RSS" />
+	</command>
+
 	<command name="viewDetailsPG">
 		<var name="key_entryTitle" value="${entryTitle}" />
 
@@ -339,5 +401,31 @@
 			<var name="entrySubtitle" value="${entrySubtitle}" />
 			<var name="entryTitle" value="${entryTitle}" />
 		</execute>
+	</command>
+
+	<command name="viewNoEntryCP">
+		<execute function="AssertTextEquals" locator1="Message#INFO" value1="No entries were found." />
+	</command>
+
+	<command name="viewNoPermissionCP">
+		<execute function="AssertTextEquals" locator1="BasePortlet#CONTROL_PANEL_TITLE" value1="Blogs" />
+		<execute function="AssertElementPresent" locator1="CPBlogs#NAVBAR_CONTAINER" />
+		<execute function="AssertTextEquals" locator1="Message#INFO" value1="No entries were found." />
+	</command>
+
+	<command name="viewNoPermissionPG">
+		<execute function="AssertTextEquals" locator1="BasePortlet#CONTROL_PANEL_TITLE" value1="Blogs" />
+		<execute function="AssertElementNotPresent" locator1="Blogs#ADD_BLOGS_ENTRY" value1="Add Blog Entry" />
+		<execute function="AssertElementNotPresent" locator1="Button#PERMISSIONS" value1="Permissions" />
+		<execute function="AssertElementNotPresent" locator1="Link#SUBSCRIBE" />
+		<execute function="AssertTextEquals" locator1="Link#RSS" value1="RSS" />
+	</command>
+
+	<command name="viewNoSubscribePG">
+		<execute function="AssertElementNotPresent" locator1="Link#SUBSCRIBE" />
+	</command>
+
+	<command name="viewPermissionCP">
+		<execute function="AssertTextEquals" locator1="Blogs#PERMISSIONS" value1="Permissions" />
 	</command>
 </definition>

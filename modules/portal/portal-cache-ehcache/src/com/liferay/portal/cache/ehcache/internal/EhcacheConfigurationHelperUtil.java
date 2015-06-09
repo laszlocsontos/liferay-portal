@@ -52,6 +52,7 @@ import net.sf.ehcache.config.CacheConfiguration.CacheEventListenerFactoryConfigu
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.FactoryConfiguration;
+import net.sf.ehcache.config.PersistenceConfiguration;
 import net.sf.ehcache.event.NotificationScope;
 
 /**
@@ -60,9 +61,10 @@ import net.sf.ehcache.event.NotificationScope;
 public class EhcacheConfigurationHelperUtil {
 
 	public static ObjectValuePair
-		<Configuration, PortalCacheManagerConfiguration> getConfiguration(
-			URL configurationURL, boolean clusterAware, boolean usingDefault,
-			Props props) {
+		<Configuration, PortalCacheManagerConfiguration>
+			getConfigurationObjectValuePair(
+				URL configurationURL, boolean clusterAware,
+				boolean usingDefault, Props props) {
 
 		if (configurationURL == null) {
 			throw new NullPointerException("Configuration path is null");
@@ -217,6 +219,37 @@ public class EhcacheConfigurationHelperUtil {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
+	private static boolean _isRequireSerialization(
+		CacheConfiguration cacheConfiguration, boolean clusterAware,
+		boolean clusterEnabled) {
+
+		if (clusterAware && clusterEnabled) {
+			return true;
+		}
+
+		if (cacheConfiguration.isOverflowToDisk() ||
+			cacheConfiguration.isOverflowToOffHeap() ||
+			cacheConfiguration.isDiskPersistent()) {
+
+			return true;
+		}
+
+		PersistenceConfiguration persistenceConfiguration =
+			cacheConfiguration.getPersistenceConfiguration();
+
+		if (persistenceConfiguration != null) {
+			PersistenceConfiguration.Strategy strategy =
+				persistenceConfiguration.getStrategy();
+
+			if (!strategy.equals(PersistenceConfiguration.Strategy.NONE)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private static PortalCacheConfiguration _parseCacheConfiguration(
 		CacheConfiguration cacheConfiguration, boolean clusterAware,
 		boolean usingDefault, boolean clusterEnabled,
@@ -329,9 +362,12 @@ public class EhcacheConfigurationHelperUtil {
 			cacheConfiguration.addBootstrapCacheLoaderFactory(null);
 		}
 
-		return new PortalCacheConfiguration(
+		boolean requireSerialization = _isRequireSerialization(
+			cacheConfiguration, clusterAware, clusterEnabled);
+
+		return new EhcachePortalCacheConfiguration(
 			portalCacheName, cacheListenerConfigurations,
-			bootstrapLoaderConfiguration);
+			bootstrapLoaderConfiguration, requireSerialization);
 	}
 
 	private static String _parseFactoryClassName(

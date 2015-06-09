@@ -24,16 +24,18 @@ import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.HitsImpl;
+import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
-import com.liferay.portal.kernel.search.QuerySuggester;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
+import com.liferay.portal.kernel.search.filter.FilterTranslator;
+import com.liferay.portal.kernel.search.highlight.HighlightUtil;
 import com.liferay.portal.kernel.search.query.QueryTranslator;
-import com.liferay.portal.kernel.search.util.SearchUtil;
+import com.liferay.portal.kernel.search.suggest.QuerySuggester;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -61,7 +63,9 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.SearchHits;
@@ -80,7 +84,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  * @author Milen Dyankov
  */
-@Component(immediate = true, service = ElasticsearchIndexSearcher.class)
+@Component(
+	immediate = true, property = {"search.engine.impl=Elasticsearch"},
+	service = IndexSearcher.class
+)
 public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	@Override
@@ -176,31 +183,10 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		}
 	}
 
-	@Reference
-	public void setElasticsearchConnectionManager(
-		ElasticsearchConnectionManager elasticsearchConnectionManager) {
-
-		_elasticsearchConnectionManager = elasticsearchConnectionManager;
-	}
-
-	@Reference(service = CompositeFacetProcessor.class)
-	public void setFacetProcessor(
-		FacetProcessor<SearchRequestBuilder> facetProcessor) {
-
-		_facetProcessor = facetProcessor;
-	}
-
 	@Override
-	@Reference(service = ElasticsearchQuerySuggester.class)
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
 	public void setQuerySuggester(QuerySuggester querySuggester) {
 		super.setQuerySuggester(querySuggester);
-	}
-
-	@Reference
-	public void setQueryTranslator(
-		QueryTranslator<QueryBuilder> queryTranslator) {
-
-		_queryTranslator = queryTranslator;
 	}
 
 	public void setSwallowException(boolean swallowException) {
@@ -247,9 +233,9 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		}
 
 		searchRequestBuilder.setHighlighterPostTags(
-			SearchUtil.HIGHLIGHT_TAG_CLOSE);
+			HighlightUtil.HIGHLIGHT_TAG_CLOSE);
 		searchRequestBuilder.setHighlighterPreTags(
-			SearchUtil.HIGHLIGHT_TAG_OPEN);
+			HighlightUtil.HIGHLIGHT_TAG_OPEN);
 		searchRequestBuilder.setHighlighterRequireFieldMatch(
 			queryConfig.isHighlightRequireFieldMatch());
 	}
@@ -310,7 +296,8 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			snippet = sb.toString();
 		}
 
-		SearchUtil.addSnippet(document, queryTerms, snippet, snippetFieldName);
+		HighlightUtil.addSnippet(
+			document, queryTerms, snippet, snippetFieldName);
 	}
 
 	protected void addSnippets(
@@ -408,6 +395,14 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		QueryBuilder queryBuilder = _queryTranslator.translate(
 			query, searchContext);
+
+		if (query.getPreBooleanFilter() != null) {
+			FilterBuilder filterBuilder = _filterTranslator.translate(
+				query.getPreBooleanFilter(), searchContext);
+
+			queryBuilder = QueryBuilders.filteredQuery(
+				queryBuilder, filterBuilder);
+		}
 
 		searchRequestBuilder.setQuery(queryBuilder);
 
@@ -547,6 +542,34 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		return document;
 	}
 
+	@Reference(unbind = "-")
+	protected void setElasticsearchConnectionManager(
+		ElasticsearchConnectionManager elasticsearchConnectionManager) {
+
+		_elasticsearchConnectionManager = elasticsearchConnectionManager;
+	}
+
+	@Reference(service = CompositeFacetProcessor.class, unbind = "-")
+	protected void setFacetProcessor(
+		FacetProcessor<SearchRequestBuilder> facetProcessor) {
+
+		_facetProcessor = facetProcessor;
+	}
+
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setFilterTranslator(
+		FilterTranslator<FilterBuilder> filterTranslator) {
+
+		_filterTranslator = filterTranslator;
+	}
+
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setQueryTranslator(
+		QueryTranslator<QueryBuilder> queryTranslator) {
+
+		_queryTranslator = queryTranslator;
+	}
+
 	protected void updateFacetCollectors(
 		SearchContext searchContext, SearchResponse searchResponse) {
 
@@ -579,6 +602,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	private ElasticsearchConnectionManager _elasticsearchConnectionManager;
 	private FacetProcessor<SearchRequestBuilder> _facetProcessor;
+	private FilterTranslator<FilterBuilder> _filterTranslator;
 	private QueryTranslator<QueryBuilder> _queryTranslator;
 	private boolean _swallowException;
 

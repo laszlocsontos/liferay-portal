@@ -16,12 +16,12 @@ package com.liferay.portal.search.elasticsearch.internal.query;
 
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.QueryVisitor;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.TermQuery;
 import com.liferay.portal.kernel.search.TermRangeQuery;
 import com.liferay.portal.kernel.search.WildcardQuery;
 import com.liferay.portal.kernel.search.query.QueryTranslator;
+import com.liferay.portal.kernel.search.query.QueryVisitor;
 import com.liferay.portal.search.elasticsearch.query.BooleanQueryTranslator;
 import com.liferay.portal.search.elasticsearch.query.TermQueryTranslator;
 import com.liferay.portal.search.elasticsearch.query.TermRangeQueryTranslator;
@@ -37,44 +37,19 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  * @author Miguel Angelo Caldas Gallindo
  */
-@Component(immediate = true, service = QueryTranslator.class)
+@Component(
+	immediate = true, property = {"search.engine.impl=Elasticsearch"},
+	service = QueryTranslator.class
+)
 public class ElasticsearchQueryTranslator
 	implements QueryTranslator<QueryBuilder>, QueryVisitor<QueryBuilder> {
-
-	@Reference
-	public void setBooleanQueryTranslator(
-		BooleanQueryTranslator booleanQueryTranslator) {
-
-		_booleanQueryTranslator = booleanQueryTranslator;
-	}
-
-	@Reference
-	public void setTermQueryTranslator(
-		TermQueryTranslator termQueryTranslator) {
-
-		_termQueryTranslator = termQueryTranslator;
-	}
-
-	@Reference
-	public void setTermRangeQueryTranslator(
-		TermRangeQueryTranslator termRangeQueryTranslator) {
-
-		_termRangeQueryTranslator = termRangeQueryTranslator;
-	}
-
-	@Reference
-	public void setWildcardQueryTranslator(
-		WildcardQueryTranslator wildcardQueryTranslator) {
-
-		_wildcardQueryTranslator = wildcardQueryTranslator;
-	}
 
 	@Override
 	public QueryBuilder translate(Query query, SearchContext searchContext) {
 		QueryBuilder queryBuilder = query.accept(this);
 
 		if (queryBuilder == null) {
-			queryBuilder = QueryBuilders.queryString(query.toString());
+			queryBuilder = QueryBuilders.queryStringQuery(query.toString());
 		}
 
 		return queryBuilder;
@@ -98,6 +73,34 @@ public class ElasticsearchQueryTranslator
 	@Override
 	public QueryBuilder visitQuery(WildcardQuery wildcardQuery) {
 		return _wildcardQueryTranslator.translate(wildcardQuery);
+	}
+
+	@Reference(unbind = "-")
+	protected void setBooleanQueryTranslator(
+		BooleanQueryTranslator booleanQueryTranslator) {
+
+		_booleanQueryTranslator = booleanQueryTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setTermQueryTranslator(
+		TermQueryTranslator termQueryTranslator) {
+
+		_termQueryTranslator = termQueryTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setTermRangeQueryTranslator(
+		TermRangeQueryTranslator termRangeQueryTranslator) {
+
+		_termRangeQueryTranslator = termRangeQueryTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setWildcardQueryTranslator(
+		WildcardQueryTranslator wildcardQueryTranslator) {
+
+		_wildcardQueryTranslator = wildcardQueryTranslator;
 	}
 
 	private BooleanQueryTranslator _booleanQueryTranslator;

@@ -14,64 +14,18 @@
 
 package com.liferay.document.library.item.selector.web;
 
+import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.ItemSelectorView;
-
-import java.io.IOException;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.portlet.PortletURL;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 /**
  * @author Roberto Díaz
  */
-public class DLItemSelectorView
-	implements ItemSelectorView<DLItemSelectorCriterion> {
+public interface DLItemSelectorView<T extends ItemSelectorCriterion>
+	extends ItemSelectorView<T> {
 
-	public static final String DL_ITEM_SELECTOR_CRITERION =
-		DLItemSelectorView.class.getName() + "#DL_ITEM_SELECTOR_CRITERION";
+	public static final String DL_ITEM_SELECTOR_VIEW_DISPLAY_CONTEXT =
+		"DL_ITEM_SELECTOR_VIEW_DISPLAY_CONTEXT";
 
-	public static final String ITEM_SELECTED_CALLBACK =
-		DLItemSelectorView.class.getName() + "#ITEM_SELECTED_CALLBACK";
-
-	public static final String PORTLET_URL =
-		DLItemSelectorView.class.getName() + "#PORTLET_URL";
-
-	@Override
-	public Class<DLItemSelectorCriterion> getItemSelectorCriterionClass() {
-		return DLItemSelectorCriterion.class;
-	}
-
-	@Override
-	public String getTitle(Locale locale) {
-		ResourceBundle resourceBundle = ResourceBundle.getBundle(
-			"content/Language", locale);
-
-		return resourceBundle.getString("documents");
-	}
-
-	@Override
-	public void renderHTML(
-			ServletRequest request, ServletResponse response,
-			DLItemSelectorCriterion dlItemSelectorCriterion,
-			PortletURL portletURL, String itemSelectedCallback)
-		throws IOException, ServletException {
-
-		request.setAttribute(
-			DL_ITEM_SELECTOR_CRITERION, dlItemSelectorCriterion);
-		request.setAttribute(ITEM_SELECTED_CALLBACK, itemSelectedCallback);
-		request.setAttribute(PORTLET_URL, portletURL);
-
-		RequestDispatcher requestDispatcher = request.getRequestDispatcher(
-			"/o/document-library-item-selector-web/documents.jsp");
-
-		requestDispatcher.include(request, response);
-	}
+	public String[] getMimeTypes();
 
 }

@@ -17,6 +17,16 @@ package com.liferay.portal.tools.sample.sql.builder;
 import com.liferay.counter.model.Counter;
 import com.liferay.counter.model.CounterModel;
 import com.liferay.counter.model.impl.CounterModelImpl;
+import com.liferay.dynamic.data.lists.display.web.constants.DDLDisplayPortletKeys;
+import com.liferay.dynamic.data.lists.model.DDLRecordConstants;
+import com.liferay.dynamic.data.lists.model.DDLRecordModel;
+import com.liferay.dynamic.data.lists.model.DDLRecordSet;
+import com.liferay.dynamic.data.lists.model.DDLRecordSetConstants;
+import com.liferay.dynamic.data.lists.model.DDLRecordSetModel;
+import com.liferay.dynamic.data.lists.model.DDLRecordVersionModel;
+import com.liferay.dynamic.data.lists.model.impl.DDLRecordModelImpl;
+import com.liferay.dynamic.data.lists.model.impl.DDLRecordSetModelImpl;
+import com.liferay.dynamic.data.lists.model.impl.DDLRecordVersionModelImpl;
 import com.liferay.journal.web.constants.JournalPortletKeys;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.metadata.RawMetadataProcessor;
@@ -121,15 +131,6 @@ import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryTypeModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileVersionModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFolderModelImpl;
 import com.liferay.portlet.documentlibrary.social.DLActivityKeys;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecordConstants;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecordModel;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecordSetConstants;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecordSetModel;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecordVersionModel;
-import com.liferay.portlet.dynamicdatalists.model.impl.DDLRecordModelImpl;
-import com.liferay.portlet.dynamicdatalists.model.impl.DDLRecordSetModelImpl;
-import com.liferay.portlet.dynamicdatalists.model.impl.DDLRecordVersionModelImpl;
 import com.liferay.portlet.dynamicdatamapping.model.DDMContent;
 import com.liferay.portlet.dynamicdatamapping.model.DDMContentModel;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink;
@@ -1261,7 +1262,7 @@ public class DataFactory {
 				PortletConstants.DEFAULT_PREFERENCES));
 		portletPreferencesModels.add(
 			newPortletPreferencesModel(
-				plid, PortletKeys.DYNAMIC_DATA_LIST_DISPLAY,
+				plid, DDLDisplayPortletKeys.DYNAMIC_DATA_LISTS_DISPLAY,
 				PortletConstants.DEFAULT_PREFERENCES));
 		portletPreferencesModels.add(
 			newPortletPreferencesModel(
@@ -2555,6 +2556,8 @@ public class DataFactory {
 		dDMStructureModel.setCompanyId(_companyId);
 		dDMStructureModel.setUserId(userId);
 		dDMStructureModel.setUserName(_SAMPLE_USER_NAME);
+		dDMStructureModel.setVersionUserId(userId);
+		dDMStructureModel.setVersionUserName(_SAMPLE_USER_NAME);
 		dDMStructureModel.setCreateDate(nextFutureDate());
 		dDMStructureModel.setModifiedDate(nextFutureDate());
 		dDMStructureModel.setClassNameId(classNameId);
@@ -2595,6 +2598,8 @@ public class DataFactory {
 		ddmTemplateModel.setResourceClassNameId(structureId);
 		ddmTemplateModel.setTemplateKey(String.valueOf(_counter.get()));
 		ddmTemplateModel.setVersion(DDMTemplateConstants.VERSION_DEFAULT);
+		ddmTemplateModel.setVersionUserId(userId);
+		ddmTemplateModel.setVersionUserName(_SAMPLE_USER_NAME);
 
 		StringBundler sb = new StringBundler(3);
 
