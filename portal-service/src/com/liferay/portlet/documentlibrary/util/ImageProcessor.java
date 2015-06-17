@@ -16,6 +16,7 @@ package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portlet.exportimport.lar.PortletDataContext;
 
@@ -31,6 +32,8 @@ public interface ImageProcessor {
 	public void cleanUp(FileEntry fileEntry);
 
 	public void cleanUp(FileVersion fileVersion);
+
+	public void cleanUp(Folder folder);
 
 	public void exportGeneratedFiles(
 			PortletDataContext portletDataContext, FileEntry fileEntry,

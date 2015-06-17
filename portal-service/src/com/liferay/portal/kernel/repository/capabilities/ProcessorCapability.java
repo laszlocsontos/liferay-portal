@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.repository.capabilities;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
 
 /**
  * @author Adolfo Pérez
@@ -26,6 +27,8 @@ public interface ProcessorCapability extends Capability {
 	public void cleanUp(FileEntry fileEntry) throws PortalException;
 
 	public void cleanUp(FileVersion fileVersion) throws PortalException;
+
+	public void cleanUp(Folder folder) throws PortalException;
 
 	public void copyPrevious(FileVersion fileVersion) throws PortalException;
 
