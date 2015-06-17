@@ -17,6 +17,7 @@ package com.liferay.portlet.documentlibrary.util;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
 
 /**
  * Document library processor responsible for the generation of raw metadata
@@ -38,6 +39,8 @@ public interface RawMetadataProcessor {
 	public void cleanUp(FileEntry fileEntry);
 
 	public void cleanUp(FileVersion fileVersion);
+
+	public void cleanUp(Folder folder);
 
 	/**
 	 * Generates the raw metadata associated with the file entry.

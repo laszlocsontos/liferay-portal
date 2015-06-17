@@ -16,6 +16,7 @@ package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portlet.exportimport.lar.PortletDataContext;
 
@@ -81,6 +82,8 @@ public interface DLProcessor {
 	 *        up
 	 */
 	public void cleanUp(FileVersion fileVersion);
+
+	public void cleanUp(Folder folder);
 
 	/**
 	 * Copies all resources generated for the source file version, reusing them
