@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -12049,29 +12048,26 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			bookmarksEntry.setUuid(uuid);
 		}
 
-		if (!ExportImportThreadLocal.isImportInProcess()) {
-			ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
 
-			Date now = new Date();
+		Date now = new Date();
 
-			if (isNew && (bookmarksEntry.getCreateDate() == null)) {
-				if (serviceContext == null) {
-					bookmarksEntry.setCreateDate(now);
-				}
-				else {
-					bookmarksEntry.setCreateDate(serviceContext.getCreateDate(
-							now));
-				}
+		if (isNew && (bookmarksEntry.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				bookmarksEntry.setCreateDate(now);
 			}
+			else {
+				bookmarksEntry.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
 
-			if (!bookmarksEntryModelImpl.hasSetModifiedDate()) {
-				if (serviceContext == null) {
-					bookmarksEntry.setModifiedDate(now);
-				}
-				else {
-					bookmarksEntry.setModifiedDate(serviceContext.getModifiedDate(
-							now));
-				}
+		if (!bookmarksEntryModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				bookmarksEntry.setModifiedDate(now);
+			}
+			else {
+				bookmarksEntry.setModifiedDate(serviceContext.getModifiedDate(
+						now));
 			}
 		}
 
@@ -12331,6 +12327,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		bookmarksEntryImpl.setDescription(bookmarksEntry.getDescription());
 		bookmarksEntryImpl.setVisits(bookmarksEntry.getVisits());
 		bookmarksEntryImpl.setPriority(bookmarksEntry.getPriority());
+		bookmarksEntryImpl.setLastPublishDate(bookmarksEntry.getLastPublishDate());
 		bookmarksEntryImpl.setStatus(bookmarksEntry.getStatus());
 		bookmarksEntryImpl.setStatusByUserId(bookmarksEntry.getStatusByUserId());
 		bookmarksEntryImpl.setStatusByUserName(bookmarksEntry.getStatusByUserName());

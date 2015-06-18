@@ -15,6 +15,7 @@
 package com.liferay.portlet.journal.service.impl;
 
 import com.liferay.portal.LocaleException;
+import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
@@ -27,7 +28,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
@@ -115,6 +115,8 @@ import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
+import com.liferay.portlet.expando.util.ExpandoBridgeUtil;
+import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 import com.liferay.portlet.journal.ArticleContentException;
 import com.liferay.portlet.journal.ArticleDisplayDateException;
 import com.liferay.portlet.journal.ArticleExpirationDateException;
@@ -332,15 +334,15 @@ public class JournalArticleLocalServiceImpl
 
 		validateDDMStructureId(groupId, folderId, ddmStructureKey);
 
+		if (autoArticleId) {
+			articleId = String.valueOf(counterLocalService.increment());
+		}
+
 		validate(
 			user.getCompanyId(), groupId, classNameId, articleId, autoArticleId,
 			version, titleMap, content, ddmStructureKey, ddmTemplateKey,
 			expirationDate, smallImage, smallImageURL, smallImageFile,
 			smallImageBytes, serviceContext);
-
-		if (autoArticleId) {
-			articleId = String.valueOf(counterLocalService.increment());
-		}
 
 		serviceContext.setAttribute("articleId", articleId);
 
@@ -432,6 +434,14 @@ public class JournalArticleLocalServiceImpl
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
 
+		// Comment
+
+		if (PropsValues.JOURNAL_ARTICLE_COMMENTS_ENABLED) {
+			CommentManagerUtil.addDiscussion(
+				userId, groupId, JournalArticle.class.getName(),
+				resourcePrimKey, article.getUserName());
+		}
+
 		// Dynamic data mapping
 
 		if (classNameLocalService.getClassNameId(DDMStructure.class) ==
@@ -442,15 +452,6 @@ public class JournalArticleLocalServiceImpl
 		}
 		else {
 			updateDDMLinks(id, groupId, ddmStructureKey, ddmTemplateKey, true);
-		}
-
-		// Message boards
-
-		if (PropsValues.JOURNAL_ARTICLE_COMMENTS_ENABLED) {
-			mbMessageLocalService.addDiscussionMessage(
-				userId, article.getUserName(), groupId,
-				JournalArticle.class.getName(), resourcePrimKey,
-				WorkflowConstants.ACTION_PUBLISH);
 		}
 
 		// Email
@@ -828,7 +829,8 @@ public class JournalArticleLocalServiceImpl
 			newArticle.setStatus(oldArticle.getStatus());
 		}
 
-		newArticle.setExpandoBridgeAttributes(oldArticle);
+		ExpandoBridgeUtil.copyExpandoBridgeAttributes(
+			oldArticle.getExpandoBridge(), newArticle.getExpandoBridge());
 
 		journalArticlePersistence.update(newArticle);
 
@@ -1006,25 +1008,25 @@ public class JournalArticleLocalServiceImpl
 
 		if (articlesCount == 1) {
 
-			// Ratings
-
-			ratingsStatsLocalService.deleteStats(
-				JournalArticle.class.getName(), article.getResourcePrimKey());
-
-			// Message boards
-
-			mbMessageLocalService.deleteDiscussionMessages(
-				JournalArticle.class.getName(), article.getResourcePrimKey());
-
 			// Asset
 
 			assetEntryLocalService.deleteEntry(
+				JournalArticle.class.getName(), article.getResourcePrimKey());
+
+			// Comment
+
+			CommentManagerUtil.deleteDiscussion(
 				JournalArticle.class.getName(), article.getResourcePrimKey());
 
 			// Content searches
 
 			journalContentSearchLocalService.deleteArticleContentSearches(
 				article.getGroupId(), article.getArticleId());
+
+			// Ratings
+
+			ratingsStatsLocalService.deleteStats(
+				JournalArticle.class.getName(), article.getResourcePrimKey());
 
 			// Small image
 
@@ -5252,7 +5254,9 @@ public class JournalArticleLocalServiceImpl
 			article.setStatus(WorkflowConstants.STATUS_EXPIRED);
 		}
 
-		article.setExpandoBridgeAttributes(serviceContext);
+		ExpandoBridgeUtil.setExpandoBridgeAttributes(
+			latestArticle.getExpandoBridge(), article.getExpandoBridge(),
+			serviceContext);
 
 		journalArticlePersistence.update(article);
 
@@ -5482,7 +5486,9 @@ public class JournalArticleLocalServiceImpl
 
 			article.setStatus(WorkflowConstants.STATUS_DRAFT);
 			article.setStatusDate(new Date());
-			article.setExpandoBridgeAttributes(oldArticle);
+
+			ExpandoBridgeUtil.copyExpandoBridgeAttributes(
+				oldArticle.getExpandoBridge(), article.getExpandoBridge());
 
 			// Dynamic data mapping
 

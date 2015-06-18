@@ -35,7 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.util.PortalUtil;
 
 import java.io.IOException;
@@ -752,33 +752,33 @@ public class CustomSQL {
 	protected void read(ClassLoader classLoader, String source)
 		throws Exception {
 
-		InputStream is = classLoader.getResourceAsStream(source);
-
-		if (is == null) {
-			return;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Loading " + source);
-		}
-
-		Document document = SAXReaderUtil.read(is);
-
-		Element rootElement = document.getRootElement();
-
-		for (Element sqlElement : rootElement.elements("sql")) {
-			String file = sqlElement.attributeValue("file");
-
-			if (Validator.isNotNull(file)) {
-				read(classLoader, file);
+		try (InputStream is = classLoader.getResourceAsStream(source)) {
+			if (is == null) {
+				return;
 			}
-			else {
-				String id = sqlElement.attributeValue("id");
-				String content = transform(sqlElement.getText());
 
-				content = replaceIsNull(content);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Loading " + source);
+			}
 
-				_sqlPool.put(id, content);
+			Document document = UnsecureSAXReaderUtil.read(is);
+
+			Element rootElement = document.getRootElement();
+
+			for (Element sqlElement : rootElement.elements("sql")) {
+				String file = sqlElement.attributeValue("file");
+
+				if (Validator.isNotNull(file)) {
+					read(classLoader, file);
+				}
+				else {
+					String id = sqlElement.attributeValue("id");
+					String content = transform(sqlElement.getText());
+
+					content = replaceIsNull(content);
+
+					_sqlPool.put(id, content);
+				}
 			}
 		}
 	}

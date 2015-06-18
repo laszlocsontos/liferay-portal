@@ -76,6 +76,8 @@
 		<column name="companyId" type="long" />
 		<column name="userId" type="long" />
 		<column name="userName" type="String" />
+		<column name="versionUserId" type="long" />
+		<column name="versionUserName" type="String" />
 		<column name="createDate" type="Date" />
 		<column name="modifiedDate" type="Date" />
 
@@ -226,11 +228,16 @@
 
 		<column name="structureId" type="long" />
 		<column name="version" type="String" />
+		<column name="parentStructureId" type="long" />
 		<column name="name" type="String" localized="true" />
 		<column name="description" type="String" localized="true" />
 		<column name="definition" type="String" />
 		<column name="storageType" type="String" />
 		<column name="type" type="int" />
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="statusDate" type="Date" />
 
 		<!-- Finder methods -->
 
@@ -240,6 +247,10 @@
 		<finder name="S_V" return-type="DDMStructureVersion" unique="true">
 			<finder-column name="structureId" />
 			<finder-column name="version" />
+		</finder>
+		<finder name="S_S" return-type="Collection">
+			<finder-column name="structureId" />
+			<finder-column name="status" />
 		</finder>
 	</entity>
 	<entity name="DDMTemplate" uuid="true" local-service="true" remote-service="true">
@@ -257,6 +268,8 @@
 		<column name="companyId" type="long" />
 		<column name="userId" type="long" />
 		<column name="userName" type="String" />
+		<column name="versionUserId" type="long" />
+		<column name="versionUserName" type="String" />
 		<column name="createDate" type="Date" />
 		<column name="modifiedDate" type="Date" />
 
@@ -399,6 +412,10 @@
 		<column name="description" type="String" localized="true" />
 		<column name="language" type="String" />
 		<column name="script" type="String" />
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="statusDate" type="Date" />
 
 		<!-- Finder methods -->
 
@@ -409,11 +426,17 @@
 			<finder-column name="templateId" />
 			<finder-column name="version" />
 		</finder>
+		<finder name="T_S" return-type="Collection">
+			<finder-column name="templateId" />
+			<finder-column name="status" />
+		</finder>
 	</entity>
 	<exceptions>
 		<exception>Content</exception>
 		<exception>ContentData</exception>
 		<exception>ContentName</exception>
+		<exception>InvalidStructureVersion</exception>
+		<exception>InvalidTemplateVersion</exception>
 		<exception>RequiredStructure</exception>
 		<exception>RequiredTemplate</exception>
 		<exception>Storage</exception>
@@ -424,6 +447,7 @@
 		<exception>StructureDuplicateElement</exception>
 		<exception>StructureDuplicateStructureKey</exception>
 		<exception>StructureField</exception>
+		<exception>StructureLayout</exception>
 		<exception>StructureName</exception>
 		<exception>TemplateDuplicateTemplateKey</exception>
 		<exception>TemplateName</exception>

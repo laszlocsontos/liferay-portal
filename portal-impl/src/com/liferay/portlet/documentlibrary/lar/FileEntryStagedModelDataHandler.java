@@ -16,12 +16,6 @@ package com.liferay.portlet.documentlibrary.lar;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.PortletDataException;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -62,6 +56,13 @@ import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.storage.StorageEngineUtil;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.PortletDataException;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelModifiedDateComparator;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.IOException;
@@ -447,12 +448,14 @@ public class FileEntryStagedModelDataHandler
 
 				boolean indexEnabled = serviceContext.isIndexingEnabled();
 
+				boolean deleteFileEntry = false;
 				boolean updateFileEntry = false;
 
 				if (!Validator.equals(
 						fileVersion.getUuid(),
 						latestExistingFileVersion.getUuid())) {
 
+					deleteFileEntry = true;
 					updateFileEntry = true;
 				}
 				else {
@@ -527,6 +530,14 @@ public class FileEntryStagedModelDataHandler
 							DLFileEntry.class);
 
 						indexer.reindex(liferayFileEntry.getModel());
+					}
+
+					if (deleteFileEntry &&
+						ExportImportThreadLocal.isStagingInProcess()) {
+
+						DLAppServiceUtil.deleteFileVersion(
+							latestExistingFileVersion.getFileEntryId(),
+							latestExistingFileVersion.getVersion());
 					}
 				}
 				finally {
@@ -735,7 +746,8 @@ public class FileEntryStagedModelDataHandler
 		try {
 			FileVersion fileVersion = fileEntry.getFileVersion();
 
-			if (!ArrayUtil.contains(
+			if (!portletDataContext.isInitialPublication() &&
+				!ArrayUtil.contains(
 					getExportableStatuses(), fileVersion.getStatus())) {
 
 				throw new PortletDataException(

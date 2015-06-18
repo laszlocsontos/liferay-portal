@@ -14,30 +14,34 @@
 
 package com.liferay.frontend.editors.web.editor.configuration;
 
+import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.ItemSelectorReturnType;
+import com.liferay.item.selector.criteria.DefaultItemSelectorReturnType;
+import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
+import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.PortletKeys;
 
-import java.util.Locale;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import javax.portlet.WindowStateException;
+import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Sergio González
+ * @author Roberto Díaz
  */
 @Component(
 	property = {"editor.name=alloyeditor"},
@@ -51,84 +55,50 @@ public class AlloyEditorConfigContributor extends BaseEditorConfigContributor {
 		ThemeDisplay themeDisplay,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		String contentsLanguageId = (String)inputEditorTaglibAttributes.get(
-			"liferay-ui:input-editor:contentsLanguageId");
-
-		Locale contentsLocale = LocaleUtil.fromLanguageId(contentsLanguageId);
-
-		String contentsLanguageDir = LanguageUtil.get(
-			contentsLocale, "lang.dir");
-
-		contentsLanguageId = LocaleUtil.toLanguageId(contentsLocale);
+		String contentsLanguageDir = getContentsLanguageDir(
+			inputEditorTaglibAttributes);
 
 		jsonObject.put(
 			"contentsLangDirection", HtmlUtil.escapeJS(contentsLanguageDir));
+
+		String contentsLanguageId = getContentsLanguageId(
+			inputEditorTaglibAttributes);
+
 		jsonObject.put(
 			"contentsLanguage", contentsLanguageId.replace("iw_", "he_"));
+
 		jsonObject.put(
 			"extraPlugins",
 			"autolink,dragresize,dropimages,placeholder,selectionregion," +
 				"tableresize,tabletools,uicore");
 
-		String languageId = LocaleUtil.toLanguageId(themeDisplay.getLocale());
+		String languageId = getLanguageId(themeDisplay);
 
 		jsonObject.put("language", languageId.replace("iw_", "he_"));
+
 		jsonObject.put(
-			"removePlugins", "elementspath,link,liststyle,resize,toolbar");
+			"removePlugins",
+			"elementspath,image,link,liststyle,resize,toolbar");
 
 		if (liferayPortletResponse != null) {
-			LiferayPortletURL itemSelectorURL =
-				liferayPortletResponse.createRenderURL(
-					PortletKeys.ITEM_SELECTOR);
-
-			itemSelectorURL.setParameter("mvcPath", "/view.jsp");
-			itemSelectorURL.setParameter(
-				"groupId", String.valueOf(themeDisplay.getScopeGroupId()));
-
 			String name =
 				liferayPortletResponse.getNamespace() +
 					GetterUtil.getString(
 						(String)inputEditorTaglibAttributes.get(
 							"liferay-ui:input-editor:name"));
 
-			itemSelectorURL.setParameter("eventName", name + "selectDocument");
-			itemSelectorURL.setParameter(
-				"showGroupsSelector", Boolean.TRUE.toString());
-
-			Map<String, String> fileBrowserParamsMap =
-				(Map<String, String>)inputEditorTaglibAttributes.get(
-					"liferay-ui:input-editor:fileBrowserParams");
-
-			if (fileBrowserParamsMap != null) {
-				for (Map.Entry<String, String> entry :
-						fileBrowserParamsMap.entrySet()) {
-
-					itemSelectorURL.setParameter(
-						entry.getKey(), entry.getValue());
-				}
-			}
-
-			try {
-				itemSelectorURL.setWindowState(LiferayWindowState.POP_UP);
-			}
-			catch (WindowStateException wse) {
-			}
-
-			jsonObject.put("filebrowserBrowseUrl", itemSelectorURL.toString());
-			jsonObject.put(
-				"filebrowserFlashBrowseUrl",
-				itemSelectorURL.toString() + "&Type=flash");
-			jsonObject.put(
-				"filebrowserImageBrowseLinkUrl",
-				itemSelectorURL.toString() + "&Type=image");
-			jsonObject.put(
-				"filebrowserImageBrowseUrl",
-				itemSelectorURL.toString() + "&Type=image");
+			populateFileBrowserURL(
+				jsonObject, liferayPortletResponse, name + "selectDocument");
 
 			jsonObject.put("srcNode", name);
 		}
 
 		jsonObject.put("toolbars", getToolbarsJSONObject());
+	}
+
+	@Reference(unbind = "-")
+	public void setItemSelector(ItemSelector itemSelector) {
+		_itemSelector = itemSelector;
 	}
 
 	protected JSONObject getToolbarsAddJSONObject() {
@@ -219,5 +189,50 @@ public class AlloyEditorConfigContributor extends BaseEditorConfigContributor {
 
 		return jsonObject;
 	}
+
+	protected void populateFileBrowserURL(
+		JSONObject jsonObject, LiferayPortletResponse liferayPortletResponse,
+		String eventName) {
+
+		Set<ItemSelectorReturnType> urlDesiredItemSelectorReturnTypes =
+			new HashSet<>();
+
+		urlDesiredItemSelectorReturnTypes.add(
+			DefaultItemSelectorReturnType.URL);
+
+		ItemSelectorCriterion urlItemSelectorCriterion =
+			new URLItemSelectorCriterion();
+
+		urlItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			urlDesiredItemSelectorReturnTypes);
+
+		PortletURL layoutItemSelectorURL = _itemSelector.getItemSelectorURL(
+			liferayPortletResponse, eventName, urlItemSelectorCriterion);
+
+		jsonObject.put(
+			"filebrowserBrowseUrl", layoutItemSelectorURL.toString());
+
+		ItemSelectorCriterion imageItemSelectorCriterion =
+			new ImageItemSelectorCriterion();
+
+		Set<ItemSelectorReturnType> imageDesiredItemSelectorReturnTypes =
+			new HashSet<>();
+
+		imageDesiredItemSelectorReturnTypes.add(
+			DefaultItemSelectorReturnType.URL);
+
+		imageItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			imageDesiredItemSelectorReturnTypes);
+
+		PortletURL dlItemSelectorURL = _itemSelector.getItemSelectorURL(
+			liferayPortletResponse, eventName, imageItemSelectorCriterion);
+
+		jsonObject.put(
+			"filebrowserImageBrowseLinkUrl", dlItemSelectorURL.toString());
+		jsonObject.put(
+			"filebrowserImageBrowseUrl", dlItemSelectorURL.toString());
+	}
+
+	private ItemSelector _itemSelector;
 
 }

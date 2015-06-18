@@ -16,9 +16,10 @@ package com.liferay.polls.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class PollsChoiceWrapper implements PollsChoice,
 		attributes.put("questionId", getQuestionId());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
+		attributes.put("lastPublishDate", getLastPublishDate());
 
 		return attributes;
 	}
@@ -135,6 +137,12 @@ public class PollsChoiceWrapper implements PollsChoice,
 
 		if (description != null) {
 			setDescription(description);
+		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
 		}
 	}
 
@@ -279,6 +287,16 @@ public class PollsChoiceWrapper implements PollsChoice,
 	@Override
 	public long getGroupId() {
 		return _pollsChoice.getGroupId();
+	}
+
+	/**
+	* Returns the last publish date of this polls choice.
+	*
+	* @return the last publish date of this polls choice
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _pollsChoice.getLastPublishDate();
 	}
 
 	/**
@@ -534,6 +552,16 @@ public class PollsChoiceWrapper implements PollsChoice,
 	@Override
 	public void setGroupId(long groupId) {
 		_pollsChoice.setGroupId(groupId);
+	}
+
+	/**
+	* Sets the last publish date of this polls choice.
+	*
+	* @param lastPublishDate the last publish date of this polls choice
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_pollsChoice.setLastPublishDate(lastPublishDate);
 	}
 
 	/**

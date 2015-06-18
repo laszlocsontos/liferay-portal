@@ -15,10 +15,7 @@
 package com.liferay.portlet.layoutsadmin.lar;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
-import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelModifiedDateComparator;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -28,6 +25,10 @@ import com.liferay.portal.model.LayoutFriendlyURL;
 import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.exportimport.lar.BaseStagedModelDataHandler;
+import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelModifiedDateComparator;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import java.util.Map;
 /**
  * @author Sergio González
  */
+@OSGiBeanProperties
 public class LayoutFriendlyURLStagedModelDataHandler
 	extends BaseStagedModelDataHandler<LayoutFriendlyURL> {
 
@@ -116,49 +118,34 @@ public class LayoutFriendlyURLStagedModelDataHandler
 
 		LayoutFriendlyURL importedLayoutFriendlyURL = null;
 
-		if (portletDataContext.isDataStrategyMirror()) {
-			LayoutFriendlyURL existingLayoutFriendlyURL =
-				fetchExistingLayoutFriendlyURL(
-					portletDataContext, layoutFriendlyURL, plid);
+		LayoutFriendlyURL existingLayoutFriendlyURL =
+			fetchExistingLayoutFriendlyURL(
+				portletDataContext, layoutFriendlyURL, plid);
 
-			layoutFriendlyURL = getUniqueLayoutFriendlyURL(
-				portletDataContext, layoutFriendlyURL,
-				existingLayoutFriendlyURL);
+		layoutFriendlyURL = getUniqueLayoutFriendlyURL(
+			portletDataContext, layoutFriendlyURL, existingLayoutFriendlyURL);
 
-			if (existingLayoutFriendlyURL == null) {
-				serviceContext.setUuid(layoutFriendlyURL.getUuid());
+		if (existingLayoutFriendlyURL == null) {
+			serviceContext.setUuid(layoutFriendlyURL.getUuid());
 
-				String friendlyURL = layoutFriendlyURL.getFriendlyURL();
+			String friendlyURL = layoutFriendlyURL.getFriendlyURL();
 
-				if (Validator.isNumber(friendlyURL.substring(1))) {
-					Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+			if (Validator.isNumber(friendlyURL.substring(1))) {
+				Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
 
-					friendlyURL = StringPool.SLASH + layout.getLayoutId();
-				}
-
-				importedLayoutFriendlyURL =
-					LayoutFriendlyURLLocalServiceUtil.addLayoutFriendlyURL(
-						userId, portletDataContext.getCompanyId(),
-						portletDataContext.getScopeGroupId(), plid,
-						portletDataContext.isPrivateLayout(), friendlyURL,
-						layoutFriendlyURL.getLanguageId(), serviceContext);
+				friendlyURL = StringPool.SLASH + layout.getLayoutId();
 			}
-			else {
-				importedLayoutFriendlyURL =
-					LayoutFriendlyURLLocalServiceUtil.updateLayoutFriendlyURL(
-						userId, portletDataContext.getCompanyId(),
-						portletDataContext.getScopeGroupId(), plid,
-						portletDataContext.isPrivateLayout(),
-						layoutFriendlyURL.getFriendlyURL(),
-						layoutFriendlyURL.getLanguageId(), serviceContext);
-			}
-		}
-		else {
-			layoutFriendlyURL = getUniqueLayoutFriendlyURL(
-				portletDataContext, layoutFriendlyURL, null);
 
 			importedLayoutFriendlyURL =
 				LayoutFriendlyURLLocalServiceUtil.addLayoutFriendlyURL(
+					userId, portletDataContext.getCompanyId(),
+					portletDataContext.getScopeGroupId(), plid,
+					portletDataContext.isPrivateLayout(), friendlyURL,
+					layoutFriendlyURL.getLanguageId(), serviceContext);
+		}
+		else {
+			importedLayoutFriendlyURL =
+				LayoutFriendlyURLLocalServiceUtil.updateLayoutFriendlyURL(
 					userId, portletDataContext.getCompanyId(),
 					portletDataContext.getScopeGroupId(), plid,
 					portletDataContext.isPrivateLayout(),

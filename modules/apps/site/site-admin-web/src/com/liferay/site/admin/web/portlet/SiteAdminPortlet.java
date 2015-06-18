@@ -21,10 +21,10 @@ import com.liferay.portal.GroupKeyException;
 import com.liferay.portal.GroupParentException;
 import com.liferay.portal.LayoutSetVirtualHostException;
 import com.liferay.portal.LocaleException;
+import com.liferay.portal.NoSuchBackgroundTaskException;
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.PendingBackgroundTaskException;
-import com.liferay.portal.RemoteExportException;
 import com.liferay.portal.RemoteOptionsException;
 import com.liferay.portal.RequiredGroupException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -54,6 +53,7 @@ import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutSet;
+import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.MembershipRequest;
 import com.liferay.portal.model.MembershipRequestConstants;
 import com.liferay.portal.model.Role;
@@ -61,9 +61,12 @@ import com.liferay.portal.model.Team;
 import com.liferay.portal.security.auth.AuthException;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.auth.RemoteAuthException;
+import com.liferay.portal.service.BackgroundTaskLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.GroupServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.LayoutSetLocalServiceUtil;
+import com.liferay.portal.service.LayoutSetPrototypeServiceUtil;
 import com.liferay.portal.service.LayoutSetServiceUtil;
 import com.liferay.portal.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.service.MembershipRequestServiceUtil;
@@ -80,6 +83,8 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
+import com.liferay.portlet.exportimport.RemoteExportException;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
 import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
 import com.liferay.site.admin.web.constants.SiteAdminPortletKeys;
@@ -151,6 +156,16 @@ public class SiteAdminPortlet extends MVCPortlet {
 		throws Exception {
 
 		updateActive(actionRequest, false);
+	}
+
+	public void deleteBackgroundTask(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long backgroundTaskId = ParamUtil.getLong(
+			actionRequest, "backgroundTaskId");
+
+		BackgroundTaskLocalServiceUtil.deleteBackgroundTask(backgroundTaskId);
 	}
 
 	public void deleteGroups(
@@ -261,12 +276,63 @@ public class SiteAdminPortlet extends MVCPortlet {
 			themeDisplay.getCompanyId(), groupId, removeUserIds);
 	}
 
+	/**
+	 * Resets the number of failed merge attempts for the site template, which
+	 * is accessed by retrieving the layout set prototype ID. Once the counter
+	 * is reset, the modified site template is merged back into its linked site,
+	 * which is accessed by retrieving the group ID and private layout set.
+	 *
+	 * <p>
+	 * If the number of failed merge attempts is not equal to zero after the
+	 * merge, an error key is submitted to {@link SessionErrors}.
+	 * </p>
+	 *
+	 * @param  actionRequest the portlet request used to retrieve parameters
+	 * @throws Exception if an exception occurred
+	 */
+	public void resetMergeFailCountAndMerge(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long layoutSetPrototypeId = ParamUtil.getLong(
+			actionRequest, "layoutSetPrototypeId");
+
+		LayoutSetPrototype layoutSetPrototype =
+			LayoutSetPrototypeServiceUtil.getLayoutSetPrototype(
+				layoutSetPrototypeId);
+
+		SitesUtil.setMergeFailCount(layoutSetPrototype, 0);
+
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+		boolean privateLayoutSet = ParamUtil.getBoolean(
+			actionRequest, "privateLayoutSet");
+
+		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+			groupId, privateLayoutSet);
+
+		SitesUtil.resetPrototype(layoutSet);
+
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+		SitesUtil.mergeLayoutSetPrototypeLayouts(group, layoutSet);
+
+		layoutSetPrototype =
+			LayoutSetPrototypeServiceUtil.getLayoutSetPrototype(
+				layoutSetPrototypeId);
+
+		if (SitesUtil.getMergeFailCount(layoutSetPrototype) > 0) {
+			SessionErrors.add(actionRequest, "resetMergeFailCountAndMerge");
+		}
+	}
+
 	@Override
 	protected void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
 		if (SessionErrors.contains(
+				renderRequest, NoSuchBackgroundTaskException.class.getName()) ||
+			SessionErrors.contains(
 				renderRequest, NoSuchGroupException.class.getName()) ||
 			SessionErrors.contains(
 				renderRequest, PrincipalException.class.getName())) {
@@ -405,6 +471,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 			cause instanceof GroupParentException ||
 			cause instanceof LayoutSetVirtualHostException ||
 			cause instanceof LocaleException ||
+			cause instanceof NoSuchBackgroundTaskException ||
 			cause instanceof PendingBackgroundTaskException ||
 			cause instanceof RemoteAuthException ||
 			cause instanceof RemoteExportException ||

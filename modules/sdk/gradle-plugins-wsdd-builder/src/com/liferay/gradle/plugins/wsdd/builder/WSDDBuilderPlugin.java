@@ -22,9 +22,10 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
+import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskOutputs;
 
@@ -42,16 +43,6 @@ public class WSDDBuilderPlugin implements Plugin<Project> {
 		addWSDDBuilderConfiguration(project);
 
 		addBuildWSDDTask(project);
-
-		project.afterEvaluate(
-			new Action<Project>() {
-
-				@Override
-				public void execute(Project project) {
-					configureBuildWSDDTask(project);
-				}
-
-			});
 	}
 
 	protected BuildWSDDTask addBuildWSDDTask(Project project) {
@@ -59,7 +50,19 @@ public class WSDDBuilderPlugin implements Plugin<Project> {
 			project, BUILD_WSDD_TASK_NAME, BuildWSDDTask.class);
 
 		buildWSDDTask.setDescription("Runs Liferay WSDD Builder.");
-		buildWSDDTask.setGroup("build");
+		buildWSDDTask.setGroup(BasePlugin.BUILD_GROUP);
+
+		buildWSDDTask.dependsOn(JavaPlugin.COMPILE_JAVA_TASK_NAME);
+
+		buildWSDDTask.doFirst(
+			new Action<Task>() {
+
+				@Override
+				public void execute(Task task) {
+					configureBuildWSDDTaskBuilderClasspath((BuildWSDDTask)task);
+				}
+
+			});
 
 		return buildWSDDTask;
 	}
@@ -92,7 +95,9 @@ public class WSDDBuilderPlugin implements Plugin<Project> {
 			"com.liferay.portal.tools.wsdd.builder", "latest.release");
 	}
 
-	protected void configureBuildWSDDTask(BuildWSDDTask buildWSDDTask) {
+	protected void configureBuildWSDDTaskBuilderClasspath(
+		BuildWSDDTask buildWSDDTask) {
+
 		if (Validator.isNotNull(buildWSDDTask.getBuilderClasspath())) {
 			return;
 		}
@@ -104,42 +109,17 @@ public class WSDDBuilderPlugin implements Plugin<Project> {
 		Task compileJavaTask = taskContainer.findByName(
 			JavaPlugin.COMPILE_JAVA_TASK_NAME);
 
-		if (compileJavaTask == null) {
-			return;
-		}
-
-		buildWSDDTask.dependsOn(compileJavaTask);
-
 		TaskOutputs taskOutputs = compileJavaTask.getOutputs();
 
 		FileCollection fileCollection = taskOutputs.getFiles();
 
-		ConfigurationContainer configurationContainer =
-			project.getConfigurations();
+		SourceSet sourceSet = GradleUtil.getSourceSet(
+			project, SourceSet.MAIN_SOURCE_SET_NAME);
 
-		Configuration configuration = configurationContainer.findByName(
-			JavaPlugin.RUNTIME_CONFIGURATION_NAME);
-
-		if (configuration != null) {
-			fileCollection = fileCollection.plus(configuration);
-		}
+		fileCollection = fileCollection.plus(sourceSet.getCompileClasspath());
+		fileCollection = fileCollection.plus(sourceSet.getRuntimeClasspath());
 
 		buildWSDDTask.setBuilderClasspath(fileCollection.getAsPath());
-	}
-
-	protected void configureBuildWSDDTask(Project project) {
-		TaskContainer taskContainer = project.getTasks();
-
-		taskContainer.withType(
-			BuildWSDDTask.class,
-			new Action<BuildWSDDTask>() {
-
-				@Override
-				public void execute(BuildWSDDTask buildWSDDTask) {
-					configureBuildWSDDTask(buildWSDDTask);
-				}
-
-			});
 	}
 
 }

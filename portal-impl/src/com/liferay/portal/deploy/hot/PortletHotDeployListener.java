@@ -22,13 +22,11 @@ import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
 import com.liferay.portal.kernel.deploy.hot.HotDeployException;
 import com.liferay.portal.kernel.javadoc.JavadocManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.language.UTF8Control;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
-import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
-import com.liferay.portal.kernel.scheduler.SchedulerEntry;
-import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.servlet.DirectServletRegistryUtil;
 import com.liferay.portal.kernel.servlet.FileTimestampUtil;
 import com.liferay.portal.kernel.servlet.PortletServlet;
@@ -53,7 +51,6 @@ import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalInstances;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebAppPool;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.CustomUserAttributes;
@@ -187,18 +184,6 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 		for (PortletURLListener portletURLListener : portletURLListeners) {
 			PortletURLListenerFactory.destroy(portletURLListener);
-		}
-
-		if (PropsValues.SCHEDULER_ENABLED) {
-			List<SchedulerEntry> schedulerEntries =
-				portlet.getSchedulerEntries();
-
-			if ((schedulerEntries != null) && !schedulerEntries.isEmpty()) {
-				for (SchedulerEntry schedulerEntry : schedulerEntries) {
-					SchedulerEngineHelperUtil.unschedule(
-						schedulerEntry, StorageType.MEMORY_CLUSTERED);
-				}
-			}
 		}
 
 		PortletInstanceFactoryUtil.destroy(portlet);
@@ -556,7 +541,8 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		if (Validator.isNotNull(languageBundleName)) {
 			for (Locale locale : LanguageUtil.getAvailableLocales()) {
 				ResourceBundle resourceBundle = ResourceBundle.getBundle(
-					languageBundleName, locale, classLoader);
+					languageBundleName, locale, classLoader,
+					UTF8Control.INSTANCE);
 
 				PortletResourceBundles.put(
 					servletContextName, LocaleUtil.toLanguageId(locale),

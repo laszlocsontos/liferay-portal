@@ -17,25 +17,14 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String itemSelectedCallback = (String)request.getAttribute(LayoutItemSelectorView.ITEM_SELECTED_CALLBACK);
-LayoutItemSelectorCriterion layoutItemSelectorCriterion = (LayoutItemSelectorCriterion)request.getAttribute(LayoutItemSelectorView.LAYOUT_ITEM_SELECTOR_CRITERION);
+LayoutItemSelectorViewDisplayContext layoutItemSelectorViewDisplayContext = (LayoutItemSelectorViewDisplayContext)request.getAttribute(LayoutItemSelectorView.LAYOUT_ITEM_SELECTOR_VIEW_DISPLAY_CONTEXT);
 
-long groupId = layoutItemSelectorCriterion.getGroupId();
+long groupId = themeDisplay.getScopeGroupId();
 
 Group group = GroupLocalServiceUtil.fetchGroup(groupId);
 
 request.setAttribute(WebKeys.GROUP, group);
 
-boolean showGroupsSelector = ParamUtil.getBoolean(request, "showGroupsSelector");
-%>
-
-<c:if test="<%= showGroupsSelector %>">
-	<liferay-util:include page="/group_selector.jsp" servletContext="<%= application %>">
-		<liferay-util:param name="tabs1" value="pages" />
-	</liferay-util:include>
-</c:if>
-
-<%
 String tabs1Names = "";
 
 if (group.getPublicLayoutsPageCount() > 0) {
@@ -52,21 +41,31 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 	<%
 	boolean checkContentDisplayPage = ParamUtil.getBoolean(request, "checkContentDisplayPage");
 	String selectedLayoutIds = ParamUtil.getString(request, "selectedLayoutIds");
+	long selPlid = ParamUtil.getLong(request, "selPlid", LayoutConstants.DEFAULT_PLID);
 
-	LayoutsAdminDisplayContext layoutsAdminDisplayContext = new LayoutsAdminDisplayContext(request, liferayPortletResponse);
+	PortletURL editLayoutURL = PortletProviderUtil.getPortletURL(request, Layout.class.getName(), PortletProvider.Action.EDIT);
+
+	editLayoutURL.setParameter("redirect", currentURL);
+	editLayoutURL.setParameter("groupId", String.valueOf(groupId));
+	editLayoutURL.setParameter("viewLayout", Boolean.TRUE.toString());
 	%>
 
 	<c:if test="<%= group.getPublicLayoutsPageCount() > 0 %>">
+
+		<%
+		editLayoutURL.setParameter("tabs1", "public-pages");
+		%>
+
 		<liferay-ui:section>
 			<div>
 				<liferay-ui:layouts-tree
 					checkContentDisplayPage="<%= checkContentDisplayPage %>"
 					draggableTree="<%= false %>"
 					groupId="<%= groupId %>"
-					portletURL="<%= layoutsAdminDisplayContext.getEditLayoutURL() %>"
-					rootNodeName="<%= layoutsAdminDisplayContext.getRootNodeName() %>"
+					portletURL="<%= editLayoutURL %>"
+					rootNodeName="<%= group.getLayoutRootNodeName(false, themeDisplay.getLocale()) %>"
 					saveState="<%= false %>"
-					selPlid="<%= layoutsAdminDisplayContext.getSelPlid() %>"
+					selPlid="<%= selPlid %>"
 					selectedLayoutIds="<%= selectedLayoutIds %>"
 					treeId="treeContainerPublicPages"
 				/>
@@ -75,17 +74,22 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 	</c:if>
 
 	<c:if test="<%= group.getPrivateLayoutsPageCount() > 0 %>">
+
+		<%
+		editLayoutURL.setParameter("tabs1", "private-pages");
+		%>
+
 		<liferay-ui:section>
 			<div>
 				<liferay-ui:layouts-tree
 					checkContentDisplayPage="<%= checkContentDisplayPage %>"
 					draggableTree="<%= false %>"
 					groupId="<%= groupId %>"
-					portletURL="<%= layoutsAdminDisplayContext.getEditLayoutURL() %>"
+					portletURL="<%= editLayoutURL %>"
 					privateLayout="<%= true %>"
-					rootNodeName="<%= layoutsAdminDisplayContext.getRootNodeName() %>"
+					rootNodeName="<%= group.getLayoutRootNodeName(true, themeDisplay.getLocale()) %>"
 					saveState="<%= false %>"
-					selPlid="<%= layoutsAdminDisplayContext.getSelPlid() %>"
+					selPlid="<%= selPlid %>"
 					selectedLayoutIds="<%= selectedLayoutIds %>"
 					treeId="treeContainerPrivatePages"
 				/>
@@ -148,10 +152,28 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 
 	button.on(
 		'click',
-		function() {
-			var url = event.target.getAttribute('data-url');
+		function(event) {
+			var currentTarget = event.currentTarget;
 
-			<%= itemSelectedCallback %>('<%= URL.class.getName() %>', url);
+			Util.getOpener().Liferay.fire(
+				'<%= layoutItemSelectorViewDisplayContext.getItemSelectedEventName() %>',
+				{
+
+					<%
+					String ckEditorFuncNum = ParamUtil.getString(request, "CKEditorFuncNum");
+					%>
+
+					<c:if test="<%= Validator.isNotNull(ckEditorFuncNum) %>">
+						ckeditorfuncnum: <%= ckEditorFuncNum %>,
+					</c:if>
+
+					layoutpath: currentTarget.attr('data-layoutpath'),
+					returnType: currentTarget.attr('data-returnType'),
+					value: currentTarget.attr('data-value')
+				}
+			);
+
+			Util.getWindow().destroy();
 		}
 	);
 
@@ -169,7 +191,6 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 		var link = labelEl.one('a');
 
 		var url = link.attr('data-url');
-
 		var uuid = link.attr('data-uuid');
 
 		if (link && url) {
@@ -179,11 +200,34 @@ if (group.getPrivateLayoutsPageCount() > 0) {
 
 			messageType = 'info';
 
-			button.attr('data-url', url);
-
-			button.attr('data-uuid', uuid);
-
 			button.attr('data-layoutpath', messageText);
+
+			<%
+			String itemSelectorReturnTypeName = StringPool.BLANK;
+
+			LayoutItemSelectorCriterion layoutItemSelectorCriterion = layoutItemSelectorViewDisplayContext.getLayoutItemSelectorCriterion();
+
+			for (ItemSelectorReturnType desiredItemSelectorReturnType : layoutItemSelectorCriterion.getDesiredItemSelectorReturnTypes()) {
+				itemSelectorReturnTypeName = desiredItemSelectorReturnType.getName();
+
+				break;
+			}
+
+			if (Validator.isNull(itemSelectorReturnTypeName)) {
+				throw new IllegalArgumentException("Invalid item selector return type " + itemSelectorReturnTypeName);
+			}
+			%>
+
+			button.attr('data-returnType', '<%= itemSelectorReturnTypeName %>');
+
+			<c:choose>
+				<c:when test="<%= itemSelectorReturnTypeName.equals(DefaultItemSelectorReturnType.URL.getName()) %>">
+					button.attr('data-value', url);
+				</c:when>
+				<c:when test="<%= itemSelectorReturnTypeName.equals(DefaultItemSelectorReturnType.UUID.getName()) %>">
+					button.attr('data-value', uuid);
+				</c:when>
+			</c:choose>
 		}
 
 		Liferay.Util.toggleDisabled(button, disabled);

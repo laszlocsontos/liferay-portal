@@ -57,9 +57,8 @@ public class PortletKeys {
 
 	public static final String DOCUMENT_LIBRARY_DISPLAY = "110";
 
-	public static final String DYNAMIC_DATA_LIST_DISPLAY = "169";
-
-	public static final String DYNAMIC_DATA_LISTS = "167";
+	public static final String DYNAMIC_DATA_LISTS =
+		"com_liferay_dynamic_data_lists_web_portlet_DDLPortlet";
 
 	public static final String DYNAMIC_DATA_MAPPING =
 		"com_liferay_dynamic_data_mapping_web_portlet_" +
@@ -75,8 +74,6 @@ public class PortletKeys {
 
 	public static final String FRIENDS_DIRECTORY = "186";
 
-	public static final String GROUP_PAGES = "156";
-
 	public static final String GROUP_STATISTICS = "181";
 
 	public static final String IMAGE_UPLOADER = "195";
@@ -87,7 +84,8 @@ public class PortletKeys {
 	public static final String JOURNAL =
 		"com_liferay_journal_web_portlet_JournalPortlet";
 
-	public static final String LAYOUTS_ADMIN = "88";
+	public static final String LAYOUTS_ADMIN =
+		"com_liferay_layout_admin_web_portlet_LayoutAdminPortlet";
 
 	public static final String LIFERAY_PORTAL = "LIFERAY_PORTAL";
 
@@ -112,7 +110,8 @@ public class PortletKeys {
 
 	public static final String MY_ACCOUNT = "2";
 
-	public static final String MY_PAGES = "140";
+	public static final String MY_PAGES =
+		"com_liferay_layout_admin_web_portlet_MyPagesPortlet";
 
 	public static final String MY_SITES_DIRECTORY = "188";
 
@@ -178,7 +177,8 @@ public class PortletKeys {
 
 	public static final String SOFTWARE_CATALOG = "98";
 
-	public static final String STAGING_BAR = "170";
+	public static final String STAGING_BAR =
+		"com_liferay_staging_bar_web_portlet_StagingBarPortlet";
 
 	public static final String STOCKS = "12";
 

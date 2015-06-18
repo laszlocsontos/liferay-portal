@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.portletdisplaytemplate.lar;
 
-import com.liferay.portal.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -30,7 +29,7 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMTemplateTestUtil;
-import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.exportimport.lar.PortletDataHandler;
 
 import java.util.List;
 
@@ -75,7 +74,7 @@ public class PortletDisplayTemplatePortletDataHandlerTest
 
 	private final Class<?>[] _DDM_TEMPLATE_CLASSES = {
 		AssetCategory.class, AssetEntry.class, AssetTag.class, BlogsEntry.class,
-		FileEntry.class, JournalArticle.class, LayoutSet.class
+		FileEntry.class, LayoutSet.class
 	};
 
 }

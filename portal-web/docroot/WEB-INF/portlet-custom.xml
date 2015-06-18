@@ -399,27 +399,6 @@
 		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
 	</portlet>
 	<portlet>
-		<portlet-name>88</portlet-name>
-		<display-name>Layouts Admin</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/layouts_admin/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/layouts_admin/edit_layouts</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>administrator</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
 		<portlet-name>90</portlet-name>
 		<display-name>Portal</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
@@ -714,14 +693,18 @@
 	<portlet>
 		<portlet-name>128</portlet-name>
 		<display-name>Roles Admin</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.rolesadmin.RolesAdminPortlet</portlet-class>
+		<init-param>
+			<name>action.package.prefix</name>
+			<value>com.liferay.portlet.rolesadmin.action</value>
+		</init-param>
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/roles_admin/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/roles_admin/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/roles_admin/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -858,32 +841,14 @@
 	<portlet>
 		<portlet-name>139</portlet-name>
 		<display-name>Expando</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
+		<portlet-class>com.liferay.portlet.expando.ExpandoPortlet</portlet-class>
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/expando/</value>
 		</init-param>
 		<init-param>
-			<name>view-action</name>
-			<value>/expando/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-	</portlet>
-	<portlet>
-		<portlet-name>140</portlet-name>
-		<display-name>My Pages</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/layouts_admin/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/my_pages/view</value>
+			<name>view-template</name>
+			<value>/html/portlet/expando/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -970,24 +935,6 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
-		<portlet-name>156</portlet-name>
-		<display-name>Group Pages</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/layouts_admin/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/group_pages/edit_layouts</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-	</portlet>
-	<portlet>
 		<portlet-name>161</portlet-name>
 		<display-name>Blogs</display-name>
 		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
@@ -1061,54 +1008,6 @@
 		<security-role-ref>
 			<role-name>guest</role-name>
 		</security-role-ref>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>167</portlet-name>
-		<display-name>Dynamic Data Lists</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/dynamic_data_lists/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/dynamic_data_lists/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
-		<security-role-ref>
-			<role-name>power-user</role-name>
-		</security-role-ref>
-		<security-role-ref>
-			<role-name>user</role-name>
-		</security-role-ref>
-	</portlet>
-	<portlet>
-		<portlet-name>170</portlet-name>
-		<display-name>Staging Bar</display-name>
-		<portlet-class>com.liferay.portlet.StrutsPortlet</portlet-class>
-		<init-param>
-			<name>template-path</name>
-			<value>/html/portlet/staging_bar/</value>
-		</init-param>
-		<init-param>
-			<name>view-action</name>
-			<value>/staging_bar/view</value>
-		</init-param>
-		<expiration-cache>0</expiration-cache>
-		<supports>
-			<mime-type>text/html</mime-type>
-		</supports>
-		<resource-bundle>com.liferay.portlet.StrutsResourceBundle</resource-bundle>
 		<security-role-ref>
 			<role-name>power-user</role-name>
 		</security-role-ref>
@@ -1467,6 +1366,10 @@
 		<init-param>
 			<name>template-path</name>
 			<value>/html/portlet/export_import/</value>
+		</init-param>
+		<init-param>
+			<name>view-action</name>
+			<value>/export_import/view</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>

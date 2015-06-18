@@ -179,7 +179,7 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 
 		content = content.replace(/nestedFields/g, 'fields');
 
-		content = formBuilder.deserializeDefinitionFields(A.JSON.parse(content));
+		content = formBuilder.deserializeDefinitionFields(JSON.parse(content));
 
 		formBuilder.set('fields', content);
 	};
@@ -223,6 +223,7 @@ for (Locale availableLocale : LanguageUtil.getAvailableLocales(themeDisplay.getS
 
 			portletNamespace: '<portlet:namespace />',
 			portletResourceNamespace: '<%= HtmlUtil.escapeJS(portletResourceNamespace) %>',
+			readOnly: <%= ParamUtil.getBoolean(request, "formBuilderReadOnly") %>,
 			srcNode: '#<portlet:namespace />formBuilderContent',
 			translationManager: {
 

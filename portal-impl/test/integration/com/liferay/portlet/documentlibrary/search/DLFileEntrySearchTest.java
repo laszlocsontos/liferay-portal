@@ -82,7 +82,7 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testLocalizedSearch() throws Exception {
@@ -176,7 +176,7 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 		testOrderHelper.testOrderByDDMTextFieldRepeatable();
 	}
 
-	@Ignore()
+	@Ignore
 	@Override
 	@Test
 	public void testSearchAttachments() throws Exception {
@@ -434,7 +434,7 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 		DDMFormLayout ddmFormLayout = DDMUtil.getDefaultDDMFormLayout(ddmForm);
 
 		DDMStructureLocalServiceUtil.updateStructure(
-			_ddmStructure.getStructureId(),
+			_ddmStructure.getUserId(), _ddmStructure.getStructureId(),
 			_ddmStructure.getParentStructureId(), _ddmStructure.getNameMap(),
 			_ddmStructure.getDescriptionMap(), ddmForm, ddmFormLayout,
 			serviceContext);

@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mobile.device.Device;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
@@ -49,6 +48,7 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.admin.util.PortalAdministrationApplicationType;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
 
 import java.io.Serializable;
@@ -905,7 +905,7 @@ public class ThemeDisplay
 
 	public String getURLLayoutTemplates() {
 		if (Validator.isNull(_urlLayoutTemplates)) {
-			return _urlPageSettings + "#layout";
+			return getURLPageSettings() + "#layout";
 		}
 
 		return _urlLayoutTemplates;
@@ -930,7 +930,18 @@ public class ThemeDisplay
 
 	@JSON(include = false)
 	public PortletURL getURLPageSettings() {
-		return _urlPageSettings;
+		try {
+			if (_urlPageSettings == null) {
+				_urlPageSettings = PortletProviderUtil.getPortletURL(
+					getRequest(), Layout.class.getName(),
+					PortletProvider.Action.EDIT);
+			}
+
+			return _urlPageSettings;
+		}
+		catch (PortalException pe) {
+			throw new SystemException(pe);
+		}
 	}
 
 	public String getURLPortal() {
@@ -1746,6 +1757,10 @@ public class ThemeDisplay
 		_urlMyAccount = urlMyAccount;
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	public void setURLPageSettings(PortletURL urlPageSettings) {
 		_urlPageSettings = urlPageSettings;
 	}

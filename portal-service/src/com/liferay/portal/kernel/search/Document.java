@@ -52,6 +52,8 @@ public interface Document extends Cloneable, Serializable {
 			String name, InputStream is, String fileExt, int maxStringLength)
 		throws IOException;
 
+	public void addGeoLocation(double latitude, double longitude);
+
 	public void addKeyword(String name, boolean value);
 
 	public void addKeyword(String name, Boolean value);
@@ -124,18 +126,6 @@ public interface Document extends Cloneable, Serializable {
 		boolean sortable);
 
 	public void addLocalizedText(String name, Map<Locale, String> values);
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public void addModifiedDate();
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	public void addModifiedDate(Date modifiedDate);
 
 	public void addNumber(String name, BigDecimal value);
 

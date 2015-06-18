@@ -16,6 +16,7 @@ package com.liferay.portlet.dynamicdatamapping.registry.bundle.ddmformfieldtyper
 
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldRenderer;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldType;
+import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldTypeSettings;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueAccessor;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueParameterSerializer;
 import com.liferay.portlet.dynamicdatamapping.registry.DDMFormFieldValueRendererAccessor;
@@ -39,6 +40,23 @@ public class TestDDMFormFieldType implements DDMFormFieldType {
 	}
 
 	@Override
+	public String getDDMFormFieldTypeJavaScriptClass() {
+		return null;
+	}
+
+	@Override
+	public String getDDMFormFieldTypeJavaScriptModule() {
+		return null;
+	}
+
+	@Override
+	public Class<? extends DDMFormFieldTypeSettings>
+		getDDMFormFieldTypeSettings() {
+
+		return null;
+	}
+
+	@Override
 	public DDMFormFieldValueAccessor<?> getDDMFormFieldValueAccessor(
 		Locale locale) {
 
@@ -56,6 +74,11 @@ public class TestDDMFormFieldType implements DDMFormFieldType {
 	public DDMFormFieldValueRendererAccessor
 		getDDMFormFieldValueRendererAccessor(Locale locale) {
 
+		return null;
+	}
+
+	@Override
+	public String getIcon() {
 		return null;
 	}
 

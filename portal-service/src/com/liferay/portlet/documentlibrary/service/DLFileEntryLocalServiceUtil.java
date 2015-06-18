@@ -482,7 +482,7 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
@@ -809,8 +809,8 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().isKeepFileVersionLabel(fileEntryId, serviceContext);
 	}
 
-	public static com.liferay.portal.model.Lock lockFileEntry(long userId,
-		long fileEntryId)
+	public static com.liferay.portal.kernel.lock.Lock lockFileEntry(
+		long userId, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().lockFileEntry(userId, fileEntryId);
 	}

@@ -16,9 +16,10 @@ package com.liferay.bookmarks.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -67,6 +68,7 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 		attributes.put("treePath", getTreePath());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
+		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
@@ -153,6 +155,12 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 
 		if (description != null) {
 			setDescription(description);
+		}
+
+		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
+
+		if (lastPublishDate != null) {
+			setLastPublishDate(lastPublishDate);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -291,6 +299,16 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 	@Override
 	public long getGroupId() {
 		return _bookmarksFolder.getGroupId();
+	}
+
+	/**
+	* Returns the last publish date of this bookmarks folder.
+	*
+	* @return the last publish date of this bookmarks folder
+	*/
+	@Override
+	public Date getLastPublishDate() {
+		return _bookmarksFolder.getLastPublishDate();
 	}
 
 	/**
@@ -716,6 +734,16 @@ public class BookmarksFolderWrapper implements BookmarksFolder,
 	@Override
 	public void setGroupId(long groupId) {
 		_bookmarksFolder.setGroupId(groupId);
+	}
+
+	/**
+	* Sets the last publish date of this bookmarks folder.
+	*
+	* @param lastPublishDate the last publish date of this bookmarks folder
+	*/
+	@Override
+	public void setLastPublishDate(Date lastPublishDate) {
+		_bookmarksFolder.setLastPublishDate(lastPublishDate);
 	}
 
 	/**

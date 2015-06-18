@@ -113,6 +113,10 @@ public interface MBMessageLocalService extends BaseLocalService,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws PortalException;
 
+	public void addMessageAttachment(long userId, long messageId,
+		java.lang.String fileName, java.io.File file, java.lang.String mimeType)
+		throws PortalException;
+
 	public void addMessageResources(
 		com.liferay.portlet.messageboards.model.MBMessage message,
 		boolean addGroupPermissions, boolean addGuestPermissions)
@@ -346,7 +350,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext);
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.messageboards.model.MBMessage> getGroupMessages(

@@ -18,19 +18,19 @@
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
-<%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
-<%@ taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %>
-<%@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
-<%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
-<%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
+taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
+taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
+taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.portal.LocaleException" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.configuration.Filter" %><%@
 page import="com.liferay.portal.kernel.dao.search.RowChecker" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
-page import="com.liferay.portal.kernel.editor.EditorUtil" %><%@
+page import="com.liferay.portal.kernel.editor.EditorModeUtil" %><%@
 page import="com.liferay.portal.kernel.json.JSONArray" %><%@
 page import="com.liferay.portal.kernel.json.JSONFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.json.JSONObject" %><%@
@@ -57,6 +57,7 @@ page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
+page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
 page import="com.liferay.portal.model.Group" %><%@
 page import="com.liferay.portal.security.auth.PrincipalException" %><%@
 page import="com.liferay.portal.security.permission.ActionKeys" %><%@
@@ -73,8 +74,6 @@ page import="com.liferay.portlet.PortalPreferences" %><%@
 page import="com.liferay.portlet.PortletPreferencesFactoryUtil" %><%@
 page import="com.liferay.portlet.PortletURLFactoryUtil" %><%@
 page import="com.liferay.portlet.PortletURLUtil" %><%@
-page import="com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata" %><%@
-page import="com.liferay.portlet.dynamicdatalists.model.DDLRecordSet" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.NoSuchStructureException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.RequiredStructureException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.RequiredTemplateException" %><%@
@@ -90,8 +89,10 @@ page import="com.liferay.portlet.dynamicdatamapping.io.DDMFormJSONDeserializerUt
 page import="com.liferay.portlet.dynamicdatamapping.model.DDMForm" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructure" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructureVersion" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.model.DDMTemplate" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.model.DDMTemplateVersion" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.search.StructureDisplayTerms" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearch" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearchTerms" %><%@
@@ -101,8 +102,10 @@ page import="com.liferay.portlet.dynamicdatamapping.search.TemplateSearchTerms" 
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureVersionServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMTemplateServiceUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.service.DDMTemplateVersionServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMPermission" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMStructurePermission" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMTemplatePermission" %><%@
@@ -183,3 +186,45 @@ else if (scopeTemplateType.equals(DDMTemplateConstants.TEMPLATE_TYPE_FORM)) {
 %>
 
 <%@ include file="/init-ext.jsp" %>
+
+<%!
+private void _addFormTemplateFieldAttributes(DDMStructure structure, JSONArray jsonArray) throws Exception {
+	for (int i = 0; i < jsonArray.length(); i++) {
+		JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+		String fieldName = jsonObject.getString("name");
+
+		try {
+			jsonObject.put("readOnlyAttributes", _getFieldReadOnlyAttributes(structure, fieldName));
+			jsonObject.put("unique", true);
+		}
+		catch (StructureFieldException sfe) {
+		}
+	}
+}
+
+private JSONArray _getFieldReadOnlyAttributes(DDMStructure structure, String fieldName) throws Exception {
+	JSONArray readOnlyAttributesJSONArray = JSONFactoryUtil.createJSONArray();
+
+	readOnlyAttributesJSONArray.put("indexType");
+	readOnlyAttributesJSONArray.put("name");
+	readOnlyAttributesJSONArray.put("options");
+	readOnlyAttributesJSONArray.put("repeatable");
+
+	boolean required = structure.getFieldRequired(fieldName);
+
+	if (required) {
+		readOnlyAttributesJSONArray.put("required");
+	}
+
+	return readOnlyAttributesJSONArray;
+}
+
+private JSONArray _getFormTemplateFieldsJSONArray(DDMStructure structure, String script) throws Exception {
+	JSONArray jsonArray = DDMUtil.getDDMFormFieldsJSONArray(structure, script);
+
+	_addFormTemplateFieldAttributes(structure, jsonArray);
+
+	return jsonArray;
+}
+%>

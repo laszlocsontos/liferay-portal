@@ -15,6 +15,7 @@
 package com.liferay.item.selector.web;
 
 import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.ItemSelectorViewRenderer;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
@@ -36,14 +37,15 @@ import javax.servlet.jsp.PageContext;
 public class ItemSelectorViewRendererImpl implements ItemSelectorViewRenderer {
 
 	public ItemSelectorViewRendererImpl(
-		ItemSelectorView<ItemSelectorCriterion> itemSelectorView,
+		ItemSelectorView<ItemSelectorCriterion, ItemSelectorReturnType>
+			itemSelectorView,
 		ItemSelectorCriterion itemSelectorCriterion, PortletURL portletURL,
-		String itemSelectedCallback) {
+		String itemSelectedEventName) {
 
 		_itemSelectorView = itemSelectorView;
 		_itemSelectorCriterion = itemSelectorCriterion;
 		_portletURL = portletURL;
-		_itemSelectedCallback = itemSelectedCallback;
+		_itemSelectedEventName = itemSelectedEventName;
 	}
 
 	@Override
@@ -52,7 +54,9 @@ public class ItemSelectorViewRendererImpl implements ItemSelectorViewRenderer {
 	}
 
 	@Override
-	public ItemSelectorView<ItemSelectorCriterion> getItemSelectorView() {
+	public ItemSelectorView<ItemSelectorCriterion, ItemSelectorReturnType>
+		getItemSelectorView() {
+
 		return _itemSelectorView;
 	}
 
@@ -70,7 +74,7 @@ public class ItemSelectorViewRendererImpl implements ItemSelectorViewRenderer {
 
 		_itemSelectorView.renderHTML(
 			pageContext.getRequest(), pipingServletResponse,
-			_itemSelectorCriterion, _portletURL, _itemSelectedCallback);
+			_itemSelectorCriterion, _portletURL, _itemSelectedEventName);
 
 		Writer writer = pageContext.getOut();
 
@@ -79,9 +83,10 @@ public class ItemSelectorViewRendererImpl implements ItemSelectorViewRenderer {
 		writer.write(sb.toString());
 	}
 
-	private final String _itemSelectedCallback;
+	private final String _itemSelectedEventName;
 	private final ItemSelectorCriterion _itemSelectorCriterion;
-	private final ItemSelectorView<ItemSelectorCriterion> _itemSelectorView;
+	private final ItemSelectorView
+		<ItemSelectorCriterion, ItemSelectorReturnType> _itemSelectorView;
 	private final PortletURL _portletURL;
 
 }

@@ -141,8 +141,6 @@ if (Validator.isNotNull(scriptContent)) {
 		var paletteDataContainer = panelScriptContainer.one('#<portlet:namespace />paletteDataContainer');
 
 		function createLiveSearch() {
-			var trim = A.Lang.trim;
-
 			var PaletteSearch = A.Component.create(
 				{
 					AUGMENTS: [A.AutoCompleteBase],
@@ -169,7 +167,7 @@ if (Validator.isNotNull(scriptContent)) {
 					function(item, index) {
 						results.push(
 							{
-								data: trim(item.text()),
+								data: item.text().trim(),
 								node: item.ancestor()
 							}
 						);
@@ -367,7 +365,7 @@ if (Validator.isNotNull(scriptContent)) {
 				{
 					boundingBox: editorNode,
 					height: 400,
-					mode: '<%= EditorUtil.getEditorMode(langType) %>',
+					mode: '<%= EditorModeUtil.getEditorMode(langType) %>',
 					width: '100%'
 				}
 			).render();
@@ -454,6 +452,12 @@ if (Validator.isNotNull(scriptContent)) {
 		'<portlet:namespace />refreshEditor',
 		function(event) {
 			var form = A.one('#<portlet:namespace />fm');
+
+			<portlet:actionURL name="refreshTemplate" var="refreshTemplateURL">
+				<portlet:param name="mvcPath" value="/edit_template.jsp" />
+			</portlet:actionURL>
+
+			form.attr('action', '<%= refreshTemplateURL %>');
 
 			if (richEditor.getEditor().getSession().getUndoManager().hasUndo()) {
 				Liferay.fire('<portlet:namespace />saveTemplate');

@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -72,6 +73,7 @@ import javax.servlet.ServletContext;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
@@ -80,6 +82,7 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
+import org.osgi.util.tracker.BundleTracker;
 
 import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.context.ApplicationContext;
@@ -374,16 +377,21 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	@Override
-	public void stopFramework() throws Exception {
+	public void stopFramework(long timeout) throws Exception {
 		if (_framework == null) {
 			return;
 		}
 
 		_framework.stop();
 
-		FrameworkEvent frameworkEvent = _framework.waitForStop(5000);
+		FrameworkEvent frameworkEvent = _framework.waitForStop(timeout);
 
-		if (_log.isInfoEnabled()) {
+		if (frameworkEvent.getType() == FrameworkEvent.WAIT_TIMEDOUT) {
+			_log.error(
+				"Module framework shutdown timeout after waiting " + timeout +
+					"ms, " + frameworkEvent);
+		}
+		else if (_log.isInfoEnabled()) {
 			_log.info(frameworkEvent);
 		}
 
@@ -485,23 +493,28 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	private Map<String, String> _buildFrameworkProperties(Class<?> clazz) {
 		Map<String, String> properties = new HashMap<>();
 
+		// Release
+
 		properties.put(
 			Constants.BUNDLE_DESCRIPTION, ReleaseInfo.getReleaseInfo());
 		properties.put(Constants.BUNDLE_NAME, ReleaseInfo.getName());
 		properties.put(Constants.BUNDLE_VENDOR, ReleaseInfo.getVendor());
 		properties.put(Constants.BUNDLE_VERSION, ReleaseInfo.getVersion());
+
+		// Fileinstall. See LPS-56385.
+
 		properties.put(
 			FrameworkPropsKeys.FELIX_FILEINSTALL_DIR,
 			_getFelixFileInstallDir());
-		properties.put(
-			FrameworkPropsKeys.FELIX_FILEINSTALL_LOG_LEVEL,
-			_getFelixFileInstallLogLevel());
 		properties.put(
 			FrameworkPropsKeys.FELIX_FILEINSTALL_POLL,
 			String.valueOf(PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_INTERVAL));
 		properties.put(
 			FrameworkPropsKeys.FELIX_FILEINSTALL_TMPDIR,
 			SystemProperties.get(SystemProperties.TMP_DIR));
+
+		// Framework
+
 		properties.put(
 			Constants.FRAMEWORK_BEGINNING_STARTLEVEL,
 			String.valueOf(PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL));
@@ -529,6 +542,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		properties.put(
 			FrameworkPropsKeys.OSGI_INSTALL_AREA, frameworkFile.getParent());
+
+		// Overrides
 
 		Properties extraProperties = PropsUtil.getProperties(
 			PropsKeys.MODULE_FRAMEWORK_PROPERTIES, true);
@@ -570,25 +585,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	private String _getFelixFileInstallDir() {
 		return PropsValues.MODULE_FRAMEWORK_PORTAL_DIR + StringPool.COMMA +
 			StringUtil.merge(PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_DIRS);
-	}
-
-	private String _getFelixFileInstallLogLevel() {
-		int level = 0;
-
-		if (_log.isDebugEnabled()) {
-			level = 4;
-		}
-		else if (_log.isInfoEnabled()) {
-			level = 3;
-		}
-		else if (_log.isWarnEnabled()) {
-			level = 2;
-		}
-		else if (_log.isErrorEnabled()) {
-			level = 1;
-		}
-
-		return String.valueOf(level);
 	}
 
 	private Dictionary<String, Object> _getProperties(
@@ -725,7 +721,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				return;
 			}
 
-			Bundle bundle = _addBundle(
+			final Bundle bundle = _addBundle(
 				initialBundleURL.toString(), inputStream, false);
 
 			if ((bundle == null) || _isFragmentBundle(bundle)) {
@@ -738,6 +734,34 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				return;
 			}
 
+			if (start) {
+				bundle.start();
+
+				final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+				BundleTracker<Void> bundleTracker = new BundleTracker<Void>(
+					_framework.getBundleContext(), Bundle.ACTIVE, null) {
+
+						@Override
+						public Void addingBundle(
+							Bundle trackedBundle, BundleEvent bundleEvent) {
+
+							if (trackedBundle == bundle) {
+								countDownLatch.countDown();
+
+								close();
+							}
+
+							return null;
+						}
+
+					};
+
+				bundleTracker.open();
+
+				countDownLatch.await();
+			}
+
 			if (((bundle.getState() & Bundle.UNINSTALLED) == 0) &&
 				(startLevel > 0)) {
 
@@ -745,10 +769,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 					BundleStartLevel.class);
 
 				bundleStartLevel.setStartLevel(startLevel);
-			}
-
-			if (start) {
-				bundle.start();
 			}
 		}
 		catch (Exception e) {

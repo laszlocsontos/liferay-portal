@@ -493,7 +493,7 @@ public interface DDMTemplateLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext);
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -733,6 +733,11 @@ public interface DDMTemplateLocalService extends BaseLocalService,
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getTemplatesCount(long groupId, long classNameId, long classPK);
+
+	public void revertTemplate(long userId, long templateId,
+		java.lang.String version,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Returns an ordered range of all the templates matching the group, class
@@ -1067,6 +1072,7 @@ public interface DDMTemplateLocalService extends BaseLocalService,
 	/**
 	* Updates the template matching the ID.
 	*
+	* @param userId the primary key of the template's creator/owner
 	* @param templateId the primary key of the template
 	* @param classPK the primary key of the template's related entity
 	* @param nameMap the template's new locales and localized names
@@ -1087,7 +1093,7 @@ public interface DDMTemplateLocalService extends BaseLocalService,
 	* @throws PortalException if a portal exception occurred
 	*/
 	public com.liferay.portlet.dynamicdatamapping.model.DDMTemplate updateTemplate(
-		long templateId, long classPK,
+		long userId, long templateId, long classPK,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String type, java.lang.String mode,
@@ -1098,6 +1104,7 @@ public interface DDMTemplateLocalService extends BaseLocalService,
 	/**
 	* Updates the template matching the ID.
 	*
+	* @param userId the primary key of the template's creator/owner
 	* @param templateId the primary key of the template
 	* @param classPK the primary key of the template's related entity
 	* @param nameMap the template's new locales and localized names
@@ -1123,7 +1130,7 @@ public interface DDMTemplateLocalService extends BaseLocalService,
 	* @throws PortalException if a portal exception occurred
 	*/
 	public com.liferay.portlet.dynamicdatamapping.model.DDMTemplate updateTemplate(
-		long templateId, long classPK,
+		long userId, long templateId, long classPK,
 		java.util.Map<java.util.Locale, java.lang.String> nameMap,
 		java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 		java.lang.String type, java.lang.String mode,

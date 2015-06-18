@@ -52,7 +52,7 @@ public class LocalizedItemSelectorRendering {
 	}
 
 	public void add(ItemSelectorViewRenderer itemSelectorViewRenderer) {
-		ItemSelectorView<?> itemSelectorView =
+		ItemSelectorView<?, ?> itemSelectorView =
 			itemSelectorViewRenderer.getItemSelectorView();
 
 		String title = itemSelectorView.getTitle(_locale);
@@ -61,8 +61,8 @@ public class LocalizedItemSelectorRendering {
 		_titles.add(title);
 	}
 
-	public String getItemSelectedCallback() {
-		return _itemSelectorRendering.getItemSelectedCallback();
+	public String getItemSelectedEventName() {
+		return _itemSelectorRendering.getItemSelectedEventName();
 	}
 
 	public ItemSelectorViewRenderer getItemSelectorViewRenderer(String title) {

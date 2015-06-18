@@ -68,7 +68,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 				count = _importCountMap.get(importName);
 			}
 			else {
-				int pos = importName.lastIndexOf(StringPool.PERIOD);
+				int pos = importName.lastIndexOf(CharPool.PERIOD);
 
 				String importClassName = importName.substring(pos + 1);
 
@@ -98,19 +98,23 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 				break;
 			}
 
-			x = content.indexOf(StringPool.QUOTE, x);
+			x = content.indexOf(CharPool.QUOTE, x);
 
 			if (x == -1) {
 				break;
 			}
 
-			int y = content.indexOf(StringPool.QUOTE, x + 1);
+			int y = content.indexOf(CharPool.QUOTE, x + 1);
 
 			if (y == -1) {
 				break;
 			}
 
 			String includeFileName = content.substring(x + 1, y);
+
+			if (!includeFileName.startsWith(StringPool.SLASH)) {
+				includeFileName = StringPool.SLASH + includeFileName;
+			}
 
 			Matcher matcher = _jspIncludeFilePattern.matcher(includeFileName);
 
@@ -172,7 +176,9 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 				}
 
 				if (content.contains(
-						"<%@ include file=\"" + fileName.substring(x))) {
+						"<%@ include file=\"" + fileName.substring(x)) ||
+					content.contains(
+						"<%@ include file=\"" + fileName.substring(x + 1))) {
 
 					_includeFileNames.add(referenceFileName);
 
@@ -187,8 +193,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		List<String> unneededImports) {
 
 		for (String importLine : importLines) {
-			int x = importLine.indexOf(StringPool.QUOTE);
-			int y = importLine.indexOf(StringPool.QUOTE, x + 1);
+			int x = importLine.indexOf(CharPool.QUOTE);
+			int y = importLine.indexOf(CharPool.QUOTE, x + 1);
 
 			if ((x == -1) || (y == -1)) {
 				continue;
@@ -197,7 +203,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			String className = importLine.substring(x + 1, y);
 
 			className = className.substring(
-				className.lastIndexOf(StringPool.PERIOD) + 1);
+				className.lastIndexOf(CharPool.PERIOD) + 1);
 
 			String regex = "[^A-Za-z0-9_\"]" + className + "[^A-Za-z0-9_\"]";
 
@@ -329,6 +335,33 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		}
 	}
 
+	protected String compressImportsOrTaglibs(
+		String fileName, String content, String attributePrefix) {
+
+		if (!fileName.endsWith("init.jsp") && !fileName.endsWith("init.jspf")) {
+			return content;
+		}
+
+		int x = content.indexOf(attributePrefix);
+
+		int y = content.lastIndexOf(attributePrefix);
+
+		y = content.indexOf("%>", y);
+
+		if ((x == -1) || (y == -1) || (x > y)) {
+			return content;
+		}
+
+		String importsOrTaglibs = content.substring(x, y);
+
+		importsOrTaglibs = StringUtil.replace(
+			importsOrTaglibs, new String[] {"%>\r\n<%@ ", "%>\n<%@ "},
+			new String[] {"%><%@\r\n", "%><%@\n"});
+
+		return content.substring(0, x) + importsOrTaglibs + 
+			content.substring(y);
+	}
+
 	@Override
 	protected String doFormat(
 			File file, String fileName, String absolutePath, String content)
@@ -355,7 +388,10 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 		if (_stripJSPImports && !_jspContents.isEmpty()) {
 			try {
-				newContent = stripJSPImports(fileName, newContent);
+				newContent = formatJSPImportsOrTaglibs(
+					fileName, newContent, _jspImportPattern, true);
+				newContent = formatJSPImportsOrTaglibs(
+					fileName, newContent, _jspTaglibPattern, false);
 			}
 			catch (RuntimeException re) {
 				_stripJSPImports = false;
@@ -394,32 +430,10 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			}
 		}
 
-		if (fileName.endsWith("init.jsp") || fileName.endsWith("init.jspf")) {
-			int x = newContent.indexOf("<%@ page import=");
-
-			int y = newContent.lastIndexOf("<%@ page import=");
-
-			y = newContent.indexOf("%>", y);
-
-			if ((x != -1) && (y != -1) && (y > x)) {
-
-				// Set compressImports to false to decompress imports
-
-				boolean compressImports = true;
-
-				if (compressImports) {
-					String imports = newContent.substring(x, y);
-
-					imports = StringUtil.replace(
-						imports, new String[] {"%>\r\n<%@ ", "%>\n<%@ "},
-						new String[] {"%><%@\r\n", "%><%@\n"});
-
-					newContent =
-						newContent.substring(0, x) + imports +
-							newContent.substring(y);
-				}
-			}
-		}
+		newContent = compressImportsOrTaglibs(
+			fileName, newContent, "<%@ page import=");
+		newContent = compressImportsOrTaglibs(
+			fileName, newContent, "<%@ taglib uri=");
 
 		newContent = fixSessionKey(fileName, newContent, sessionKeyPattern);
 		newContent = fixSessionKey(
@@ -698,7 +712,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 					if (!trimmedLine.startsWith(StringPool.FORWARD_SLASH) &&
 						!trimmedLine.startsWith(StringPool.GREATER_THAN)) {
 
-						int pos = trimmedLine.indexOf(StringPool.EQUAL);
+						int pos = trimmedLine.indexOf(CharPool.EQUAL);
 
 						if (pos != -1) {
 							String attribute = trimmedLine.substring(0, pos);
@@ -842,9 +856,9 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 					int x = line.indexOf("<%@ include file");
 
 					if (x != -1) {
-						x = line.indexOf(StringPool.QUOTE, x);
+						x = line.indexOf(CharPool.QUOTE, x);
 
-						int y = line.indexOf(StringPool.QUOTE, x + 1);
+						int y = line.indexOf(CharPool.QUOTE, x + 1);
 
 						if (y != -1) {
 							String includeFileName = line.substring(x + 1, y);
@@ -902,6 +916,78 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 					content, currentException, previousException);
 			}
 		}
+
+		return content;
+	}
+
+	protected String formatJSPImportsOrTaglibs(
+			String fileName, String content, Pattern pattern,
+			boolean checkUnusedImports)
+		throws IOException {
+
+		if (fileName.endsWith("init-ext.jsp")) {
+			return content;
+		}
+
+		Matcher matcher = pattern.matcher(content);
+
+		if (!matcher.find()) {
+			return content;
+		}
+
+		String imports = matcher.group();
+
+		imports = StringUtil.replace(
+			imports, new String[] {"<%@\r\n", "<%@\n"},
+			new String[] {"\r\n<%@ ", "\n<%@ "});
+
+		if (checkUnusedImports) {
+			List<String> importLines = new ArrayList<>();
+
+			UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(new UnsyncStringReader(imports));
+
+			String line = null;
+
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				if (line.contains("import=")) {
+					importLines.add(line);
+				}
+			}
+
+			List<String> unneededImports = getJSPDuplicateImports(
+				fileName, content, importLines);
+
+			addJSPUnusedImports(fileName, importLines, unneededImports);
+
+			for (String unneededImport : unneededImports) {
+				imports = StringUtil.replace(
+					imports, unneededImport, StringPool.BLANK);
+			}
+		}
+
+		ImportsFormatter importsFormatter = new JSPImportsFormatter();
+
+		imports = importsFormatter.format(imports);
+
+		String beforeImports = content.substring(0, matcher.start());
+
+		if (Validator.isNull(imports)) {
+			beforeImports = StringUtil.replaceLast(
+				beforeImports, "\n", StringPool.BLANK);
+		}
+
+		String afterImports = content.substring(matcher.end());
+
+		if (Validator.isNull(afterImports)) {
+			imports = StringUtil.replaceLast(imports, "\n", StringPool.BLANK);
+
+			content = beforeImports + imports;
+
+			return content;
+		}
+
+		content = beforeImports + imports + "\n" + afterImports;
 
 		return content;
 	}
@@ -1179,7 +1265,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		int x = line.indexOf(" = ");
 
 		if (x == -1) {
-			int y = line.lastIndexOf(" ");
+			int y = line.lastIndexOf(CharPool.SPACE);
 
 			if (y != -1) {
 				variableName = line.substring(y + 1, line.length() - 1);
@@ -1188,7 +1274,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		else {
 			line = line.substring(0, x);
 
-			int y = line.lastIndexOf(" ");
+			int y = line.lastIndexOf(CharPool.SPACE);
 
 			if (y != -1) {
 				variableName = line.substring(y + 1);
@@ -1224,9 +1310,9 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			return false;
 		}
 
-		x = line.indexOf(StringPool.QUOTE, x);
+		x = line.indexOf(CharPool.QUOTE, x);
 
-		int y = line.indexOf(StringPool.QUOTE, x + 1);
+		int y = line.indexOf(CharPool.QUOTE, x + 1);
 
 		if ((x == -1) || (y == -1)) {
 			return false;
@@ -1289,13 +1375,13 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			return false;
 		}
 
-		y = content.indexOf(StringPool.QUOTE, y);
+		y = content.indexOf(CharPool.QUOTE, y);
 
 		if (y == -1) {
 			return false;
 		}
 
-		int z = content.indexOf(StringPool.QUOTE, y + 1);
+		int z = content.indexOf(CharPool.QUOTE, y + 1);
 
 		if (z == -1) {
 			return false;
@@ -1412,7 +1498,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 			String importName = importCount.getKey();
 
-			int y = importName.lastIndexOf(StringPool.PERIOD);
+			int y = importName.lastIndexOf(CharPool.PERIOD);
 
 			String importClassName = importName.substring(y + 1);
 
@@ -1466,77 +1552,6 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 			line, attributeAndValue, newAttributeAndValue);
 	}
 
-	protected String stripJSPImports(String fileName, String content)
-		throws IOException {
-
-		fileName = fileName.replace(
-			CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
-
-		if (fileName.endsWith("init-ext.jsp")) {
-			return content;
-		}
-
-		Matcher matcher = _jspImportPattern.matcher(content);
-
-		if (!matcher.find()) {
-			return content;
-		}
-
-		String imports = matcher.group();
-
-		imports = StringUtil.replace(
-			imports, new String[] {"%><%@\r\n", "%><%@\n"},
-			new String[] {"%>\r\n<%@ ", "%>\n<%@ "});
-
-		List<String> importLines = new ArrayList<>();
-
-		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
-			new UnsyncStringReader(imports));
-
-		String line = null;
-
-		while ((line = unsyncBufferedReader.readLine()) != null) {
-			if (line.contains("import=")) {
-				importLines.add(line);
-			}
-		}
-
-		List<String> unneededImports = getJSPDuplicateImports(
-			fileName, content, importLines);
-
-		addJSPUnusedImports(fileName, importLines, unneededImports);
-
-		for (String unneededImport : unneededImports) {
-			imports = StringUtil.replace(
-				imports, unneededImport, StringPool.BLANK);
-		}
-
-		ImportsFormatter importsFormatter = new JSPImportsFormatter();
-
-		imports = importsFormatter.format(imports);
-
-		String beforeImports = content.substring(0, matcher.start());
-
-		if (Validator.isNull(imports)) {
-			beforeImports = StringUtil.replaceLast(
-				beforeImports, "\n", StringPool.BLANK);
-		}
-
-		String afterImports = content.substring(matcher.end());
-
-		if (Validator.isNull(afterImports)) {
-			imports = StringUtil.replaceLast(imports, "\n", StringPool.BLANK);
-
-			content = beforeImports + imports;
-
-			return content;
-		}
-
-		content = beforeImports + imports + "\n" + afterImports;
-
-		return content;
-	}
-
 	private static final String[] _INCLUDES = new String[] {
 		"**\\*.jsp", "**\\*.jspf", "**\\*.vm"
 	};
@@ -1562,6 +1577,8 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 		"(<.*\n*page.import=\".*>\n*)+", Pattern.MULTILINE);
 	private final Pattern _jspIncludeFilePattern = Pattern.compile(
 		"/.*[.]jsp[f]?");
+	private final Pattern _jspTaglibPattern = Pattern.compile(
+		"(<.*\n*taglib uri=\".*>\n*)+", Pattern.MULTILINE);
 	private boolean _moveFrequentlyUsedImportsToCommonInit;
 	private Set<String> _primitiveTagAttributeDataTypes;
 	private final Pattern _redirectBackURLPattern = Pattern.compile(

@@ -25,6 +25,12 @@ String portletResourceNamespace = ParamUtil.getString(request, "portletResourceN
 
 DDMStructure structure = (DDMStructure)request.getAttribute(WebKeys.DYNAMIC_DATA_MAPPING_STRUCTURE);
 
+DDMStructureVersion structureVersion = null;
+
+if (structure != null) {
+	structureVersion = structure.getStructureVersion();
+}
+
 long groupId = BeanParamUtil.getLong(structure, request, "groupId", scopeGroupId);
 
 long parentStructureId = BeanParamUtil.getLong(structure, request, "parentStructureId", DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID);
@@ -54,9 +60,13 @@ if (fieldsJSONArray != null) {
 }
 %>
 
-<portlet:actionURL name="addStructure" var="addStructureURL" />
+<portlet:actionURL name="addStructure" var="addStructureURL">
+	<portlet:param name="mvcPath" value="/edit_structure.jsp" />
+</portlet:actionURL>
 
-<portlet:actionURL name="updateStructure" var="updateStructureURL" />
+<portlet:actionURL name="updateStructure" var="updateStructureURL">
+	<portlet:param name="mvcPath" value="/edit_structure.jsp" />
+</portlet:actionURL>
 
 <%
 String requestUpdateStructureURL = ParamUtil.getString(request, "updateStructureURL");
@@ -72,7 +82,9 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input name="classNameId" type="hidden" value="<%= String.valueOf(classNameId) %>" />
 	<aui:input name="classPK" type="hidden" value="<%= String.valueOf(classPK) %>" />
+	<aui:input name="scopeClassNameId" type="hidden" value="<%= scopeClassNameId %>" />
 	<aui:input name="definition" type="hidden" />
+	<aui:input name="status" type="hidden" />
 	<aui:input name="saveAndContinue" type="hidden" value="<%= false %>" />
 
 	<liferay-ui:error exception="<%= LocaleException.class %>">
@@ -112,6 +124,41 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 
 	<aui:model-context bean="<%= structure %>" model="<%= DDMStructure.class %>" />
 
+	<c:if test="<%= structureVersion != null %>">
+		<aui:workflow-status model="<%= DDMStructure.class %>" status="<%= structureVersion.getStatus() %>" version="<%= structureVersion.getVersion() %>" />
+
+		<div class="structure-history-toolbar" id="<portlet:namespace />structureHistoryToolbar"></div>
+
+		<aui:script use="aui-toolbar,aui-dialog-iframe-deprecated,liferay-util-window">
+			var toolbarChildren = [
+				<portlet:renderURL var="viewHistoryURL">
+					<portlet:param name="mvcPath" value="/view_structure_history.jsp" />
+					<portlet:param name="redirect" value="<%= redirect %>" />
+					<portlet:param name="structureId" value="<%= String.valueOf(structure.getStructureId()) %>" />
+				</portlet:renderURL>
+
+				{
+					icon: 'icon-time',
+					label: '<%= UnicodeLanguageUtil.get(request, "view-history") %>',
+					on: {
+						click: function(event) {
+							event.domEvent.preventDefault();
+
+							window.location.href = '<%= viewHistoryURL %>';
+						}
+					}
+				}
+			];
+
+			new A.Toolbar(
+				{
+					boundingBox: '#<portlet:namespace />structureHistoryToolbar',
+					children: toolbarChildren
+				}
+			).render();
+		</aui:script>
+	</c:if>
+
 	<aui:fieldset>
 		<aui:field-wrapper>
 			<c:if test="<%= (structure != null) && (DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(classPK) > 0) %>">
@@ -131,22 +178,6 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 		<liferay-ui:panel-container cssClass="lfr-structure-entry-details-container" extended="<%= false %>" id="structureDetailsPanelContainer" persistState="<%= true %>">
 			<liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= false %>" id="structureDetailsSectionPanel" persistState="<%= true %>" title='<%= LanguageUtil.get(request, "details") %>'>
 				<aui:row cssClass="lfr-ddm-types-form-column">
-					<c:choose>
-						<c:when test="<%= scopeClassNameId == 0 %>">
-							<aui:col width="<%= 50 %>">
-								<aui:field-wrapper>
-									<aui:select disabled="<%= structure != null %>" label="type" name="scopeClassNameId">
-										<aui:option label="<%= ResourceActionsUtil.getModelResource(locale, DDLRecordSet.class.getName()) %>" value="<%= PortalUtil.getClassNameId(DDLRecordSet.class.getName()) %>" />
-										<aui:option label="<%= ResourceActionsUtil.getModelResource(locale, DLFileEntryMetadata.class.getName()) %>" value="<%= PortalUtil.getClassNameId(DLFileEntryMetadata.class.getName()) %>" />
-									</aui:select>
-								</aui:field-wrapper>
-							</aui:col>
-						</c:when>
-						<c:otherwise>
-							<aui:input name="scopeClassNameId" type="hidden" value="<%= scopeClassNameId %>" />
-						</c:otherwise>
-					</c:choose>
-
 					<c:choose>
 						<c:when test="<%= Validator.isNull(storageTypeValue) %>">
 							<aui:col width="<%= 50 %>">
@@ -208,7 +239,9 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 <%@ include file="/form_builder.jspf" %>
 
 <aui:button-row>
-	<aui:button onClick='<%= renderResponse.getNamespace() + "saveStructure();" %>' primary="<%= true %>" value='<%= LanguageUtil.get(request, "save") %>' />
+	<aui:button onClick='<%= renderResponse.getNamespace() + "saveStructure(false);" %>' primary="<%= true %>" value='<%= LanguageUtil.get(request, "save") %>' />
+
+	<aui:button onClick='<%= renderResponse.getNamespace() + "saveStructure(true);" %>' value='<%= LanguageUtil.get(request, "save-draft") %>' />
 
 	<aui:button href="<%= redirect %>" type="cancel" />
 </aui:button-row>
@@ -249,10 +282,17 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 		form.fm('removeParentStructureButton').attr('disabled', true).addClass('disabled');
 	}
 
-	function <portlet:namespace />saveStructure() {
+	function <portlet:namespace />saveStructure(draft) {
 		var form = AUI.$('#<portlet:namespace />fm');
 
 		form.fm('definition').val(<portlet:namespace />formBuilder.getContentValue());
+
+		if (draft) {
+			form.fm('status').val(<%= String.valueOf(WorkflowConstants.STATUS_DRAFT) %>);
+		}
+		else {
+			form.fm('status').val(<%= String.valueOf(WorkflowConstants.STATUS_APPROVED) %>);
+		}
 
 		submitForm(form);
 	}

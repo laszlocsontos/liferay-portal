@@ -17,6 +17,9 @@ package com.liferay.portal.security.auth;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifier;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierConfiguration;
+import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -306,6 +309,10 @@ public class AuthVerifierPipeline {
 
 			AuthVerifier authVerifier = registry.getService(serviceReference);
 
+			if (authVerifier == null) {
+				return null;
+			}
+
 			Class<?> authVerifierClass = authVerifier.getClass();
 
 			AuthVerifierConfiguration authVerifierConfiguration =
@@ -403,11 +410,15 @@ public class AuthVerifierPipeline {
 			String[] urlsIncludes = StringUtil.split(
 				properties.getProperty("urls.includes"));
 
-			if ((urlsIncludes.length == 0) && _log.isWarnEnabled()) {
-				_log.warn(
-					"Auth verifier " +
-						authVerifierConfiguration.getAuthVerifierClassName() +
+			if (urlsIncludes.length == 0) {
+				if (_log.isWarnEnabled()) {
+					String authVerifierClassName =
+						authVerifierConfiguration.getAuthVerifierClassName();
+
+					_log.warn(
+						"Auth verifier " + authVerifierClassName +
 							" does not have URLs configured");
+				}
 
 				return false;
 			}

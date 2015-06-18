@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.file.FileCollection;
@@ -62,9 +63,16 @@ public class CompileThemeTask extends DefaultTask {
 		return _diffsDir;
 	}
 
+	@InputDirectory
+	@Optional
+	public File getFrontendCssWebDir() {
+		return _frontendCssWebDir;
+	}
+
 	@InputFile
-	public File getPortalWebFile() {
-		return _portalWebFile;
+	@Optional
+	public File getFrontendCssWebFile() {
+		return _frontendCssWebFile;
 	}
 
 	@OutputDirectories
@@ -127,8 +135,12 @@ public class CompileThemeTask extends DefaultTask {
 		_diffsDir = diffsDir;
 	}
 
-	public void setPortalWebFile(File portalWebFile) {
-		_portalWebFile = portalWebFile;
+	public void setFrontendCssWebDir(File frontendCssWebDir) {
+		_frontendCssWebDir = frontendCssWebDir;
+	}
+
+	public void setFrontendCssWebFile(File frontendCssWebFile) {
+		_frontendCssWebFile = frontendCssWebFile;
 	}
 
 	public void setThemeParent(String themeParent) {
@@ -161,16 +173,45 @@ public class CompileThemeTask extends DefaultTask {
 	}
 
 	protected void copyPortalThemeDir(
-		String theme, String[] excludes, String include) {
+		String theme, final String[] excludes, final String include) {
 
-		String prefix = "html/themes/" + theme + "/";
+		final String prefix = "html/themes/" + theme + "/";
 
-		excludes = StringUtil.prepend(excludes, prefix);
-		include = prefix + include;
+		final File frontendCssWebDir = getFrontendCssWebDir();
+		File frontendCssWebFile = getFrontendCssWebFile();
 
-		FileUtil.unzip(
-			_project, getPortalWebFile(), getThemeRootDir(), 3, excludes,
-			new String[] {include});
+		if (frontendCssWebDir != null) {
+			Closure<Void> closure = new Closure<Void>(null) {
+
+				@SuppressWarnings("unused")
+				public void doCall(CopySpec copySpec) {
+					copySpec.from(new File(frontendCssWebDir, prefix));
+
+					if (ArrayUtil.isNotEmpty(excludes)) {
+						copySpec.exclude(excludes);
+					}
+
+					copySpec.include(include);
+					copySpec.into(getThemeRootDir());
+				}
+
+			};
+
+			_project.copy(closure);
+		}
+		else if (frontendCssWebFile != null) {
+			String jarPrefix = "META-INF/resources/" + prefix;
+
+			String[] prefixedExcludes = StringUtil.prepend(excludes, jarPrefix);
+			String prefixedInclude = jarPrefix + include;
+
+			FileUtil.unzip(
+				_project, frontendCssWebFile, getThemeRootDir(), 5,
+				prefixedExcludes, new String[] {prefixedInclude});
+		}
+		else {
+			throw new GradleException("Unable to find frontend css web");
+		}
 	}
 
 	protected void copyThemeParent() {
@@ -261,7 +302,8 @@ public class CompileThemeTask extends DefaultTask {
 	};
 
 	private File _diffsDir;
-	private File _portalWebFile;
+	private File _frontendCssWebDir;
+	private File _frontendCssWebFile;
 	private final Project _project;
 	private String _themeParent;
 	private Project _themeParentProject;

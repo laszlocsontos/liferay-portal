@@ -15,18 +15,24 @@
 package com.liferay.item.selector.web.util;
 
 import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONDeserializer;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONSerializer;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -43,7 +49,7 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 		_itemSelectorCriterion = itemSelectorCriterion;
 		_prefix = prefix;
 
-		_initSerializableFields();
+		_initExternalPropertyKeys();
 	}
 
 	public Map<String, String[]> getProperties() {
@@ -51,7 +57,10 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 
 		JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
 
-		jsonSerializer.include(_serializableFields);
+		String[] serializableFields = ArrayUtil.append(
+			_externalPropertyKeys, "desiredItemSelectorReturnTypes");
+
+		jsonSerializer.include(serializableFields);
 
 		properties.put(
 			_prefix + JSON,
@@ -69,11 +78,11 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 
 			Map<String, ?> map = jsonDeserializer.deserialize(json);
 
-			for (String serializableField : _serializableFields) {
+			for (String externalPropertyKey : _externalPropertyKeys) {
 				Class<?> serializableFieldClass = PropertyUtils.getPropertyType(
-					_itemSelectorCriterion, serializableField);
+					_itemSelectorCriterion, externalPropertyKey);
 
-				Object value = map.get(serializableField);
+				Object value = map.get(externalPropertyKey);
 
 				if (serializableFieldClass.isArray() &&
 					List.class.isInstance(value)) {
@@ -87,8 +96,10 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 				}
 
 				PropertyUtils.setProperty(
-					_itemSelectorCriterion, serializableField, value);
+					_itemSelectorCriterion, externalPropertyKey, value);
 			}
+
+			_setDesiredItemSelectorReturnTypes(map);
 		}
 		catch (IllegalAccessException | InvocationTargetException |
 			NoSuchMethodException e) {
@@ -97,7 +108,7 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 		}
 	}
 
-	private void _initSerializableFields() {
+	private void _initExternalPropertyKeys() {
 		List<String> list = new ArrayList<>();
 
 		try {
@@ -120,12 +131,13 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 			throw new SystemException(e);
 		}
 
-		_serializableFields = list.toArray(new String[list.size()]);
+		_externalPropertyKeys = list.toArray(new String[list.size()]);
 	}
 
 	private boolean _isInternalProperty(String name) {
-		if (name.equals("availableReturnTypes") || name.equals("class") ||
-			name.equals("desiredReturnTypes")) {
+		if (name.equals("availableItemSelectorReturnTypes") ||
+			name.equals("class") ||
+			name.equals("desiredItemSelectorReturnTypes")) {
 
 			return true;
 		}
@@ -133,8 +145,51 @@ public class ItemSelectorCriterionSerializer<T extends ItemSelectorCriterion> {
 		return false;
 	}
 
+	private void _setDesiredItemSelectorReturnTypes(Map<String, ?> map) {
+		Set<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
+			new LinkedHashSet<>();
+
+		List<String> desiredItemSelectorReturnTypeNames = (List<String>)map.get(
+			"desiredItemSelectorReturnTypes");
+
+		for (String desiredItemSelectorReturnTypeName :
+				desiredItemSelectorReturnTypeNames) {
+
+			Set<ItemSelectorReturnType> availableItemSelectorReturnTypes =
+				_itemSelectorCriterion.getAvailableItemSelectorReturnTypes();
+
+			for (ItemSelectorReturnType availableItemSelectorReturnType :
+					availableItemSelectorReturnTypes) {
+
+				String availableItemSelectorReturnTypeName =
+					availableItemSelectorReturnType.getName();
+
+				if (availableItemSelectorReturnTypeName.equals(
+						desiredItemSelectorReturnTypeName)) {
+
+					desiredItemSelectorReturnTypes.add(
+						availableItemSelectorReturnType);
+
+					break;
+				}
+			}
+		}
+
+		if (desiredItemSelectorReturnTypes.isEmpty()) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("No valid desired item selector return types found");
+			}
+		}
+
+		_itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			desiredItemSelectorReturnTypes);
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ItemSelectorCriterionSerializer.class);
+
+	private String[] _externalPropertyKeys;
 	private final T _itemSelectorCriterion;
 	private final String _prefix;
-	private String[] _serializableFields;
 
 }

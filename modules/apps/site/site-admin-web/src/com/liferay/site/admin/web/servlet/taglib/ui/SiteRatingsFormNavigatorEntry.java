@@ -25,7 +25,10 @@ import com.liferay.portlet.ratings.definition.PortletRatingsDefinitionValues;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Sergio González
@@ -63,6 +66,15 @@ public class SiteRatingsFormNavigatorEntry extends BaseSiteFormNavigatorEntry {
 					getPortletRatingsDefinitionValuesMap();
 
 		return !portletRatingsDefinitionValuesMap.isEmpty();
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.site.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override

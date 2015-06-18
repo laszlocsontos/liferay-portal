@@ -90,7 +90,19 @@ public class GradleUtil {
 		Project project, String configurationName, String group, String name,
 		String version, boolean transitive) {
 
+		return addDependency(
+			project, configurationName, group, name, version, null, transitive);
+	}
+
+	public static Dependency addDependency(
+		Project project, String configurationName, String group, String name,
+		String version, String classifier, boolean transitive) {
+
 		Map<String, Object> dependencyNotation = new HashMap<>();
+
+		if (Validator.isNotNull(classifier)) {
+			dependencyNotation.put("classifier", classifier);
+		}
 
 		dependencyNotation.put("group", group);
 		dependencyNotation.put("name", name);
@@ -106,6 +118,16 @@ public class GradleUtil {
 		ExtensionContainer extensionContainer = project.getExtensions();
 
 		return extensionContainer.create(name, clazz, project);
+	}
+
+	public static SourceSet addSourceSet(Project project, String name) {
+		JavaPluginConvention javaPluginConvention = getConvention(
+			project, JavaPluginConvention.class);
+
+		SourceSetContainer sourceSetContainer =
+			javaPluginConvention.getSourceSets();
+
+		return sourceSetContainer.create(name);
 	}
 
 	public static <T extends Task> T addTask(
@@ -160,8 +182,12 @@ public class GradleUtil {
 
 					Set<Dependency> dependencies =
 						configuration.getDependencies();
+					Set<Configuration> parentConfigurations =
+						configuration.getExtendsFrom();
 
-					if (dependencies.isEmpty()) {
+					if (dependencies.isEmpty() &&
+						parentConfigurations.isEmpty()) {
+
 						action.execute(configuration);
 					}
 				}

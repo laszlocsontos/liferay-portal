@@ -15,6 +15,7 @@
 package com.liferay.wiki.service.impl;
 
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.diff.DiffHtmlUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -71,6 +72,7 @@ import com.liferay.portlet.asset.model.AssetLink;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.expando.model.ExpandoBridge;
+import com.liferay.portlet.expando.util.ExpandoBridgeUtil;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
@@ -229,10 +231,9 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 					node.getGroupId(), WikiConstants.SERVICE_NAME));
 
 		if (wikiGroupServiceSettings.pageCommentsEnabled()) {
-			mbMessageLocalService.addDiscussionMessage(
-				userId, page.getUserName(), page.getGroupId(),
-				WikiPage.class.getName(), resourcePrimKey,
-				WorkflowConstants.ACTION_PUBLISH);
+			CommentManagerUtil.addDiscussion(
+				userId, page.getGroupId(), WikiPage.class.getName(),
+				resourcePrimKey, page.getUserName());
 		}
 
 		// Workflow
@@ -651,14 +652,14 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		assetEntryLocalService.deleteEntry(
 			WikiPage.class.getName(), page.getResourcePrimKey());
 
+		// Comment
+
+		CommentManagerUtil.deleteDiscussion(
+			WikiPage.class.getName(), page.getResourcePrimKey());
+
 		// Expando
 
 		expandoRowLocalService.deleteRows(page.getPrimaryKey());
-
-		// Message boards
-
-		mbMessageLocalService.deleteDiscussionMessages(
-			WikiPage.class.getName(), page.getResourcePrimKey());
 
 		// Trash
 
@@ -2022,14 +2023,12 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
-		Date now = new Date();
-
 		int oldStatus = page.getStatus();
 
 		page.setStatus(status);
 		page.setStatusByUserId(userId);
 		page.setStatusByUserName(user.getFullName());
-		page.setStatusDate(now);
+		page.setStatusDate(new Date());
 
 		wikiPagePersistence.update(page);
 
@@ -3310,7 +3309,9 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 			page.setRedirectTitle(redirectTitle);
 		}
 
-		page.setExpandoBridgeAttributes(serviceContext);
+		ExpandoBridgeUtil.setExpandoBridgeAttributes(
+			oldPage.getExpandoBridge(), page.getExpandoBridge(),
+			serviceContext);
 
 		wikiPagePersistence.update(page);
 

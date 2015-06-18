@@ -138,6 +138,13 @@ public class MBMessageLocalServiceUtil {
 			priority, allowPingbacks, serviceContext);
 	}
 
+	public static void addMessageAttachment(long userId, long messageId,
+		java.lang.String fileName, java.io.File file, java.lang.String mimeType)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.addMessageAttachment(userId, messageId, fileName, file, mimeType);
+	}
+
 	public static void addMessageResources(
 		com.liferay.portlet.messageboards.model.MBMessage message,
 		boolean addGroupPermissions, boolean addGuestPermissions)
@@ -447,7 +454,7 @@ public class MBMessageLocalServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext) {
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext) {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 

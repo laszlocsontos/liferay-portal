@@ -661,12 +661,6 @@ public class LiferaySeleniumHelper {
 		return matcher.find();
 	}
 
-	public static boolean isElementNotPresent(
-		LiferaySelenium liferaySelenium, String locator) {
-
-		return !liferaySelenium.isElementPresent(locator);
-	}
-
 	public static boolean isElementPresentAfterWait(
 			LiferaySelenium liferaySelenium, String locator)
 		throws Exception {
@@ -1462,6 +1456,29 @@ public class LiferaySeleniumHelper {
 
 	public static void typeScreen(String value) {
 		throw new UnsupportedOperationException();
+	}
+
+	public static void waitForConfirmation(
+			LiferaySelenium liferaySelenium, String pattern)
+		throws Exception {
+
+		int timeout =
+			PropsValues.TIMEOUT_EXPLICIT_WAIT /
+				PropsValues.TIMEOUT_IMPLICIT_WAIT;
+
+		for (int second = 0;; second++) {
+			if (second >= timeout) {
+				assertConfirmation(liferaySelenium, pattern);
+			}
+
+			try {
+				if (isConfirmation(liferaySelenium, pattern)) {
+					break;
+				}
+			}
+			catch (Exception e) {
+			}
+		}
 	}
 
 	public static void waitForElementNotPresent(

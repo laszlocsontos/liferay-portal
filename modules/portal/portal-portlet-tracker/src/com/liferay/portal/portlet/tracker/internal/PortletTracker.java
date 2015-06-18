@@ -53,6 +53,7 @@ import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletBagFactory;
 import com.liferay.portlet.PortletInstanceFactory;
 import com.liferay.registry.util.StringPlus;
+import com.liferay.util.log4j.Log4JUtil;
 
 import java.io.IOException;
 
@@ -60,6 +61,7 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +89,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.http.context.ServletContextHelper;
 import org.osgi.service.http.runtime.HttpServiceRuntime;
@@ -216,8 +219,13 @@ public class PortletTracker
 	}
 
 	@Activate
+	@Modified
 	protected void activate(ComponentContext componentContext) {
 		_componentContext = componentContext;
+
+		if (_serviceTracker != null) {
+			_serviceTracker.close();
+		}
 
 		BundleContext bundleContext = _componentContext.getBundleContext();
 
@@ -925,6 +933,8 @@ public class PortletTracker
 
 		createContext(bundle, bundlePortletApp, serviceRegistrations);
 
+		initLogger(classLoader);
+
 		serviceRegistrations.setBundlePortletApp(bundlePortletApp);
 
 		serviceRegistrations.doConfiguration(classLoader);
@@ -1013,6 +1023,25 @@ public class PortletTracker
 
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
+		Dictionary<String, Object> componentProperties =
+			_componentContext.getProperties();
+
+		for (Enumeration<String> keys = componentProperties.keys();
+				keys.hasMoreElements();) {
+
+			String key = keys.nextElement();
+
+			if (!key.startsWith(_JSP_SERVLET_INIT_PARAM_PREFIX)) {
+				continue;
+			}
+
+			String paramName =
+				_SERVLET_INIT_PARAM_PREFIX +
+					key.substring(_JSP_SERVLET_INIT_PARAM_PREFIX.length());
+
+			properties.put(paramName, componentProperties.get(key));
+		}
+
 		properties.put(
 			HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
 			contextName);
@@ -1096,6 +1125,11 @@ public class PortletTracker
 		return serviceRegistrations;
 	}
 
+	protected void initLogger(ClassLoader classLoader) {
+		Log4JUtil.configureLog4J(
+			classLoader.getResource("META-INF/portal-log4j.xml"));
+	}
+
 	protected void readResourceActions(
 		Configuration configuration, String servletContextName,
 		ClassLoader classLoader) {
@@ -1132,8 +1166,7 @@ public class PortletTracker
 		HttpServiceRuntime httpServiceRuntime, Map<String, Object> properties) {
 
 		List<String> httpServiceEndpoints = StringPlus.asList(
-			properties.get(
-				HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT_ATTRIBUTE));
+			properties.get(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT));
 
 		if (!httpServiceEndpoints.isEmpty()) {
 			_httpServiceEndpoint = httpServiceEndpoints.get(0);
@@ -1203,7 +1236,13 @@ public class PortletTracker
 		}
 	}
 
+	private static final String _JSP_SERVLET_INIT_PARAM_PREFIX =
+		"jsp.servlet.init.param.";
+
 	private static final String _NAMESPACE = "com.liferay.portlet.";
+
+	private static final String _SERVLET_INIT_PARAM_PREFIX =
+		HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX;
 
 	private static final Log _log = LogFactoryUtil.getLog(PortletTracker.class);
 

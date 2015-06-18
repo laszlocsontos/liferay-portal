@@ -14,14 +14,12 @@
 
 package com.liferay.portlet.exportimport.action;
 
-import com.liferay.portal.DuplicateLockException;
 import com.liferay.portal.LayoutPrototypeException;
 import com.liferay.portal.NoSuchGroupException;
-import com.liferay.portal.RemoteExportException;
 import com.liferay.portal.RemoteOptionsException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -29,7 +27,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.AuthException;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.auth.RemoteAuthException;
-import com.liferay.portlet.layoutsadmin.action.EditLayoutsAction;
+import com.liferay.portal.struts.PortletAction;
+import com.liferay.portlet.exportimport.RemoteExportException;
+import com.liferay.portlet.exportimport.staging.StagingUtil;
 import com.liferay.portlet.sites.action.ActionUtil;
 
 import javax.portlet.ActionRequest;
@@ -51,7 +51,7 @@ import org.apache.struts.action.ActionMapping;
  * @author Raymond Augé
  * @author Levente Hudák
  */
-public class PublishLayoutsAction extends EditLayoutsAction {
+public class PublishLayoutsAction extends PortletAction {
 
 	@Override
 	public void processAction(
@@ -59,13 +59,6 @@ public class PublishLayoutsAction extends EditLayoutsAction {
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			ActionResponse actionResponse)
 		throws Exception {
-
-		try {
-			checkPermissions(actionRequest);
-		}
-		catch (PrincipalException pe) {
-			return;
-		}
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 

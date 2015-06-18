@@ -381,7 +381,7 @@ public interface DLFolderLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext);
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<java.lang.Object> getFileEntriesAndFileShortcuts(
@@ -582,12 +582,12 @@ public interface DLFolderLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasFolderLock(long userId, long folderId);
 
-	public com.liferay.portal.model.Lock lockFolder(long userId, long folderId)
-		throws PortalException;
+	public com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
+		long folderId) throws PortalException;
 
-	public com.liferay.portal.model.Lock lockFolder(long userId, long folderId,
-		java.lang.String owner, boolean inheritable, long expirationTime)
-		throws PortalException;
+	public com.liferay.portal.kernel.lock.Lock lockFolder(long userId,
+		long folderId, java.lang.String owner, boolean inheritable,
+		long expirationTime) throws PortalException;
 
 	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
 	public com.liferay.portlet.documentlibrary.model.DLFolder moveFolder(

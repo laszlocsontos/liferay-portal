@@ -14,7 +14,7 @@
 
 package com.liferay.source.formatter;
 
-import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.CharPool;
 
 /**
  * @author Carlos Sierra Andrés
@@ -65,12 +65,24 @@ public class ImportPackage implements Comparable<ImportPackage> {
 	}
 
 	public String getPackageLevel() {
-		int pos = _importString.indexOf(StringPool.PERIOD);
+		int pos = _importString.indexOf(CharPool.SLASH);
 
-		pos = _importString.indexOf(StringPool.PERIOD, pos + 1);
+		if (pos != -1) {
+			pos = _importString.indexOf(CharPool.SLASH, pos + 1);
+
+			if (pos == -1) {
+				return _importString;
+			}
+
+			return _importString.substring(0, pos);
+		}
+
+		pos = _importString.indexOf(CharPool.PERIOD);
+
+		pos = _importString.indexOf(CharPool.PERIOD, pos + 1);
 
 		if (pos == -1) {
-			pos = _importString.indexOf(StringPool.PERIOD);
+			pos = _importString.indexOf(CharPool.PERIOD);
 		}
 
 		return _importString.substring(0, pos);

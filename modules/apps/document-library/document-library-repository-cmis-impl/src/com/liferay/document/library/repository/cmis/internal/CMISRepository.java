@@ -26,6 +26,8 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lock.Lock;
+import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.RepositoryException;
@@ -53,7 +55,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.TransientValue;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.RepositoryEntry;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
@@ -69,8 +70,8 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelCreateDateComparator;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelModifiedDateComparator;
-import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelNameComparator;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelSizeComparator;
+import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelTitleComparator;
 
 import java.io.InputStream;
 
@@ -129,11 +130,13 @@ public class CMISRepository extends BaseCmisRepository {
 	public CMISRepository(
 		CMISRepositoryConfiguration cmisRepositoryConfiguration,
 		CMISRepositoryHandler cmisRepositoryHandler,
-		CMISSearchQueryBuilder cmisSearchQueryBuilder) {
+		CMISSearchQueryBuilder cmisSearchQueryBuilder,
+		LockManager lockManager) {
 
 		_cmisRepositoryConfiguration = cmisRepositoryConfiguration;
 		_cmisRepositoryHandler = cmisRepositoryHandler;
 		_cmisSearchQueryBuilder = cmisSearchQueryBuilder;
+		_lockManager = lockManager;
 	}
 
 	@Override
@@ -2151,8 +2154,8 @@ public class CMISRepository extends BaseCmisRepository {
 		if ((obc != null) &&
 			((obc instanceof RepositoryModelCreateDateComparator) ||
 			 (obc instanceof RepositoryModelModifiedDateComparator) ||
-			 (obc instanceof RepositoryModelNameComparator) ||
-			 (obc instanceof RepositoryModelSizeComparator))) {
+			 (obc instanceof RepositoryModelSizeComparator) ||
+			 (obc instanceof RepositoryModelTitleComparator))) {
 
 			list = ListUtil.sort(list, obc);
 		}
@@ -2174,7 +2177,7 @@ public class CMISRepository extends BaseCmisRepository {
 
 		FileEntry fileEntry = new CMISFileEntry(
 			this, repositoryEntry.getUuid(),
-			repositoryEntry.getRepositoryEntryId(), document);
+			repositoryEntry.getRepositoryEntryId(), document, _lockManager);
 
 		FileVersion fileVersion = null;
 
@@ -2365,6 +2368,7 @@ public class CMISRepository extends BaseCmisRepository {
 	private CMISRepositoryDetector _cmisRepositoryDetector;
 	private final CMISRepositoryHandler _cmisRepositoryHandler;
 	private final CMISSearchQueryBuilder _cmisSearchQueryBuilder;
+	private final LockManager _lockManager;
 	private String _sessionKey;
 
 }

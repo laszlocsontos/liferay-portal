@@ -16,9 +16,10 @@ package com.liferay.portlet.messageboards.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
+
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -340,7 +341,7 @@ public class MBThreadWrapper implements MBThread, ModelWrapper<MBThread> {
 	}
 
 	@Override
-	public com.liferay.portal.model.Lock getLock() {
+	public com.liferay.portal.kernel.lock.Lock getLock() {
 		return _mbThread.getLock();
 	}
 

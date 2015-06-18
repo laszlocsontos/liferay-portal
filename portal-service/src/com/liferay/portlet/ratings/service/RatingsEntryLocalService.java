@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.service.BaseLocalService;
 import com.liferay.portal.service.PersistedModelLocalService;
 
@@ -66,6 +67,11 @@ public interface RatingsEntryLocalService extends BaseLocalService,
 	*/
 	public com.liferay.portlet.ratings.model.RatingsEntry createRatingsEntry(
 		long entryId);
+
+	@com.liferay.portal.kernel.systemevent.SystemEvent(type = SystemEventConstants.TYPE_DELETE)
+	public void deleteEntry(
+		com.liferay.portlet.ratings.model.RatingsEntry entry, long userId,
+		java.lang.String className, long classPK) throws PortalException;
 
 	public void deleteEntry(long userId, java.lang.String className,
 		long classPK) throws PortalException;
@@ -217,7 +223,7 @@ public interface RatingsEntryLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portal.kernel.lar.PortletDataContext portletDataContext);
+		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

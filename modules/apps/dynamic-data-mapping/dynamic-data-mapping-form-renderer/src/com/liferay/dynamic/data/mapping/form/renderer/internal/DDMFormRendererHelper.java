@@ -64,6 +64,12 @@ public class DDMFormRendererHelper {
 		}
 	}
 
+	public void setExpressionEvaluator(
+		ExpressionEvaluator expressionEvaluator) {
+
+		_expressionEvaluator = expressionEvaluator;
+	}
+
 	protected DDMFormFieldRenderingContext
 		createDDMFormFieldRenderingContext() {
 
@@ -212,6 +218,9 @@ public class DDMFormRendererHelper {
 			ddmFormField.getLabel(), ddmFormFieldRenderingContext);
 		setDDMFormFieldRenderingContextName(
 			ddmFormFieldParameterName, ddmFormFieldRenderingContext);
+		setDDMFormFieldRenderingContextVisible(
+			ddmFormField.getVisibilityExpression(),
+			ddmFormFieldRenderingContext);
 
 		return renderDDMFormField(ddmFormField, ddmFormFieldRenderingContext);
 	}
@@ -228,6 +237,9 @@ public class DDMFormRendererHelper {
 			ddmFormField.getLabel(), ddmFormFieldRenderingContext);
 		setDDMFormFieldRenderingContextValue(
 			ddmFormFieldValue.getValue(), ddmFormFieldRenderingContext);
+		setDDMFormFieldRenderingContextVisible(
+			ddmFormField.getVisibilityExpression(),
+			ddmFormFieldRenderingContext);
 
 		return renderDDMFormField(ddmFormField, ddmFormFieldRenderingContext);
 	}
@@ -329,10 +341,25 @@ public class DDMFormRendererHelper {
 			value.getString(ddmFormFieldRenderingContext.getLocale()));
 	}
 
-	protected String wrapDDMFormFieldHTML(String ddmFormFieldHTML) {
-		StringBundler sb = new StringBundler(3);
+	protected void setDDMFormFieldRenderingContextVisible(
+		String visibilityExpression,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
-		sb.append("<div class=\"lfr-ddm-form-field-container\">");
+		boolean visible = true;
+
+		if (Validator.isNotNull(visibilityExpression)) {
+			visible = _expressionEvaluator.evaluateBooleanExpression(
+				visibilityExpression);
+		}
+
+		ddmFormFieldRenderingContext.setVisible(visible);
+	}
+
+	protected String wrapDDMFormFieldHTML(String ddmFormFieldHTML) {
+		StringBundler sb = new StringBundler(4);
+
+		sb.append("<div class=\"lfr-ddm-form-field-container");
+		sb.append("\">");
 		sb.append(ddmFormFieldHTML);
 		sb.append("</div>");
 
@@ -343,5 +370,6 @@ public class DDMFormRendererHelper {
 	private final Map<String, DDMFormField> _ddmFormFieldsMap;
 	private final DDMFormRenderingContext _ddmFormRenderingContext;
 	private final DDMFormValues _ddmFormValues;
+	private ExpressionEvaluator _expressionEvaluator;
 
 }

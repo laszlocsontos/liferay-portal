@@ -32,11 +32,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
-import com.liferay.portal.kernel.lar.ManifestSummary;
-import com.liferay.portal.kernel.lar.PortletDataContext;
-import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -47,8 +42,6 @@ import com.liferay.portal.service.persistence.ClassNamePersistence;
 import com.liferay.portal.service.persistence.GroupFinder;
 import com.liferay.portal.service.persistence.GroupPersistence;
 import com.liferay.portal.service.persistence.ImagePersistence;
-import com.liferay.portal.service.persistence.LockFinder;
-import com.liferay.portal.service.persistence.LockPersistence;
 import com.liferay.portal.service.persistence.RepositoryPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
@@ -78,6 +71,11 @@ import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureFi
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructurePersistence;
 import com.liferay.portlet.expando.service.persistence.ExpandoRowPersistence;
 import com.liferay.portlet.expando.service.persistence.ExpandoTablePersistence;
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.lar.ManifestSummary;
+import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portlet.exportimport.lar.StagedModelType;
 import com.liferay.portlet.trash.service.persistence.TrashEntryPersistence;
 
 import java.io.Serializable;
@@ -737,61 +735,6 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	 */
 	public void setImagePersistence(ImagePersistence imagePersistence) {
 		this.imagePersistence = imagePersistence;
-	}
-
-	/**
-	 * Returns the lock local service.
-	 *
-	 * @return the lock local service
-	 */
-	public com.liferay.portal.service.LockLocalService getLockLocalService() {
-		return lockLocalService;
-	}
-
-	/**
-	 * Sets the lock local service.
-	 *
-	 * @param lockLocalService the lock local service
-	 */
-	public void setLockLocalService(
-		com.liferay.portal.service.LockLocalService lockLocalService) {
-		this.lockLocalService = lockLocalService;
-	}
-
-	/**
-	 * Returns the lock persistence.
-	 *
-	 * @return the lock persistence
-	 */
-	public LockPersistence getLockPersistence() {
-		return lockPersistence;
-	}
-
-	/**
-	 * Sets the lock persistence.
-	 *
-	 * @param lockPersistence the lock persistence
-	 */
-	public void setLockPersistence(LockPersistence lockPersistence) {
-		this.lockPersistence = lockPersistence;
-	}
-
-	/**
-	 * Returns the lock finder.
-	 *
-	 * @return the lock finder
-	 */
-	public LockFinder getLockFinder() {
-		return lockFinder;
-	}
-
-	/**
-	 * Sets the lock finder.
-	 *
-	 * @param lockFinder the lock finder
-	 */
-	public void setLockFinder(LockFinder lockFinder) {
-		this.lockFinder = lockFinder;
 	}
 
 	/**
@@ -1865,12 +1808,6 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	protected com.liferay.portal.service.ImageService imageService;
 	@BeanReference(type = ImagePersistence.class)
 	protected ImagePersistence imagePersistence;
-	@BeanReference(type = com.liferay.portal.service.LockLocalService.class)
-	protected com.liferay.portal.service.LockLocalService lockLocalService;
-	@BeanReference(type = LockPersistence.class)
-	protected LockPersistence lockPersistence;
-	@BeanReference(type = LockFinder.class)
-	protected LockFinder lockFinder;
 	@BeanReference(type = com.liferay.portal.service.RepositoryLocalService.class)
 	protected com.liferay.portal.service.RepositoryLocalService repositoryLocalService;
 	@BeanReference(type = com.liferay.portal.service.RepositoryService.class)

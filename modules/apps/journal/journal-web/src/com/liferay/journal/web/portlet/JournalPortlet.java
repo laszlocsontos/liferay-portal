@@ -14,8 +14,10 @@
 
 package com.liferay.journal.web.portlet;
 
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.journal.web.asset.JournalArticleAssetRenderer;
 import com.liferay.journal.web.constants.JournalPortletKeys;
+import com.liferay.journal.web.constants.JournalWebKeys;
 import com.liferay.journal.web.portlet.action.ActionUtil;
 import com.liferay.journal.web.upgrade.JournalWebUpgrade;
 import com.liferay.journal.web.util.JournalRSSUtil;
@@ -159,7 +161,6 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.display-name=Web Content",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.action.package.prefix=com.liferay.journal.web.portlet.action",
-		"javax.portlet.init-param.config-template=/configuration.jsp",
 		"javax.portlet.init-param.single-page-application-cacheable=false",
 		"javax.portlet.init-param.template-path=/",
 		"javax.portlet.init-param.view-template=/view.jsp",
@@ -370,6 +371,21 @@ public class JournalPortlet extends MVCPortlet {
 		updateArticle(actionRequest, actionResponse);
 	}
 
+	@Override
+	public void render(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+		String path = getPath(renderRequest);
+
+		if (Validator.equals(path, "/edit_article.jsp")) {
+			renderRequest.setAttribute(
+				JournalWebKeys.ITEM_SELECTOR, _itemSelector);
+		}
+
+		super.render(renderRequest, renderResponse);
+	}
+
 	public void restoreTrashEntries(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
@@ -464,6 +480,11 @@ public class JournalPortlet extends MVCPortlet {
 		else {
 			super.serveResource(resourceRequest, resourceResponse);
 		}
+	}
+
+	@Reference
+	public void setItemSelector(ItemSelector itemSelector) {
+		_itemSelector = itemSelector;
 	}
 
 	public void subscribeFolder(
@@ -1326,6 +1347,7 @@ public class JournalPortlet extends MVCPortlet {
 	private static final Log _log = LogFactoryUtil.getLog(JournalPortlet.class);
 
 	private DDMStructureLocalService _ddmStructureLocalService;
+	private ItemSelector _itemSelector;
 	private JournalArticleService _journalArticleService;
 	private JournalContentSearchLocalService _journalContentSearchLocalService;
 	private JournalFeedService _journalFeedService;

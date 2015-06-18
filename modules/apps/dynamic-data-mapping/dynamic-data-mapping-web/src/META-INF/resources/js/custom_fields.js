@@ -19,7 +19,6 @@ AUI.add(
 		var isObject = Lang.isObject;
 		var isUndefined = Lang.isUndefined;
 		var isValue = Lang.isValue;
-		var trim = Lang.trim;
 
 		var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
@@ -90,7 +89,7 @@ AUI.add(
 
 					if (rule.length == 2) {
 						var key = camelize(rule[0]);
-						var value = trim(rule[1]);
+						var value = rule[1].trim();
 
 						node.setStyle(key, value);
 					}
@@ -267,11 +266,11 @@ AUI.add(
 						LinkToPageCellEditor.superclass.renderUI.apply(instance, arguments);
 
 						A.io.request(
-							themeDisplay.getPathMain() + '/layouts_admin/get_layouts',
+							themeDisplay.getPathMain() + '/portal/get_layouts',
 							{
 								after: {
 									success: function() {
-										var	response = A.JSON.parse(this.get('responseData'));
+										var	response = JSON.parse(this.get('responseData'));
 
 										if (response && response.layouts) {
 											instance._createOptionElements(response.layouts, options, STR_BLANK);
@@ -532,16 +531,9 @@ AUI.add(
 			var defaultLocale = translationManager.get('defaultLocale');
 			var editingLocale = translationManager.get('editingLocale');
 
-			UNLOCALIZABLE_FIELD_ATTRS.forEach(
-				function(item, index) {
-					if (defaultLocale === editingLocale) {
-						AArray.removeItem(val, item);
-					}
-					else {
-						val.push(item);
-					}
-				}
-			);
+			if (defaultLocale !== editingLocale) {
+				val = UNLOCALIZABLE_FIELD_ATTRS.concat(val);
+			}
 
 			return AArray.dedupe(val);
 		};

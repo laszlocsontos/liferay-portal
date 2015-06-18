@@ -131,6 +131,8 @@ public class DDMStructureVersionPersistenceTest {
 
 		newDDMStructureVersion.setVersion(RandomTestUtil.randomString());
 
+		newDDMStructureVersion.setParentStructureId(RandomTestUtil.nextLong());
+
 		newDDMStructureVersion.setName(RandomTestUtil.randomString());
 
 		newDDMStructureVersion.setDescription(RandomTestUtil.randomString());
@@ -140,6 +142,14 @@ public class DDMStructureVersionPersistenceTest {
 		newDDMStructureVersion.setStorageType(RandomTestUtil.randomString());
 
 		newDDMStructureVersion.setType(RandomTestUtil.nextInt());
+
+		newDDMStructureVersion.setStatus(RandomTestUtil.nextInt());
+
+		newDDMStructureVersion.setStatusByUserId(RandomTestUtil.nextLong());
+
+		newDDMStructureVersion.setStatusByUserName(RandomTestUtil.randomString());
+
+		newDDMStructureVersion.setStatusDate(RandomTestUtil.nextDate());
 
 		_ddmStructureVersions.add(_persistence.update(newDDMStructureVersion));
 
@@ -162,6 +172,8 @@ public class DDMStructureVersionPersistenceTest {
 			newDDMStructureVersion.getStructureId());
 		Assert.assertEquals(existingDDMStructureVersion.getVersion(),
 			newDDMStructureVersion.getVersion());
+		Assert.assertEquals(existingDDMStructureVersion.getParentStructureId(),
+			newDDMStructureVersion.getParentStructureId());
 		Assert.assertEquals(existingDDMStructureVersion.getName(),
 			newDDMStructureVersion.getName());
 		Assert.assertEquals(existingDDMStructureVersion.getDescription(),
@@ -172,6 +184,15 @@ public class DDMStructureVersionPersistenceTest {
 			newDDMStructureVersion.getStorageType());
 		Assert.assertEquals(existingDDMStructureVersion.getType(),
 			newDDMStructureVersion.getType());
+		Assert.assertEquals(existingDDMStructureVersion.getStatus(),
+			newDDMStructureVersion.getStatus());
+		Assert.assertEquals(existingDDMStructureVersion.getStatusByUserId(),
+			newDDMStructureVersion.getStatusByUserId());
+		Assert.assertEquals(existingDDMStructureVersion.getStatusByUserName(),
+			newDDMStructureVersion.getStatusByUserName());
+		Assert.assertEquals(Time.getShortTimestamp(
+				existingDDMStructureVersion.getStatusDate()),
+			Time.getShortTimestamp(newDDMStructureVersion.getStatusDate()));
 	}
 
 	@Test
@@ -188,6 +209,14 @@ public class DDMStructureVersionPersistenceTest {
 		_persistence.countByS_V(0L, StringPool.NULL);
 
 		_persistence.countByS_V(0L, (String)null);
+	}
+
+	@Test
+	public void testCountByS_S() throws Exception {
+		_persistence.countByS_S(RandomTestUtil.nextLong(),
+			RandomTestUtil.nextInt());
+
+		_persistence.countByS_S(0L, 0);
 	}
 
 	@Test
@@ -216,8 +245,10 @@ public class DDMStructureVersionPersistenceTest {
 		return OrderByComparatorFactoryUtil.create("DDMStructureVersion",
 			"structureVersionId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
-			"structureId", true, "version", true, "name", true, "description",
-			true, "definition", true, "storageType", true, "type", true);
+			"structureId", true, "version", true, "parentStructureId", true,
+			"name", true, "description", true, "definition", true,
+			"storageType", true, "type", true, "status", true,
+			"statusByUserId", true, "statusByUserName", true, "statusDate", true);
 	}
 
 	@Test
@@ -453,6 +484,8 @@ public class DDMStructureVersionPersistenceTest {
 
 		ddmStructureVersion.setVersion(RandomTestUtil.randomString());
 
+		ddmStructureVersion.setParentStructureId(RandomTestUtil.nextLong());
+
 		ddmStructureVersion.setName(RandomTestUtil.randomString());
 
 		ddmStructureVersion.setDescription(RandomTestUtil.randomString());
@@ -462,6 +495,14 @@ public class DDMStructureVersionPersistenceTest {
 		ddmStructureVersion.setStorageType(RandomTestUtil.randomString());
 
 		ddmStructureVersion.setType(RandomTestUtil.nextInt());
+
+		ddmStructureVersion.setStatus(RandomTestUtil.nextInt());
+
+		ddmStructureVersion.setStatusByUserId(RandomTestUtil.nextLong());
+
+		ddmStructureVersion.setStatusByUserName(RandomTestUtil.randomString());
+
+		ddmStructureVersion.setStatusDate(RandomTestUtil.nextDate());
 
 		_ddmStructureVersions.add(_persistence.update(ddmStructureVersion));
 

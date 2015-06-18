@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.Repository;
@@ -43,7 +44,6 @@ import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.UserConstants;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
@@ -70,7 +70,7 @@ import com.liferay.portlet.documentlibrary.service.base.DLAppHelperLocalServiceB
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
 import com.liferay.portlet.documentlibrary.social.DLActivityKeys;
 import com.liferay.portlet.documentlibrary.util.DLAppHelperThreadLocal;
-import com.liferay.portlet.documentlibrary.util.comparator.FileVersionVersionComparator;
+import com.liferay.portlet.documentlibrary.util.comparator.DLFileVersionVersionComparator;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.model.TrashVersion;
@@ -1433,7 +1433,7 @@ public class DLAppHelperLocalServiceImpl
 				fileEntry.getFileEntryId(), WorkflowConstants.STATUS_IN_TRASH);
 
 		dlFileVersions = ListUtil.sort(
-			dlFileVersions, new FileVersionVersionComparator());
+			dlFileVersions, new DLFileVersionVersionComparator());
 
 		FileVersion fileVersion = new LiferayFileVersion(dlFileVersions.get(0));
 
@@ -1526,7 +1526,7 @@ public class DLAppHelperLocalServiceImpl
 				fileEntry.getFileEntryId(), WorkflowConstants.STATUS_ANY);
 
 		dlFileVersions = ListUtil.sort(
-			dlFileVersions, new FileVersionVersionComparator());
+			dlFileVersions, new DLFileVersionVersionComparator());
 
 		List<ObjectValuePair<Long, Integer>> dlFileVersionStatusOVPs =
 			new ArrayList<>();

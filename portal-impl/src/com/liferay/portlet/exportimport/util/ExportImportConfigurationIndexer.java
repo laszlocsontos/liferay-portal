@@ -16,7 +16,8 @@ package com.liferay.portlet.exportimport.util;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
@@ -24,13 +25,15 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.ExportImportConfiguration;
-import com.liferay.portal.service.ExportImportConfigurationLocalServiceUtil;
+import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
+import com.liferay.portlet.exportimport.service.ExportImportConfigurationLocalServiceUtil;
 
 import java.io.Serializable;
 
@@ -62,29 +65,30 @@ public class ExportImportConfigurationIndexer extends BaseIndexer {
 	}
 
 	@Override
-	public void postProcessContextQuery(
-			BooleanQuery contextQuery, SearchContext searchContext)
+	public void postProcessContextBooleanFilter(
+			BooleanFilter contextBooleanFilter, SearchContext searchContext)
 		throws Exception {
 
-		addStatus(contextQuery, searchContext);
+		addStatus(contextBooleanFilter, searchContext);
 
-		contextQuery.addRequiredTerm(
+		contextBooleanFilter.addRequiredTerm(
 			Field.COMPANY_ID, searchContext.getCompanyId());
-		contextQuery.addRequiredTerm(
+		contextBooleanFilter.addRequiredTerm(
 			Field.GROUP_ID,
 			GetterUtil.getLong(searchContext.getAttribute(Field.GROUP_ID)));
 
 		Serializable type = searchContext.getAttribute(Field.TYPE);
 
 		if (type != null) {
-			contextQuery.addRequiredTerm(
+			contextBooleanFilter.addRequiredTerm(
 				Field.TYPE, GetterUtil.getInteger(type));
 		}
 	}
 
 	@Override
 	public void postProcessSearchQuery(
-			BooleanQuery searchQuery, SearchContext searchContext)
+			BooleanQuery searchQuery, BooleanFilter fullQueryBooleanFilter,
+			SearchContext searchContext)
 		throws Exception {
 
 		addSearchTerm(searchQuery, searchContext, Field.DESCRIPTION, true);
@@ -292,15 +296,25 @@ public class ExportImportConfigurationIndexer extends BaseIndexer {
 			new ActionableDynamicQuery.PerformActionMethod() {
 
 				@Override
-				public void performAction(Object object)
-					throws PortalException {
-
+				public void performAction(Object object) {
 					ExportImportConfiguration exportImportConfiguration =
 						(ExportImportConfiguration)object;
 
-					Document document = getDocument(exportImportConfiguration);
+					try {
+						Document document = getDocument(
+							exportImportConfiguration);
 
-					actionableDynamicQuery.addDocument(document);
+						actionableDynamicQuery.addDocument(document);
+					}
+					catch (PortalException pe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to index export import configuration " +
+									exportImportConfiguration.
+										getExportImportConfigurationId(),
+								pe);
+						}
+					}
 				}
 
 			});
@@ -312,5 +326,8 @@ public class ExportImportConfigurationIndexer extends BaseIndexer {
 	private static final String _PREFIX_PARAMETER = "parameter_";
 
 	private static final String _PREFIX_SETTING = "setting_";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ExportImportConfigurationIndexer.class);
 
 }

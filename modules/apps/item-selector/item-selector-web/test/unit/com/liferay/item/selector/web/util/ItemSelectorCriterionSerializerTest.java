@@ -14,12 +14,16 @@
 
 package com.liferay.item.selector.web.util;
 
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.web.FlickrItemSelectorCriterion;
+import com.liferay.item.selector.web.TestItemSelectorReturnType;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.junit.Assert;
@@ -46,16 +50,28 @@ public class ItemSelectorCriterionSerializerTest {
 
 	@Test
 	public void testGetProperties() {
+		Set<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
+			new HashSet<>();
+
+		desiredItemSelectorReturnTypes.add(TestItemSelectorReturnType.URL);
+
+		_flickrItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			desiredItemSelectorReturnTypes);
+
 		Map<String, String[]> properties =
 			_itemSelectorCriterionSerializer.getProperties();
 
 		String json = properties.get(
 			_PREFIX + ItemSelectorCriterionSerializer.JSON)[0];
 
+		json = _assert(
+			"\"desiredItemSelectorReturnTypes\":[\"" +
+				TestItemSelectorReturnType.URL.getName() + "\"]",
+			json);
 		json = _assert("\"tags\":[\"me\",\"photo\",\"picture\"]", json);
 		json = _assert("\"user\":\"anonymous\"", json);
 
-		Assert.assertEquals("{,}", json);
+		Assert.assertEquals("{,,}", json);
 	}
 
 	@Test
@@ -65,8 +81,10 @@ public class ItemSelectorCriterionSerializerTest {
 		properties.put(
 			_PREFIX + ItemSelectorCriterionSerializer.JSON,
 			new String[] {
-				"{\"tags\":[\"tag1\",\"tag2\",\"tag3\"],\"user\":" +
-					"\"Joe Bloggs\"}"
+				"{\"desiredItemSelectorReturnTypes\":[\"" +
+					TestItemSelectorReturnType.URL.getName() + "\"],\"" +
+						"tags\":[\"tag1\",\"tag2\",\"tag3\"],\"user\":\"" +
+							"Joe Bloggs\"}"
 			});
 
 		_itemSelectorCriterionSerializer.setProperties(properties);
@@ -76,6 +94,16 @@ public class ItemSelectorCriterionSerializerTest {
 		Assert.assertArrayEquals(
 			new String[] {"tag1", "tag2", "tag3"},
 			_flickrItemSelectorCriterion.getTags());
+
+		Set<TestItemSelectorReturnType>
+			expectedDesiredItemSelectorReturnTypes = new HashSet<>();
+
+		expectedDesiredItemSelectorReturnTypes.add(
+			TestItemSelectorReturnType.URL);
+
+		Assert.assertEquals(
+			expectedDesiredItemSelectorReturnTypes,
+			_flickrItemSelectorCriterion.getDesiredItemSelectorReturnTypes());
 	}
 
 	private String _assert(String expected, String json) {

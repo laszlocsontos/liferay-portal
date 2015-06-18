@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.search;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
@@ -166,6 +167,15 @@ public class DocumentImpl implements Document {
 		String name, InputStream is, String fileExt, int maxStringLength) {
 
 		addText(name, FileUtil.extractText(is, fileExt, maxStringLength));
+	}
+
+	@Override
+	public void addGeoLocation(double latitude, double longitude) {
+		Field field = new Field(Field.GEO_LOCATION);
+
+		field.setGeoLocationPoint(new GeoLocationPoint(latitude, longitude));
+
+		add(field);
 	}
 
 	@Override
@@ -456,24 +466,6 @@ public class DocumentImpl implements Document {
 		Field field = createField(name, values);
 
 		field.setTokenized(true);
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	@Override
-	public void addModifiedDate() {
-		addModifiedDate(new Date());
-	}
-
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	@Deprecated
-	@Override
-	public void addModifiedDate(Date modifiedDate) {
-		addDate(Field.MODIFIED, modifiedDate);
 	}
 
 	@Override
@@ -967,13 +959,7 @@ public class DocumentImpl implements Document {
 			value = StringUtil.toLowerCase(value);
 		}
 
-		Field field = createField(name, value);
-
-		for (String fieldName : Field.UNSCORED_FIELD_NAMES) {
-			if (StringUtil.equalsIgnoreCase(name, fieldName)) {
-				field.setBoost(0);
-			}
-		}
+		createField(name, value);
 	}
 
 	protected void createNumberField(

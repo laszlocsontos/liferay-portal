@@ -22,7 +22,10 @@ import com.liferay.portal.model.User;
 
 import java.util.Locale;
 
+import javax.servlet.ServletContext;
+
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Sergio González
@@ -55,6 +58,15 @@ public class SiteMapsFormNavigatorEntry extends BaseSiteFormNavigatorEntry {
 		}
 
 		return true;
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.site.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
