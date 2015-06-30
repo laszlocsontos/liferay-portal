@@ -149,9 +149,17 @@ public class UserDisplayTag extends TagSupport {
 		_userName = userName;
 	}
 
+	public void setView(String view) {
+		_view = view;
+	}
+
 	protected String getEndPage() {
 		if (Validator.isNull(_endPage)) {
-			return _END_PAGE;
+			if (Validator.isNull(_view)) {
+				return "/html/taglib/ui/user_display/end.jsp";
+			}
+
+			return "/html/taglib/ui/user_display/" + _view + "/end.jsp";
 		}
 		else {
 			return _endPage;
@@ -160,18 +168,16 @@ public class UserDisplayTag extends TagSupport {
 
 	protected String getStartPage() {
 		if (Validator.isNull(_startPage)) {
-			return _START_PAGE;
+			if (Validator.isNull(_view)) {
+				return "/html/taglib/ui/user_display/start.jsp";
+			}
+
+			return "/html/taglib/ui/user_display/" + _view + "/start.jsp";
 		}
 		else {
 			return _startPage;
 		}
 	}
-
-	private static final String _END_PAGE =
-		"/html/taglib/ui/user_display/end.jsp";
-
-	private static final String _START_PAGE =
-		"/html/taglib/ui/user_display/start.jsp";
 
 	private boolean _author;
 	private int _displayStyle = 1;
@@ -183,5 +189,6 @@ public class UserDisplayTag extends TagSupport {
 	private String _url;
 	private long _userId;
 	private String _userName;
+	private String _view;
 
 }
