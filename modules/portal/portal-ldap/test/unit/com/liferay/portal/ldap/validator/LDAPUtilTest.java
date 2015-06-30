@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.ldap;
 
-import com.liferay.portal.ldap.validator.LDAPFilterValidatorImpl;
 import com.liferay.portal.security.ldap.LDAPFilterValidator;
 
 import org.junit.Assert;
