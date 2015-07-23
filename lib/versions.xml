@@ -1904,7 +1904,7 @@
 					</license>
 				</licenses>
 				<comments>
-					This includes a public patch from HHH-6286.
+					This includes a public patch from HHH-6286 and HHH-5927.
 				</comments>
 			</library>
 			<library>
