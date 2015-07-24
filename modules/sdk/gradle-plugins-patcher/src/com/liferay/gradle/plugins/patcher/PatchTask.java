@@ -16,9 +16,11 @@ package com.liferay.gradle.plugins.patcher;
 
 import com.liferay.gradle.util.FileUtil;
 import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.util.copy.ReplaceLeadingPathAction;
 
 import groovy.lang.Closure;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import java.nio.file.Files;
@@ -48,9 +50,7 @@ import org.gradle.api.artifacts.ResolvedModuleVersion;
 import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.file.FileCopyDetails;
 import org.gradle.api.file.FileTree;
-import org.gradle.api.file.RelativePath;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
@@ -147,7 +147,7 @@ public class PatchTask extends DefaultTask {
 	}
 
 	public File getOriginalLibSrcFile() throws Exception {
-		return FileUtil.get(_project, getOriginalLibSrcUrl(), null);
+		return FileUtil.get(_project, getOriginalLibSrcUrl());
 	}
 
 	public Map<String, File> getPatchedSrcDirMappings() {
@@ -224,45 +224,17 @@ public class PatchTask extends DefaultTask {
 				final String originalLibSrcDirName = getOriginalLibSrcDirName();
 
 				if (!originalLibSrcDirName.equals(".")) {
+					Map<Object, Object> leadingPathReplacementsMap =
+						new HashMap<>();
+
+					leadingPathReplacementsMap.put(originalLibSrcDirName, "");
+
 					copySpec.eachFile(
-						new Action<FileCopyDetails>() {
-
-							@Override
-							public void execute(
-								FileCopyDetails fileCopyDetails) {
-
-								RelativePath relativePath =
-									fileCopyDetails.getRelativePath();
-
-								String relativePathString =
-									relativePath.getPathString();
-
-								if (!relativePathString.startsWith(
-										originalLibSrcDirName + "/")) {
-
-									fileCopyDetails.exclude();
-
-									return;
-								}
-
-								relativePathString =
-									relativePathString.substring(
-										originalLibSrcDirName.length() + 1);
-
-								fileCopyDetails.setRelativePath(
-									RelativePath.parse(
-										true, relativePathString));
-							}
-
-						});
+						new ReplaceLeadingPathAction(
+							leadingPathReplacementsMap));
 				}
 
-				Map<String, Object> args = new HashMap<>();
-
-				args.put("eol", FixCrLfFilter.CrLf.newInstance("lf"));
-
-				copySpec.filter(args, FixCrLfFilter.class);
-
+				copySpec.filter(FixCrLfFilter.class);
 				copySpec.from(_project.zipTree(getOriginalLibSrcFile()));
 				copySpec.include(getFileNames());
 				copySpec.into(temporaryDir);
@@ -274,6 +246,9 @@ public class PatchTask extends DefaultTask {
 		_project.copy(closure);
 
 		for (final File patchFile : getPatchFiles()) {
+			final ByteArrayOutputStream byteArrayOutputStream =
+				new ByteArrayOutputStream();
+
 			_project.exec(
 				new Action<ExecSpec>() {
 
@@ -282,13 +257,18 @@ public class PatchTask extends DefaultTask {
 						execSpec.setExecutable("patch");
 						execSpec.setWorkingDir(temporaryDir);
 
+						execSpec.args("--binary");
 						execSpec.args(
 							"--input=" +
 								FileUtil.relativize(patchFile, temporaryDir));
 						execSpec.args("--strip=1");
+
+						execSpec.setStandardOutput(byteArrayOutputStream);
 					}
 
 				});
+
+			System.out.println(byteArrayOutputStream.toString());
 		}
 
 		FileTree fileTree = _project.fileTree(temporaryDir);
@@ -337,7 +317,7 @@ public class PatchTask extends DefaultTask {
 	public void setFileNames(Iterable<Object> fileNames) {
 		_fileNames.clear();
 
-		GUtil.addToCollection(_fileNames, fileNames);
+		fileNames(fileNames);
 	}
 
 	public void setOriginalLibConfigurationName(
@@ -369,7 +349,7 @@ public class PatchTask extends DefaultTask {
 	public void setPatchFiles(Iterable<Object> patchFiles) {
 		_patchFiles.clear();
 
-		GUtil.addToCollection(_patchFiles, patchFiles);
+		patchFiles(patchFiles);
 	}
 
 	protected Dependency getOriginalLibDependency() {

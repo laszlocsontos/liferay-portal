@@ -14,14 +14,6 @@
 				imageTPL: React.PropTypes.string
 			},
 
-			componentWillUnmount: function() {
-				var instance = this;
-
-				if (instance._itemSelectorDialog) {
-					instance._itemSelectorDialog.destroy();
-				}
-			},
-
 			getDefaultProps: function() {
 				return {
 					imageTPL: new CKEDITOR.template('<img src="{src}" />')
@@ -50,6 +42,19 @@
 				);
 			},
 
+			_destroyItemSelectorDialog: function() {
+				var instance = this;
+
+				if (instance._itemSelectorDialog) {
+					setTimeout(
+						function() {
+							instance._itemSelectorDialog.destroy();
+						},
+						0
+					);
+				}
+			},
+
 			_handleClick: function() {
 				var instance = this;
 
@@ -66,10 +71,10 @@
 						function(A) {
 							var itemSelectorDialog = new A.LiferayItemSelectorDialog(
 								{
-									eventName: eventName,
-									on: {
+									after: {
 										selectedItemChange: A.bind('_onSelectedItemChange', instance)
 									},
+									eventName: eventName,
 									url: editor.config.filebrowserImageBrowseUrl
 								}
 							);
@@ -95,7 +100,7 @@
 					Util.getWindow(eventName).onceAfter(
 						'visibleChange',
 						function() {
-							var image = CKEDITOR.dom.element.createFromHtml(
+							var el = CKEDITOR.dom.element.createFromHtml(
 								instance.props.imageTPL.output(
 									{
 										src: selectedItem.value
@@ -103,10 +108,12 @@
 								)
 							);
 
-							editor.insertElement(image);
+							editor.insertElement(el);
 						}
 					);
 				}
+
+				instance._destroyItemSelectorDialog();
 			}
 		}
 	);

@@ -35,6 +35,7 @@ import java.util.TreeSet;
 
 import org.apache.tools.ant.DirectoryScanner;
 
+import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
@@ -121,6 +122,10 @@ public class PoshiRunnerContext {
 	}
 
 	public static int getFunctionLocatorCount(String className) {
+		if (_functionLocatorCounts.get(className) == null) {
+			return 0;
+		}
+
 		return _functionLocatorCounts.get(className);
 	}
 
@@ -170,6 +175,10 @@ public class PoshiRunnerContext {
 
 	public static String getTestCaseName() {
 		return _testClassName;
+	}
+
+	public static List<String> getTestCaseRequiredPropertyNames() {
+		return _testCaseRequiredPropertyNames;
 	}
 
 	public static Element getTestCaseRootElement(String className) {
@@ -655,6 +664,28 @@ public class PoshiRunnerContext {
 				sb.append(commandPropertyElement.attributeValue("value"));
 				sb.append("\n");
 			}
+
+			List<Attribute> commandAttributes = commandElement.attributes();
+
+			for (Attribute commandAttribute : commandAttributes) {
+				String commandAttributeName = StringUtil.replace(
+					commandAttribute.getName(), "-", ".");
+
+				if (commandAttributeName.equals("line.number") ||
+					commandAttributeName.equals("name")) {
+
+					continue;
+				}
+
+				sb.append(className);
+				sb.append("TestCase.test");
+				sb.append(commandName);
+				sb.append(".");
+				sb.append(commandAttributeName);
+				sb.append("=");
+				sb.append(commandAttribute.getValue());
+				sb.append("\n");
+			}
 		}
 
 		FileUtil.write("test.generated.properties", sb.toString());
@@ -684,6 +715,8 @@ public class PoshiRunnerContext {
 	private static final Map<String, Set<String>> _testCaseClassCommandNames =
 		new TreeMap<>();
 	private static final List<String> _testCaseClassNames = new ArrayList<>();
+	private static final List<String> _testCaseRequiredPropertyNames =
+		new ArrayList<>();
 	private static String _testClassCommandName;
 	private static String _testClassName;
 
@@ -706,6 +739,14 @@ public class PoshiRunnerContext {
 			_testCaseAvailablePropertyNames.addAll(
 				Arrays.asList(
 					StringUtil.split(testCaseAvailablePropertyNames)));
+		}
+
+		String testCaseRequiredPropertyNames =
+			PropsValues.TEST_CASE_REQUIRED_PROPERTY_NAMES;
+
+		if (Validator.isNotNull(testCaseRequiredPropertyNames)) {
+			_testCaseRequiredPropertyNames.addAll(
+				Arrays.asList(StringUtil.split(testCaseRequiredPropertyNames)));
 		}
 	}
 
