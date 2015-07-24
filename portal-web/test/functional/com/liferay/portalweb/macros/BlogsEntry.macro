@@ -146,7 +146,7 @@
 	</command>
 
 	<command name="addContent">
-		<execute function="Type#typeCKEditor" locator1="AlloyEditor#CONTENT_FIELD" value1="${entryContent}" />
+		<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#CONTENT_FIELD" value1="${entryContent}" />
 	</command>
 
 	<command name="addCP">
@@ -195,7 +195,7 @@
 	<command name="addCustomAbstract">
 		<execute function="Click" locator1="BlogsEditEntry#SETTINGS_TAB_CUSTOM_ABSTRACT_RADIO" />
 
-		<execute function="Type#typeCKEditor" locator1="BlogsEditEntry#SETTINGS_TAB_CUSTOM_ABSTRACT_FIELD" value1="${entryAbstractDescription}" />
+		<execute function="Type#typeAlloyEditor" locator1="BlogsEditEntry#SETTINGS_TAB_CUSTOM_ABSTRACT_FIELD" value1="${entryAbstractDescription}" />
 	</command>
 
 	<command name="addDefaultAbstract">
@@ -446,10 +446,22 @@
 		</if>
 
 		<execute function="SelectFrame" locator1="PGAssetpublisherAddnewblogsentry#BLOGS_ENTRY_IFRAME" />
-		<execute function="Type" locator1="PGAssetpublisherAddnewblogsentry#TITLE_FIELD" value1="${entryTitle}" />
-		<execute function="Type" locator1="PGAssetpublisherAddnewblogsentry#CONTENT_FIELD" value1="${entryContent}" />
-		<execute function="AssertClick" locator1="PGAssetpublisherAddnewblogsentry#PUBLISH_BUTTON" value1="Publish" />
+
+		<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#TITLE_FIELD" value1="${entryTitle}" />
+
+		<if>
+			<isset var="entrySubtitle" />
+			<then>
+				<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#SUBTITLE_FIELD" value1="${entrySubtitle}" />
+			</then>
+		</if>
+
+		<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#CONTENT_FIELD" value1="${entryContent}" />
+
+		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
+
 		<execute function="Pause" locator1="5000" />
+
 		<execute function="SelectFrame" value1="relative=top" />
 
 		<var name="key_assetTitle" value="${entryTitle}" />
@@ -533,7 +545,7 @@
 	</command>
 
 	<command name="addSubtitle">
-		<execute function="Type#typeCKEditor" locator1="AlloyEditor#SUBTITLE_FIELD" value1="${entrySubtitle}" />
+		<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#SUBTITLE_FIELD" value1="${entrySubtitle}" />
 	</command>
 
 	<command name="addTag">
@@ -618,7 +630,7 @@
 	</command>
 
 	<command name="addTitle">
-		<execute function="Type#typeCKEditor" locator1="AlloyEditor#TITLE_FIELD" value1="${entryTitle}" />
+		<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#TITLE_FIELD" value1="${entryTitle}" />
 	</command>
 
 	<command name="addWithTrackbackURLPG">
@@ -743,7 +755,7 @@
 	<command name="editContent">
 		<execute function="AssertTextEquals" locator1="AlloyEditor#CONTENT_FIELD" value1="${entryContent}" />
 
-		<execute function="Type#typeCKEditor" locator1="AlloyEditor#CONTENT_FIELD" value1="${entryContentEdit}" />
+		<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#CONTENT_FIELD" value1="${entryContentEdit}" />
 	</command>
 
 	<command name="editContentCP">
@@ -754,7 +766,7 @@
 		<execute function="AssertClick" locator1="CPBlogs#ENTRY_MENULIST_EDIT" value1="Edit" />
 
 		<execute function="Type" locator1="CPBlogsEdit#TITLE_FIELD" value1="${entryTitle}" />
-		<execute function="Type#typeFrameWaitForCKEditor" locator1="CPBlogsEdit#CONTENT_FIELD" value1="${entryContentEdit}" />
+		<execute function="Type#typeCKEditorWaitForCKEditor" locator1="CPBlogsEdit#CONTENT_FIELD" value1="${entryContentEdit}" />
 		<execute function="AssertClick" locator1="CPBlogsEdit#PUBLISH_BUTTON" value1="Publish" />
 
 		<execute function="AssertTextEquals" locator1="CPBlogs#SUCCESS_MESSAGE" value1="Your request completed successfully." />
@@ -817,7 +829,6 @@
 			<isset var="entrySubtitleEdit" />
 			<then>
 				<execute macro="BlogsEntry#editSubtitle">
-					<var name="entryEditSubtitle" value="${entryEditSubtitle}" />
 					<var name="entrySubtitle" value="${entrySubtitle}" />
 					<var name="entrySubtitleEdit" value="${entrySubtitleEdit}" />
 				</execute>
@@ -865,13 +876,13 @@
 	<command name="editSubtitle">
 		<execute function="AssertTextEquals" locator1="AlloyEditor#SUBTITLE_FIELD" value1="${entrySubtitle}" />
 
-		<execute function="Type#typeCKEditor" locator1="AlloyEditor#SUBTITLE_FIELD" value1="${entryEditSubtitle}" />
+		<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#SUBTITLE_FIELD" value1="${entrySubtitleEdit}" />
 	</command>
 
 	<command name="editTitle">
 		<execute function="AssertTextEquals" locator1="AlloyEditor#TITLE_FIELD" value1="${entryTitle}" />
 
-		<execute function="Type#typeCKEditor" locator1="AlloyEditor#TITLE_FIELD" value1="${entryTitleEdit}" />
+		<execute function="Type#typeAlloyEditor" locator1="AlloyEditor#TITLE_FIELD" value1="${entryTitleEdit}" />
 	</command>
 
 	<command name="editTitleCP">
@@ -1203,6 +1214,22 @@
 		<execute function="AssertClick" locator1="PGBlogs#ENTRY_TITLE" value1="${entryTitle}" />
 
 		<execute function="Click#clickWaitForInlineCKEditorNoMouseOver" locator1="PGBlogsEntry#YOUR_RATING_STAR_EMPTY_4" />
+	</command>
+
+	<command name="rateThumbsDown">
+		<var name="key_entryTitle" value="${entryTitle}" />
+
+		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
+
+		<execute function="Click" locator1="Ratings#THUMBS_DOWN" />
+	</command>
+
+	<command name="rateThumbsUp">
+		<var name="key_entryTitle" value="${entryTitle}" />
+
+		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
+
+		<execute function="Click" locator1="Ratings#THUMBS_UP" />
 	</command>
 
 	<command name="removeViewPermissionsPG">
@@ -1926,9 +1953,9 @@
 			<isset var="tagNameList" />
 			<then>
 				<for list="${tagNameList}" param="tagName">
-					<var method="StringUtil#lowerCase('${tagName}')" name="tagName" />
+					<var method="StringUtil#lowerCase('${tagName}')" name="${tagName}" />
 
-					<var name="key_tagName" value="tagName" />
+					<var name="key_tagName" value="${tagName}" />
 
 					<execute function="AssertTextEquals" locator1="PGBlogs#ENTRY_TAG" value1="${tagName}" />
 					<execute function="AssertClick" locator1="PGBlogs#ENTRY_TAG" value1="${tagName}" />
@@ -1947,6 +1974,22 @@
 				<execute function="AssertTextEquals" locator1="PGBlogs#ENTRY_TITLE" value1="${entryTitle}" />
 			</else>
 		</if>
+	</command>
+
+	<command name="viewThumbsDown">
+		<var name="key_entryTitle" value="${entryTitle}" />
+
+		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
+
+		<execute function="AssertTextEquals" locator1="Ratings#THUMBS_DOWN" value1="${voteCount}" />
+	</command>
+
+	<command name="viewThumbsUp">
+		<var name="key_entryTitle" value="${entryTitle}" />
+
+		<execute function="AssertTextEquals" locator1="BlogsEntry#TITLE" value1="${entryTitle}" />
+
+		<execute function="AssertTextEquals" locator1="Ratings#THUMBS_UP" value1="${voteCount}" />
 	</command>
 
 	<command name="viewTitle">
