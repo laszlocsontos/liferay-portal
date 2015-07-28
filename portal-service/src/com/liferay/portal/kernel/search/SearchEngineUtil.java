@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.registry.Registry;
@@ -303,7 +304,7 @@ public class SearchEngineUtil {
 	public static String[] getEntryClassNames() {
 		Set<String> assetEntryClassNames = new HashSet<>();
 
-		for (Indexer indexer : IndexerRegistryUtil.getIndexers()) {
+		for (Indexer<?> indexer : IndexerRegistryUtil.getIndexers()) {
 			for (String className : indexer.getSearchClassNames()) {
 				if (!_excludedEntryClassNames.contains(className)) {
 					assetEntryClassNames.add(className);
@@ -375,7 +376,7 @@ public class SearchEngineUtil {
 	public static String getSearchEngineId(Document document) {
 		String entryClassName = document.get("entryClassName");
 
-		Indexer indexer = IndexerRegistryUtil.getIndexer(entryClassName);
+		Indexer<?> indexer = IndexerRegistryUtil.getIndexer(entryClassName);
 
 		String searchEngineId = indexer.getSearchEngineId();
 
@@ -965,15 +966,6 @@ public class SearchEngineUtil {
 		_queueCapacity = queueCapacity;
 	}
 
-	public void setSearchPermissionChecker(
-		SearchPermissionChecker searchPermissionChecker) {
-
-		PortalRuntimePermission.checkSetBeanProperty(
-			getClass(), "searchPermissionChecker");
-
-		_searchPermissionChecker = searchPermissionChecker;
-	}
-
 	private SearchEngineUtil() {
 		Registry registry = RegistryUtil.getRegistry();
 
@@ -998,7 +990,8 @@ public class SearchEngineUtil {
 		_queuingSearchEngines = new HashMap<>();
 	private static final Map<String, SearchEngine> _searchEngines =
 		new ConcurrentHashMap<>();
-	private static SearchPermissionChecker _searchPermissionChecker;
+	private static final SearchPermissionChecker _searchPermissionChecker =
+		ProxyFactory.newServiceTrackedInstance(SearchPermissionChecker.class);
 
 	private final ServiceTracker
 		<SearchEngineConfigurator, SearchEngineConfigurator> _serviceTracker;

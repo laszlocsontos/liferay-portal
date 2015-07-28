@@ -125,6 +125,9 @@
 		<var name="key_categoryName" value="${categoryName}" />
 
 		<execute function="Click" locator1="PGAssetpublisherConfiguration#FILTER_CATEGORIES_CATEGORY_CHECKBOX" />
+
+		<execute function="Click" locator1="PGAssetpublisherConfiguration#FILTER_CATEGORIES_CATEGORY_CLOSE_BUTTON" />
+
 		<execute function="AssertClick" locator1="PGAssetpublisherConfiguration#SAVE_BUTTON" value1="Save" />
 		<execute function="AssertTextEquals" locator1="PGAssetpublisherConfiguration#SUCCESS_MESSAGE" value1="You have successfully updated the setup." />
 	</command>
@@ -494,9 +497,7 @@
 	</command>
 
 	<command name="rate4StarsPG">
-		<var name="key_assetTitle" value="${assetTitle}" />
-
-		<execute function="Click" locator1="PGAssetpublisher#YOUR_RATING_STAR_EMPTY_4" />
+		<execute function="Click#clickNoMouseOver" locator1="PGAssetpublisher#YOUR_RATING_STAR_EMPTY_4" />
 	</command>
 
 	<command name="restoreArchivedSetupPG">

@@ -42,24 +42,18 @@ public abstract class BaseElasticsearchConnection
 	implements ElasticsearchConnection {
 
 	@Override
-	public synchronized boolean close() {
+	public void close() {
 		if (_client == null) {
-			return false;
+			return;
 		}
 
 		_client.close();
 
 		_client = null;
-
-		return true;
 	}
 
 	@Override
-	public synchronized Client getClient() {
-		if (_client != null) {
-			return _client;
-		}
-
+	public void connect() {
 		ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder();
 
 		loadOptionalDefaultConfigurations(builder);
@@ -84,7 +78,10 @@ public abstract class BaseElasticsearchConnection
 		loadSettingsContributors(builder);
 
 		_client = createClient(builder);
+	}
 
+	@Override
+	public Client getClient() {
 		return _client;
 	}
 

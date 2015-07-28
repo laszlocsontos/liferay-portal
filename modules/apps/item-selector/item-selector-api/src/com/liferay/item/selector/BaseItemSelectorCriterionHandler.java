@@ -14,16 +14,17 @@
 
 package com.liferay.item.selector;
 
-import com.liferay.portal.kernel.registry.ServiceTrackerCustomizerFactory;
 import com.liferay.portal.kernel.util.ClassUtil;
-import com.liferay.portal.kernel.util.PredicateFilter;
-import com.liferay.registry.collections.ServiceTrackerCollections;
-import com.liferay.registry.collections.ServiceTrackerList;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Roberto Díaz
@@ -39,28 +40,18 @@ public abstract class BaseItemSelectorCriterionHandler
 		List<ItemSelectorView<T>> filteredItemSelectedViews = new ArrayList<>();
 
 		for (ItemSelectorView itemSelectorView : _itemSelectorViews) {
-			Set<ItemSelectorReturnType> supportedItemSelectorReturnTypes =
-				itemSelectorView.getSupportedItemSelectorReturnTypes();
-
-			Set<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
+			List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
 				itemSelectorCriterion.getDesiredItemSelectorReturnTypes();
 
 			for (ItemSelectorReturnType desiredItemSelectorReturnType :
 					desiredItemSelectorReturnTypes) {
 
-				for (ItemSelectorReturnType supportedItemSelectorReturnType :
-						supportedItemSelectorReturnTypes) {
+				if (_isItemSelectorViewSupported(
+						itemSelectorView, desiredItemSelectorReturnType)) {
 
-					String desiredItemSelectorReturnTypeClassName =
-						ClassUtil.getClassName(desiredItemSelectorReturnType);
-					String supportedItemSelectorReturnTypeClassName =
-						ClassUtil.getClassName(supportedItemSelectorReturnType);
+					filteredItemSelectedViews.add(itemSelectorView);
 
-					if (desiredItemSelectorReturnTypeClassName.equals(
-							supportedItemSelectorReturnTypeClassName)) {
-
-						filteredItemSelectedViews.add(itemSelectorView);
-					}
+					break;
 				}
 			}
 		}
@@ -68,22 +59,97 @@ public abstract class BaseItemSelectorCriterionHandler
 		return (List)Collections.unmodifiableList(filteredItemSelectedViews);
 	}
 
-	private final ServiceTrackerList<ItemSelectorView> _itemSelectorViews =
-		ServiceTrackerCollections.list(
-			ItemSelectorView.class,
-			ServiceTrackerCustomizerFactory.create(
-				new PredicateFilter<ItemSelectorView>() {
+	protected void activate(BundleContext bundleContext) {
+		_serviceTracker = new ServiceTracker<>(
+			bundleContext, ItemSelectorView.class,
+			new ItemSelectorViewServiceTrackerCustomizer(bundleContext));
 
-					@Override
-					public boolean filter(ItemSelectorView itemSelectorView) {
-						Class<?> itemSelectorCriterionClass =
-							itemSelectorView.getItemSelectorCriterionClass();
+		_serviceTracker.open();
+	}
 
-						return itemSelectorCriterionClass.isAssignableFrom(
-							BaseItemSelectorCriterionHandler.this.
-								getItemSelectorCriterionClass());
-					}
+	private boolean _isItemSelectorViewSupported(
+		ItemSelectorView itemSelectorView,
+		ItemSelectorReturnType itemSelectorReturnType) {
 
-				}));
+		String itemSelectorReturnTypeClassName = ClassUtil.getClassName(
+			itemSelectorReturnType);
+
+		List<ItemSelectorReturnType> supportedItemSelectorReturnTypes =
+			itemSelectorView.getSupportedItemSelectorReturnTypes();
+
+		for (ItemSelectorReturnType supportedItemSelectorReturnType :
+				supportedItemSelectorReturnTypes) {
+
+			String supportedItemSelectorReturnTypeClassName =
+				ClassUtil.getClassName(supportedItemSelectorReturnType);
+
+			if (itemSelectorReturnTypeClassName.equals(
+					supportedItemSelectorReturnTypeClassName)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private final List<ItemSelectorView<?>> _itemSelectorViews =
+		new CopyOnWriteArrayList<>();
+	private ServiceTracker _serviceTracker;
+
+	private class ItemSelectorViewServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer
+			<ItemSelectorView, ItemSelectorView> {
+
+		public ItemSelectorViewServiceTrackerCustomizer(
+			BundleContext bundleContext) {
+
+			_bundleContext = bundleContext;
+		}
+
+		@Override
+		public ItemSelectorView addingService(
+			ServiceReference<ItemSelectorView> reference) {
+
+			ItemSelectorView service = _bundleContext.getService(reference);
+
+			Class<?> itemSelectorCriterionClass =
+				service.getItemSelectorCriterionClass();
+
+			if (!itemSelectorCriterionClass.isAssignableFrom(
+					BaseItemSelectorCriterionHandler.this.
+						getItemSelectorCriterionClass())) {
+
+				return null;
+			}
+
+			_itemSelectorViews.add(service);
+
+			return service;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<ItemSelectorView> serviceReference,
+			ItemSelectorView itemSelectorView) {
+
+			removedService(serviceReference, itemSelectorView);
+
+			addingService(serviceReference);
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<ItemSelectorView> serviceReference,
+			ItemSelectorView itemSelectorView) {
+
+			_itemSelectorViews.remove(itemSelectorView);
+
+			_bundleContext.ungetService(serviceReference);
+		}
+
+		private final BundleContext _bundleContext;
+
+	}
 
 }
