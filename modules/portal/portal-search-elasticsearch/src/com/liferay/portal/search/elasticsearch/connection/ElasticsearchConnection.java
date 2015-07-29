@@ -22,7 +22,9 @@ import org.elasticsearch.client.Client;
  */
 public interface ElasticsearchConnection {
 
-	public boolean close();
+	public void close();
+
+	public void connect();
 
 	public Client getClient();
 

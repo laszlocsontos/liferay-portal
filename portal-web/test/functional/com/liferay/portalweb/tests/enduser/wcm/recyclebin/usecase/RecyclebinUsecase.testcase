@@ -1,5 +1,5 @@
 <definition component-name="portal-wcm">
-	<property name="testray.main.component.name" value="WCM" />
+	<property name="testray.main.component.name" value="Recycle Bin" />
 
 	<set-up>
 		<execute macro="User#firstLoginPG" />
@@ -805,7 +805,7 @@
 		</execute>
 	</command>
 
-	<command name="RecycleBinWebContent" priority="3">
+	<command known-issues="LPS-56568" name="RecycleBinWebContent" priority="3">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Web Content" />
 			<var name="siteScopeName" value="Site Name" />
@@ -1035,7 +1035,7 @@
 		</execute>
 	</command>
 
-	<command name="RestoreDMDocumentFromFolderCP" priority="4">
+	<command name="RestoreDMDocumentFromFolderCP" priority="5">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Documents and Media" />
 			<var name="siteScopeName" value="Site Name" />

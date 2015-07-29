@@ -14,6 +14,7 @@
 
 package com.liferay.journal.web.asset;
 
+import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleResource;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
@@ -21,7 +22,6 @@ import com.liferay.journal.service.JournalArticleResourceLocalServiceUtil;
 import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.service.permission.JournalArticlePermission;
 import com.liferay.journal.service.permission.JournalPermission;
-import com.liferay.journal.web.constants.JournalPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -46,7 +46,10 @@ import javax.portlet.PortletURL;
 import javax.portlet.WindowState;
 import javax.portlet.WindowStateException;
 
+import javax.servlet.ServletContext;
+
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Julio Camarero
@@ -93,10 +96,15 @@ public class JournalArticleAssetRendererFactory
 			}
 
 			if (article == null) {
-				article = JournalArticleLocalServiceUtil.getLatestArticle(
+				article = JournalArticleLocalServiceUtil.fetchLatestArticle(
 					articleResource.getGroupId(),
 					articleResource.getArticleId(),
 					WorkflowConstants.STATUS_ANY);
+			}
+
+			if ((article == null) && (type == TYPE_LATEST)) {
+				article = JournalArticleLocalServiceUtil.fetchLatestArticle(
+					classPK, WorkflowConstants.STATUS_ANY);
 			}
 		}
 
@@ -104,6 +112,7 @@ public class JournalArticleAssetRendererFactory
 			new JournalArticleAssetRenderer(article);
 
 		journalArticleAssetRenderer.setAssetRendererType(type);
+		journalArticleAssetRenderer.setServletContext(_servletContext);
 
 		return journalArticleAssetRenderer;
 	}
@@ -234,9 +243,18 @@ public class JournalArticleAssetRendererFactory
 		return false;
 	}
 
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.journal.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
 	@Override
 	protected String getIconPath(ThemeDisplay themeDisplay) {
 		return themeDisplay.getPathThemeImages() + "/common/history.png";
 	}
+
+	private ServletContext _servletContext;
 
 }

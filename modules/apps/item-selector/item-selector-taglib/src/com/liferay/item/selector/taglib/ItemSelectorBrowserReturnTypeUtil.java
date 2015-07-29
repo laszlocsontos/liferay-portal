@@ -18,43 +18,40 @@ import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.Base64ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
+import com.liferay.item.selector.criteria.UploadableFileReturnType;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.ClassUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
 
-import java.util.Set;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Sergio González
+ * @author Roberto Díaz
  */
 public class ItemSelectorBrowserReturnTypeUtil
 	implements ItemSelectorReturnType {
 
 	public static ItemSelectorReturnType
-		getFirstAvailableItemSelectorReturnType(
-			Set<ItemSelectorReturnType> desiredItemSelectorReturnTypes) {
+		getFirstAvailableDraggableFileReturnType(
+			List<ItemSelectorReturnType> desiredItemSelectorReturnTypes) {
 
-		for (ItemSelectorReturnType desiredItemSelectorReturnType :
-				desiredItemSelectorReturnTypes) {
+		return getFirstAvailableItemSelectorReturnType(
+			desiredItemSelectorReturnTypes, _draggableFileReturnTypeNames);
+	}
 
-			String className = ClassUtil.getClassName(
-				desiredItemSelectorReturnType);
+	public static ItemSelectorReturnType
+		getFirstAvailableExistingFileEntryReturnType(
+			List<ItemSelectorReturnType> desiredItemSelectorReturnTypes) {
 
-			if (className.equals(
-					Base64ItemSelectorReturnType.class.getName()) ||
-				className.equals(
-					FileEntryItemSelectorReturnType.class.getName()) ||
-				className.equals(URLItemSelectorReturnType.class.getName())) {
-
-				return desiredItemSelectorReturnType;
-			}
-		}
-
-		return null;
+		return getFirstAvailableItemSelectorReturnType(
+			desiredItemSelectorReturnTypes, _existingFileEntryReturnTypeNames);
 	}
 
 	public static String getValue(
@@ -64,12 +61,7 @@ public class ItemSelectorBrowserReturnTypeUtil
 
 		String className = ClassUtil.getClassName(itemSelectorReturnType);
 
-		if (className.equals(Base64ItemSelectorReturnType.class.getName())) {
-			return StringPool.BLANK;
-		}
-		else if (className.equals(
-					FileEntryItemSelectorReturnType.class.getName())) {
-
+		if (className.equals(FileEntryItemSelectorReturnType.class.getName())) {
 			return getFileEntryValue(fileEntry, themeDisplay);
 		}
 		else if (className.equals(URLItemSelectorReturnType.class.getName())) {
@@ -95,11 +87,45 @@ public class ItemSelectorBrowserReturnTypeUtil
 		return fileEntryJSONObject.toString();
 	}
 
+	protected static ItemSelectorReturnType
+		getFirstAvailableItemSelectorReturnType(
+			List<ItemSelectorReturnType> desiredItemSelectorReturnTypes,
+			List<String> itemSelectorReturnTypeTypes) {
+
+		Iterator<ItemSelectorReturnType> iterator =
+			desiredItemSelectorReturnTypes.iterator();
+
+		while (iterator.hasNext()) {
+			ItemSelectorReturnType itemSelectorReturnType = iterator.next();
+
+			String className = ClassUtil.getClassName(itemSelectorReturnType);
+
+			if (itemSelectorReturnTypeTypes.contains(className)) {
+				return itemSelectorReturnType;
+			}
+		}
+
+		return null;
+	}
+
 	protected static String getURLValue(
 			FileEntry fileEntry, ThemeDisplay themeDisplay)
 		throws Exception {
 
 		return DLUtil.getImagePreviewURL(fileEntry, themeDisplay);
 	}
+
+	private static final List<String> _draggableFileReturnTypeNames =
+		ListUtil.fromArray(
+			new String[] {
+				ClassUtil.getClassName(new Base64ItemSelectorReturnType()),
+				ClassUtil.getClassName(new UploadableFileReturnType())
+			});
+	private static final List<String> _existingFileEntryReturnTypeNames =
+		ListUtil.fromArray(
+			new String[] {
+				ClassUtil.getClassName(new FileEntryItemSelectorReturnType()),
+				ClassUtil.getClassName(new URLItemSelectorReturnType())
+			});
 
 }
