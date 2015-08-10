@@ -14,7 +14,7 @@
 
 package com.liferay.message.boards.web.asset;
 
-import com.liferay.message.boards.web.constants.MessageBoardsPortletKeys;
+import com.liferay.message.boards.web.constants.MBPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -44,21 +44,22 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = {"javax.portlet.name=" + MessageBoardsPortletKeys.MESSAGE_BOARDS},
+	property = {"javax.portlet.name=" + MBPortletKeys.MESSAGE_BOARDS},
 	service = AssetRendererFactory.class
 )
-public class MBCategoryAssetRendererFactory extends BaseAssetRendererFactory {
+public class MBCategoryAssetRendererFactory
+	extends BaseAssetRendererFactory<MBCategory> {
 
 	public static final String TYPE = "category";
 
 	public MBCategoryAssetRendererFactory() {
 		setCategorizable(false);
-		setPortletId(MessageBoardsPortletKeys.MESSAGE_BOARDS);
+		setPortletId(MBPortletKeys.MESSAGE_BOARDS);
 		setSelectable(false);
 	}
 
 	@Override
-	public AssetRenderer getAssetRenderer(long classPK, int type)
+	public AssetRenderer<MBCategory> getAssetRenderer(long classPK, int type)
 		throws PortalException {
 
 		MBCategory category = _mbCategoryLocalService.getMBCategory(classPK);
@@ -93,8 +94,7 @@ public class MBCategoryAssetRendererFactory extends BaseAssetRendererFactory {
 
 		LiferayPortletURL liferayPortletURL =
 			liferayPortletResponse.createLiferayPortletURL(
-				MessageBoardsPortletKeys.MESSAGE_BOARDS,
-				PortletRequest.RENDER_PHASE);
+				MBPortletKeys.MESSAGE_BOARDS, PortletRequest.RENDER_PHASE);
 
 		try {
 			liferayPortletURL.setWindowState(windowState);

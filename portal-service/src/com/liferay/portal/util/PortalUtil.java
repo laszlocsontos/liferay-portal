@@ -1806,12 +1806,32 @@ public class PortalUtil {
 
 	public static PortletURL getSiteAdministrationURL(
 		HttpServletRequest request, ThemeDisplay themeDisplay,
-		String portletName) {
+		String portletId) {
 
 		return getPortal().getSiteAdministrationURL(
-			request, themeDisplay, portletName);
+			request, themeDisplay, portletId);
 	}
 
+	public static PortletURL getSiteAdministrationURL(
+		PortletRequest portletRequest, ThemeDisplay themeDisplay) {
+
+		return getPortal().getSiteAdministrationURL(
+			portletRequest, themeDisplay);
+	}
+
+	public static PortletURL getSiteAdministrationURL(
+		PortletRequest portletRequest, ThemeDisplay themeDisplay,
+		String portletId) {
+
+		return getPortal().getSiteAdministrationURL(
+			portletRequest, themeDisplay, portletId);
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getSiteAdministrationURL(PortletRequest, themeDisplay)}
+	 */
+	@Deprecated
 	public static PortletURL getSiteAdministrationURL(
 		PortletResponse portletResponse, ThemeDisplay themeDisplay) {
 
@@ -1819,6 +1839,12 @@ public class PortalUtil {
 			portletResponse, themeDisplay);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getSiteAdministrationURL(PortletRequest, themeDisplay,
+	 *             String)}
+	 */
+	@Deprecated
 	public static PortletURL getSiteAdministrationURL(
 		PortletResponse portletResponse, ThemeDisplay themeDisplay,
 		String portletName) {

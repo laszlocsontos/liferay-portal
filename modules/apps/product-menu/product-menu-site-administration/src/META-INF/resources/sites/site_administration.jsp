@@ -19,7 +19,7 @@
 <%
 PanelCategory panelCategory = (PanelCategory)request.getAttribute(ApplicationListWebKeys.PANEL_CATEGORY);
 
-Group group = themeDisplay.getScopeGroup();
+Group group = themeDisplay.getSiteGroup();
 %>
 
 <div class="toolbar">
@@ -27,7 +27,7 @@ Group group = themeDisplay.getScopeGroup();
 		<a class="icon-angle-left icon-monospaced" href="javascript:;" id="<portlet:namespace />allSitesLink"></a>
 	</div>
 	<div class="toolbar-group-content">
-		<%= group.getDescriptiveName(locale) %>
+		<aui:a href="<%= group.getDisplayURL(themeDisplay) %>" label="<%= group.getDescriptiveName(locale) %>" />
 	</div>
 
 	<c:if test="<%= themeDisplay.isShowStagingIcon() %>">
@@ -48,13 +48,15 @@ Group group = themeDisplay.getScopeGroup();
 					layoutSet = stagingGroup.getPublicLayoutSet();
 				}
 
-				stagingGroupURL = PortalUtil.getGroupFriendlyURL(layoutSet, themeDisplay);
+				if (layoutSet.getPageCount() > 0) {
+					stagingGroupURL = PortalUtil.getGroupFriendlyURL(layoutSet, themeDisplay);
+				}
 			}
 		}
 		%>
 
-		<div class="toolbar-group-field">
-			<aui:a cssClass="icon-fb-radio icon-monospaced" href="<%= stagingGroupURL %>" title="staging"></aui:a>
+		<div class="<%= stagingGroupURL == null ? "active" : StringPool.BLANK %> toolbar-group-field">
+			<aui:a cssClass="icon-fb-radio icon-monospaced" href="<%= stagingGroupURL %>" title="staging" />
 		</div>
 
 		<%
@@ -73,13 +75,15 @@ Group group = themeDisplay.getScopeGroup();
 					layoutSet = liveGroup.getPublicLayoutSet();
 				}
 
-				liveGroupURL = PortalUtil.getGroupFriendlyURL(layoutSet, themeDisplay);
+				if (layoutSet.getPageCount() > 0) {
+					liveGroupURL = PortalUtil.getGroupFriendlyURL(layoutSet, themeDisplay);
+				}
 			}
 		}
 		%>
 
-		<div class="toolbar-group-field">
-			<aui:a cssClass="icon-circle-blank icon-monospaced" href="<%= liveGroupURL %>" title="live"></aui:a>
+		<div class="<%= liveGroupURL == null ? "active" : StringPool.BLANK %> toolbar-group-field">
+			<aui:a cssClass="icon-circle-blank icon-monospaced" href="<%= liveGroupURL %>" title="live" />
 		</div>
 	</c:if>
 </div>
@@ -90,7 +94,7 @@ Group group = themeDisplay.getScopeGroup();
 	$('#<portlet:namespace />allSitesLink').on(
 		'click',
 		function(event) {
-			$('#<portlet:namespace />all_sitesTabLink').tab('show');
+			$('#<portlet:namespace /><%= PanelCategoryKeys.SITES_ALL_SITES %>TabLink').tab('show');
 		}
 	);
 </aui:script>

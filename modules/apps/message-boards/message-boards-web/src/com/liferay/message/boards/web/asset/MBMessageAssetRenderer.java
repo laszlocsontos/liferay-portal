@@ -14,7 +14,7 @@
 
 package com.liferay.message.boards.web.asset;
 
-import com.liferay.message.boards.web.constants.MessageBoardsPortletKeys;
+import com.liferay.message.boards.web.constants.MBPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.BaseJSPAssetRenderer;
@@ -48,10 +49,15 @@ import javax.servlet.http.HttpServletResponse;
  * @author Sergio González
  */
 public class MBMessageAssetRenderer
-	extends BaseJSPAssetRenderer implements TrashRenderer {
+	extends BaseJSPAssetRenderer<MBMessage> implements TrashRenderer {
 
 	public MBMessageAssetRenderer(MBMessage message) {
 		_message = message;
+	}
+
+	@Override
+	public MBMessage getAssetObject() {
+		return _message;
 	}
 
 	@Override
@@ -88,7 +94,8 @@ public class MBMessageAssetRenderer
 
 	@Override
 	public String getPortletId() {
-		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
+		AssetRendererFactory<MBMessage> assetRendererFactory =
+			getAssetRendererFactory();
 
 		return assetRendererFactory.getPortletId();
 	}
@@ -142,9 +149,8 @@ public class MBMessageAssetRenderer
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
-			getControlPanelPlid(liferayPortletRequest),
-			MessageBoardsPortletKeys.MESSAGE_BOARDS,
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, MBPortletKeys.MESSAGE_BOARDS, 0,
 			PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter(
@@ -161,7 +167,8 @@ public class MBMessageAssetRenderer
 			WindowState windowState)
 		throws Exception {
 
-		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
+		AssetRendererFactory<MBMessage> assetRendererFactory =
+			getAssetRendererFactory();
 
 		PortletURL portletURL = assetRendererFactory.getURLView(
 			liferayPortletResponse, windowState);

@@ -1641,7 +1641,7 @@ public class PortalImpl implements Portal {
 			long scopeGroupId, String ppid, Map<String, String[]> params)
 		throws PortalException {
 
-		StringBundler sb = new StringBundler(6);
+		StringBundler sb = new StringBundler(7);
 
 		Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
 
@@ -1652,7 +1652,10 @@ public class PortalImpl implements Portal {
 			getPortalURL(
 				company.getVirtualHostname(), getPortalServerPort(false),
 				false));
+
 		sb.append(getPathFriendlyURLPrivateGroup());
+		sb.append(group.getFriendlyURL());
+		sb.append(VirtualLayoutConstants.CANONICAL_URL_SEPARATOR);
 		sb.append(GroupConstants.CONTROL_PANEL_FRIENDLY_URL);
 		sb.append(PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL);
 
@@ -1668,10 +1671,6 @@ public class PortalImpl implements Portal {
 		params.put(
 			"p_p_state", new String[] {WindowState.MAXIMIZED.toString()});
 		params.put("p_p_mode", new String[] {PortletMode.VIEW.toString()});
-		params.put("doAsGroupId", new String[] {String.valueOf(scopeGroupId)});
-		params.put(
-			"controlPanelCategory",
-			new String[] {PortletCategoryKeys.CURRENT_SITE});
 
 		sb.append(HttpUtil.parameterMapToString(params, true));
 
@@ -1743,26 +1742,12 @@ public class PortalImpl implements Portal {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Layout layout = null;
+		Layout layout = getControlPanelLayout(themeDisplay);
 
-		try {
-			long plid = getControlPanelPlid(themeDisplay.getCompanyId());
-
-			layout = LayoutLocalServiceUtil.getLayout(plid);
-		}
-		catch (PortalException pe) {
-			_log.error("Unable to determine control panel layout", pe);
-
-			return null;
-		}
-
-		VirtualLayout virtualLayout = new VirtualLayout(
-			layout, themeDisplay.getScopeGroup());
-
-		request.setAttribute(WebKeys.LAYOUT, virtualLayout);
+		request.setAttribute(WebKeys.LAYOUT, layout);
 
 		LiferayPortletURL liferayPortletURL = new PortletURLImpl(
-			request, portletId, virtualLayout.getPlid(), lifecycle);
+			request, portletId, layout.getPlid(), lifecycle);
 
 		try {
 			liferayPortletURL.setWindowState(WindowState.MAXIMIZED);
@@ -1782,20 +1767,19 @@ public class PortalImpl implements Portal {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long plid = 0;
+		Layout layout = getControlPanelLayout(themeDisplay);
 
-		try {
-			plid = getControlPanelPlid(themeDisplay.getCompanyId());
-		}
-		catch (Exception e) {
-			_log.error("Unable to determine control panel layout id", e);
-		}
+		portletRequest.setAttribute(WebKeys.LAYOUT, layout);
 
 		LiferayPortletURL liferayPortletURL = new PortletURLImpl(
-			portletRequest, portletId, plid, lifecycle);
+			portletRequest, portletId, layout.getPlid(), lifecycle);
 
-		liferayPortletURL.setDoAsGroupId(themeDisplay.getScopeGroupId());
-		liferayPortletURL.setRefererPlid(themeDisplay.getPlid());
+		try {
+			liferayPortletURL.setWindowState(WindowState.MAXIMIZED);
+		}
+		catch (WindowStateException wse) {
+			_log.error(wse);
+		}
 
 		return liferayPortletURL;
 	}
@@ -4954,19 +4938,51 @@ public class PortalImpl implements Portal {
 		HttpServletRequest request, ThemeDisplay themeDisplay,
 		String portletId) {
 
-		LiferayPortletURL siteAdministrationURL = PortletURLFactoryUtil.create(
-			request, portletId, themeDisplay.getPlid(),
-			PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = getControlPanelPortletURL(
+			request, portletId, 0, PortletRequest.RENDER_PHASE);
 
-		siteAdministrationURL.setControlPanelCategory(
-			PortletCategoryKeys.SITES);
-		siteAdministrationURL.setDoAsGroupId(themeDisplay.getScopeGroupId());
-		siteAdministrationURL.setParameter(
-			"redirect", themeDisplay.getURLCurrent());
+		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
 
-		return siteAdministrationURL;
+		return portletURL;
 	}
 
+	@Override
+	public PortletURL getSiteAdministrationURL(
+		PortletRequest portletRequest, ThemeDisplay themeDisplay) {
+
+		Portlet portlet = getFirstSiteAdministrationPortlet(themeDisplay);
+
+		if (portlet == null) {
+			return null;
+		}
+
+		PortletURL portletURL = getControlPanelPortletURL(
+			portletRequest, portlet.getPortletId(), 0,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
+
+		return portletURL;
+	}
+
+	@Override
+	public PortletURL getSiteAdministrationURL(
+		PortletRequest portletRequest, ThemeDisplay themeDisplay,
+		String portletId) {
+
+		PortletURL portletURL = getControlPanelPortletURL(
+			portletRequest, portletId, 0, PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
+
+		return portletURL;
+	}
+
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getSiteAdministrationURL(PortletRequest, themeDisplay)}
+	 */
+	@Deprecated
 	@Override
 	public PortletURL getSiteAdministrationURL(
 		PortletResponse portletResponse, ThemeDisplay themeDisplay) {
@@ -4981,6 +4997,12 @@ public class PortalImpl implements Portal {
 			portletResponse, themeDisplay, portlet.getPortletId());
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #getSiteAdministrationURL(PortletRequest, themeDisplay,
+	 *             String)}
+	 */
+	@Deprecated
 	@Override
 	public PortletURL getSiteAdministrationURL(
 		PortletResponse portletResponse, ThemeDisplay themeDisplay,
@@ -7664,6 +7686,35 @@ public class PortalImpl implements Portal {
 		}
 
 		return contextPath;
+	}
+
+	protected Layout getControlPanelLayout(ThemeDisplay themeDisplay) {
+		Layout layout = null;
+
+		try {
+			long plid = getControlPanelPlid(themeDisplay.getCompanyId());
+
+			layout = LayoutLocalServiceUtil.getLayout(plid);
+		}
+		catch (PortalException pe) {
+			_log.error("Unable to get control panel layout", pe);
+
+			return null;
+		}
+
+		Group group = null;
+
+		long groupId = themeDisplay.getDoAsGroupId();
+
+		if (groupId > 0) {
+			group = GroupLocalServiceUtil.fetchGroup(groupId);
+		}
+
+		if (group == null) {
+			group = themeDisplay.getScopeGroup();
+		}
+
+		return new VirtualLayout(layout, group);
 	}
 
 	protected long getDefaultScopeGroupId(long companyId)
