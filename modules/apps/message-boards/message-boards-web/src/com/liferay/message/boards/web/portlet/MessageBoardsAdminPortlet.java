@@ -14,12 +14,14 @@
 
 package com.liferay.message.boards.web.portlet;
 
-import com.liferay.message.boards.web.constants.MessageBoardsPortletKeys;
+import com.liferay.message.boards.web.constants.MBPortletKeys;
+import com.liferay.message.boards.web.upgrade.MBWebUpgrade;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 
 import javax.portlet.Portlet;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Adolfo Pérez
@@ -46,8 +48,8 @@ import org.osgi.service.component.annotations.Component;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.config-template=/message_boards_admin/configuration.jsp",
 		"javax.portlet.init-param.template-path=/",
-		"javax.portlet.init-param.view-template=/message_boards/view",
-		"javax.portlet.name=" + MessageBoardsPortletKeys.MESSAGE_BOARDS_ADMIN,
+		"javax.portlet.init-param.view-template=/message_boards_admin/view",
+		"javax.portlet.name=" + MBPortletKeys.MESSAGE_BOARDS_ADMIN,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator",
 		"javax.portlet.supports.mime-type=text/html"
@@ -55,4 +57,9 @@ import org.osgi.service.component.annotations.Component;
 	service = Portlet.class
 )
 public class MessageBoardsAdminPortlet extends MVCPortlet {
+
+	@Reference(unbind = "-")
+	protected void setMBWebUpgrade(MBWebUpgrade mbWebUpgrade) {
+	}
+
 }

@@ -44,7 +44,7 @@ if (user.isSetupComplete() || themeDisplay.isImpersonated()) {
 				<li class="left pull-left">
 					<ul>
 						<li>
-							<a class="control-menu-icon sidenav-toggler" href="javascript:;" id="sidenavToggleId"><span class="icon-align-justify icon-monospaced"></span></a>
+							<a class="control-menu-icon sidenav-toggler" data-content="#wrapper" data-toggle="sidenav" data-type="fixed-push" data-type-mobile="fixed" href="#sidenavSliderId" id="sidenavToggleId"><span class="icon-align-justify icon-monospaced"></span></a>
 						</li>
 					</ul>
 				</li>
@@ -114,7 +114,7 @@ if (user.isSetupComplete() || themeDisplay.isImpersonated()) {
 
 						<%
 						boolean customizableLayout = !(group.isLayoutPrototype() || group.isLayoutSetPrototype() || group.isStagingGroup() || group.isUserGroup()) && layoutTypePortlet.isCustomizable() && LayoutPermissionUtil.containsWithoutViewableGroup(permissionChecker, layout, false, ActionKeys.CUSTOMIZE);
-						boolean linkedLayout = ((!SitesUtil.isLayoutUpdateable(layout) && SitesUtil.isUserGroupLayout(layout)) || (layout.isLayoutPrototypeLinkActive() && !group.hasStagingGroup())) && LayoutPermissionUtil.containsWithoutViewableGroup(themeDisplay.getPermissionChecker(), layout, false, ActionKeys.UPDATE);
+						boolean linkedLayout = (!SitesUtil.isLayoutUpdateable(layout) || (layout.isLayoutPrototypeLinkActive() && !group.hasStagingGroup())) && LayoutPermissionUtil.containsWithoutViewableGroup(themeDisplay.getPermissionChecker(), layout, false, ActionKeys.UPDATE);
 						boolean modifiedLayout = (layoutSet != null) && layoutSet.isLayoutSetPrototypeLinkActive() && SitesUtil.isLayoutModifiedSinceLastMerge(layout) && hasLayoutUpdatePermission;
 						boolean hasMessages = modifiedLayout || linkedLayout || customizableLayout;
 						%>

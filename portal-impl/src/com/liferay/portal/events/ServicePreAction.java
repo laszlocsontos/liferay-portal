@@ -828,8 +828,7 @@ public class ServicePreAction extends Action {
 
 			// Temporary workaround for LPS-56017
 
-			themeDisplay.setPathEditors(
-				portalWebResources.getContextPath() + "/html");
+			themeDisplay.setPathEditors(portalWebResources.getContextPath());
 		}
 
 		themeDisplay.setPathFlash(contextPath.concat("/flash"));
@@ -838,12 +837,9 @@ public class ServicePreAction extends Action {
 		themeDisplay.setPathFriendlyURLPrivateUser(friendlyURLPrivateUserPath);
 		themeDisplay.setPathFriendlyURLPublic(friendlyURLPublicPath);
 		themeDisplay.setPathImage(imagePath);
-
-		String javaScriptPath = PortalWebResourcesUtil.getContextPath(
-			PortalWebResourceConstants.RESOURCE_TYPE_JS);
-
-		themeDisplay.setPathJavaScript(javaScriptPath.concat("/html/js"));
-
+		themeDisplay.setPathJavaScript(
+			PortalWebResourcesUtil.getContextPath(
+				PortalWebResourceConstants.RESOURCE_TYPE_JS));
 		themeDisplay.setPathMain(mainPath);
 		themeDisplay.setPathSound(contextPath.concat("/html/sound"));
 		themeDisplay.setPermissionChecker(permissionChecker);
@@ -982,8 +978,6 @@ public class ServicePreAction extends Action {
 			siteAdministrationURL, "doAsGroupId", siteGroupId);
 
 		themeDisplay.setURLSiteAdministration(siteAdministrationURL);
-
-		long controlPanelPlid = PortalUtil.getControlPanelPlid(companyId);
 
 		if (layout != null) {
 			if (layout.isTypePortlet()) {
@@ -1184,12 +1178,6 @@ public class ServicePreAction extends Action {
 		themeDisplay.setURLSignIn(urlSignIn);
 
 		themeDisplay.setURLSignOut(mainPath.concat(_PATH_PORTAL_LOGOUT));
-
-		PortletURL updateManagerURL = new PortletURLImpl(
-			request, PortletKeys.MARKETPLACE_STORE, controlPanelPlid,
-			PortletRequest.RENDER_PHASE);
-
-		themeDisplay.setURLUpdateManager(updateManagerURL);
 
 		return themeDisplay;
 	}
@@ -2057,9 +2045,10 @@ public class ServicePreAction extends Action {
 							Portlet firstPortlet = categoryPortlets.get(0);
 
 							PortletURL redirectURL =
-								PortalUtil.getSiteAdministrationURL(
-									request, themeDisplay,
-									firstPortlet.getPortletId());
+								PortalUtil.getControlPanelPortletURL(
+									request, themeDisplay.getScopeGroup(),
+									firstPortlet.getPortletId(), 0,
+									PortletRequest.RENDER_PHASE);
 
 							response.sendRedirect(redirectURL.toString());
 						}

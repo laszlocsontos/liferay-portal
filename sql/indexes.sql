@@ -56,14 +56,6 @@ create unique index IX_C0AAD74D on AssetVocabulary (groupId, name);
 create index IX_C4E6FD10 on AssetVocabulary (uuid_, companyId);
 create unique index IX_1B2B8792 on AssetVocabulary (uuid_, groupId);
 
-create index IX_C5A6C78F on BackgroundTask (companyId);
-create index IX_579C63B0 on BackgroundTask (groupId, name, taskExecutorClassName, completed);
-create index IX_C71C3B7 on BackgroundTask (groupId, status);
-create index IX_7A9FF471 on BackgroundTask (groupId, taskExecutorClassName, completed);
-create index IX_7E757D70 on BackgroundTask (groupId, taskExecutorClassName, status);
-create index IX_75638CDF on BackgroundTask (status);
-create index IX_2FCFE748 on BackgroundTask (taskExecutorClassName, status);
-
 create index IX_BB0C2905 on BlogsEntry (companyId, displayDate, status);
 create index IX_EB2DCE27 on BlogsEntry (companyId, status);
 create index IX_A5F57B61 on BlogsEntry (companyId, userId, status);
@@ -312,24 +304,6 @@ create index IX_8CB0A24A on MBThreadFlag (threadId);
 create unique index IX_33781904 on MBThreadFlag (userId, threadId);
 create index IX_DCE308C5 on MBThreadFlag (uuid_, companyId);
 create unique index IX_FEB0FC87 on MBThreadFlag (uuid_, groupId);
-
-create index IX_FD90786C on MDRAction (ruleGroupInstanceId);
-create index IX_C58A516B on MDRAction (uuid_, companyId);
-create unique index IX_75BE36AD on MDRAction (uuid_, groupId);
-
-create index IX_4F4293F1 on MDRRule (ruleGroupId);
-create index IX_7DEA8DF1 on MDRRule (uuid_, companyId);
-create unique index IX_F3EFDCB3 on MDRRule (uuid_, groupId);
-
-create index IX_5849891C on MDRRuleGroup (groupId);
-create index IX_CC14DC2 on MDRRuleGroup (uuid_, companyId);
-create unique index IX_46665CC4 on MDRRuleGroup (uuid_, groupId);
-
-create unique index IX_808A0036 on MDRRuleGroupInstance (classNameId, classPK, ruleGroupId);
-create index IX_22DAB85C on MDRRuleGroupInstance (groupId, classNameId, classPK);
-create index IX_BF3E642B on MDRRuleGroupInstance (ruleGroupId);
-create index IX_25C9D1F7 on MDRRuleGroupInstance (uuid_, companyId);
-create unique index IX_9CBC6A39 on MDRRuleGroupInstance (uuid_, groupId);
 
 create index IX_C28C72EC on MembershipRequest (groupId, statusId);
 create index IX_35AA8FA6 on MembershipRequest (groupId, userId, statusId);

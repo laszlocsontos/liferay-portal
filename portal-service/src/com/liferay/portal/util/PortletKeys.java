@@ -58,8 +58,6 @@ public class PortletKeys {
 
 	public static final String FRIENDS_DIRECTORY = "186";
 
-	public static final String GROUP_STATISTICS = "181";
-
 	public static final String IMAGE_UPLOADER = "195";
 
 	public static final String ITEM_SELECTOR =
@@ -81,16 +79,13 @@ public class PortletKeys {
 
 	public static final String MARKETPLACE_STORE = "1_WAR_marketplaceportlet";
 
-	public static final String MESSAGE_BOARDS = "19";
-
-	public static final String MESSAGE_BOARDS_ADMIN = "162";
-
 	public static final String MOBILE_DEVICE_RULES =
 		"com_liferay_mobile_device_rules_web_portlet_MDRPortlet";
 
 	public static final String MONITORING = "131";
 
-	public static final String MY_ACCOUNT = "2";
+	public static final String MY_ACCOUNT =
+		"com_liferay_my_account_web_portlet_MyAccountPortlet";
 
 	public static final String MY_PAGES =
 		"com_liferay_layout_admin_web_portlet_MyPagesPortlet";
@@ -106,7 +101,8 @@ public class PortletKeys {
 	public static final String NESTED_PORTLETS =
 		"com_liferay_nested_portlets_web_portlet_NestedPortletsPortlet";
 
-	public static final String PLUGINS_ADMIN = "132";
+	public static final String PLUGINS_ADMIN =
+		"com_liferay_plugins_admin_web_portlet_PluginsAdminPortlet";
 
 	public static final String PORTAL = "90";
 
@@ -138,8 +134,6 @@ public class PortletKeys {
 
 	public static final String REQUESTS = "121";
 
-	public static final String ROLES_ADMIN = "128";
-
 	public static final String SHOPPING = "34";
 
 	public static final String SITE_ADMIN =
@@ -161,9 +155,8 @@ public class PortletKeys {
 	public static final String USER_GROUPS_ADMIN =
 		"com_liferay_user_groups_admin_web_portlet_UserGroupsAdminPortlet";
 
-	public static final String USER_STATISTICS = "180";
-
-	public static final String USERS_ADMIN = "125";
+	public static final String USERS_ADMIN =
+		"com_liferay_users_admin_web_portlet_UsersAdminPortlet";
 
 	public static final String WORKFLOW_DEFINITION =
 		"com_liferay_workflow_definition_web_portlet_WorkflowDefinitionPortlet";

@@ -14,13 +14,14 @@
 
 package com.liferay.message.boards.web.asset;
 
-import com.liferay.message.boards.web.constants.MessageBoardsPortletKeys;
+import com.liferay.message.boards.web.constants.MBPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.BaseJSPAssetRenderer;
@@ -43,10 +44,15 @@ import javax.servlet.http.HttpServletResponse;
  * @author Sergio González
  * @author Jonathan Lee
  */
-public class MBCategoryAssetRenderer extends BaseJSPAssetRenderer {
+public class MBCategoryAssetRenderer extends BaseJSPAssetRenderer<MBCategory> {
 
 	public MBCategoryAssetRenderer(MBCategory category) {
 		_category = category;
+	}
+
+	@Override
+	public MBCategory getAssetObject() {
+		return _category;
 	}
 
 	@Override
@@ -99,9 +105,8 @@ public class MBCategoryAssetRenderer extends BaseJSPAssetRenderer {
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
-		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
-			getControlPanelPlid(liferayPortletRequest),
-			MessageBoardsPortletKeys.MESSAGE_BOARDS,
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, MBPortletKeys.MESSAGE_BOARDS, 0,
 			PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter(
@@ -118,7 +123,8 @@ public class MBCategoryAssetRenderer extends BaseJSPAssetRenderer {
 			WindowState windowState)
 		throws Exception {
 
-		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
+		AssetRendererFactory<MBCategory> assetRendererFactory =
+			getAssetRendererFactory();
 
 		PortletURL portletURL = assetRendererFactory.getURLView(
 			liferayPortletResponse, windowState);
