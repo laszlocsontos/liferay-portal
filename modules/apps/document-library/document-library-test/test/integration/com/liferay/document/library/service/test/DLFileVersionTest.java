@@ -53,11 +53,11 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.DDMForm;
+import com.liferay.portlet.dynamicdatamapping.DDMFormFieldValue;
+import com.liferay.portlet.dynamicdatamapping.DDMFormValues;
 import com.liferay.portlet.dynamicdatamapping.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.model.DDMForm;
-import com.liferay.portlet.dynamicdatamapping.model.LocalizedValue;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormFieldValue;
-import com.liferay.portlet.dynamicdatamapping.storage.DDMFormValues;
+import com.liferay.portlet.dynamicdatamapping.LocalizedValue;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.model.ExpandoTable;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
@@ -138,7 +138,7 @@ public class DLFileVersionTest {
 		_serviceContext = getServiceContext();
 
 		FileEntry fileEntry = DLAppServiceUtil.addFileEntry(
-			_group.getGroupId(), parentFolder.getFolderId(), _SOURCE_FILE_NAME,
+			_group.getGroupId(), _parentFolder.getFolderId(), _SOURCE_FILE_NAME,
 			ContentTypes.APPLICATION_OCTET_STREAM, _TITLE, StringPool.BLANK,
 			StringPool.BLANK, _DATA_VERSION_1, _serviceContext);
 
@@ -370,7 +370,7 @@ public class DLFileVersionTest {
 			ServiceContextTestUtil.getServiceContext(
 				_group.getGroupId(), TestPropsValues.getUserId());
 
-		parentFolder = DLAppServiceUtil.addFolder(
+		_parentFolder = DLAppServiceUtil.addFolder(
 			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			"Test Folder", RandomTestUtil.randomString(), serviceContext);
 	}
@@ -520,7 +520,7 @@ public class DLFileVersionTest {
 
 	private String _originalName;
 	private PermissionChecker _originalPermissionChecker;
+	private Folder _parentFolder;
 	private ServiceContext _serviceContext;
-	private Folder parentFolder;
 
 }

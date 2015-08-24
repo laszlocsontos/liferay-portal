@@ -1,6 +1,10 @@
+import com.liferay.gradle.util.GradleUtil
+
 buildscript {
 	repositories {
-		mavenLocal()
+		if (!Boolean.getBoolean("maven.local.ignore")) {
+			mavenLocal()
+		}
 
 		maven {
 			url "http://cdn.repository.liferay.com/nexus/content/groups/public"
@@ -8,7 +12,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.poshi.runner", version: "1.0.5"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.poshi.runner", version: "1.0.7"
 	}
 }
 
@@ -19,7 +23,13 @@ poshiRunner {
 		poshiProperty "component.names", project.properties["componentNames"]
 	}
 
-	poshiProperty "ignore.errors.file.name", "test-ignorable-error-lines.xml"
+	if (project.hasProperty("ignoreErrorsFileName")) {
+		poshiProperty "ignore.errors.file.name", project.properties["ignoreErrorsFileName"]
+	}
+
+	if (project.hasProperty("portalProjectDir")) {
+		poshiProperty "project.dir", project.properties["portalProjectDir"]
+	}
 
 	if (project.hasProperty("poshiTestName")) {
 		poshiProperty "test.name", project.properties["poshiTestName"]
@@ -27,10 +37,6 @@ poshiRunner {
 
 	if (project.hasProperty("productNames")) {
 		poshiProperty "product.names", project.properties["productNames"]
-	}
-
-	if (project.hasProperty("projectDir")) {
-		poshiProperty "project.dir", project.properties["projectDir"]
 	}
 
 	if (project.hasProperty("saveScreenshot")) {
@@ -53,23 +59,57 @@ poshiRunner {
 		poshiProperty "test.console.log.file.name", project.properties["testConsoleLogFileName"]
 	}
 
+	if (project.hasProperty("testConsoleShutDownFileName")) {
+		poshiProperty "test.console.shut.down.file.name", project.properties["testConsoleShutDownFileName"]
+	}
+
 	poshiProperty "test.dependencies.dir.name", "com/liferay/portalweb/dependencies"
 
 	if (project.hasProperty("testSkipTearDown")) {
 		poshiProperty "test.skip.tear.down", project.properties["testSkipTearDown"]
 	}
 
+	if (project.hasProperty("testPoshiWarningsFileName")) {
+		poshiProperty "test.poshi.warnings.file.name", project.properties["testPoshiWarningsFileName"]
+	}
+
 	version = "1.0.12"
 }
 
 repositories {
-	mavenLocal()
+	if (!Boolean.getBoolean("maven.local.ignore")) {
+		mavenLocal()
+	}
 
 	maven {
 		url "http://cdn.repository.liferay.com/nexus/content/groups/public"
 	}
 }
 
+File localPoshiDir = new File(buildDir, "poshi")
+
+task copyLocalPoshi(type: GradleBuild)
+
+copyLocalPoshi {
+	configure(startParameter) {
+		configureOnDemand = true
+		gradleUserHomeDir = file("../.gradle")
+		projectProperties = ["destinationDir": localPoshiDir]
+	}
+
+	dir = file("../modules/test/poshi-runner")
+	tasks = ["deployWithDependencies"]
+}
+
 runPoshi {
 	jvmArgs "-Dfile.encoding=UTF-8"
+}
+
+if (GradleUtil.getProperty(project, "local", false)) {
+	dependencies {
+		poshiRunner fileTree(localPoshiDir) {
+			builtBy copyLocalPoshi
+			include "*.jar"
+		}
+	}
 }

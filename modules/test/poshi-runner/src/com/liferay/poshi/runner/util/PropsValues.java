@@ -145,11 +145,8 @@ public class PropsValues {
 	public static final boolean TEAR_DOWN_BEFORE_TEST = GetterUtil.getBoolean(
 		PropsUtil.get("tear.down.before.test"));
 
-	public static final boolean TEST_ASSERT_JAVASCRIPT_ERRORS =
-		GetterUtil.getBoolean(PropsUtil.get("test.assert.javascript.errors"));
-
-	public static final boolean TEST_ASSERT_LIFERAY_ERRORS =
-		GetterUtil.getBoolean(PropsUtil.get("test.assert.liferay.errors"));
+	public static final boolean TEST_ASSERT_WARNING_EXCEPTIONS =
+		GetterUtil.getBoolean(PropsUtil.get("test.assert.warning.exceptions"));
 
 	public static final String TEST_BASE_DIR_NAME = PropsUtil.get(
 		"test.base.dir.name");
@@ -163,11 +160,17 @@ public class PropsValues {
 	public static final String TEST_CONSOLE_LOG_FILE_NAME = PropsUtil.get(
 		"test.console.log.file.name");
 
+	public static final String TEST_CONSOLE_SHUT_DOWN_FILE_NAME = PropsUtil.get(
+		"test.console.shut.down.file.name");
+
 	public static final boolean TEST_DATABASE_MINIMAL = GetterUtil.getBoolean(
 		PropsUtil.get("test.database.minimal"));
 
 	public static final String TEST_DEPENDENCIES_DIR_NAME = PropsUtil.get(
 		"test.dependencies.dir.name");
+
+	public static final String TEST_POSHI_WARNINGS_FILE_NAME = PropsUtil.get(
+		"test.poshi.warnings.file.name");
 
 	public static final boolean TEST_RUN_LOCALLY = GetterUtil.getBoolean(
 		PropsUtil.get("test.run.locally"));

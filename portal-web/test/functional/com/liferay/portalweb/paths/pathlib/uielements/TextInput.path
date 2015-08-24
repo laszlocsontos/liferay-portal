@@ -49,6 +49,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DESCRIPTION</td>
+	<td>//textarea[contains(@id,'description')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DISPLAY_DATE</td>
 	<td>//input[contains(@id,'displayDate')]</td>
 	<td></td>
@@ -246,6 +251,11 @@
 <tr>
 	<td>NEW_PASSWORD</td>
 	<td>//div[label[contains(.,'New Password')]]/input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NEW_NAME</td>
+	<td>//input[contains(@id,'newName')]</td>
 	<td></td>
 </tr>
 <tr>

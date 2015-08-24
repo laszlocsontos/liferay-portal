@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.xml.Element;
@@ -40,7 +41,9 @@ import java.util.List;
 
 import javax.portlet.PortletPreferences;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Juan Fernández
@@ -53,12 +56,6 @@ public class PortletDisplayTemplatePortletDataHandler
 	extends BasePortletDataHandler {
 
 	public static final String NAMESPACE = "portlet_display_template";
-
-	public PortletDisplayTemplatePortletDataHandler() {
-		setExportControls(
-			new PortletDataHandlerBoolean(
-				NAMESPACE, "application-display-templates", true, true));
-	}
 
 	@Override
 	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
@@ -87,6 +84,13 @@ public class PortletDisplayTemplatePortletDataHandler
 		}
 
 		return totalModelCount;
+	}
+
+	@Activate
+	protected void activate() {
+		setExportControls(
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "application-display-templates", true, true));
 	}
 
 	@Override
@@ -207,6 +211,11 @@ public class PortletDisplayTemplatePortletDataHandler
 			new StagedModelType[stagedModelTypes.size()]);
 
 		return _stagedModelTypes;
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	private StagedModelType[] _stagedModelTypes;

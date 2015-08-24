@@ -515,10 +515,6 @@
 		<reference package-path="com.liferay.portlet.exportimport" entity="ExportImport" />
 		<reference package-path="com.liferay.portlet.exportimport" entity="ExportImportConfiguration" />
 		<reference package-path="com.liferay.portlet.exportimport" entity="Staging" />
-		<reference package-path="com.liferay.portlet.shopping" entity="ShoppingCart" />
-		<reference package-path="com.liferay.portlet.shopping" entity="ShoppingCategory" />
-		<reference package-path="com.liferay.portlet.shopping" entity="ShoppingCoupon" />
-		<reference package-path="com.liferay.portlet.shopping" entity="ShoppingOrder" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialActivity" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialActivitySetting" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialRequest" />
@@ -2026,9 +2022,11 @@
 		<column name="name" type="String" />
 		<column name="scope" type="int" />
 		<column name="primKey" type="String" />
+		<column name="primKeyId" type="long" />
 		<column name="roleId" type="long" />
 		<column name="ownerId" type="long" />
 		<column name="actionIds" type="long" />
+		<column name="viewActionId" type="boolean" />
 
 		<!-- Finder methods -->
 
@@ -2059,6 +2057,14 @@
 			<finder-column name="scope" />
 			<finder-column name="primKey" />
 			<finder-column name="roleId" arrayable-operator="OR" />
+		</finder>
+		<finder name="C_N_S_P_R_V" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="name" />
+			<finder-column name="scope" />
+			<finder-column name="primKeyId" />
+			<finder-column name="roleId" arrayable-operator="OR" />
+			<finder-column name="viewActionId" />
 		</finder>
 
 		<!-- References -->
@@ -2588,7 +2594,6 @@
 		<reference package-path="com.liferay.portlet.messageboards" entity="MBMessage" />
 		<reference package-path="com.liferay.portlet.messageboards" entity="MBStatsUser" />
 		<reference package-path="com.liferay.portlet.messageboards" entity="MBThreadFlag" />
-		<reference package-path="com.liferay.portlet.shopping" entity="ShoppingCart" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialActivity" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialRelation" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialRequest" />
